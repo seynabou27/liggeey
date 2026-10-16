@@ -323,34 +323,29 @@ function Stepper({ step }) {
     { n: 3, label: "Confirmation" },
   ];
   return (
-    <div className="flex items-center mb-10">
+    <ol className="flex items-center mb-10" aria-label="Étapes de l'inscription">
       {steps.map((s, i) => {
         const state = s.n < step ? "done" : s.n === step ? "current" : "upcoming";
         return (
           <React.Fragment key={s.n}>
-            <div className="flex items-center gap-2">
-              <div
-                className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
-                style={{
-                  background: state === "upcoming" ? COLORS.surface : COLORS.orange,
-                  color: state === "upcoming" ? COLORS.slateLight : COLORS.onOrange,
-                  border: state === "upcoming" ? `1px solid ${COLORS.border}` : "none",
-                }}
-              >
-                {state === "done" ? <Check size={13} /> : s.n}
-              </div>
+            <li className="flex items-center gap-2" aria-current={state === "current" ? "step" : undefined}>
               <span
-                className="text-sm whitespace-nowrap"
-                style={{ color: state === "upcoming" ? COLORS.slateLight : COLORS.slate, fontWeight: state === "current" ? 600 : 400 }}
+                className={`grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${
+                  state === "upcoming" ? "border border-forte bg-surface text-discret" : "bg-marque text-sur-marque"
+                }`}
               >
+                {state === "done" ? <Check size={14} aria-hidden="true" /> : s.n}
+              </span>
+              {/* Sur mobile, seul le libellé de l'étape en cours s'affiche ; les autres restent annoncés aux lecteurs d'écran. */}
+              <span className={`whitespace-nowrap text-sm ${state === "current" ? "" : "sr-only sm:not-sr-only"} ${state === "upcoming" ? "text-discret" : state === "current" ? "font-semibold text-principal" : "text-secondaire"}`}>
                 {s.label}
               </span>
-            </div>
-            {i < steps.length - 1 && <div className="flex-1 h-px mx-3" style={{ background: COLORS.border }} />}
+            </li>
+            {i < steps.length - 1 && <li className={`mx-2 h-px min-w-[16px] flex-1 sm:mx-3 ${state === "done" ? "bg-marque" : "bg-[rgb(var(--bordure-base))]"}`} aria-hidden="true" />}
           </React.Fragment>
         );
       })}
-    </div>
+    </ol>
   );
 }
 
@@ -435,7 +430,36 @@ function FilePickerButton({ accept, onPick, className, style, children }) {
   );
 }
 
+/* ---------- Styles partagés des écrans de connexion et d'inscription ----------
+   Mêmes règles que la bibliothèque components/app : champs de 48 px, focus orange,
+   liens en text-marque (orange lisible sur blanc), sélection en fond orange léger. */
+
+const AUTH = {
+  titre: "text-3xl font-semibold text-principal mb-2",
+  intro: "text-sm text-secondaire",
+  libelle: "block text-sm font-semibold text-principal mb-1.5",
+  champ: (erreur) =>
+    `h-12 w-full rounded-md border bg-surface px-4 text-[15px] text-principal placeholder:text-discret outline-none transition-colors focus:border-marque focus:ring-2 focus:ring-focus/40 ${
+      erreur ? "border-statut-danger" : "border-base hover:border-forte"
+    }`,
+  aide: (erreur) => `mt-1.5 text-xs ${erreur ? "text-statut-danger" : "text-discret"}`,
+  lien: "font-semibold text-marque underline-offset-4 hover:underline",
+  principal:
+    "inline-flex min-h-[48px] w-full items-center justify-center rounded-md bg-marque px-6 text-[15px] font-semibold text-sur-marque transition-colors hover:bg-marque-survol active:bg-marque-actif",
+  secondaire:
+    "inline-flex min-h-[48px] w-full items-center justify-center rounded-md border border-forte bg-surface px-6 text-[15px] font-semibold text-principal transition-colors hover:bg-doux",
+  case: "h-5 w-5 shrink-0 rounded accent-primaire-500",
+  oeil: "absolute right-1.5 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-md text-discret hover:bg-doux hover:text-secondaire",
+};
+
 /* ---------- Screen 1 : Connexion ---------- */
+
+const ESPACES_DEMO = [
+  { id: "chercheur", label: "Chercheur d'emploi" },
+  { id: "prestataire", label: "Prestataire" },
+  { id: "entreprise", label: "Entreprise" },
+  { id: "admin", label: "Admin" },
+];
 
 function ConnexionScreen({ onNavigate }) {
   const [mode, setMode] = useState("login"); // login | forgot | sent
@@ -470,42 +494,40 @@ function ConnexionScreen({ onNavigate }) {
   }
 
   if (mode === "forgot" || mode === "sent") {
+    const erreur = resetTouched && !resetEmailValid;
     return (
       <form onSubmit={handleResetSubmit} noValidate>
-        <button
-          type="button"
-          onClick={() => setMode("login")}
-          className="flex items-center gap-1.5 text-sm font-medium mb-5"
-          style={{ color: COLORS.orange }}
-        >
-          <ArrowLeft size={14} /> Retour à la connexion
+        <button type="button" onClick={() => setMode("login")} className={`inline-flex min-h-[44px] items-center gap-1.5 text-sm mb-3 ${AUTH.lien}`}>
+          <ArrowLeft size={15} aria-hidden="true" /> Retour à la connexion
         </button>
-        <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Mot de passe oublié</h2>
-        <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
+        <h2 className={AUTH.titre}>Mot de passe oublié</h2>
+        <p className={`${AUTH.intro} mb-6`}>
           Saisissez votre adresse e-mail, nous vous enverrons un lien pour réinitialiser votre mot de passe.
         </p>
 
         {mode === "sent" ? (
-          <div className="rounded-md px-4 py-3 text-sm mb-2" style={{ background: "#ECFDF5", color: "#047857" }}>
-            Un lien de réinitialisation a été envoyé à <strong>{resetEmail}</strong>. Vérifiez votre boîte de réception.
+          <div role="status" className="flex items-start gap-3 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes mb-2">
+            <CheckCircle2 size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+            <span>Un lien de réinitialisation a été envoyé à <strong>{resetEmail}</strong>. Vérifiez votre boîte de réception.</span>
           </div>
         ) : (
           <>
-            <label className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Adresse e-mail</label>
+            <label htmlFor="reset-email" className={AUTH.libelle}>Adresse e-mail</label>
             <input
+              id="reset-email"
               type="email"
+              autoComplete="email"
               value={resetEmail}
               onChange={(e) => setResetEmail(e.target.value)}
               placeholder="exemple@liggeey.sn"
-              className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-primaire-400"
-              style={{ borderColor: resetTouched && !resetEmailValid ? COLORS.danger : COLORS.border }}
+              aria-invalid={erreur || undefined}
+              aria-describedby="reset-email-aide"
+              className={AUTH.champ(erreur)}
             />
-            <p className="text-xs mb-5" style={{ color: resetTouched && !resetEmailValid ? COLORS.danger : COLORS.slateLight }}>
-              {resetTouched && !resetEmailValid ? "Veuillez saisir une adresse e-mail valide." : "Utilisez l'adresse associée à votre compte LIGGEEY"}
+            <p id="reset-email-aide" className={`${AUTH.aide(erreur)} mb-6`}>
+              {erreur ? "Veuillez saisir une adresse e-mail valide." : "Utilisez l'adresse associée à votre compte LIGGEEY"}
             </p>
-            <button type="submit" className="w-full rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
-              Envoyer le lien
-            </button>
+            <button type="submit" className={AUTH.principal}>Envoyer le lien</button>
           </>
         )}
         <SSLNote />
@@ -513,86 +535,95 @@ function ConnexionScreen({ onNavigate }) {
     );
   }
 
+  const emailErreur = touched && !emailValid;
+  const passwordErreur = touched && !passwordValid;
+
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Bon retour parmi nous</h2>
-      <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>
+      <h2 className={AUTH.titre}>Bon retour parmi nous</h2>
+      <p className={`${AUTH.intro} mb-6`}>
         Pas encore de compte ?{" "}
-        <button type="button" onClick={() => onNavigate("signup-choice")} className="font-semibold hover:underline" style={{ color: COLORS.orange }}>
+        <button type="button" onClick={() => onNavigate("signup-choice")} className={AUTH.lien}>
           Inscrivez-vous
         </button>
       </p>
-      <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slateLight }}>
-        Espace à ouvrir (démo)
-      </label>
-      <div className="flex flex-wrap gap-2 mb-6">
-        {[
-          { id: "chercheur", label: "Chercheur d'emploi" },
-          { id: "prestataire", label: "Prestataire" },
-          { id: "entreprise", label: "Entreprise" },
-          { id: "admin", label: "Admin" },
-        ].map((o) => (
-          <button
-            key={o.id}
-            type="button"
-            onClick={() => setEspace(o.id)}
-            className="flex-1 rounded-md py-2 text-xs font-semibold"
-            style={{
-              background: espace === o.id ? COLORS.orange : COLORS.surface,
-              color: espace === o.id ? COLORS.onOrange : COLORS.slate,
-              border: `1px solid ${espace === o.id ? COLORS.orange : COLORS.border}`,
-            }}
-          >
-            {o.label}
-          </button>
-        ))}
-      </div>
 
-      <label className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Adresse e-mail</label>
-      <input
-        type="email"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="exemple@liggeey.sn"
-        className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-primaire-400"
-        style={{ borderColor: touched && !emailValid ? COLORS.danger : COLORS.border }}
-      />
-      <p className="text-xs mb-4" style={{ color: touched && !emailValid ? COLORS.danger : COLORS.slateLight }}>
-        {touched && !emailValid ? "Veuillez saisir une adresse e-mail valide." : "Saisissez l'adresse e-mail utilisée lors de votre inscription"}
-      </p>
+      <fieldset className="mb-6">
+        <legend className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-discret">Espace à ouvrir (démo)</legend>
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+          {ESPACES_DEMO.map((o) => {
+            const actif = espace === o.id;
+            return (
+              <button
+                key={o.id}
+                type="button"
+                aria-pressed={actif}
+                onClick={() => setEspace(o.id)}
+                className={`min-h-[44px] rounded-md border px-2 text-xs font-semibold leading-tight transition-colors ${
+                  actif ? "border-marque bg-marque-doux text-marque-fort" : "border-base bg-surface text-secondaire hover:bg-doux hover:text-principal"
+                }`}
+              >
+                {o.label}
+              </button>
+            );
+          })}
+        </div>
+      </fieldset>
 
-      <div className="flex items-center justify-between mb-1.5">
-        <label className="text-sm font-semibold" style={{ color: COLORS.slate }}>Mot de passe</label>
-        <button type="button" onClick={() => setMode("forgot")} className="text-sm font-medium hover:underline" style={{ color: COLORS.orange }}>Mot de passe oublié ?</button>
-      </div>
-      <div className="relative mb-1.5">
+      <div className="mb-4">
+        <label htmlFor="connexion-email" className={AUTH.libelle}>Adresse e-mail</label>
         <input
-          type={showPassword ? "text" : "password"}
-          value={password}
-          onChange={(e) => setPassword(e.target.value)}
-          placeholder="Tapez votre mot de passe"
-          className="w-full rounded-md border px-4 py-2.5 pr-10 text-sm outline-none transition-colors focus:border-primaire-400"
-          style={{ borderColor: touched && !passwordValid ? COLORS.danger : COLORS.border }}
+          id="connexion-email"
+          type="email"
+          autoComplete="email"
+          value={email}
+          onChange={(e) => setEmail(e.target.value)}
+          placeholder="exemple@liggeey.sn"
+          aria-invalid={emailErreur || undefined}
+          aria-describedby="connexion-email-aide"
+          className={AUTH.champ(emailErreur)}
         />
-        <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-discret hover:text-secondaire" aria-label="Afficher/masquer le mot de passe">
-          {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
-        </button>
+        <p id="connexion-email-aide" className={AUTH.aide(emailErreur)}>
+          {emailErreur ? "Veuillez saisir une adresse e-mail valide." : "Saisissez l'adresse e-mail utilisée lors de votre inscription"}
+        </p>
       </div>
-      <p className="text-xs mb-5" style={{ color: touched && !passwordValid ? COLORS.danger : COLORS.slateLight }}>
-        {touched && !passwordValid ? "8 caractères minimum requis." : "8 caractères minimum"}
-      </p>
 
-      <label className="flex items-center gap-2 mb-6 cursor-pointer select-none">
-        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="w-4 h-4 rounded accent-primaire-500" />
-        <span className="text-sm" style={{ color: COLORS.slate }}>Se souvenir de moi</span>
+      <div className="mb-5">
+        <div className="flex items-center justify-between mb-1.5">
+          <label htmlFor="connexion-mdp" className="text-sm font-semibold text-principal">Mot de passe</label>
+          <button type="button" onClick={() => setMode("forgot")} className={`text-sm ${AUTH.lien}`}>Mot de passe oublié ?</button>
+        </div>
+        <div className="relative">
+          <input
+            id="connexion-mdp"
+            type={showPassword ? "text" : "password"}
+            autoComplete="current-password"
+            value={password}
+            onChange={(e) => setPassword(e.target.value)}
+            placeholder="Tapez votre mot de passe"
+            aria-invalid={passwordErreur || undefined}
+            aria-describedby="connexion-mdp-aide"
+            className={`${AUTH.champ(passwordErreur)} pr-12`}
+          />
+          <button type="button" onClick={() => setShowPassword((s) => !s)} className={AUTH.oeil} aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}>
+            {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
+          </button>
+        </div>
+        <p id="connexion-mdp-aide" className={AUTH.aide(passwordErreur)}>
+          {passwordErreur ? "8 caractères minimum requis." : "8 caractères minimum"}
+        </p>
+      </div>
+
+      <label className="flex min-h-[44px] items-center gap-3 mb-4 cursor-pointer select-none">
+        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className={AUTH.case} />
+        <span className="text-sm text-principal">Se souvenir de moi</span>
       </label>
 
-      <button type="submit" onClick={handleSubmit} className="w-full rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
-        Se connecter
-      </button>
+      <button type="submit" className={AUTH.principal}>Se connecter</button>
 
       {status === "error" && (
-        <div className="mt-5 rounded-md px-4 py-3 text-sm" style={{ background: "#FEF2F2", color: "#B91C1C" }}>
+        <div role="alert" className="mt-5 flex items-start gap-3 rounded-md bg-statut-danger-doux px-4 py-3 text-sm text-statut-danger">
+          <AlertCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
           Merci de corriger les champs en rouge avant de continuer.
         </div>
       )}
@@ -615,25 +646,22 @@ function ProfileRadioCard({ profile, selected, onSelect }) {
   return (
     <button
       type="button"
+      role="radio"
+      aria-checked={isSelected}
       onClick={() => onSelect(profile.id)}
-      className="w-full text-left rounded-lg border px-5 py-4 mb-3 transition-colors"
-      style={{
-        borderColor: isSelected ? COLORS.orange : COLORS.border,
-        background: isSelected ? COLORS.orangeSoft : COLORS.surface,
-      }}
+      className={`w-full text-left rounded-lg border px-5 py-4 mb-3 transition-colors ${
+        isSelected ? "border-marque bg-marque-doux" : "border-base bg-surface hover:border-forte hover:bg-doux"
+      }`}
     >
-      <div className="flex items-center justify-between">
-        <div>
-          <p className="font-semibold" style={{ color: COLORS.slate }}>{profile.title}</p>
-          <p className="text-sm" style={{ color: COLORS.slateLight }}>{profile.subtitle}</p>
-        </div>
-        <span
-          className="w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ml-4"
-          style={{ borderColor: isSelected ? COLORS.orange : COLORS.borderStrong }}
-        >
-          {isSelected && <span className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS.orange }} />}
+      <span className="flex items-center justify-between gap-4">
+        <span>
+          <span className={`block font-semibold ${isSelected ? "text-marque-fort" : "text-principal"}`}>{profile.title}</span>
+          <span className="block text-sm text-secondaire">{profile.subtitle}</span>
         </span>
-      </div>
+        <span className={`grid h-5 w-5 shrink-0 place-items-center rounded-full border-2 ${isSelected ? "border-marque" : "border-forte"}`} aria-hidden="true">
+          {isSelected && <span className="h-2.5 w-2.5 rounded-full bg-marque" />}
+        </span>
+      </span>
     </button>
   );
 }
@@ -644,24 +672,21 @@ function SignupChoiceScreen({ onNavigate }) {
   return (
     <div>
       <Stepper step={1} />
-      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Créer votre compte</h2>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
+      <h2 className={AUTH.titre}>Créer votre compte</h2>
+      <p className={`${AUTH.intro} mb-6`}>
         Déjà inscrit ?{" "}
-        <button type="button" onClick={() => onNavigate("login")} className="font-semibold hover:underline" style={{ color: COLORS.orange }}>
+        <button type="button" onClick={() => onNavigate("login")} className={AUTH.lien}>
           Connectez-vous
         </button>
       </p>
 
-      {PROFILES.map((p) => (
-        <ProfileRadioCard key={p.id} profile={p} selected={selected} onSelect={setSelected} />
-      ))}
+      <div role="radiogroup" aria-label="Votre profil">
+        {PROFILES.map((p) => (
+          <ProfileRadioCard key={p.id} profile={p} selected={selected} onSelect={setSelected} />
+        ))}
+      </div>
 
-      <button
-        type="button"
-        onClick={() => onNavigate("signup-info", { profile: selected })}
-        className="w-full rounded-md py-3 mt-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
-        style={{ background: COLORS.orange }}
-      >
+      <button type="button" onClick={() => onNavigate("signup-info", { profile: selected })} className={`${AUTH.principal} mt-3`}>
         Continuer
       </button>
 
@@ -726,37 +751,38 @@ function SignupInfoScreen({ profile, onNavigate }) {
     if (formValid) onNavigate("signup-confirm", { profile });
   }
 
+  const passwordErreur = touched && !passwordValid;
+
   return (
     <form onSubmit={handleSubmit} noValidate>
       <Stepper step={2} />
-      <span
-        className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4"
-        style={{ background: COLORS.orangeSoft, color: COLORS.orange }}
-      >
-        {meta.badge}
-      </span>
-      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Créer votre compte</h2>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
+      <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4 bg-marque-doux text-marque-fort">{meta.badge}</span>
+      <h2 className={AUTH.titre}>Créer votre compte</h2>
+      <p className={`${AUTH.intro} mb-6`}>
         Remplissez les informations suivantes pour finaliser votre inscription {meta.tagline}.
       </p>
 
       {fields.map((f) => {
         const val = values[f.name] || "";
         const invalid = touched && (val.trim().length === 0 || (f.type === "email" && !emailValid));
+        const id = `inscription-${f.name}`;
         return (
           <div key={f.name} className="mb-4">
-            <label className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>
-              {f.label} <span style={{ color: COLORS.danger }}>*</span>
+            <label htmlFor={id} className={AUTH.libelle}>
+              {f.label} <span className="text-statut-danger" aria-hidden="true">*</span>
             </label>
             <input
+              id={id}
               type={f.type || "text"}
               value={val}
               onChange={(e) => setField(f.name, e.target.value)}
               placeholder={f.placeholder}
-              className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-primaire-400"
-              style={{ borderColor: invalid ? COLORS.danger : COLORS.border }}
+              aria-required="true"
+              aria-invalid={invalid || undefined}
+              aria-describedby={`${id}-aide`}
+              className={AUTH.champ(invalid)}
             />
-            <p className="text-xs" style={{ color: invalid ? COLORS.danger : COLORS.slateLight }}>
+            <p id={`${id}-aide`} className={AUTH.aide(invalid)}>
               {invalid ? "Ce champ est requis." : f.help}
             </p>
           </div>
@@ -764,59 +790,48 @@ function SignupInfoScreen({ profile, onNavigate }) {
       })}
 
       <div className="mb-4">
-        <label className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>
-          Mot de passe <span style={{ color: COLORS.danger }}>*</span>
+        <label htmlFor="inscription-mdp" className={AUTH.libelle}>
+          Mot de passe <span className="text-statut-danger" aria-hidden="true">*</span>
         </label>
-        <div className="relative mb-1.5">
+        <div className="relative">
           <input
+            id="inscription-mdp"
             type={showPassword ? "text" : "password"}
+            autoComplete="new-password"
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Tapez votre mot de passe"
-            className="w-full rounded-md border px-4 py-2.5 pr-10 text-sm outline-none transition-colors focus:border-primaire-400"
-            style={{ borderColor: touched && !passwordValid ? COLORS.danger : COLORS.border }}
+            aria-required="true"
+            aria-invalid={passwordErreur || undefined}
+            aria-describedby="inscription-mdp-aide"
+            className={`${AUTH.champ(passwordErreur)} pr-12`}
           />
-          <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-discret hover:text-secondaire" aria-label="Afficher/masquer le mot de passe">
-            {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
+          <button type="button" onClick={() => setShowPassword((s) => !s)} className={AUTH.oeil} aria-label={showPassword ? "Masquer le mot de passe" : "Afficher le mot de passe"}>
+            {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
           </button>
         </div>
-        <p className="text-xs" style={{ color: touched && !passwordValid ? COLORS.danger : COLORS.slateLight }}>
+        <p id="inscription-mdp-aide" className={AUTH.aide(passwordErreur)}>
           8 caractères minimum avec au moins un chiffre
         </p>
       </div>
 
-      <label className="flex items-start gap-2.5 mb-6 cursor-pointer select-none">
-        <input
-          type="checkbox"
-          checked={accepted}
-          onChange={(e) => setAccepted(e.target.checked)}
-          className="w-4 h-4 rounded accent-primaire-500 mt-0.5"
-        />
-        <span className="text-sm" style={{ color: COLORS.slate }}>
+      <label className="flex items-start gap-3 mb-6 cursor-pointer select-none">
+        <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className={`${AUTH.case} mt-0.5`} />
+        <span className="text-sm text-principal">
           J'accepte les{" "}
-          <a href="#" className="hover:underline" style={{ color: COLORS.orange }}>conditions d'utilisation</a> et la{" "}
-          <a href="#" className="hover:underline" style={{ color: COLORS.orange }}>politique de confidentialité</a> de Liggeey.
+          <a href="/cgu" className={AUTH.lien}>conditions d'utilisation</a> et la{" "}
+          <a href="/confidentialite" className={AUTH.lien}>politique de confidentialité</a> de LIGGEEY.
         </span>
       </label>
       {touched && !accepted && (
-        <p className="text-xs mb-4 -mt-4" style={{ color: COLORS.danger }}>Merci d'accepter les conditions pour continuer.</p>
+        <p role="alert" className="text-xs mb-4 -mt-4 text-statut-danger">Merci d'accepter les conditions pour continuer.</p>
       )}
 
       <div className="flex gap-3">
-        <button
-          type="button"
-          onClick={() => onNavigate("signup-choice")}
-          className="flex-1 rounded-md py-3 text-sm font-semibold border transition-colors hover:bg-doux"
-          style={{ borderColor: COLORS.border, color: COLORS.slate }}
-        >
+        <button type="button" onClick={() => onNavigate("signup-choice")} className={AUTH.secondaire}>
           Retour
         </button>
-        <button
-          type="submit"
-          onClick={handleSubmit}
-          className="flex-1 rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
-          style={{ background: COLORS.orange }}
-        >
+        <button type="submit" className={AUTH.principal}>
           Créer mon compte
         </button>
       </div>
@@ -833,32 +848,21 @@ function ConfirmationScreen({ profile, onNavigate }) {
   return (
     <div>
       <Stepper step={3} />
-      <div
-        className="w-14 h-14 rounded-full flex items-center justify-center mb-6"
-        style={{ background: "#ECFDF5" }}
-      >
-        <Check size={26} color="#047857" />
+      <div className="grid h-14 w-14 place-items-center rounded-full bg-statut-succes-doux text-statut-succes mb-6">
+        <Check size={26} aria-hidden="true" />
       </div>
-      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Compte créé avec succès</h2>
-      <p className="text-sm mb-8 leading-relaxed" style={{ color: COLORS.slateLight }}>
-        Bienvenue sur LIGGEEY ! Votre compte <strong style={{ color: COLORS.slate }}>{meta.tagline}</strong> est prêt.
+      <h2 className={AUTH.titre}>Compte créé avec succès</h2>
+      <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
+        Bienvenue sur LIGGEEY ! Votre compte <strong className="text-principal">{meta.tagline}</strong> est prêt.
       </p>
-      <button
-        type="button"
-        onClick={() => onNavigate("dashboard", { espace: profile })}
-        className="w-full rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90 mb-3"
-        style={{ background: COLORS.orange }}
-      >
-        Accéder à mon tableau de bord
-      </button>
-      <button
-        type="button"
-        onClick={() => onNavigate("login")}
-        className="w-full rounded-md py-3 text-sm font-semibold border transition-colors hover:bg-doux"
-        style={{ borderColor: COLORS.border, color: COLORS.slate }}
-      >
-        Retour à la connexion
-      </button>
+      <div className="flex flex-col gap-3">
+        <button type="button" onClick={() => onNavigate("dashboard", { espace: profile })} className={AUTH.principal}>
+          Accéder à mon tableau de bord
+        </button>
+        <button type="button" onClick={() => onNavigate("login")} className={AUTH.secondaire}>
+          Retour à la connexion
+        </button>
+      </div>
       <SSLNote />
     </div>
   );
