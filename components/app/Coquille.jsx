@@ -67,11 +67,12 @@ const HABILLAGES = {
     fond: 'bg-sombre border-sur-sombre',
     section: 'text-sur-sombre-discret',
     filet: 'bg-[rgb(var(--bordure-sur-sombre))]',
-    actif: 'bg-marque font-semibold text-sur-marque',
-    iconeActive: '',
-    inactif: 'font-medium text-sur-sombre-secondaire hover:bg-sombre-doux hover:text-sur-sombre',
-    barre: false,
-    compteurActif: 'inverse',
+    // Style Mifty : teinte orange translucide, texte orange clair (5,5:1), barre orange à gauche.
+    actif: 'bg-marque/15 font-semibold text-primaire-400',
+    iconeActive: 'text-marque-vif',
+    inactif: 'font-medium text-sur-sombre-secondaire hover:bg-white/[0.06] hover:text-sur-sombre',
+    barre: true,
+    compteurActif: 'plein',
     fermer: 'sur-sombre',
   },
   claire: {
@@ -169,7 +170,7 @@ export function BarreIcones({ elements = [] }) {
       {elements.map((el, i) => {
         const Icone = el.icone;
         const classes = `inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-          el.actif ? 'bg-marque text-sur-marque' : 'text-sur-sombre-discret hover:bg-sombre-doux hover:text-sur-sombre'
+          el.actif ? 'bg-marque/15 text-marque-vif' : 'text-sur-sombre-discret hover:bg-white/[0.06] hover:text-sur-sombre'
         }`;
         return el.onClick ? (
           <button key={el.label || i} type="button" onClick={el.onClick} aria-label={el.label} title={el.label} className={classes}>
