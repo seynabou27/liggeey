@@ -104,6 +104,8 @@ import {
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip, AreaChart, Area, CartesianGrid } from "recharts";
 // Bibliothèque de l'application (components/app) : coquille, cartes, badges, tableaux… sur les tokens LIGGEEY.
 import * as App from "../app";
+import { site } from "@/lib/site";
+import { lienWhatsApp } from "@/lib/liens";
 
 // Couleurs : tokens LIGGEEY (lib/tokens/couleurs.mjs), lus via les variables CSS du site.
 // Les noms d'origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
@@ -183,47 +185,121 @@ function Logo({ color = COLORS.brandPale, iconColor, height = 24, iconOnly = fal
   );
 }
 
-// Shared split-screen shell used by every auth screen
-function AuthShell({ children, onNavigate }) {
+/* ---------- Coquille des écrans de connexion et d'inscription ----------
+   Écran partagé : panneau de marque à gauche (fond orange, texte ardoise, comme la charte),
+   formulaire à droite. Le panneau change de message selon le mode : connexion ou inscription.
+   Sur mobile, le panneau est remplacé par un bandeau orange compact au-dessus du formulaire. */
+
+const AUTH_PANNEAU = {
+  connexion: {
+    surtitre: "Espace LIGGEEY",
+    titre: "Rendons l'insertion plus facile et plus juste.",
+    texte: "Retrouvez vos candidatures, vos missions et votre accompagnement là où vous les avez laissés.",
+    liste: [
+      { icon: ShieldCheck, titre: "Offres et profils vérifiés", texte: "Chaque entreprise et chaque offre sont contrôlées avant publication." },
+      { icon: HeartHandshake, titre: "Un accompagnement humain", texte: "Sur WhatsApp et au bureau d'accueil de Dakar." },
+      { icon: Smartphone, titre: "Pensé pour votre téléphone", texte: "Paiement par Wave ou Orange Money." },
+    ],
+  },
+  inscription: {
+    surtitre: "Créer votre compte",
+    titre: "Un profil, trois parcours.",
+    texte: "Choisissez le vôtre : LIGGEEY vous accompagne avant, pendant et après l'embauche.",
+    liste: [
+      { icon: Briefcase, titre: "Talents", texte: "Valorisez vos compétences et postulez à des offres vérifiées." },
+      { icon: Wrench, titre: "Indépendants", texte: "Formalisez votre activité et trouvez des missions." },
+      { icon: Building2, titre: "Entreprises", texte: "Recrutez avec un suivi de vos recrues pendant 90 jours." },
+    ],
+  },
+};
+
+function AuthPanneau({ mode }) {
+  const t = AUTH_PANNEAU[mode] || AUTH_PANNEAU.connexion;
   return (
-    <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 font-sans">
-      <div
-        className="relative hidden md:flex flex-col justify-between p-10 md:p-14"
-        style={{
-          background:
-            "radial-gradient(circle at 15% 10%, rgb(var(--primaire-500) / 0.35), transparent 45%), linear-gradient(160deg, rgb(var(--neutre-800)) 0%, rgb(var(--neutre-850)) 55%, rgb(var(--neutre-900)) 100%)",
-          minHeight: "100vh",
-        }}
-      >
-        <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex self-start"><Logo /></a>
-        <div className="max-w-md">
-          <h1 className="text-4xl md:text-[2.5rem] leading-[1.1] font-bold text-sur-sombre">Rejoignez le mouvement</h1>
-          <h1 className="text-4xl md:text-[2.5rem] leading-[1.1] font-bold mb-6" style={{ color: COLORS.orange }}>LIGGEEY</h1>
-          <p className="text-white/70 text-base leading-relaxed mb-6 max-w-sm">
-            Emploi, freelance ou service à la demande&nbsp;: créez votre profil et accédez à un accompagnement personnalisé, gratuitement.
-          </p>
-          <div className="w-14 h-[2px] mb-6" style={{ background: COLORS.orange }} />
-          {/* Les offres se découvrent sur le site : la plateforme ne s'ouvre qu'après connexion */}
-          <a
-            href={`${SITE_URL}#offres`}
-            className="inline-block text-sm font-medium px-5 py-2.5 rounded-md border transition-colors hover:bg-white/5"
-            style={{ borderColor: COLORS.orange, color: COLORS.orange }}
-          >
-            Découvrir les offres sur le site
-          </a>
-        </div>
-        <p className="text-xs text-white/40 max-w-xs leading-relaxed">
-          © 2026 LIGGEEY. Tous droits réservés. Accompagnement à l'insertion professionnelle au Sénégal.
-        </p>
+    <aside className="relative hidden md:flex flex-col overflow-hidden bg-marque text-sur-marque px-10 py-10 lg:px-14 lg:py-12" style={{ minHeight: "100vh" }}>
+      {/* Décor : grand monogramme en filigrane et halo plus clair, sans contenu */}
+      <div className="pointer-events-none absolute -right-28 -bottom-24 opacity-[0.08]" aria-hidden="true">
+        <Logo iconOnly height={560} color="rgb(var(--neutre-800))" />
+      </div>
+      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full" style={{ background: "rgb(var(--primaire-300) / 0.45)" }} aria-hidden="true" />
+
+      {/* Haut : logo et liens vers le site */}
+      <div className="relative flex items-center justify-between gap-4">
+        <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex">
+          <Logo color="rgb(var(--texte-sur-marque))" height={26} />
+        </a>
+        <a href={`${SITE_URL}#offres`} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold underline decoration-2 underline-offset-4 hover:no-underline">
+          Voir les offres <ChevronRight size={15} aria-hidden="true" />
+        </a>
       </div>
 
-      <div className="flex items-center justify-center bg-surface px-6 py-10 md:py-16">
-        <div className="w-full max-w-md">
-          <a href={SITE_URL} className="inline-flex items-center gap-1.5 min-h-[44px] mb-4 text-sm font-medium hover:underline" style={{ color: COLORS.slateLight }}>
-            <ArrowLeft size={15} /> Retour au site
+      {/* Centre : message et points clés */}
+      <div className="relative flex flex-1 flex-col justify-center py-12">
+        <p className="flex items-center gap-2.5 text-sm font-semibold uppercase tracking-wider">
+          <span className="h-0.5 w-9 bg-current" aria-hidden="true" />
+          {t.surtitre}
+        </p>
+        <p className="mt-4 max-w-md text-balance text-[34px] font-semibold leading-[1.15] lg:text-[42px]">{t.titre}</p>
+        <p className="mt-4 max-w-md text-base leading-relaxed">{t.texte}</p>
+
+        <ul className="mt-9 flex max-w-md flex-col gap-3">
+          {t.liste.map(({ icon: Icon, titre, texte }) => (
+            <li key={titre} className="flex items-start gap-4 rounded-lg bg-marque-doux p-4 shadow-sm">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-sombre text-marque-vif">
+                <Icon size={19} aria-hidden="true" />
+              </span>
+              <span>
+                <span className="block font-semibold">{titre}</span>
+                <span className="block text-sm leading-relaxed">{texte}</span>
+              </span>
+            </li>
+          ))}
+        </ul>
+      </div>
+
+      {/* Bas : aide et mentions */}
+      <div className="relative flex flex-col gap-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-sombre px-5 py-4 text-sur-sombre">
+          <span>
+            <span className="block text-sm font-semibold">Besoin d'aide pour vous inscrire ?</span>
+            <span className="flex items-center gap-1.5 text-xs text-white/75">
+              <MapPin size={12} aria-hidden="true" /> {site.bureau.adresse}, {site.bureau.ville}
+            </span>
+          </span>
+          <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-2 rounded bg-whatsapp px-4 text-sm font-semibold text-sur-marque hover:brightness-95">
+            <MessageCircle size={16} aria-hidden="true" /> WhatsApp
           </a>
-          <div className="md:hidden mb-8"><a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="rounded-lg px-4 py-3 inline-flex" style={{ background: COLORS.dark }}><Logo /></a></div>
-          {children}
+        </div>
+        <p className="text-xs">© 2026 LIGGEEY · Insertion professionnelle au Sénégal</p>
+      </div>
+    </aside>
+  );
+}
+
+// Écran partagé par la connexion et l'inscription
+function AuthShell({ children, mode = "connexion" }) {
+  return (
+    <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] font-sans">
+      <AuthPanneau mode={mode} />
+
+      <div className="flex flex-col bg-surface">
+        {/* Mobile : bandeau orange compact à la place du panneau */}
+        <div className="md:hidden flex items-center justify-between gap-4 bg-marque px-6 py-4 text-sur-marque">
+          <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex">
+            <Logo color="rgb(var(--texte-sur-marque))" height={22} />
+          </a>
+          <a href={SITE_URL} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold">
+            <ArrowLeft size={15} aria-hidden="true" /> Retour au site
+          </a>
+        </div>
+
+        <div className="flex flex-1 items-center justify-center px-6 py-10 md:py-16">
+          <div className="w-full max-w-md">
+            <a href={SITE_URL} className="hidden md:inline-flex items-center gap-1.5 min-h-[44px] mb-4 text-sm font-medium hover:underline" style={{ color: COLORS.slateLight }}>
+              <ArrowLeft size={15} aria-hidden="true" /> Retour au site
+            </a>
+            {children}
+          </div>
         </div>
       </div>
     </div>
@@ -8234,7 +8310,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   }
 
   return (
-    <AuthShell onNavigate={navigate}>
+    <AuthShell mode={screen === "login" ? "connexion" : "inscription"}>
       {screen === "login" && <ConnexionScreen onNavigate={navigate} />}
       {screen === "signup-choice" && <SignupChoiceScreen onNavigate={navigate} />}
       {screen === "signup-info" && <SignupInfoScreen profile={signupProfile} onNavigate={navigate} />}

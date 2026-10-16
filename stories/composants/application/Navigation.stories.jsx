@@ -61,14 +61,23 @@ export const CoquilleApplication = {
 };
 
 export const CoquilleAuthentification = {
-  name: 'AuthShell',
+  name: 'AuthShell · connexion',
   render: (args) => (
-    <AuthShell onNavigate={args.onNavigate}>
+    <AuthShell mode={args.mode}>
       <div className="rounded-lg border border-base p-10 text-center text-secondaire">Formulaire de connexion ou d’inscription</div>
     </AuthShell>
   ),
-  args: { onNavigate: fn() },
-  parameters: { layout: 'fullscreen', docs: { story: { inline: false, height: '640px' } } },
+  args: { mode: 'connexion' },
+  argTypes: { mode: { control: 'inline-radio', options: ['connexion', 'inscription'] } },
+  parameters: { layout: 'fullscreen', docs: { story: { inline: false, height: '760px' } } },
+};
+
+export const CoquilleInscription = { ...CoquilleAuthentification, name: 'AuthShell · inscription', args: { mode: 'inscription' } };
+
+export const CoquilleMobile = {
+  ...CoquilleAuthentification,
+  name: 'AuthShell · mobile',
+  globals: { viewport: { value: 'mobile2', isRotated: false } },
 };
 
 export default {
