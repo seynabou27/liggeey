@@ -102,12 +102,28 @@ import {
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
 
+// Couleurs : tokens LIGGEEY (lib/tokens/couleurs.mjs), lus via les variables CSS du site.
+// Les noms d'origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
 const COLORS = {
-  orange: "#F0891D",
-  orangeSoft: "#FDEBD3",
-  slate: "#1E2733",
-  slateLight: "#6B7480",
-  border: "#E2E5E9",
+  orange: "rgb(var(--fond-marque))", // couleur de marque (primaire-500)
+  orangeSoft: "rgb(var(--fond-marque-doux))",
+  orangeSubtle: "rgb(var(--fond-marque-subtil))",
+  onOrange: "rgb(var(--texte-sur-marque))", // texte sur orange : ardoise, contraste 6:1
+  slate: "rgb(var(--texte-principal))",
+  slateLight: "rgb(var(--texte-discret))",
+  border: "rgb(var(--bordure-base))",
+  borderStrong: "rgb(var(--bordure-forte))",
+  surface: "rgb(var(--fond-surface))",
+  soft: "rgb(var(--fond-doux))",
+  softStrong: "rgb(var(--fond-doux-fort))",
+  dark: "rgb(var(--fond-sombre))", // menu, bandeaux sombres
+  darkDeep: "rgb(var(--fond-sombre-profond))",
+  darkLine: "rgb(var(--bordure-sur-sombre))",
+  darkTrack: "rgb(var(--neutre-700))",
+  onDark: "rgb(var(--texte-sur-sombre))",
+  onDarkMuted: "rgb(var(--texte-sur-sombre-secondaire))",
+  onDarkSubtle: "rgb(var(--texte-sur-sombre-discret))",
+  brandPale: "rgb(var(--texte-marque-pale))",
   danger: "#DC2626",
 };
 
@@ -147,7 +163,7 @@ function readStore(data, key, initial) {
    Si la plateforme est un jour déployée à part, mettre ici l'adresse complète du site. */
 const SITE_URL = "/";
 
-function Logo({ color = "#F9E4C4", height = 24, iconOnly = false }) {
+function Logo({ color = COLORS.brandPale, height = 24, iconOnly = false }) {
   const viewW = iconOnly ? 658 : 3525;
   const width = height * (viewW / 690);
   return (
@@ -172,13 +188,13 @@ function AuthShell({ children, onNavigate }) {
         className="relative hidden md:flex flex-col justify-between p-10 md:p-14"
         style={{
           background:
-            "radial-gradient(circle at 15% 10%, rgba(240,140,40,0.35), transparent 45%), linear-gradient(160deg, #1c130d 0%, #120d0a 55%, #000000 100%)",
+            "radial-gradient(circle at 15% 10%, rgb(var(--primaire-500) / 0.35), transparent 45%), linear-gradient(160deg, rgb(var(--neutre-800)) 0%, rgb(var(--neutre-850)) 55%, rgb(var(--neutre-900)) 100%)",
           minHeight: "100vh",
         }}
       >
         <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex self-start"><Logo /></a>
         <div className="max-w-md">
-          <h1 className="text-4xl md:text-[2.5rem] leading-[1.1] font-bold text-white">Rejoignez le mouvement</h1>
+          <h1 className="text-4xl md:text-[2.5rem] leading-[1.1] font-bold text-sur-sombre">Rejoignez le mouvement</h1>
           <h1 className="text-4xl md:text-[2.5rem] leading-[1.1] font-bold mb-6" style={{ color: COLORS.orange }}>LIGGEEY</h1>
           <p className="text-white/70 text-base leading-relaxed mb-6 max-w-sm">
             Emploi, freelance ou service à la demande&nbsp;: créez votre profil et accédez à un accompagnement personnalisé, gratuitement.
@@ -198,12 +214,12 @@ function AuthShell({ children, onNavigate }) {
         </p>
       </div>
 
-      <div className="flex items-center justify-center bg-white px-6 py-10 md:py-16">
+      <div className="flex items-center justify-center bg-surface px-6 py-10 md:py-16">
         <div className="w-full max-w-md">
           <a href={SITE_URL} className="inline-flex items-center gap-1.5 min-h-[44px] mb-4 text-sm font-medium hover:underline" style={{ color: COLORS.slateLight }}>
             <ArrowLeft size={15} /> Retour au site
           </a>
-          <div className="md:hidden mb-8"><a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="rounded-lg px-4 py-3 inline-flex" style={{ background: "#1A130E" }}><Logo /></a></div>
+          <div className="md:hidden mb-8"><a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="rounded-lg px-4 py-3 inline-flex" style={{ background: COLORS.dark }}><Logo /></a></div>
           {children}
         </div>
       </div>
@@ -227,8 +243,8 @@ function Stepper({ step }) {
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold shrink-0"
                 style={{
-                  background: state === "upcoming" ? "#fff" : COLORS.orange,
-                  color: state === "upcoming" ? COLORS.slateLight : "#fff",
+                  background: state === "upcoming" ? COLORS.surface : COLORS.orange,
+                  color: state === "upcoming" ? COLORS.slateLight : COLORS.onOrange,
                   border: state === "upcoming" ? `1px solid ${COLORS.border}` : "none",
                 }}
               >
@@ -270,7 +286,7 @@ function Pagination({ page, pageSize, totalItems, onPageChange }) {
 
   return (
     <div
-      className="flex items-center justify-center gap-4 rounded-md border bg-white py-3 text-sm mt-6"
+      className="flex items-center justify-center gap-4 rounded-md border bg-surface py-3 text-sm mt-6"
       style={{ borderColor: COLORS.border, color: COLORS.slateLight }}
     >
       <button type="button" disabled={atStart} onClick={() => go(1)} style={{ opacity: atStart ? 0.35 : 1 }}>«</button>
@@ -304,7 +320,7 @@ function Toaster() {
   return (
     <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 items-stretch sm:items-end pointer-events-none" role="status" aria-live="polite">
       {items.map((t) => (
-        <div key={t.id} className="pointer-events-auto rounded-md px-4 py-3 text-sm font-medium shadow-lg flex items-center gap-2 sm:max-w-sm" style={{ background: COLORS.slate, color: "#fff" }}>
+        <div key={t.id} className="pointer-events-auto rounded-md px-4 py-3 text-sm font-medium shadow-lg flex items-center gap-2 sm:max-w-sm" style={{ background: COLORS.dark, color: COLORS.onDark }}>
           {t.tone === "info" ? <AlertCircle size={15} color={COLORS.orange} /> : <CheckCircle2 size={15} color="#4ADE80" />}
           {t.message}
         </div>
@@ -321,7 +337,7 @@ function SafeImg({ src, alt = "", className = "", style, kind = "avatar" }) {
   if (failed) {
     if (kind === "photo") {
       return (
-        <div role="img" aria-label={alt} className={`${className} flex items-center justify-center`} style={{ background: "linear-gradient(135deg, #FDEBD3 0%, #F7F5F2 100%)", ...style }}>
+        <div role="img" aria-label={alt} className={`${className} flex items-center justify-center`} style={{ background: "linear-gradient(135deg, rgb(var(--fond-marque-doux)) 0%, rgb(var(--fond-doux)) 100%)", ...style }}>
           <Wrench size={22} color={COLORS.orange} />
         </div>
       );
@@ -409,13 +425,13 @@ function ConnexionScreen({ onNavigate }) {
               value={resetEmail}
               onChange={(e) => setResetEmail(e.target.value)}
               placeholder="exemple@liggeey.sn"
-              className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-orange-400"
+              className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-primaire-400"
               style={{ borderColor: resetTouched && !resetEmailValid ? COLORS.danger : COLORS.border }}
             />
             <p className="text-xs mb-5" style={{ color: resetTouched && !resetEmailValid ? COLORS.danger : COLORS.slateLight }}>
               {resetTouched && !resetEmailValid ? "Veuillez saisir une adresse e-mail valide." : "Utilisez l'adresse associée à votre compte LIGGEEY"}
             </p>
-            <button type="submit" className="w-full rounded-md py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
+            <button type="submit" className="w-full rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
               Envoyer le lien
             </button>
           </>
@@ -450,8 +466,8 @@ function ConnexionScreen({ onNavigate }) {
             onClick={() => setEspace(o.id)}
             className="flex-1 rounded-md py-2 text-xs font-semibold"
             style={{
-              background: espace === o.id ? COLORS.orange : "#fff",
-              color: espace === o.id ? "#fff" : COLORS.slate,
+              background: espace === o.id ? COLORS.orange : COLORS.surface,
+              color: espace === o.id ? COLORS.onOrange : COLORS.slate,
               border: `1px solid ${espace === o.id ? COLORS.orange : COLORS.border}`,
             }}
           >
@@ -466,7 +482,7 @@ function ConnexionScreen({ onNavigate }) {
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         placeholder="exemple@liggeey.sn"
-        className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-orange-400"
+        className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-primaire-400"
         style={{ borderColor: touched && !emailValid ? COLORS.danger : COLORS.border }}
       />
       <p className="text-xs mb-4" style={{ color: touched && !emailValid ? COLORS.danger : COLORS.slateLight }}>
@@ -483,10 +499,10 @@ function ConnexionScreen({ onNavigate }) {
           value={password}
           onChange={(e) => setPassword(e.target.value)}
           placeholder="Tapez votre mot de passe"
-          className="w-full rounded-md border px-4 py-2.5 pr-10 text-sm outline-none transition-colors focus:border-orange-400"
+          className="w-full rounded-md border px-4 py-2.5 pr-10 text-sm outline-none transition-colors focus:border-primaire-400"
           style={{ borderColor: touched && !passwordValid ? COLORS.danger : COLORS.border }}
         />
-        <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" aria-label="Afficher/masquer le mot de passe">
+        <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-discret hover:text-secondaire" aria-label="Afficher/masquer le mot de passe">
           {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
         </button>
       </div>
@@ -495,11 +511,11 @@ function ConnexionScreen({ onNavigate }) {
       </p>
 
       <label className="flex items-center gap-2 mb-6 cursor-pointer select-none">
-        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="w-4 h-4 rounded accent-orange-500" />
+        <input type="checkbox" checked={remember} onChange={(e) => setRemember(e.target.checked)} className="w-4 h-4 rounded accent-primaire-500" />
         <span className="text-sm" style={{ color: COLORS.slate }}>Se souvenir de moi</span>
       </label>
 
-      <button type="submit" onClick={handleSubmit} className="w-full rounded-md py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
+      <button type="submit" onClick={handleSubmit} className="w-full rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
         Se connecter
       </button>
 
@@ -531,7 +547,7 @@ function ProfileRadioCard({ profile, selected, onSelect }) {
       className="w-full text-left rounded-lg border px-5 py-4 mb-3 transition-colors"
       style={{
         borderColor: isSelected ? COLORS.orange : COLORS.border,
-        background: isSelected ? COLORS.orangeSoft : "#fff",
+        background: isSelected ? COLORS.orangeSoft : COLORS.surface,
       }}
     >
       <div className="flex items-center justify-between">
@@ -541,7 +557,7 @@ function ProfileRadioCard({ profile, selected, onSelect }) {
         </div>
         <span
           className="w-5 h-5 rounded-full border flex items-center justify-center shrink-0 ml-4"
-          style={{ borderColor: isSelected ? COLORS.orange : "#C7CCD1" }}
+          style={{ borderColor: isSelected ? COLORS.orange : COLORS.borderStrong }}
         >
           {isSelected && <span className="w-2.5 h-2.5 rounded-full" style={{ background: COLORS.orange }} />}
         </span>
@@ -571,7 +587,7 @@ function SignupChoiceScreen({ onNavigate }) {
       <button
         type="button"
         onClick={() => onNavigate("signup-info", { profile: selected })}
-        className="w-full rounded-md py-3 mt-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+        className="w-full rounded-md py-3 mt-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
         style={{ background: COLORS.orange }}
       >
         Continuer
@@ -665,7 +681,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
               value={val}
               onChange={(e) => setField(f.name, e.target.value)}
               placeholder={f.placeholder}
-              className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-orange-400"
+              className="w-full rounded-md border px-4 py-2.5 text-sm mb-1.5 outline-none transition-colors focus:border-primaire-400"
               style={{ borderColor: invalid ? COLORS.danger : COLORS.border }}
             />
             <p className="text-xs" style={{ color: invalid ? COLORS.danger : COLORS.slateLight }}>
@@ -685,10 +701,10 @@ function SignupInfoScreen({ profile, onNavigate }) {
             value={password}
             onChange={(e) => setPassword(e.target.value)}
             placeholder="Tapez votre mot de passe"
-            className="w-full rounded-md border px-4 py-2.5 pr-10 text-sm outline-none transition-colors focus:border-orange-400"
+            className="w-full rounded-md border px-4 py-2.5 pr-10 text-sm outline-none transition-colors focus:border-primaire-400"
             style={{ borderColor: touched && !passwordValid ? COLORS.danger : COLORS.border }}
           />
-          <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-slate-400 hover:text-slate-600" aria-label="Afficher/masquer le mot de passe">
+          <button type="button" onClick={() => setShowPassword((s) => !s)} className="absolute right-3 top-1/2 -translate-y-1/2 text-discret hover:text-secondaire" aria-label="Afficher/masquer le mot de passe">
             {showPassword ? <EyeOff size={18} /> : <Eye size={18} />}
           </button>
         </div>
@@ -702,7 +718,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
           type="checkbox"
           checked={accepted}
           onChange={(e) => setAccepted(e.target.checked)}
-          className="w-4 h-4 rounded accent-orange-500 mt-0.5"
+          className="w-4 h-4 rounded accent-primaire-500 mt-0.5"
         />
         <span className="text-sm" style={{ color: COLORS.slate }}>
           J'accepte les{" "}
@@ -718,7 +734,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
         <button
           type="button"
           onClick={() => onNavigate("signup-choice")}
-          className="flex-1 rounded-md py-3 text-sm font-semibold border transition-colors hover:bg-gray-50"
+          className="flex-1 rounded-md py-3 text-sm font-semibold border transition-colors hover:bg-doux"
           style={{ borderColor: COLORS.border, color: COLORS.slate }}
         >
           Retour
@@ -726,7 +742,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
         <button
           type="submit"
           onClick={handleSubmit}
-          className="flex-1 rounded-md py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="flex-1 rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
           style={{ background: COLORS.orange }}
         >
           Créer mon compte
@@ -758,7 +774,7 @@ function ConfirmationScreen({ profile, onNavigate }) {
       <button
         type="button"
         onClick={() => onNavigate("dashboard", { espace: profile })}
-        className="w-full rounded-md py-3 text-sm font-semibold text-white transition-opacity hover:opacity-90 mb-3"
+        className="w-full rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90 mb-3"
         style={{ background: COLORS.orange }}
       >
         Accéder à mon tableau de bord
@@ -766,7 +782,7 @@ function ConfirmationScreen({ profile, onNavigate }) {
       <button
         type="button"
         onClick={() => onNavigate("login")}
-        className="w-full rounded-md py-3 text-sm font-semibold border transition-colors hover:bg-gray-50"
+        className="w-full rounded-md py-3 text-sm font-semibold border transition-colors hover:bg-doux"
         style={{ borderColor: COLORS.border, color: COLORS.slate }}
       >
         Retour à la connexion
@@ -846,10 +862,10 @@ const RAIL_ICONS = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell];
 
 function IconRail() {
   return (
-    <div className="hidden md:flex flex-col items-center w-14 shrink-0 py-4 gap-3" style={{ background: "#0F0B08" }} aria-hidden="true">
+    <div className="hidden md:flex flex-col items-center w-14 shrink-0 py-4 gap-3" style={{ background: COLORS.darkDeep }} aria-hidden="true">
       {RAIL_ICONS.map((Icon, i) => (
         <div key={i} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: i === 0 ? COLORS.orange : "transparent" }}>
-          <Icon size={16} color={i === 0 ? "#fff" : i === RAIL_ICONS.length - 1 ? "#4ADE80" : "#6B6259"} />
+          <Icon size={16} color={i === 0 ? "#fff" : i === RAIL_ICONS.length - 1 ? "#4ADE80" : COLORS.onDarkSubtle} />
         </div>
       ))}
     </div>
@@ -863,7 +879,7 @@ function Sidebar({ navItems, active, onNavigate, user, badges = {} }) {
   const [collapsed, setCollapsed] = useState(() => typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 767px)").matches);
 
   return (
-    <div className="flex flex-col shrink-0 py-5 px-3 transition-all sticky top-0 h-screen overflow-y-auto" style={{ background: "#1A130E", width: collapsed ? 64 : 240 }}>
+    <div className="flex flex-col shrink-0 py-5 px-3 transition-all sticky top-0 h-screen overflow-y-auto" style={{ background: COLORS.dark, width: collapsed ? 64 : 240 }}>
       <div className={`flex items-center mb-6 px-1 ${collapsed ? "flex-col gap-3" : "justify-between"}`}>
         <a href={SITE_URL} aria-label="LIGGEEY, retour au site" title="Retour au site" className="inline-flex">
           {collapsed ? <Logo iconOnly height={22} /> : <Logo />}
@@ -889,9 +905,9 @@ function Sidebar({ navItems, active, onNavigate, user, badges = {} }) {
           return (
             <React.Fragment key={item.id}>
               {newSection && (collapsed ? (
-                i > 0 && <div className="my-2 mx-2 h-px" style={{ background: "#2C241C" }} />
+                i > 0 && <div className="my-2 mx-2 h-px" style={{ background: COLORS.darkLine }} />
               ) : (
-                <p className={`text-[11px] font-semibold px-3 mb-1 ${i > 0 ? "mt-4" : ""}`} style={{ color: "#6B6259" }}>{item.section}</p>
+                <p className={`text-[11px] font-semibold px-3 mb-1 ${i > 0 ? "mt-4" : ""}`} style={{ color: COLORS.onDarkSubtle }}>{item.section}</p>
               ))}
               <button
                 type="button"
@@ -899,14 +915,14 @@ function Sidebar({ navItems, active, onNavigate, user, badges = {} }) {
                 title={collapsed ? item.label : undefined}
                 aria-current={isActive ? "page" : undefined}
                 className={`relative flex items-center gap-2.5 rounded-md py-2 text-sm text-left transition-colors ${collapsed ? "justify-center px-0" : "px-3"}`}
-                style={{ background: isActive ? COLORS.orange : "transparent", color: isActive ? "#fff" : "#B9AFA5", fontWeight: isActive ? 600 : 400 }}
+                style={{ background: isActive ? COLORS.orange : "transparent", color: isActive ? COLORS.onOrange : COLORS.onDarkMuted, fontWeight: isActive ? 600 : 400 }}
               >
                 <Icon size={17} />
                 {!collapsed && <span className="flex-1">{item.label}</span>}
                 {badge > 0 && (collapsed ? (
                   <span className="absolute top-1 right-2 w-2 h-2 rounded-full" style={{ background: COLORS.orange }} aria-label={`${badge} à traiter`} />
                 ) : (
-                  <span className="text-[11px] font-bold rounded-full px-1.5 min-w-[20px] text-center" style={{ background: isActive ? "#fff" : COLORS.orange, color: isActive ? COLORS.orange : "#fff" }} aria-label={`${badge} à traiter`}>{badge}</span>
+                  <span className="text-[11px] font-bold rounded-full px-1.5 min-w-[20px] text-center" style={{ background: isActive ? COLORS.surface : COLORS.orange, color: isActive ? COLORS.orange : COLORS.onOrange }} aria-label={`${badge} à traiter`}>{badge}</span>
                 ))}
               </button>
             </React.Fragment>
@@ -916,13 +932,13 @@ function Sidebar({ navItems, active, onNavigate, user, badges = {} }) {
 
       <div className="pt-4 mt-4" style={{ borderTop: "1px solid #2C241C" }}>
         <div className={`flex items-center gap-2.5 mb-3 ${collapsed ? "justify-center px-0" : "px-1"}`}>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orange, color: "#fff" }} title={collapsed ? `${user.name} · ${user.role}` : undefined}>
+          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orange, color: COLORS.onOrange }} title={collapsed ? `${user.name} · ${user.role}` : undefined}>
             {user.initials}
           </div>
           {!collapsed && (
             <div className="min-w-0">
-              <p className="text-sm font-semibold text-white truncate">{user.name}</p>
-              <p className="text-xs truncate" style={{ color: "#8A8078" }}>{user.role}</p>
+              <p className="text-sm font-semibold text-sur-sombre truncate">{user.name}</p>
+              <p className="text-xs truncate" style={{ color: COLORS.onDarkSubtle }}>{user.role}</p>
             </div>
           )}
         </div>
@@ -932,13 +948,13 @@ function Sidebar({ navItems, active, onNavigate, user, badges = {} }) {
             onClick={() => onNavigate("abonnement")}
             title={collapsed ? `Profil ${currentPlan.nom}` : undefined}
             className={`w-full rounded-md mb-3 flex items-center text-xs ${collapsed ? "justify-center py-2" : "justify-between px-3 py-2"}`}
-            style={{ background: "#2C241C" }}
+            style={{ background: COLORS.darkLine }}
           >
             {collapsed ? (
-              <Crown size={14} color={upgradeTo ? "#8A8078" : COLORS.orange} />
+              <Crown size={14} color={upgradeTo ? COLORS.onDarkSubtle : COLORS.orange} />
             ) : (
               <>
-                <span className="flex items-center gap-1.5" style={{ color: "#B9AFA5" }}>
+                <span className="flex items-center gap-1.5" style={{ color: COLORS.onDarkMuted }}>
                   {!upgradeTo && <Crown size={12} color={COLORS.orange} />} Profil {currentPlan.nom}
                 </span>
                 {upgradeTo && <span className="font-semibold" style={{ color: COLORS.orange }}>Passer {upgradeTo.nom}</span>}
@@ -946,10 +962,10 @@ function Sidebar({ navItems, active, onNavigate, user, badges = {} }) {
             )}
           </button>
         )}
-        <button type="button" onClick={() => onNavigate("login")} title="Changer d'espace" className={`flex items-center gap-1.5 text-xs ${collapsed ? "justify-center w-full" : "px-1"}`} style={{ color: "#8A8078" }}>
+        <button type="button" onClick={() => onNavigate("login")} title="Changer d'espace" className={`flex items-center gap-1.5 text-xs ${collapsed ? "justify-center w-full" : "px-1"}`} style={{ color: COLORS.onDarkSubtle }}>
           <ArrowLeft size={12} /> {!collapsed && "Changer d'espace"}
         </button>
-        <a href={SITE_URL} title="Retour au site" aria-label={collapsed ? "Retour au site" : undefined} className={`mt-3 flex items-center gap-1.5 text-xs hover:text-white ${collapsed ? "justify-center w-full" : "px-1"}`} style={{ color: "#8A8078" }}>
+        <a href={SITE_URL} title="Retour au site" aria-label={collapsed ? "Retour au site" : undefined} className={`mt-3 flex items-center gap-1.5 text-xs hover:text-sur-sombre ${collapsed ? "justify-center w-full" : "px-1"}`} style={{ color: COLORS.onDarkSubtle }}>
           <Home size={12} /> {!collapsed && "Retour au site"}
         </a>
       </div>
@@ -997,7 +1013,7 @@ function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, chil
   }, []);
 
   return (
-    <div className="min-h-screen w-full flex" style={{ fontFamily: "Inter, system-ui, -apple-system, sans-serif", background: "#F7F5F2" }}>
+    <div className="min-h-screen w-full flex" style={{ fontFamily: "Inter, system-ui, -apple-system, sans-serif", background: COLORS.soft }}>
       <IconRail />
       <Sidebar navItems={navItems} active={active} onNavigate={onNavigate} user={user} badges={badges} />
       <main ref={mainRef} className="flex-1 min-w-0 px-4 sm:px-6 md:px-10 py-6 md:py-8 overflow-x-hidden">
@@ -1013,7 +1029,7 @@ function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, chil
 function TodoPanel({ items, onNavigate }) {
   if (!items || items.length === 0) return null;
   return (
-    <div className="rounded-lg border bg-white mb-6 overflow-hidden" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface mb-6 overflow-hidden" style={{ borderColor: COLORS.border }}>
       <p className="px-5 pt-4 pb-2 font-semibold" style={{ color: COLORS.slate }}>À faire maintenant</p>
       {items.map((it) => {
         const Icon = it.icon || AlertCircle;
@@ -1037,7 +1053,7 @@ function TodoPanel({ items, onNavigate }) {
 
 function StatCard({ icon: Icon, value, label }) {
   return (
-    <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
       <div className="w-9 h-9 rounded-md flex items-center justify-center mb-4" style={{ background: COLORS.orangeSoft }}>
         <Icon size={17} color={COLORS.orange} />
       </div>
@@ -1060,7 +1076,7 @@ function StatusBadge({ status }) {
     "Refusée": { bg: "#FEE2E2", color: "#B91C1C" },
     "Acceptée": { bg: "#DCFCE7", color: "#16A34A" },
     "En cours": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Terminée": { bg: "#F1F1F1", color: COLORS.slateLight },
+    "Terminée": { bg: COLORS.softStrong, color: COLORS.slateLight },
     "Nouveau": { bg: "#DBEAFE", color: "#1D4ED8" },
     "Retenu": { bg: "#DCFCE7", color: "#16A34A" },
     "Rejeté": { bg: "#FEE2E2", color: "#B91C1C" },
@@ -1073,20 +1089,20 @@ function StatusBadge({ status }) {
     "Actif": { bg: "#DCFCE7", color: "#16A34A" },
     "Active": { bg: "#DCFCE7", color: "#16A34A" },
     "En pause": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Complète": { bg: "#F1F1F1", color: COLORS.slateLight },
-    "Brouillon": { bg: "#F1F1F1", color: COLORS.slateLight },
-    "Expirée": { bg: "#F1F1F1", color: COLORS.slateLight },
-    "Inactif": { bg: "#F1F1F1", color: COLORS.slateLight },
+    "Complète": { bg: COLORS.softStrong, color: COLORS.slateLight },
+    "Brouillon": { bg: COLORS.softStrong, color: COLORS.slateLight },
+    "Expirée": { bg: COLORS.softStrong, color: COLORS.slateLight },
+    "Inactif": { bg: COLORS.softStrong, color: COLORS.slateLight },
     "Annulée": { bg: "#FEE2E2", color: "#B91C1C" },
     "Annulé": { bg: "#FEE2E2", color: "#B91C1C" },
     "En révision": { bg: COLORS.orangeSoft, color: COLORS.orange },
     "En cours d'apprentissage": { bg: COLORS.orangeSoft, color: COLORS.orange },
     "Apprenant": { bg: COLORS.orangeSoft, color: COLORS.orange },
     "Mentoré": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Remboursé": { bg: "#F1F1F1", color: COLORS.slateLight },
+    "Remboursé": { bg: COLORS.softStrong, color: COLORS.slateLight },
     "Fait": { bg: "#DCFCE7", color: "#16A34A" },
     "À compléter": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "À venir": { bg: "#F1F1F1", color: COLORS.slateLight },
+    "À venir": { bg: COLORS.softStrong, color: COLORS.slateLight },
     "En période d'essai": { bg: COLORS.orangeSoft, color: COLORS.orange },
     "À risque": { bg: "#FEE2E2", color: "#B91C1C" },
     "Confirmé": { bg: "#DCFCE7", color: "#16A34A" },
@@ -1096,7 +1112,7 @@ function StatusBadge({ status }) {
     "Échoué": { bg: "#FEE2E2", color: "#B91C1C" },
     "Échec de paiement": { bg: "#FEE2E2", color: "#B91C1C" },
   };
-  const s = styles[status] || { bg: "#F1F1F1", color: COLORS.slateLight };
+  const s = styles[status] || { bg: COLORS.softStrong, color: COLORS.slateLight };
   return (
     <span className="text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap" style={{ background: s.bg, color: s.color }}>
       {status}
@@ -1118,20 +1134,20 @@ function DashboardScreen({ user, onNavigate, todos }) {
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Voici un aperçu de votre recherche d'emploi et de votre nouveau poste.</p>
       <TodoPanel items={todos} onNavigate={onNavigate} />
 
-      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: "#1A130E" }}>
+      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: COLORS.dark }}>
         <div className="flex-1">
-          <p className="text-lg font-bold text-white mb-1">Profil complété à 70%</p>
+          <p className="text-lg font-bold text-sur-sombre mb-1">Profil complété à 70%</p>
           <p className="text-sm mb-3" style={{ color: COLORS.orange }}>
             Les profils complets sont contactés bien plus souvent par les recruteurs.
           </p>
-          <div className="w-full h-1.5 rounded-full" style={{ background: "#3A2F24" }}>
+          <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.darkTrack }}>
             <div className="h-1.5 rounded-full" style={{ width: "70%", background: COLORS.orange }} />
           </div>
         </div>
         <button
           type="button"
           onClick={() => onNavigate("profil")}
-          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
           style={{ background: COLORS.orange }}
         >
           Compléter mon profil
@@ -1145,7 +1161,7 @@ function DashboardScreen({ user, onNavigate, todos }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Candidatures récentes</h3>
             <button type="button" onClick={() => onNavigate("candidatures")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
@@ -1165,7 +1181,7 @@ function DashboardScreen({ user, onNavigate, todos }) {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Mentors</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <div
@@ -1184,7 +1200,7 @@ function DashboardScreen({ user, onNavigate, todos }) {
           <button
             type="button"
             onClick={() => onNavigate("mentors", { mentorId: "cheikh-fall" })}
-            className="w-full rounded-md py-2.5 text-sm font-semibold border transition-colors hover:bg-gray-50"
+            className="w-full rounded-md py-2.5 text-sm font-semibold border transition-colors hover:bg-doux"
             style={{ borderColor: COLORS.border, color: COLORS.slate }}
           >
             Voir mon Mentor
@@ -1275,7 +1291,7 @@ function OfferCard({ offre, onOpen, applied }) {
     <button
       type="button"
       onClick={() => onOpen(offre)}
-      className="text-left rounded-lg border bg-white p-5 transition-shadow hover:shadow-md"
+      className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md"
       style={{ borderColor: COLORS.border }}
     >
       <div className="flex items-start justify-between gap-2 mb-0.5">
@@ -1315,12 +1331,12 @@ function OfferModal({ offre, onClose }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(15,11,8,0.55)" }} onClick={onClose}>
       <div
-        className="w-full max-w-lg rounded-lg bg-white p-6"
+        className="w-full max-w-lg rounded-lg bg-surface p-6"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
           <h3 className="text-xl font-bold" style={{ color: COLORS.slate }}>{offre.titre}</h3>
-          <button type="button" onClick={onClose} className="text-slate-400 hover:text-slate-600 text-xl leading-none">×</button>
+          <button type="button" onClick={onClose} className="text-discret hover:text-secondaire text-xl leading-none">×</button>
         </div>
 
         <div className="flex flex-col gap-3 mb-5">
@@ -1345,7 +1361,7 @@ function OfferModal({ offre, onClose }) {
             Candidature envoyée. Vous la retrouverez dans « Mes candidatures ».
           </div>
         ) : existing ? (
-          <div className="rounded-md px-4 py-3 text-sm mb-2 flex items-center justify-between gap-3" style={{ background: "#F7F5F2", color: COLORS.slate }}>
+          <div className="rounded-md px-4 py-3 text-sm mb-2 flex items-center justify-between gap-3" style={{ background: COLORS.soft, color: COLORS.slate }}>
             <span>Vous avez déjà postulé le {existing.date}.</span>
             <StatusBadge status={existing.statut} />
           </div>
@@ -1360,7 +1376,7 @@ function OfferModal({ offre, onClose }) {
             <button
               type="button"
               onClick={onClose}
-              className="rounded-md px-5 py-2.5 text-sm font-semibold border transition-colors hover:bg-gray-50"
+              className="rounded-md px-5 py-2.5 text-sm font-semibold border transition-colors hover:bg-doux"
               style={{ borderColor: COLORS.border, color: COLORS.slate }}
             >
               Fermer
@@ -1368,7 +1384,7 @@ function OfferModal({ offre, onClose }) {
             <button
               type="button"
               onClick={postuler}
-              className="rounded-md px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+              className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
               style={{ background: COLORS.orange }}
             >
               Postuler
@@ -1416,7 +1432,7 @@ function OffresScreen({ extraOffres = [] }) {
         value={query}
         onChange={(e) => { setQuery(e.target.value); setPage(1); }}
         placeholder="Rechercher ici"
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-orange-400"
+        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
         style={{ borderColor: COLORS.border }}
       />
 
@@ -1469,8 +1485,8 @@ function CandidatureStepper({ step, negative }) {
               <div
                 className="w-6 h-6 rounded-full flex items-center justify-center text-xs font-semibold"
                 style={{
-                  background: done ? lineColor : "#fff",
-                  color: done ? "#fff" : COLORS.slateLight,
+                  background: done ? lineColor : COLORS.surface,
+                  color: done ? (negative ? COLORS.onDark : COLORS.onOrange) : COLORS.slateLight,
                   border: done ? "none" : `1px solid ${COLORS.border}`,
                 }}
               >
@@ -1490,7 +1506,7 @@ function CandidatureStepper({ step, negative }) {
 
 function CandidatureCard({ c, onNavigate }) {
   return (
-    <div className="rounded-lg border bg-white p-5 mb-4" style={{ borderColor: c.embauche ? "#86EFAC" : COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-5 mb-4" style={{ borderColor: c.embauche ? "#86EFAC" : COLORS.border }}>
       <div className="flex items-start justify-between gap-3 mb-1">
         <p className="font-semibold" style={{ color: COLORS.slate }}>{c.poste}</p>
         <StatusBadge status={c.statut} />
@@ -1523,7 +1539,7 @@ function CandidaturesScreen({ onNavigate }) {
         Suivez en temps réel l'avancement de vos dossiers de candidature auprès des entreprises sénégalaises.
       </p>
       {candidatures.length === 0 && (
-        <div className="rounded-lg border bg-white p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>
+        <div className="rounded-lg border bg-surface p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>
           Vous n'avez pas encore postulé. <button type="button" onClick={() => onNavigate("offres")} className="font-semibold" style={{ color: COLORS.orange }}>Parcourir les offres</button>
         </div>
       )}
@@ -1568,7 +1584,7 @@ function moduleStatus(index, enrolled, progressCount) {
 const MODULE_BADGE_STYLE = {
   "Complété": { bg: "#DCFCE7", color: "#16A34A" },
   "En cours": { bg: COLORS.orangeSoft, color: COLORS.orange },
-  "Verrouillé": { bg: "#F1F1F1", color: COLORS.slateLight },
+  "Verrouillé": { bg: COLORS.softStrong, color: COLORS.slateLight },
 };
 
 const FORMATIONS_ALL = [
@@ -1589,7 +1605,7 @@ function FormationCard({ f, onOpen, premium, locked }) {
     <button
       type="button"
       onClick={() => onOpen(f)}
-      className="text-left rounded-lg border bg-white p-5 transition-shadow hover:shadow-md"
+      className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md"
       style={{ borderColor: COLORS.border }}
     >
       <div className="flex items-start justify-between mb-3">
@@ -1619,19 +1635,19 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
       <div className="flex items-start justify-between flex-wrap gap-3 mb-1">
         <h1 className="text-2xl font-bold" style={{ color: COLORS.slate }}>{formation.nom}</h1>
         {!enrolled && (
-          <button type="button" onClick={onToggleEnroll} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={onToggleEnroll} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
             S'inscrire à cette formation
           </button>
         )}
         {isComplete && (
-          <button type="button" onClick={onViewCertificate} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={onViewCertificate} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
             Voir mon certificat
           </button>
         )}
       </div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>{formation.tagline}</p>
 
-      <div className="rounded-lg border bg-white divide-y mb-6" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface divide-y mb-6" style={{ borderColor: COLORS.border }}>
         <Row label="Libellé" value={formation.nom} />
         <div className="px-5 py-3"><Row label="Description" value={formation.description} /></div>
         <div className="px-5 py-3"><Row label="Coach" value={formation.coach} /></div>
@@ -1639,13 +1655,13 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
         <div className="px-5 py-3"><Row label="Durée" value={dureeFromHeures(formation.heures)} /></div>
         <div className="px-5 py-3 flex items-center justify-between">
           <p className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>Statut</p>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: enrolled ? "#DCFCE7" : "#F1F1F1", color: enrolled ? "#16A34A" : COLORS.slateLight }}>
+          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: enrolled ? "#DCFCE7" : COLORS.softStrong, color: enrolled ? "#16A34A" : COLORS.slateLight }}>
             {isComplete ? "Terminée" : enrolled ? "Actif" : "Non inscrit"}
           </span>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-5 mb-6" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-5 mb-6" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold" style={{ color: COLORS.slate }}>Modules</h3>
           {enrolled && <p className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>{Math.min(progressCount, total)} / {total} modules validés</p>}
@@ -1656,7 +1672,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
               <p className="text-xs" style={{ color: COLORS.slateLight }}>Progression globale</p>
               <p className="text-xs font-semibold" style={{ color: COLORS.orange }}>{globalProgress}%</p>
             </div>
-            <div className="w-full h-1.5 rounded-full" style={{ background: "#F1F1F1" }}>
+            <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.softStrong }}>
               <div className="h-1.5 rounded-full" style={{ width: `${globalProgress}%`, background: "#16A34A" }} />
             </div>
           </div>
@@ -1674,7 +1690,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   {status === "En cours" && (
-                    <button type="button" onClick={onAdvanceModule} className="rounded-md px-3 py-1.5 text-xs font-semibold text-white" style={{ background: COLORS.orange }}>
+                    <button type="button" onClick={onAdvanceModule} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
                       Marquer comme terminé
                     </button>
                   )}
@@ -1687,7 +1703,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
       </div>
 
       {formation.linkedCandidature && (
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-start justify-between mb-1">
             <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>{formation.linkedCandidature.poste}</p>
             <StatusBadge status={formation.linkedCandidature.statut} />
@@ -1731,7 +1747,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
       </div>
 
       <div className="flex gap-3 mb-8">
-        <button type="button" onClick={() => setFeedback("téléchargé")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Télécharger (PDF)</button>
+        <button type="button" onClick={() => setFeedback("téléchargé")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Télécharger (PDF)</button>
         <button type="button" onClick={() => setFeedback("partagé")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Partager</button>
         {feedback && <span className="self-center text-sm" style={{ color: "#047857" }}>Certificat {feedback} (démo).</span>}
       </div>
@@ -1739,7 +1755,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
       <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Formations recommandées pour vous</h3>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {recommandees.map((f) => (
-          <div key={f.id} className="rounded-lg border bg-white p-4" style={{ borderColor: COLORS.border }}>
+          <div key={f.id} className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>Recommandé</span>
             <p className="font-semibold text-sm mt-2" style={{ color: COLORS.slate }}>{f.nom}</p>
             <p className="text-xs" style={{ color: COLORS.slateLight }}>{f.modules} Modules · {f.heures}h</p>
@@ -1839,7 +1855,7 @@ function FormationsScreen({ initialTab, dataset, userName }) {
             type="button"
             onClick={() => { setTab(t.id); setPage(1); }}
             className="rounded-md px-4 py-2 text-sm font-semibold"
-            style={{ background: tab === t.id ? COLORS.orange : "#fff", color: tab === t.id ? "#fff" : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}
+            style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}
           >
             {t.label}
           </button>
@@ -1851,7 +1867,7 @@ function FormationsScreen({ initialTab, dataset, userName }) {
         value={query}
         onChange={(e) => { setQuery(e.target.value); setPage(1); }}
         placeholder={tab === "mes" ? "Rechercher parmi mes formations..." : "Rechercher une formation..."}
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-orange-400"
+        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
         style={{ borderColor: COLORS.border }}
       />
 
@@ -1903,7 +1919,7 @@ function MentorCard({ m, onOpen }) {
     <button
       type="button"
       onClick={() => onOpen(m)}
-      className="text-left rounded-lg border bg-white p-5 transition-shadow hover:shadow-md"
+      className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md"
       style={{ borderColor: COLORS.border }}
     >
       <div className="flex items-start justify-between mb-3">
@@ -1918,7 +1934,7 @@ function MentorCard({ m, onOpen }) {
 
 function StatMini({ value, label }) {
   return (
-    <div className="rounded-lg border bg-white p-4 text-center" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-4 text-center" style={{ borderColor: COLORS.border }}>
       <p className="text-2xl font-bold" style={{ color: COLORS.orange }}>{value}</p>
       <p className="text-xs" style={{ color: COLORS.slateLight }}>{label}</p>
     </div>
@@ -1979,7 +1995,7 @@ function MentorsScreen({ initialMentorId, dataset }) {
         value={query}
         onChange={(e) => { setQuery(e.target.value); setPage(1); }}
         placeholder="Rechercher un mentor, une compétence..."
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-orange-400"
+        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
         style={{ borderColor: COLORS.border }}
       />
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -2044,7 +2060,7 @@ function ProfilScreen({ onNavigate }) {
         />
       )}
 
-      <div className="rounded-lg border bg-white p-6 mb-4 flex items-start gap-5" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-4 flex items-start gap-5" style={{ borderColor: COLORS.border }}>
         <SafeImg src="https://randomuser.me/api/portraits/women/65.jpg" alt="Absatou Diallo" className="w-20 h-20 rounded-full object-cover shrink-0" />
         <div className="flex flex-wrap gap-x-16 gap-y-3 flex-1">
           <p className="text-lg font-bold w-full" style={{ color: COLORS.slate }}>Absatou Diallo</p>
@@ -2056,13 +2072,13 @@ function ProfilScreen({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-2">
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Progression du profil</h3>
             <span className="text-lg font-bold" style={{ color: COLORS.orange }}>75%</span>
           </div>
           <p className="text-xs mb-2" style={{ color: COLORS.slateLight }}>Complétion de dossier</p>
-          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: "#F1F1F1" }}>
+          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: COLORS.softStrong }}>
             <div className="h-1.5 rounded-full" style={{ width: "75%", background: COLORS.orange }} />
           </div>
           <ChecklistItem label="Informations personnelles" done />
@@ -2072,7 +2088,7 @@ function ProfilScreen({ onNavigate }) {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold" style={{ color: COLORS.slate }}>Disponibilité & CV</h3>
               <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>Disponible immédiatement</span>
@@ -2096,7 +2112,7 @@ function ProfilScreen({ onNavigate }) {
             </div>
           </div>
 
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center justify-between mb-3">
               <h3 className="font-semibold" style={{ color: COLORS.slate }}>Langues</h3>
               <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>3 langues</span>
@@ -2112,7 +2128,7 @@ function ProfilScreen({ onNavigate }) {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-6 mb-4" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Compétences</h3>
         <div className="flex flex-wrap gap-2">
           {["Gestion de projet", "Excel avancé", "Anglais professionnel", "Communication", "Comptabilité de base"].map((c) => (
@@ -2121,7 +2137,7 @@ function ProfilScreen({ onNavigate }) {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-6 mb-6" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-6" style={{ borderColor: COLORS.border }}>
         <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Vérification d'identité</h3>
         <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>
           Pour obtenir le badge « profil vérifié » et rassurer les employeurs sénégalais partenaires, transmettez une pièce d'identité en cours de validité ainsi que vos diplômes.
@@ -2132,7 +2148,7 @@ function ProfilScreen({ onNavigate }) {
           </div>
         ) : (
           <div className="flex gap-3">
-            <button type="button" onClick={() => setDocumentsSubmitted(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+            <button type="button" onClick={() => setDocumentsSubmitted(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
               Transmettre mes documents
             </button>
             <button type="button" onClick={() => setShowVerifInfo((v) => !v)} aria-expanded={showVerifInfo} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
@@ -2148,19 +2164,19 @@ function ProfilScreen({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Mes candidatures</h3>
           <p className="text-3xl font-bold mb-1" style={{ color: COLORS.orange }}>5</p>
           <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Candidatures envoyées</p>
-          <button type="button" onClick={() => onNavigate("candidatures")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: "#F1F1F1", color: COLORS.slate }}>
+          <button type="button" onClick={() => onNavigate("candidatures")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
             Voir mes candidatures
           </button>
         </div>
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Mes formations</h3>
           <p className="text-3xl font-bold mb-1" style={{ color: COLORS.orange }}>5</p>
           <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Formations suivies</p>
-          <button type="button" onClick={() => onNavigate("formations", { tab: "mes" })} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: "#F1F1F1", color: COLORS.slate }}>
+          <button type="button" onClick={() => onNavigate("formations", { tab: "mes" })} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
             Voir mes formations
           </button>
         </div>
@@ -2180,7 +2196,7 @@ const DEMANDES_RECENTES = [
 
 function DemandeCard({ d }) {
   return (
-    <div className="rounded-lg border p-4 mb-3" style={{ borderColor: COLORS.border, background: "#FAFAF8" }}>
+    <div className="rounded-lg border p-4 mb-3" style={{ borderColor: COLORS.border, background: COLORS.soft }}>
       <div className="flex items-start justify-between mb-2">
         <div>
           <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>{d.titre}</p>
@@ -2203,20 +2219,20 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Voici un aperçu de votre activité de prestataire.</p>
       <TodoPanel items={todos} onNavigate={onNavigate} />
 
-      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: "#1A130E" }}>
+      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: COLORS.dark }}>
         <div className="flex-1">
-          <p className="text-lg font-bold text-white mb-1">Profil complété à 70%</p>
+          <p className="text-lg font-bold text-sur-sombre mb-1">Profil complété à 70%</p>
           <p className="text-sm mb-3" style={{ color: COLORS.orange }}>
             Un profil complet et vérifié rassure vos futurs clients.
           </p>
-          <div className="w-full h-1.5 rounded-full" style={{ background: "#3A2F24" }}>
+          <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.darkTrack }}>
             <div className="h-1.5 rounded-full" style={{ width: "70%", background: COLORS.orange }} />
           </div>
         </div>
         <button
           type="button"
           onClick={() => onNavigate("profil")}
-          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
           style={{ background: COLORS.orange }}
         >
           Compléter mon profil
@@ -2231,7 +2247,7 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Dernières demandes</h3>
             <button type="button" onClick={() => onNavigate("missions")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
@@ -2243,7 +2259,7 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
           ))}
         </div>
 
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Mes services actifs</h3>
             <button type="button" onClick={() => onNavigate("services")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
@@ -2275,13 +2291,13 @@ const SERVICES_INITIAL = [
 
 function ServiceCard({ s, onOpen, onEdit, onArchive }) {
   return (
-    <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
       <p className="font-semibold text-base mb-1.5" style={{ color: COLORS.slate }}>{s.nom}</p>
       <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-3" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{s.tag}</span>
       <p className="text-sm mb-0.5" style={{ color: COLORS.slate }}>À partir de {s.tarifBase}</p>
       <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>{s.note.toFixed(1)}/5</p>
       <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full text-white" style={{ background: s.disponible ? "#16A34A" : COLORS.danger }}>
+        <span className="text-xs font-semibold px-2.5 py-1 rounded-full text-sur-sombre" style={{ background: s.disponible ? "#16A34A" : COLORS.danger }}>
           {s.disponible ? "Disponible" : "Indisponible"}
         </span>
         <span className="text-sm" style={{ color: COLORS.slateLight }}>{s.missions} missions</span>
@@ -2312,36 +2328,36 @@ function ServiceForm({ initial, onSave, onCancel }) {
   }
 
   return (
-    <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
       <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>{initial ? "Modifier un service" : "Ajouter un service"}</h3>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="col-span-2">
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Nom du service *</label>
-          <input value={values.nom} onChange={(e) => set("nom", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={values.nom} onChange={(e) => set("nom", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Catégorie *</label>
-          <input value={values.tag} onChange={(e) => set("tag", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={values.tag} onChange={(e) => set("tag", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Zone d'intervention</label>
-          <input value={values.zone} onChange={(e) => set("zone", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={values.zone} onChange={(e) => set("zone", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div className="col-span-2">
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Description *</label>
-          <textarea value={values.description} onChange={(e) => set("description", e.target.value)} rows={3} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <textarea value={values.description} onChange={(e) => set("description", e.target.value)} rows={3} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Tarif de base *</label>
-          <input value={values.tarifBase} onChange={(e) => set("tarifBase", e.target.value)} placeholder="Ex: 25 000 FCFA" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={values.tarifBase} onChange={(e) => set("tarifBase", e.target.value)} placeholder="Ex: 25 000 FCFA" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Disponibilité</label>
-          <input value={values.disponibilite} onChange={(e) => set("disponibilite", e.target.value)} placeholder="Ex: Lundi-Samedi, 8h-18h" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={values.disponibilite} onChange={(e) => set("disponibilite", e.target.value)} placeholder="Ex: Lundi-Samedi, 8h-18h" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
       </div>
       <label className="flex items-center gap-2 mb-5 cursor-pointer select-none">
-        <input type="checkbox" checked={values.disponible} onChange={(e) => set("disponible", e.target.checked)} className="w-4 h-4 rounded accent-orange-500" />
+        <input type="checkbox" checked={values.disponible} onChange={(e) => set("disponible", e.target.checked)} className="w-4 h-4 rounded accent-primaire-500" />
         <span className="text-sm" style={{ color: COLORS.slate }}>Service disponible</span>
       </label>
       <div className="flex gap-3">
@@ -2352,7 +2368,7 @@ function ServiceForm({ initial, onSave, onCancel }) {
           type="button"
           disabled={!valid}
           onClick={() => onSave({ ...values, id: initial?.id || values.nom.toLowerCase().replace(/\s+/g, "-") })}
-          className="rounded-md px-5 py-2.5 text-sm font-semibold text-white"
+          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre"
           style={{ background: COLORS.orange, opacity: valid ? 1 : 0.5 }}
         >
           Enregistrer
@@ -2365,7 +2381,7 @@ function ServiceForm({ initial, onSave, onCancel }) {
 function ArchiveConfirm({ onCancel, onConfirm }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(15,11,8,0.55)" }} onClick={onCancel}>
-      <div className="w-full max-w-sm rounded-lg bg-white p-6" onClick={(e) => e.stopPropagation()}>
+      <div className="w-full max-w-sm rounded-lg bg-surface p-6" onClick={(e) => e.stopPropagation()}>
         <h3 className="text-lg font-bold mb-2" style={{ color: COLORS.slate }}>Archiver ce service ?</h3>
         <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>
           Ce service ne sera plus visible par vos clients. Vous pourrez le réactiver plus tard.
@@ -2374,7 +2390,7 @@ function ArchiveConfirm({ onCancel, onConfirm }) {
           <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
             Annuler
           </button>
-          <button type="button" onClick={onConfirm} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.danger }}>
+          <button type="button" onClick={onConfirm} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.danger }}>
             Archiver
           </button>
         </div>
@@ -2393,7 +2409,7 @@ function ServiceDetail({ service, onEdit, onDelete, onBack }) {
       <div className="flex items-center justify-between mb-1 flex-wrap gap-3">
         <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>{service.nom}</h1>
         <div className="flex gap-3">
-          <button type="button" onClick={onEdit} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: "#F1F1F1", color: COLORS.slate }}>
+          <button type="button" onClick={onEdit} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
             Modifier le service
           </button>
           <button type="button" onClick={onDelete} className="text-sm font-semibold" style={{ color: COLORS.orange }}>
@@ -2410,33 +2426,33 @@ function ServiceDetail({ service, onEdit, onDelete, onBack }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Description</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{service.description}</p>
           </div>
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Tarification</h3>
             <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Déplacement</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.tarifDeplacement}</p></div>
             <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Intervention simple</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.tarifSimple}</p></div>
             <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Installation complète</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.tarifComplete}</p></div>
           </div>
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Zone d'intervention</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{service.zone}</p>
           </div>
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Disponibilité</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{service.disponibilite}</p>
           </div>
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Stats</h3>
             <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Note moyenne</p><p className="text-sm font-semibold" style={{ color: COLORS.orange }}>{service.note.toFixed(1)}/5</p></div>
             <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Missions réalisées</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.missions}</p></div>
           </div>
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Derniers avis clients</h3>
             {service.avis.length === 0 && <p className="text-sm" style={{ color: COLORS.slateLight }}>Aucun avis pour le moment.</p>}
             {service.avis.map((a, i) => (
@@ -2515,7 +2531,7 @@ function ServicesScreen() {
     <div>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mes services</h1>
-        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Ajouter un service
         </button>
       </div>
@@ -2529,7 +2545,7 @@ function ServicesScreen() {
         value={query}
         onChange={(e) => { setQuery(e.target.value); setPage(1); }}
         placeholder="Rechercher un service..."
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-orange-400"
+        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
         style={{ borderColor: COLORS.border }}
       />
 
@@ -2575,7 +2591,7 @@ const MISSION_TABS = [
 
 function MissionCard({ m, onOpen, onAccept, onRefuse }) {
   return (
-    <div className="rounded-lg border bg-white p-5 mb-4" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-5 mb-4" style={{ borderColor: COLORS.border }}>
       <div className="flex items-start justify-between mb-1">
         <button type="button" onClick={() => onOpen(m)} className="font-semibold text-sm text-left flex items-center gap-1.5" style={{ color: COLORS.slate }}>
           {m.titre} <Check size={14} color="#16A34A" />
@@ -2590,7 +2606,7 @@ function MissionCard({ m, onOpen, onAccept, onRefuse }) {
         </div>
         {m.statut === "En attente" ? (
           <div className="flex gap-2">
-            <button type="button" onClick={() => onAccept(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Accepter</button>
+            <button type="button" onClick={() => onAccept(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Accepter</button>
             <button type="button" onClick={() => onRefuse(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Refuser</button>
           </div>
         ) : (
@@ -2625,7 +2641,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
             <button type="button" onClick={() => (planApi ? planApi.gate("contreOffre", () => setCounterMode(true)) : setCounterMode(true))} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}>
               {planApi && !planApi.can("contreOffre") && <Lock size={13} />} Proposer un autre tarif
             </button>
-            <button type="button" onClick={() => onAccept(mission.id)} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+            <button type="button" onClick={() => onAccept(mission.id)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
               Accepter la mission
             </button>
           </div>
@@ -2634,7 +2650,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
       <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Demande reçue le {mission.dateDemande}</p>
 
       {counterMode && (
-        <div className="rounded-lg border bg-white p-5 flex items-end gap-3 mb-4" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5 flex items-end gap-3 mb-4" style={{ borderColor: COLORS.border }}>
           <div className="flex-1">
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Votre contre-proposition (FCFA)</label>
             <input
@@ -2642,7 +2658,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
               value={counterValue}
               onChange={(e) => setCounterValue(e.target.value)}
               placeholder="Ex: 70 000"
-              className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400"
+              className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400"
               style={{ borderColor: COLORS.border }}
             />
           </div>
@@ -2650,7 +2666,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
             type="button"
             disabled={!counterValue.trim()}
             onClick={() => { onCounterOffer(mission.id, counterValue); setCounterMode(false); }}
-            className="rounded-md px-5 py-2.5 text-sm font-semibold text-white"
+            className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre"
             style={{ background: COLORS.orange, opacity: counterValue.trim() ? 1 : 0.5 }}
           >
             Envoyer
@@ -2669,11 +2685,11 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Description de la mission</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{mission.description}</p>
           </div>
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Détails</h3>
             <div className="grid grid-cols-2 gap-4">
               <Row label="Type" value={mission.type} />
@@ -2685,7 +2701,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Informations client</h3>
             <div className="flex items-center gap-2.5 mb-3">
               <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
@@ -2704,7 +2720,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
             <div className="h-2" />
             <Row label="Missions précédentes" value={mission.missionsPrecedentes} />
           </div>
-          <div className="rounded-lg border bg-white p-5 text-center" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5 text-center" style={{ borderColor: COLORS.border }}>
             <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>Budget proposé</p>
             <p className="text-2xl font-bold" style={{ color: COLORS.orange }}>{mission.budget}</p>
           </div>
@@ -2760,7 +2776,7 @@ function MissionsScreen() {
             type="button"
             onClick={() => { setTab(t.id); setPage(1); }}
             className="rounded-md px-4 py-2 text-sm font-semibold"
-            style={{ background: tab === t.id ? COLORS.orange : "#fff", color: tab === t.id ? "#fff" : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}
+            style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}
           >
             {t.label} ({counts[t.id]})
           </button>
@@ -2832,7 +2848,7 @@ function RealisationsScreen({ onBack }) {
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>{PORTFOLIO_REALISATIONS.length} réalisations mises en avant sur votre profil.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {PORTFOLIO_REALISATIONS.map((r) => (
-          <div key={r.id} className="rounded-lg border bg-white overflow-hidden" style={{ borderColor: COLORS.border }}>
+          <div key={r.id} className="rounded-lg border bg-surface overflow-hidden" style={{ borderColor: COLORS.border }}>
             <SafeImg kind="photo" src={r.photo} alt={r.titre} className="w-full h-36 object-cover" />
             <div className="p-4">
               <p className="font-semibold text-sm mb-1" style={{ color: COLORS.slate }}>{r.titre}</p>
@@ -2873,7 +2889,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
         />
       )}
 
-      <div className="rounded-lg border bg-white p-6 mb-4" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <div className="flex items-start gap-5 flex-wrap">
           <SafeImg src="https://randomuser.me/api/portraits/men/67.jpg" alt="Mamadou Ndiaye" className="w-24 h-24 rounded-full object-cover shrink-0" />
           <div className="flex flex-wrap gap-x-16 gap-y-3 flex-1">
@@ -2898,17 +2914,17 @@ function ProfilPrestataireScreen({ onNavigate }) {
         <StatCard icon={Check} value="96%" label="Taux de satisfaction" />
       </div>
 
-      <div className="rounded-lg border bg-white p-6 mb-4" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center justify-between mb-2">
           <h3 className="font-semibold" style={{ color: COLORS.slate }}>Profil complété à 75%</h3>
         </div>
-        <div className="w-full h-1.5 rounded-full" style={{ background: "#F1F1F1" }}>
+        <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.softStrong }}>
           <div className="h-1.5 rounded-full" style={{ width: "75%", background: COLORS.orange }} />
         </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Compétences & Métiers</h3>
           <div className="flex flex-wrap gap-2">
             {["Électricité bâtiment", "Câblage réseau", "Installation solaire", "Dépannage", "Mise aux normes", "Tableau électrique"].map((c) => (
@@ -2916,7 +2932,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
             ))}
           </div>
         </div>
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Disponibilité</h3>
           <p className="text-sm" style={{ color: COLORS.slate }}>Lundi – Samedi · 8h-18h</p>
           <p className="text-sm" style={{ color: COLORS.slate }}>Urgences · 24h/7j</p>
@@ -2924,7 +2940,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Certifications</h3>
           {[
             { titre: "Certificat d'aptitude professionnelle (CAP) Électricité", annee: 2018 },
@@ -2937,19 +2953,19 @@ function ProfilPrestataireScreen({ onNavigate }) {
             </div>
           ))}
         </div>
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Langues & Zone d'intervention</h3>
           <div className="flex items-center gap-2 text-sm mb-1"><Check size={14} color="#16A34A" /><span style={{ color: COLORS.slate }}>Wolof</span><span style={{ color: COLORS.slateLight }}>natif</span></div>
           <div className="flex items-center gap-2 text-sm mb-3"><Check size={14} color="#16A34A" /><span style={{ color: COLORS.slate }}>Français</span><span style={{ color: COLORS.slateLight }}>courant</span></div>
           <div className="flex flex-wrap gap-2">
             {["Dakar", "Pikine", "Guédiawaye", "Rufisque", "Thiès"].map((v) => (
-              <span key={v} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: "#F1F1F1", color: COLORS.slate }}>{v}</span>
+              <span key={v} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{v}</span>
             ))}
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-6 mb-4" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold" style={{ color: COLORS.slate }}>Portfolio / Réalisations</h3>
         </div>
@@ -2961,12 +2977,12 @@ function ProfilPrestataireScreen({ onNavigate }) {
             </div>
           ))}
         </div>
-        <button type="button" onClick={() => onNavigate("realisations")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: "#F1F1F1", color: COLORS.slate }}>
+        <button type="button" onClick={() => onNavigate("realisations")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
           Voir mes réalisations
         </button>
       </div>
 
-      <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold" style={{ color: COLORS.slate }}>Avis récents</h3>
           <button type="button" onClick={() => onNavigate("evaluations")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
@@ -3011,17 +3027,17 @@ function EvaluationsScreen({ onNavigate }) {
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez les retours de vos clients après chaque prestation.</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-6 text-center" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6 text-center" style={{ borderColor: COLORS.border }}>
           <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>NOTE MOYENNE</p>
           <p className="text-4xl font-bold mb-2" style={{ color: COLORS.orange }}>{AVG_NOTE}/5</p>
           <Stars note={Math.round(AVG_NOTE)} size={16} />
           <p className="text-xs mt-2" style={{ color: COLORS.slateLight }}>{REVIEWS_DATA.length} avis au total</p>
         </div>
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           {distribution.map((d) => (
             <div key={d.n} className="flex items-center gap-3 mb-1.5">
               <span className="text-xs w-8" style={{ color: COLORS.slateLight }}>{d.n}★</span>
-              <div className="flex-1 h-2 rounded-full" style={{ background: "#F1F1F1" }}>
+              <div className="flex-1 h-2 rounded-full" style={{ background: COLORS.softStrong }}>
                 <div className="h-2 rounded-full" style={{ width: `${(d.count / maxCount) * 100}%`, background: COLORS.orange }} />
               </div>
               <span className="text-xs w-4" style={{ color: COLORS.slateLight }}>{d.count}</span>
@@ -3042,7 +3058,7 @@ function EvaluationsScreen({ onNavigate }) {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setPage(1); }}
           placeholder="Rechercher un avis"
-          className="rounded-md border px-4 py-2 text-sm outline-none focus:border-orange-400 flex-1 max-w-xs"
+          className="rounded-md border px-4 py-2 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
           style={{ borderColor: COLORS.border }}
         />
         {[{ id: "tous", label: "Tous" }, { id: "5", label: "5 étoiles" }, { id: "4", label: "4 étoiles" }, { id: "3", label: "3 étoiles" }, { id: "recents", label: "Récents" }].map((f) => (
@@ -3051,7 +3067,7 @@ function EvaluationsScreen({ onNavigate }) {
             type="button"
             onClick={() => { setFilter(f.id); setPage(1); }}
             className="rounded-md px-3 py-1.5 text-xs font-semibold"
-            style={{ background: filter === f.id ? COLORS.orange : "#fff", color: filter === f.id ? "#fff" : COLORS.slate, border: `1px solid ${filter === f.id ? COLORS.orange : COLORS.border}` }}
+            style={{ background: filter === f.id ? COLORS.orange : COLORS.surface, color: filter === f.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${filter === f.id ? COLORS.orange : COLORS.border}` }}
           >
             {f.label}
           </button>
@@ -3059,7 +3075,7 @@ function EvaluationsScreen({ onNavigate }) {
       </div>
 
       {paged.map((r, i) => (
-        <div key={i} className="rounded-lg border bg-white p-5 mb-3" style={{ borderColor: COLORS.border }}>
+        <div key={i} className="rounded-lg border bg-surface p-5 mb-3" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-1">
             <div>
               <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{r.auteur}</p>
@@ -3118,15 +3134,15 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Voici un aperçu de vos recrutements chez Senegal Construction SARL.</p>
       <TodoPanel items={todos} onNavigate={onNavigate} />
 
-      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: "#1A130E" }}>
+      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: COLORS.dark }}>
         <div className="flex-1">
-          <p className="text-lg font-bold text-white mb-1">Profil complété à 85%</p>
+          <p className="text-lg font-bold text-sur-sombre mb-1">Profil complété à 85%</p>
           <p className="text-sm mb-3" style={{ color: COLORS.orange }}>Un profil complet augmente votre attractivité auprès des meilleurs talents.</p>
-          <div className="w-full h-1.5 rounded-full" style={{ background: "#3A2F24" }}>
+          <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.darkTrack }}>
             <div className="h-1.5 rounded-full" style={{ width: "85%", background: COLORS.orange }} />
           </div>
         </div>
-        <button type="button" onClick={() => onNavigate("profil")} className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => onNavigate("profil")} className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
           Compléter mon profil
         </button>
       </div>
@@ -3139,7 +3155,7 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Dernières candidatures</h3>
             <button type="button" onClick={() => onNavigate("candidatures")} className="text-sm font-medium" style={{ color: COLORS.orange }}>Tout voir</button>
@@ -3157,7 +3173,7 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
           </div>
         </div>
 
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-4">
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Mes offres actives</h3>
             <button type="button" onClick={() => onNavigate("offres")} className="text-sm font-medium" style={{ color: COLORS.orange }}>Gérer</button>
@@ -3173,10 +3189,10 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
 
 function OffreEntrepriseCard({ o, onOpen }) {
   return (
-    <button type="button" onClick={() => onOpen(o)} className="text-left rounded-lg border bg-white p-5 transition-shadow hover:shadow-md" style={{ borderColor: o.sponsorisee ? COLORS.orange : COLORS.border }}>
+    <button type="button" onClick={() => onOpen(o)} className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md" style={{ borderColor: o.sponsorisee ? COLORS.orange : COLORS.border }}>
       <div className="flex items-center justify-between mb-2">
         <span className="flex items-center gap-1.5">
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full" style={{ background: "#F1F1F1", color: COLORS.slate }}>{o.categorie}</span>
+          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{o.categorie}</span>
           {o.sponsorisee && <PremiumChip label="Sponsorisée" />}
         </span>
         <StatusBadge status={o.statut} />
@@ -3195,46 +3211,46 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
   function set(k, val) { setV((s) => ({ ...s, [k]: val })); }
 
   return (
-    <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
       <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>{initial ? "Modifier l'offre" : "Créer une offre d'emploi"}</h3>
       <div className="grid grid-cols-2 gap-4 mb-4">
         <div className="col-span-2">
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Titre du poste *</label>
-          <input value={v.titre} onChange={(e) => set("titre", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={v.titre} onChange={(e) => set("titre", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Catégorie *</label>
-          <input value={v.categorie} onChange={(e) => set("categorie", e.target.value)} placeholder="Ex: BTP, Plomberie..." className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={v.categorie} onChange={(e) => set("categorie", e.target.value)} placeholder="Ex: BTP, Plomberie..." className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Type de contrat *</label>
-          <select value={v.contrat} onChange={(e) => set("contrat", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }}>
+          <select value={v.contrat} onChange={(e) => set("contrat", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }}>
             {["CDI", "CDD", "Stage", "Freelance", "Bénévolat"].map((c) => <option key={c}>{c}</option>)}
           </select>
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Localisation *</label>
-          <input value={v.localisation} onChange={(e) => set("localisation", e.target.value)} placeholder="Ex: Dakar, Plateau" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={v.localisation} onChange={(e) => set("localisation", e.target.value)} placeholder="Ex: Dakar, Plateau" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Salaire mensuel *</label>
-          <input value={v.salaire} onChange={(e) => set("salaire", e.target.value)} placeholder="Ex: 300 000 FCFA/mois" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={v.salaire} onChange={(e) => set("salaire", e.target.value)} placeholder="Ex: 300 000 FCFA/mois" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Expérience requise</label>
-          <input value={v.experience} onChange={(e) => set("experience", e.target.value)} placeholder="Ex: 3-5 ans" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={v.experience} onChange={(e) => set("experience", e.target.value)} placeholder="Ex: 3-5 ans" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div>
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Date limite</label>
-          <input value={v.dateLimite} onChange={(e) => set("dateLimite", e.target.value)} placeholder="Ex : 30 nov. 2026" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={v.dateLimite} onChange={(e) => set("dateLimite", e.target.value)} placeholder="Ex : 30 nov. 2026" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div className="col-span-2">
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Description du poste *</label>
-          <textarea value={v.description} onChange={(e) => set("description", e.target.value)} rows={3} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <textarea value={v.description} onChange={(e) => set("description", e.target.value)} rows={3} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
         <div className="col-span-2">
           <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Compétences requises</label>
-          <input value={v.competencesTxt} onChange={(e) => set("competencesTxt", e.target.value)} placeholder="Séparées par des virgules" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input value={v.competencesTxt} onChange={(e) => set("competencesTxt", e.target.value)} placeholder="Séparées par des virgules" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
       </div>
       <div className="flex gap-3">
@@ -3250,7 +3266,7 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
             competences: v.competencesTxt.split(",").map((s) => s.trim()).filter(Boolean),
             candidats: initial?.candidats || [],
           })}
-          className="rounded-md px-5 py-2.5 text-sm font-semibold text-white"
+          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre"
           style={{ background: COLORS.orange, opacity: valid ? 1 : 0.5 }}
         >
           {initial ? "Enregistrer" : "Publier l'offre"}
@@ -3279,7 +3295,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
       <h1 className="text-2xl font-bold mb-6" style={{ color: COLORS.slate }}>{offre.titre}</h1>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-4">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Détails de l'offre</h3>
           <BorderedField label="Catégorie" value={offre.categorie} />
           <BorderedField label="Contrat" value={offre.contrat} />
@@ -3294,7 +3310,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Description du poste</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{offre.description}</p>
             {offre.competences?.length > 0 && (
@@ -3306,7 +3322,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
             )}
           </div>
 
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Candidatures reçues ({offre.candidats?.length || 0})</h3>
             {(offre.candidats || []).map((c, i) => (
               <div key={i} className="flex items-center justify-between py-3" style={{ borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none" }}>
@@ -3337,11 +3353,11 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
             </button>
           )
         )}
-        <button type="button" onClick={onEdit} className="rounded-md px-5 py-2.5 text-sm font-semibold" style={{ background: "#F1F1F1", color: COLORS.slate }}>
+        <button type="button" onClick={onEdit} className="rounded-md px-5 py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
           Modifier
         </button>
         {offre.statut !== "Clôturée" && (
-          <button type="button" onClick={onToggleStatut} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={onToggleStatut} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
             Clôturer l'offre
           </button>
         )}
@@ -3405,7 +3421,7 @@ function MesOffresScreen({ offres, setOffres }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mes offres d'emploi</h1>
-        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Nouvelle offre
         </button>
       </div>
@@ -3420,7 +3436,7 @@ function MesOffresScreen({ offres, setOffres }) {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setPage(1); }}
           placeholder="Rechercher une offre..."
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-orange-400 flex-1 max-w-xs"
+          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
           style={{ borderColor: COLORS.border }}
         />
         {["Tous", "Active", "En pause", "Clôturée"].map((s) => (
@@ -3429,7 +3445,7 @@ function MesOffresScreen({ offres, setOffres }) {
             type="button"
             onClick={() => { setStatutFilter(s); setPage(1); }}
             className="rounded-md px-3 py-1.5 text-xs font-semibold"
-            style={{ background: statutFilter === s ? COLORS.orange : "#fff", color: statutFilter === s ? "#fff" : COLORS.slate, border: `1px solid ${statutFilter === s ? COLORS.orange : COLORS.border}` }}
+            style={{ background: statutFilter === s ? COLORS.orange : COLORS.surface, color: statutFilter === s ? COLORS.onOrange : COLORS.slate, border: `1px solid ${statutFilter === s ? COLORS.orange : COLORS.border}` }}
           >
             {s}
           </button>
@@ -3466,7 +3482,7 @@ function CandidatureEntrepriseRow({ c, onOpen }) {
     <button
       type="button"
       onClick={() => onOpen(c)}
-      className="w-full flex items-center justify-between gap-4 rounded-lg border bg-white px-5 py-4 mb-3 text-left transition-shadow hover:shadow-md"
+      className="w-full flex items-center justify-between gap-4 rounded-lg border bg-surface px-5 py-4 mb-3 text-left transition-shadow hover:shadow-md"
       style={{ borderColor: PREMIUM_CANDIDATS.has(c.id) ? COLORS.orange : COLORS.border }}
     >
       <div className="flex items-center gap-3 min-w-0" style={{ flex: "1 1 30%" }}>
@@ -3507,7 +3523,7 @@ function CandidatureEntrepriseDetail({ candidat, onDecide, onBack }) {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.4fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
               {initials(candidat.nom)}
@@ -3527,7 +3543,7 @@ function CandidatureEntrepriseDetail({ candidat, onDecide, onBack }) {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold" style={{ color: COLORS.slate }}>Détails de la candidature</h3>
               <StatusBadge status={candidat.statut} />
@@ -3536,7 +3552,7 @@ function CandidatureEntrepriseDetail({ candidat, onDecide, onBack }) {
             <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>Lettre de motivation</p>
             <p className="text-sm" style={{ color: COLORS.slate }}>{candidat.lettre}</p>
           </div>
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Compétences clés</p>
             <div className="flex flex-wrap gap-1.5 mb-4">
               {candidat.competences.map((c) => (
@@ -3572,7 +3588,7 @@ function CandidatureEntrepriseDetail({ candidat, onDecide, onBack }) {
         <button type="button" onClick={() => onDecide(candidat.id, "En cours")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.orange, color: COLORS.orange }}>
           Planifier entretien
         </button>
-        <button type="button" onClick={() => onDecide(candidat.id, "Retenu")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => onDecide(candidat.id, "Retenu")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
           Retenir la candidature
         </button>
       </div>
@@ -3618,7 +3634,7 @@ function CandidaturesEntrepriseScreen() {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setPage(1); }}
           placeholder="Rechercher un candidat..."
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-orange-400 flex-1 max-w-xs"
+          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
           style={{ borderColor: COLORS.border }}
         />
         <select value={offreFilter} onChange={(e) => { setOffreFilter(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
@@ -3666,7 +3682,7 @@ const PRESTATAIRES_SEARCH = [
 
 function PrestataireSearchCard({ p, onOpen }) {
   return (
-    <div className="rounded-lg border bg-white p-5 flex flex-col" style={{ borderColor: PREMIUM_PRESTATAIRES.has(p.id) ? COLORS.orange : COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-5 flex flex-col" style={{ borderColor: PREMIUM_PRESTATAIRES.has(p.id) ? COLORS.orange : COLORS.border }}>
       <div className="flex flex-wrap gap-1.5 mb-3 min-h-[20px]">
         {PREMIUM_PRESTATAIRES.has(p.id) && <TierBadge premium size="sm" />}
         {PRESTATAIRES_REGULARISES.has(p.id) && <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}><BadgeCheck size={10} /> Activité régularisée</span>}
@@ -3685,7 +3701,7 @@ function PrestataireSearchCard({ p, onOpen }) {
         <Stars note={Math.round(p.note)} />
         <StatusBadge status={p.disponible ? "Disponible" : "Occupé"} />
       </div>
-      <button type="button" onClick={() => onOpen(p)} className="w-full rounded-md py-2.5 text-sm font-semibold mt-auto" style={{ background: "#F1F1F1", color: COLORS.slate }}>
+      <button type="button" onClick={() => onOpen(p)} className="w-full rounded-md py-2.5 text-sm font-semibold mt-auto" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
         Voir profil
       </button>
     </div>
@@ -3706,7 +3722,7 @@ function PrestataireProfilDetail({ p, onBack }) {
       </button>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
               {initials(p.nom)}
@@ -3725,7 +3741,7 @@ function PrestataireProfilDetail({ p, onBack }) {
           <div className="flex items-center gap-2 text-sm"><MapPin size={14} color={COLORS.slateLight} /><span style={{ color: COLORS.slate }}>{p.localisation}</span></div>
         </div>
 
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Expérience professionnelle</h3>
           <div className="flex flex-col gap-3">
             {p.timeline.map((t, i) => (
@@ -3743,7 +3759,7 @@ function PrestataireProfilDetail({ p, onBack }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Compétences</h3>
           <div className="flex flex-wrap gap-1.5">
             {p.competences.map((c) => (
@@ -3751,7 +3767,7 @@ function PrestataireProfilDetail({ p, onBack }) {
             ))}
           </div>
         </div>
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Avis clients</h3>
           {p.avis.map((a, i) => (
             <div key={i} className="py-2" style={{ borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none" }}>
@@ -3764,7 +3780,7 @@ function PrestataireProfilDetail({ p, onBack }) {
             </div>
           ))}
         </div>
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Certifications</h3>
           {p.certifications.map((c) => (
             <div key={c} className="flex items-start gap-2 py-1">
@@ -3783,15 +3799,15 @@ function PrestataireProfilDetail({ p, onBack }) {
       ) : (
         <div className="flex gap-3">
           <button type="button" onClick={() => gateContact(() => setContactOpen((o) => !o))} aria-expanded={contactOpen} className="rounded-md px-5 py-2.5 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}>{!contactOk && <Lock size={13} />} Contacter</button>
-          <button type="button" onClick={() => gateContact(() => setProposed(true))} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>{!contactOk && <Lock size={13} />} Proposer une mission</button>
+          <button type="button" onClick={() => gateContact(() => setProposed(true))} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>{!contactOk && <Lock size={13} />} Proposer une mission</button>
         </div>
       )}
       {contactOpen && (
-        <div className="rounded-lg border bg-white p-5 mt-4 max-w-xl" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5 mt-4 max-w-xl" style={{ borderColor: COLORS.border }}>
           <label htmlFor="contact-msg" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Message à {p.nom}</label>
-          <textarea id="contact-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Bonjour, je souhaiterais échanger sur un besoin…" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <textarea id="contact-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Bonjour, je souhaiterais échanger sur un besoin…" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           <div className="flex gap-2 mt-3">
-            <button type="button" disabled={!message.trim()} onClick={() => { notify(`Message envoyé à ${p.nom}.`); setMessage(""); setContactOpen(false); }} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange, opacity: message.trim() ? 1 : 0.5 }}>
+            <button type="button" disabled={!message.trim()} onClick={() => { notify(`Message envoyé à ${p.nom}.`); setMessage(""); setContactOpen(false); }} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: message.trim() ? 1 : 0.5 }}>
               <Send size={14} /> Envoyer
             </button>
             <button type="button" onClick={() => setContactOpen(false)} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
@@ -3831,7 +3847,7 @@ function PrestatairesSearchScreen() {
           value={query}
           onChange={(e) => { setQuery(e.target.value); setPage(1); }}
           placeholder="Rechercher un artisan..."
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-orange-400 flex-1 max-w-xs"
+          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
           style={{ borderColor: COLORS.border }}
         />
         <select value={metier} onChange={(e) => { setMetier(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
@@ -3897,7 +3913,7 @@ function EditableTags({ tags, onChange }) {
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
           placeholder="Ajouter un secteur..."
-          className="rounded-md border px-3 py-1.5 text-sm outline-none focus:border-orange-400"
+          className="rounded-md border px-3 py-1.5 text-sm outline-none focus:border-primaire-400"
           style={{ borderColor: COLORS.border }}
         />
         <button type="button" onClick={add} className="rounded-md px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
@@ -3915,7 +3931,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
   return (
     <div>
       <h1 className="text-2xl font-bold mb-6" style={{ color: COLORS.slate }}>Modifier le profil</h1>
-      <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center gap-4 mb-6">
           {v.logo ? (
             <img src={v.logo} alt={`Logo ${v.nom}`} className="w-14 h-14 rounded-md object-cover" />
@@ -3937,45 +3953,45 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
         <div className="grid grid-cols-2 gap-4 mb-4">
           <div className="col-span-2">
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Nom de l'entreprise *</label>
-            <input value={v.nom} onChange={(e) => set("nom", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.nom} onChange={(e) => set("nom", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Secteur principal *</label>
-            <input value={v.secteurPrincipal} onChange={(e) => set("secteurPrincipal", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.secteurPrincipal} onChange={(e) => set("secteurPrincipal", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Taille de l'entreprise *</label>
-            <select value={v.taille} onChange={(e) => set("taille", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }}>
+            <select value={v.taille} onChange={(e) => set("taille", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }}>
               {["1-10 employés", "11-45 employés", "45-50 employés", "50-100 employés", "100+ employés"].map((t) => <option key={t}>{t}</option>)}
             </select>
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>NINEA *</label>
-            <input value={v.ninea} onChange={(e) => set("ninea", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.ninea} onChange={(e) => set("ninea", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>RCCM *</label>
-            <input value={v.rccm} onChange={(e) => set("rccm", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.rccm} onChange={(e) => set("rccm", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Téléphone *</label>
-            <input value={v.telephone} onChange={(e) => set("telephone", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.telephone} onChange={(e) => set("telephone", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Email de contact *</label>
-            <input value={v.email} onChange={(e) => set("email", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.email} onChange={(e) => set("email", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Site web</label>
-            <input value={v.siteWeb} onChange={(e) => set("siteWeb", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.siteWeb} onChange={(e) => set("siteWeb", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div>
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Adresse de l'établissement principal *</label>
-            <input value={v.adresse} onChange={(e) => set("adresse", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <input value={v.adresse} onChange={(e) => set("adresse", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div className="col-span-2">
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Présentation / Description *</label>
-            <textarea value={v.description} onChange={(e) => set("description", e.target.value)} rows={4} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+            <textarea value={v.description} onChange={(e) => set("description", e.target.value)} rows={4} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           </div>
           <div className="col-span-2">
             <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Tags de secteurs d'activité associés</label>
@@ -3985,7 +4001,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
 
         <div className="flex gap-3">
           <button type="button" onClick={onCancel} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={() => onSave(v)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Enregistrer</button>
+          <button type="button" onClick={() => onSave(v)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Enregistrer</button>
         </div>
       </div>
     </div>
@@ -4015,14 +4031,14 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
           <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Profil entreprise</h1>
           <ProfileTierBadge />
         </div>
-        <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
           <Pencil size={14} /> Modifier le profil
         </button>
       </div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez la visibilité publique de votre marque employeur.</p>
       <ProfileTierCard />
 
-      <div className="rounded-lg border bg-white p-6 mb-4" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center justify-between flex-wrap gap-3">
           <div className="flex items-center gap-3">
             {profile.logo ? (
@@ -4042,7 +4058,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
               <p className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>Profil complété</p>
               <p className="text-sm font-bold" style={{ color: COLORS.orange }}>85%</p>
             </div>
-            <div className="w-full h-1.5 rounded-full" style={{ background: "#F1F1F1" }}>
+            <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.softStrong }}>
               <div className="h-1.5 rounded-full" style={{ width: "85%", background: COLORS.orange }} />
             </div>
           </div>
@@ -4050,7 +4066,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Informations administratives</h3>
           <Row label="NINEA" value={profile.ninea} />
           <div className="h-2" />
@@ -4067,22 +4083,22 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
           <Row label="Site web" value={profile.siteWeb} />
         </div>
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>À propos de l'entreprise</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{profile.description}</p>
           </div>
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Secteurs d'activité</h3>
             <div className="flex flex-wrap gap-2">
               {profile.secteurs.map((s) => (
-                <span key={s} className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: "#F1F1F1", color: COLORS.slate }}>{s}</span>
+                <span key={s} className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{s}</span>
               ))}
             </div>
           </div>
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center justify-between mb-3">
           <h3 className="font-semibold" style={{ color: COLORS.slate }}>Nos offres d'emploi actives</h3>
           <button type="button" onClick={() => onNavigate("offres")} className="text-sm font-medium" style={{ color: COLORS.orange }}>Gérer les offres</button>
@@ -4110,10 +4126,10 @@ const ADMIN_PAGE_SIZE = 8;
 
 function ActionButton({ label, variant = "primary", onClick, icon: Icon }) {
   const styles = {
-    danger: { border: `1px solid ${COLORS.danger}`, color: COLORS.danger, background: "#fff" },
-    warning: { border: `1px solid #D97706`, color: "#D97706", background: "#fff" },
-    primary: { border: "none", color: "#fff", background: COLORS.orange },
-    neutral: { border: `1px solid ${COLORS.border}`, color: COLORS.slate, background: "#fff" },
+    danger: { border: `1px solid ${COLORS.danger}`, color: COLORS.danger, background: COLORS.surface },
+    warning: { border: `1px solid #D97706`, color: "#D97706", background: COLORS.surface },
+    primary: { border: "none", color: COLORS.onOrange, background: COLORS.orange },
+    neutral: { border: `1px solid ${COLORS.border}`, color: COLORS.slate, background: COLORS.surface },
   };
   return (
     <button type="button" onClick={onClick} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold" style={styles[variant]}>
@@ -4124,7 +4140,7 @@ function ActionButton({ label, variant = "primary", onClick, icon: Icon }) {
 
 function AdminSubListCard({ title, items }) {
   return (
-    <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
       <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>{title}</h3>
       {items.length === 0 && <p className="text-sm" style={{ color: COLORS.slateLight }}>Aucun élément.</p>}
       {items.map((it, i) => (
@@ -4142,7 +4158,7 @@ function AdminSubListCard({ title, items }) {
 
 function AdminInfoCard({ title, rows }) {
   return (
-    <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+    <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
       <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>{title}</h3>
       {rows.map((r, i) => (
         <div key={i} className="flex items-center justify-between py-1.5">
@@ -4197,7 +4213,7 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
           value={query}
           onChange={(e) => { setQuery(e.target.value); setPage(1); }}
           placeholder={`Rechercher...`}
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-orange-400 flex-1 max-w-xs"
+          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
           style={{ borderColor: COLORS.border }}
         />
         {filters.map((f) => (
@@ -4214,8 +4230,8 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
         ))}
       </div>
 
-      <div className="rounded-lg border bg-white overflow-hidden" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center px-5 py-3" style={{ background: "#FAFAF8", borderBottom: `1px solid ${COLORS.border}` }}>
+      <div className="rounded-lg border bg-surface overflow-hidden" style={{ borderColor: COLORS.border }}>
+        <div className="flex items-center px-5 py-3" style={{ background: COLORS.soft, borderBottom: `1px solid ${COLORS.border}` }}>
           {columns.map((c) => (
             <p key={c.key} className="text-xs font-semibold" style={{ flex: c.flex || 1, color: COLORS.slateLight }}>{c.label}</p>
           ))}
@@ -4226,7 +4242,7 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
             key={row.id}
             type="button"
             onClick={() => setSelectedId(row.id)}
-            className="w-full flex items-center px-5 py-3.5 text-left hover:bg-gray-50"
+            className="w-full flex items-center px-5 py-3.5 text-left hover:bg-doux"
             style={{ borderBottom: `1px solid ${COLORS.border}` }}
           >
             {columns.map((c) => (
@@ -4297,7 +4313,7 @@ function AdminDashboardScreen({ onNavigate, todos }) {
           { label: "Candidatures", value: "3 421", delta: "+15%" },
           { label: "Missions en cours", value: "156", delta: "+5%" },
         ].map((s) => (
-          <div key={s.label} className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div key={s.label} className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <p className="text-xs mb-2" style={{ color: COLORS.slateLight }}>{s.label}</p>
             <p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{s.value} <span className="text-xs font-semibold" style={{ color: "#16A34A" }}>{s.delta}</span></p>
           </div>
@@ -4305,7 +4321,7 @@ function AdminDashboardScreen({ onNavigate, todos }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Inscriptions mensuelles</h3>
           <div style={{ width: "100%", height: 220 }}>
             <ResponsiveContainer>
@@ -4318,7 +4334,7 @@ function AdminDashboardScreen({ onNavigate, todos }) {
             </ResponsiveContainer>
           </div>
         </div>
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Répartition des profils</h3>
           <div className="flex items-center gap-6">
             <div style={{ width: 160, height: 160 }}>
@@ -4344,7 +4360,7 @@ function AdminDashboardScreen({ onNavigate, todos }) {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center justify-between mb-3">
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Dernières inscriptions</h3>
             <span className="text-sm font-medium" style={{ color: COLORS.orange }}>Voir tout</span>
@@ -4359,7 +4375,7 @@ function AdminDashboardScreen({ onNavigate, todos }) {
             </div>
           ))}
         </div>
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Alertes & Actions requises</h3>
           {[
             { label: "Profils en attente de vérification", value: 23, target: "verifications" },
@@ -4400,7 +4416,7 @@ function ChercheursAdminDetail(row, { onBack, update, remove }) {
       <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du profil</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce chercheur d'emploi</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil du chercheur</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <SafeImg src={row.photo} alt={row.nom} className="w-14 h-14 rounded-full object-cover mb-2" />
@@ -4475,7 +4491,7 @@ function PrestatairesAdminDetail(row, { onBack, update, remove }) {
       <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du prestataire</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce prestataire de services</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil du prestataire</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <SafeImg src={row.photo} alt={row.nom} className="w-14 h-14 rounded-full object-cover mb-2" />
@@ -4548,7 +4564,7 @@ function EntreprisesAdminDetail(row, { onBack, update, remove }) {
       <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail de l'entreprise</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de cette entreprise</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil de l'entreprise</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <div className="w-14 h-14 rounded-md flex items-center justify-center text-sm font-semibold mb-2" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.nom)}</div>
@@ -4563,7 +4579,7 @@ function EntreprisesAdminDetail(row, { onBack, update, remove }) {
           {row.siteWeb && <><div className="h-2" /><Row label="Site web" value={row.siteWeb} /></>}
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Secteurs d'activité</p>
           <div className="flex flex-wrap gap-1.5">
-            {row.secteurs.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: "#F1F1F1", color: COLORS.slate }}>{c}</span>)}
+            {row.secteurs.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{c}</span>)}
           </div>
         </div>
         <div className="flex flex-col gap-4">
@@ -4625,7 +4641,7 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez cette offre d'emploi</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6">
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.entreprise)}</div>
               <div>
@@ -4704,7 +4720,7 @@ function FormationsAdminDetail(row, { onBack, update, remove }) {
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
       <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail de la formation</h1>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6 mt-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ background: COLORS.orangeSoft }}><GraduationCap size={18} color={COLORS.orange} /></div>
             <div>
@@ -4784,7 +4800,7 @@ function MentoratAdminDetail(row, { onBack, update, remove }) {
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
       <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du mentor</h1>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6 mt-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex flex-col items-center text-center mb-4">
             <SafeImg src={row.photo} alt={row.nom} className="w-14 h-14 rounded-full object-cover mb-2" />
             <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
@@ -4864,7 +4880,7 @@ function ServicesAdminDetail(row, { onBack, update }) {
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
       <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du service</h1>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6 mt-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.prestataire)}</div>
             <div>
@@ -4879,7 +4895,7 @@ function ServicesAdminDetail(row, { onBack, update }) {
           <Row label="Forfait" value={row.forfaitInstallation} />
           <p className="text-xs font-semibold mt-4 mb-1.5" style={{ color: COLORS.slateLight }}>Zone d'intervention</p>
           <div className="flex flex-wrap gap-1.5">
-            {row.zones.map((z) => <span key={z} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: "#F1F1F1", color: COLORS.slate }}>{z}</span>)}
+            {row.zones.map((z) => <span key={z} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{z}</span>)}
           </div>
         </div>
         <div className="flex flex-col gap-4">
@@ -4940,7 +4956,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
       <h1 className="text-2xl font-bold mb-6" style={{ color: COLORS.slate }}>Détail de la candidature</h1>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.4fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.nom)}</div>
             <div>
@@ -4957,7 +4973,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
           </div>
         </div>
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center justify-between mb-1">
               <h3 className="font-semibold" style={{ color: COLORS.slate }}>Détails de l'application</h3>
               <StatusBadge status={row.statut} />
@@ -4968,7 +4984,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
             <p className="text-xs font-semibold mt-4 mb-1" style={{ color: COLORS.slateLight }}>Lettre de motivation</p>
             <p className="text-sm" style={{ color: COLORS.slate }}>{row.lettre}</p>
           </div>
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Documents joints</p>
             {row.documents.map((d) => (
               <div key={d.nom} className="flex items-center gap-2 py-1">
@@ -5028,7 +5044,7 @@ function MissionsAdminDetail(row, { onBack, update }) {
       <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail de la mission</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Mission #{row.refId}</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Informations de la mission</h3>
           <Row label="Service requis" value={row.description} /><div className="h-2" />
           <Row label="Prestataire assigné" value={row.prestataire} /><div className="h-2" />
@@ -5049,7 +5065,7 @@ function MissionsAdminDetail(row, { onBack, update }) {
         <div className="flex flex-col gap-4">
           <AdminInfoCard title="Statut actuel de la mission" rows={[{ label: "Statut opérationnel", value: row.statut, badge: true }]} />
           {row.historique.length > 0 && (
-            <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+            <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Historique des étapes</h3>
               {row.historique.map((h, i) => (
                 <div key={i} className="flex gap-3 py-2">
@@ -5121,7 +5137,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.7fr,1fr] gap-4">
         <div>
-          <div className="rounded-lg border bg-white px-4 py-3 mb-3 flex items-center justify-between" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface px-4 py-3 mb-3 flex items-center justify-between" style={{ borderColor: COLORS.border }}>
             <div>
               <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{doc.fichier}</p>
               <p className="text-xs" style={{ color: COLORS.slateLight }}>{doc.taille} · {doc.pages} pages</p>
@@ -5132,7 +5148,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
               <button type="button" onClick={() => setZoom((z) => Math.min(150, z + 10))} className="w-7 h-7 rounded-md border flex items-center justify-center" style={{ borderColor: COLORS.border }}><ZoomIn size={13} /></button>
             </div>
           </div>
-          <div className="rounded-lg border bg-white p-10 flex items-center justify-center" style={{ borderColor: COLORS.border, minHeight: 480 }}>
+          <div className="rounded-lg border bg-surface p-10 flex items-center justify-center" style={{ borderColor: COLORS.border, minHeight: 480 }}>
             <div
               className="text-center px-10 py-10"
               style={{ transform: `scale(${zoom / 100})`, transition: "transform 0.15s", border: "1px solid #E5E0D5", maxWidth: 460 }}
@@ -5151,7 +5167,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center gap-2.5 mb-3">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(doc.nom)}</div>
               <div><p className="font-semibold" style={{ color: COLORS.slate }}>{doc.nom}</p><p className="text-xs" style={{ color: COLORS.slateLight }}>{doc.metier} · Dakar</p></div>
@@ -5169,7 +5185,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             <p className="text-xs" style={{ color: "#047857" }}>Le diplôme et la spécialité correspondent aux compétences déclarées sur le profil.</p>
           </div>
 
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Points de contrôle</h3>
             {["Nom identique au profil", "Document lisible et complet", "Institution identifiable", "Date et signature présentes"].map((p) => (
               <div key={p} className="flex items-center gap-2 py-1">
@@ -5179,11 +5195,11 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             ))}
           </div>
 
-          <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Décision de contrôle</h3>
             <p className="text-xs mb-4" style={{ color: COLORS.slateLight }}>Confirmez uniquement après avoir vérifié toutes les informations visibles.</p>
-            <button type="button" onClick={() => onDecide(doc.id, "Validé")} className="w-full rounded-md py-2.5 text-sm font-semibold text-white mb-2" style={{ background: COLORS.orange }}>Valider</button>
-            <button type="button" onClick={() => onDecide(doc.id, "Rejeté")} className="w-full rounded-md py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.danger }}>Rejeter</button>
+            <button type="button" onClick={() => onDecide(doc.id, "Validé")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-sombre mb-2" style={{ background: COLORS.orange }}>Valider</button>
+            <button type="button" onClick={() => onDecide(doc.id, "Rejeté")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.danger }}>Rejeter</button>
           </div>
         </div>
       </div>
@@ -5228,7 +5244,7 @@ function VerificationCVScreen() {
 
       <div className="flex flex-wrap gap-2 mb-5">
         {["Tous", "En attente", "Validés", "Rejetés"].map((t) => (
-          <button key={t} type="button" onClick={() => { setTab(t); setPage(1); }} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t ? COLORS.orange : "#fff", color: tab === t ? "#fff" : COLORS.slate, border: `1px solid ${tab === t ? COLORS.orange : COLORS.border}` }}>
+          <button key={t} type="button" onClick={() => { setTab(t); setPage(1); }} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t ? COLORS.orange : COLORS.surface, color: tab === t ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t ? COLORS.orange : COLORS.border}` }}>
             {t} ({counts[t]})
           </button>
         ))}
@@ -5239,12 +5255,12 @@ function VerificationCVScreen() {
         value={query}
         onChange={(e) => { setQuery(e.target.value); setPage(1); }}
         placeholder="Rechercher un candidat..."
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-5 outline-none focus:border-orange-400"
+        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-5 outline-none focus:border-primaire-400"
         style={{ borderColor: COLORS.border }}
       />
 
-      <div className="rounded-lg border bg-white overflow-hidden" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center px-5 py-3" style={{ background: "#FAFAF8", borderBottom: `1px solid ${COLORS.border}` }}>
+      <div className="rounded-lg border bg-surface overflow-hidden" style={{ borderColor: COLORS.border }}>
+        <div className="flex items-center px-5 py-3" style={{ background: COLORS.soft, borderBottom: `1px solid ${COLORS.border}` }}>
           <p className="text-xs font-semibold" style={{ flex: 2, color: COLORS.slateLight }}>Utilisateur</p>
           <p className="text-xs font-semibold" style={{ flex: 1.2, color: COLORS.slateLight }}>Document</p>
           <p className="text-xs font-semibold" style={{ flex: 1.4, color: COLORS.slateLight }}>Fichier PDF</p>
@@ -5346,7 +5362,7 @@ function MessagerieTab() {
   }
 
   return (
-    <div className="rounded-lg border bg-white overflow-hidden grid grid-cols-1 md:grid-cols-[300px,1fr]" style={{ borderColor: COLORS.border, minHeight: 480 }}>
+    <div className="rounded-lg border bg-surface overflow-hidden grid grid-cols-1 md:grid-cols-[300px,1fr]" style={{ borderColor: COLORS.border, minHeight: 480 }}>
       <div className={`${active ? "hidden md:flex" : "flex"} flex-col`} style={{ borderRight: `1px solid ${COLORS.border}` }}>
         <div className="p-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
           <div className="flex items-center gap-2 rounded-md border px-3 py-2" style={{ borderColor: COLORS.border }}>
@@ -5358,7 +5374,7 @@ function MessagerieTab() {
           {visible.map((c) => {
             const last = c.messages[c.messages.length - 1];
             return (
-              <button key={c.id} type="button" onClick={() => open(c.id)} className="w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-gray-50" style={{ background: c.id === activeId ? "#FFFBF5" : undefined, borderBottom: `1px solid ${COLORS.border}` }}>
+              <button key={c.id} type="button" onClick={() => open(c.id)} className="w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-doux" style={{ background: c.id === activeId ? COLORS.orangeSubtle : undefined, borderBottom: `1px solid ${COLORS.border}` }}>
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(c.nom)}</div>
                 <div className="flex-1 min-w-0">
                   <div className="flex items-center justify-between gap-2">
@@ -5369,7 +5385,7 @@ function MessagerieTab() {
                     {last ? (last.de === "moi" ? "Vous : " : "") + last.texte : ""}
                   </p>
                 </div>
-                {c.nonLu > 0 && <span className="text-[11px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 text-white" style={{ background: COLORS.orange }}>{c.nonLu}</span>}
+                {c.nonLu > 0 && <span className="text-[11px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 text-sur-sombre" style={{ background: COLORS.orange }}>{c.nonLu}</span>}
               </button>
             );
           })}
@@ -5391,10 +5407,10 @@ function MessagerieTab() {
               <Archive size={13} /> Archiver
             </button>
           </div>
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ background: "#FAFAF8", maxHeight: 420 }}>
+          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ background: COLORS.soft, maxHeight: 420 }}>
             {active.messages.map((m, i) => (
               <div key={i} className={`max-w-[80%] ${m.de === "moi" ? "self-end" : "self-start"}`}>
-                <div className="rounded-lg px-3.5 py-2.5 text-sm leading-relaxed" style={m.de === "moi" ? { background: COLORS.orange, color: "#fff" } : { background: "#fff", color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
+                <div className="rounded-lg px-3.5 py-2.5 text-sm leading-relaxed" style={m.de === "moi" ? { background: COLORS.orange, color: COLORS.onOrange } : { background: COLORS.surface, color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
                   {m.texte}
                 </div>
                 <p className={`text-[11px] mt-1 ${m.de === "moi" ? "text-right" : ""}`} style={{ color: COLORS.slateLight }}>{m.heure}</p>
@@ -5410,10 +5426,10 @@ function MessagerieTab() {
               onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
               placeholder={`Écrire à ${active.nom}…`}
               aria-label="Votre message"
-              className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400 resize-none"
+              className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400 resize-none"
               style={{ borderColor: COLORS.border }}
             />
-            <button type="button" onClick={send} disabled={!draft.trim()} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange, opacity: draft.trim() ? 1 : 0.5 }}>
+            <button type="button" onClick={send} disabled={!draft.trim()} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: draft.trim() ? 1 : 0.5 }}>
               <Send size={14} /> Envoyer
             </button>
           </div>
@@ -5463,28 +5479,28 @@ function ArchivesTab() {
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-        <div className="rounded-lg border bg-white p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{items.length}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Éléments archivés</p></div>
-        <div className="rounded-lg border bg-white p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{docs}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents</p></div>
-        <div className="rounded-lg border bg-white p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{discussions}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p></div>
+        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{items.length}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Éléments archivés</p></div>
+        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{docs}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents</p></div>
+        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{discussions}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p></div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-4 items-center">
-        <div className="flex items-center gap-2 rounded-md border px-3 py-2 bg-white flex-1 max-w-xs" style={{ borderColor: COLORS.border }}>
+        <div className="flex items-center gap-2 rounded-md border px-3 py-2 bg-surface flex-1 max-w-xs" style={{ borderColor: COLORS.border }}>
           <Search size={14} color={COLORS.slateLight} />
           <input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Rechercher dans les archives" aria-label="Rechercher dans les archives" className="flex-1 text-sm outline-none bg-transparent min-w-0" />
         </div>
         <div className="flex gap-2">
           {["Tous", "Document", "Discussion"].map((t) => (
-            <button key={t} type="button" onClick={() => { setType(t); setPage(1); }} className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: type === t ? "#F1F1F1" : "#fff", color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
+            <button key={t} type="button" onClick={() => { setType(t); setPage(1); }} className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: type === t ? COLORS.softStrong : COLORS.surface, color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
               {t === "Tous" ? "Tous" : t === "Document" ? "Documents" : "Discussions"}
             </button>
           ))}
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white overflow-x-auto" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
         <div className="min-w-[640px]">
-          <div className="grid grid-cols-[2.4fr,1fr,1fr,0.9fr,110px] px-5 py-3 text-xs font-semibold" style={{ background: "#FAFAF8", borderBottom: `1px solid ${COLORS.border}`, color: COLORS.slateLight }}>
+          <div className="grid grid-cols-[2.4fr,1fr,1fr,0.9fr,110px] px-5 py-3 text-xs font-semibold" style={{ background: COLORS.soft, borderBottom: `1px solid ${COLORS.border}`, color: COLORS.slateLight }}>
             <p>Élément</p><p>Catégorie</p><p>Archivé le</p><p>Taille</p><p className="text-right">Action</p>
           </div>
           {paged.map((a) => (
@@ -5579,10 +5595,10 @@ function EventForm({ defaultDate, onSave, onCancel }) {
     if (v.fin < v.debut) return setError("La date de fin doit suivre la date de début.");
     onSave({ ...v, titre: v.titre.trim(), id: `e${Date.now()}` });
   }
-  const field = "w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400";
+  const field = "w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400";
   return (
     <div className="fixed inset-0 z-40 flex items-center justify-center p-4" style={{ background: "rgba(15,11,8,0.55)" }} role="dialog" aria-modal="true" aria-labelledby="event-form-title">
-      <div className="w-full max-w-md rounded-lg bg-white p-6">
+      <div className="w-full max-w-md rounded-lg bg-surface p-6">
         <div className="flex items-center justify-between mb-5">
           <h2 id="event-form-title" className="text-lg font-bold" style={{ color: COLORS.slate }}>Ajouter un événement</h2>
           <button type="button" onClick={onCancel} aria-label="Fermer"><X size={18} color={COLORS.slateLight} /></button>
@@ -5608,7 +5624,7 @@ function EventForm({ defaultDate, onSave, onCancel }) {
         {error && <p className="text-xs mb-3" style={{ color: COLORS.danger }}>{error}</p>}
         <div className="flex gap-2 justify-end">
           <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Ajouter l'événement</button>
+          <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Ajouter l'événement</button>
         </div>
       </div>
     </div>
@@ -5666,20 +5682,20 @@ function PlanningScreen() {
           <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Planning</h1>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Gérez le calendrier des formations, événements et activités de la plateforme LIGGEEY</p>
         </div>
-        <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-white shrink-0" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre shrink-0" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Ajouter un événement
         </button>
       </div>
 
       <div className="flex items-center justify-between gap-3 mt-6 mb-4 flex-wrap">
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => move(-1)} aria-label="Période précédente" className="w-7 h-7 rounded-md border flex items-center justify-center bg-white" style={{ borderColor: COLORS.border }}><ArrowLeft size={13} /></button>
+          <button type="button" onClick={() => move(-1)} aria-label="Période précédente" className="w-7 h-7 rounded-md border flex items-center justify-center bg-surface" style={{ borderColor: COLORS.border }}><ArrowLeft size={13} /></button>
           <p className="font-bold text-lg" style={{ color: COLORS.slate }} aria-live="polite">{title}</p>
-          <button type="button" onClick={() => move(1)} aria-label="Période suivante" className="w-7 h-7 rounded-md border flex items-center justify-center bg-white" style={{ borderColor: COLORS.border }}><ChevronRight size={13} /></button>
+          <button type="button" onClick={() => move(1)} aria-label="Période suivante" className="w-7 h-7 rounded-md border flex items-center justify-center bg-surface" style={{ borderColor: COLORS.border }}><ChevronRight size={13} /></button>
         </div>
         <div className="flex rounded-md border overflow-hidden" style={{ borderColor: COLORS.border }}>
           {["Mois", "Semaine", "Jour"].map((v) => (
-            <button key={v} type="button" onClick={() => { setView(v); if (v === "Mois") setCursor(new Date(selected.getFullYear(), selected.getMonth(), 1)); }} aria-pressed={view === v} className="px-4 py-1.5 text-sm" style={{ background: view === v ? "#fff" : "transparent", color: COLORS.slate, fontWeight: view === v ? 700 : 400 }}>
+            <button key={v} type="button" onClick={() => { setView(v); if (v === "Mois") setCursor(new Date(selected.getFullYear(), selected.getMonth(), 1)); }} aria-pressed={view === v} className="px-4 py-1.5 text-sm" style={{ background: view === v ? COLORS.surface : "transparent", color: COLORS.slate, fontWeight: view === v ? 700 : 400 }}>
               {v}
             </button>
           ))}
@@ -5687,7 +5703,7 @@ function PlanningScreen() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[2.4fr,1fr] gap-4">
-        <div className="rounded-lg border bg-white overflow-x-auto" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
           {view !== "Jour" && (
             <div className="min-w-[560px]">
               <div className="grid grid-cols-7" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
@@ -5699,8 +5715,8 @@ function PlanningScreen() {
                     const out = view === "Mois" && d.getMonth() !== cursor.getMonth();
                     const isSel = isoDate(d) === selKey;
                     return (
-                      <button key={ci} type="button" onClick={() => pickDay(d)} className={`p-2 text-left align-top hover:bg-gray-50 ${view === "Semaine" ? "min-h-[220px]" : "min-h-[84px]"}`} style={{ borderRight: ci < 6 ? `1px solid ${COLORS.border}` : "none", opacity: out ? 0.35 : 1 }} aria-label={`${d.getDate()} ${MOIS_FR[d.getMonth()]}, ${eventsOn(events, d).length} événement(s)`}>
-                        <span className="text-xs font-semibold mb-1 inline-flex w-6 h-6 items-center justify-center rounded-full" style={isSel ? { background: COLORS.orange, color: "#fff" } : { color: COLORS.slate }}>{d.getDate()}</span>
+                      <button key={ci} type="button" onClick={() => pickDay(d)} className={`p-2 text-left align-top hover:bg-doux ${view === "Semaine" ? "min-h-[220px]" : "min-h-[84px]"}`} style={{ borderRight: ci < 6 ? `1px solid ${COLORS.border}` : "none", opacity: out ? 0.35 : 1 }} aria-label={`${d.getDate()} ${MOIS_FR[d.getMonth()]}, ${eventsOn(events, d).length} événement(s)`}>
+                        <span className="text-xs font-semibold mb-1 inline-flex w-6 h-6 items-center justify-center rounded-full" style={isSel ? { background: COLORS.orange, color: COLORS.onOrange } : { color: COLORS.slate }}>{d.getDate()}</span>
                         {eventsOn(events, d).map((e) => <EventChip key={e.id} e={e} />)}
                       </button>
                     );
@@ -5729,7 +5745,7 @@ function PlanningScreen() {
           )}
         </div>
 
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Prochains événements</h3>
           {upcoming.length === 0 && <p className="text-sm" style={{ color: COLORS.slateLight }}>Rien de prévu après cette date.</p>}
           {upcoming.map((e, i) => (
@@ -5792,7 +5808,7 @@ function CommunicationScreen({ onNavigate }) {
 
       <div className="flex flex-wrap gap-2 mb-5">
         {["Notifications", "Messagerie", "Archives"].map((t) => (
-          <button key={t} type="button" onClick={() => setMainTab(t)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: mainTab === t ? COLORS.orange : "#fff", color: mainTab === t ? "#fff" : COLORS.slate, border: `1px solid ${mainTab === t ? COLORS.orange : COLORS.border}` }}>
+          <button key={t} type="button" onClick={() => setMainTab(t)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: mainTab === t ? COLORS.orange : COLORS.surface, color: mainTab === t ? COLORS.onOrange : COLORS.slate, border: `1px solid ${mainTab === t ? COLORS.orange : COLORS.border}` }}>
             {t}
           </button>
         ))}
@@ -5807,7 +5823,7 @@ function CommunicationScreen({ onNavigate }) {
             <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
               <div className="flex gap-2">
                 {[{ id: "Toutes", label: "Toutes" }, { id: "Non lues", label: `Non lues (${nonLues})` }, { id: "Système", label: "Système" }, { id: "Utilisateurs", label: "Utilisateurs" }].map((t) => (
-                  <button key={t.id} type="button" onClick={() => setSubTab(t.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: subTab === t.id ? "#F1F1F1" : "#fff", color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
+                  <button key={t.id} type="button" onClick={() => setSubTab(t.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: subTab === t.id ? COLORS.softStrong : COLORS.surface, color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
                     {t.label}
                   </button>
                 ))}
@@ -5820,7 +5836,7 @@ function CommunicationScreen({ onNavigate }) {
             {filtered.map((n) => {
               const Icon = n.icon;
               return (
-                <div key={n.id} className="rounded-lg border p-4 mb-3 flex items-start gap-3" style={{ borderColor: COLORS.border, background: n.lu ? "#fff" : "#FFFBF5" }}>
+                <div key={n.id} className="rounded-lg border p-4 mb-3 flex items-start gap-3" style={{ borderColor: COLORS.border, background: n.lu ? COLORS.surface : COLORS.orangeSubtle }}>
                   {!n.lu && <span className="w-1.5 h-1.5 rounded-full mt-2 shrink-0" style={{ background: COLORS.orange }} />}
                   <Icon size={16} color={COLORS.slateLight} className="mt-0.5 shrink-0" />
                   <div className="flex-1 min-w-0">
@@ -5840,18 +5856,18 @@ function CommunicationScreen({ onNavigate }) {
           </div>
 
           <div className="flex flex-col gap-4">
-            <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+            <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Statistiques de communication</h3>
               <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Total envoyées</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>1 247</p></div>
               <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Taux de lecture</p><p className="text-sm font-bold" style={{ color: "#16A34A" }}>78%</p></div>
               <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Messages en attente</p><p className="text-sm font-bold" style={{ color: COLORS.orange }}>5</p></div>
             </div>
-            <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+            <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <div className="flex items-center gap-2 mb-2"><Archive size={16} color={COLORS.slate} /><h3 className="font-semibold" style={{ color: COLORS.slate }}>Archives plateforme</h3></div>
               <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>Accédez à l'historique complet des dossiers archivés pour libérer l'espace actif de la base.</p>
               <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents archivés</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>342</p></div>
               <div className="flex items-center justify-between py-1 mb-3"><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>89</p></div>
-              <button type="button" onClick={() => setMainTab("Archives")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: "#F1F1F1", color: COLORS.slate }}>Consulter les archives</button>
+              <button type="button" onClick={() => setMainTab("Archives")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>Consulter les archives</button>
             </div>
           </div>
         </div>
@@ -5889,12 +5905,12 @@ function PasswordChanger() {
       {[{ k: "actuel", l: "Mot de passe actuel" }, { k: "nouveau", l: "Nouveau mot de passe" }, { k: "confirmation", l: "Confirmer le nouveau mot de passe" }].map((f) => (
         <div key={f.k} className="mb-3">
           <label htmlFor={`pwd-${f.k}`} className="block text-xs font-semibold mb-1" style={{ color: COLORS.slate }}>{f.l}</label>
-          <input id={`pwd-${f.k}`} type="password" value={pwd[f.k]} onChange={(e) => setPwd((s) => ({ ...s, [f.k]: e.target.value }))} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
+          <input id={`pwd-${f.k}`} type="password" value={pwd[f.k]} onChange={(e) => setPwd((s) => ({ ...s, [f.k]: e.target.value }))} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
         </div>
       ))}
       {error && <p className="text-xs mb-3" style={{ color: COLORS.danger }}>{error}</p>}
       <div className="flex gap-2">
-        <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Changer le mot de passe</button>
+        <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Changer le mot de passe</button>
         <button type="button" onClick={() => { setOpen(false); setError(""); }} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
       </div>
     </div>
@@ -5921,23 +5937,23 @@ function ParametresScreen() {
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez votre compte administrateur et les préférences de la plateforme LIGGEEY</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Compte administrateur</h3>
           <Row label="Nom" value="Admin LIGGEEY" /><div className="h-2" />
           <Row label="Rôle" value="Super Admin" /><div className="h-2" />
           <Row label="Email" value="admin@liggeey.sn" />
         </div>
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Sécurité</h3>
           <label className="flex items-center justify-between py-1.5 cursor-pointer">
             <span className="text-sm" style={{ color: COLORS.slate }}>Authentification à deux facteurs</span>
-            <input type="checkbox" checked={toggles.doubleAuth} onChange={() => toggle("doubleAuth")} className="w-4 h-4 accent-orange-500" />
+            <input type="checkbox" checked={toggles.doubleAuth} onChange={() => toggle("doubleAuth")} className="w-4 h-4 accent-primaire-500" />
           </label>
           <PasswordChanger />
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-6 mb-4" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Notifications administrateur</h3>
         {[
           { key: "notifNouveauProfil", label: "Nouveau profil en attente de vérification" },
@@ -5946,12 +5962,12 @@ function ParametresScreen() {
         ].map((n) => (
           <label key={n.key} className="flex items-center justify-between py-2 cursor-pointer" style={{ borderTop: `1px solid ${COLORS.border}` }}>
             <span className="text-sm" style={{ color: COLORS.slate }}>{n.label}</span>
-            <input type="checkbox" checked={toggles[n.key]} onChange={() => toggle(n.key)} className="w-4 h-4 accent-orange-500" />
+            <input type="checkbox" checked={toggles[n.key]} onChange={() => toggle(n.key)} className="w-4 h-4 accent-primaire-500" />
           </label>
         ))}
       </div>
 
-      <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+      <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
         Enregistrer les modifications
       </button>
       {saved && <span className="ml-3 text-sm" style={{ color: "#047857" }}>Préférences enregistrées.</span>}
@@ -6131,7 +6147,7 @@ function buildPlanApi({ espace, user, plans, setPlans, subs, setSubs, usage, set
 
 function PremiumChip({ label = "Premium", locked }) {
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "#1A130E", color: "#F9E4C4" }}>
+    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.dark, color: COLORS.brandPale }}>
       {locked ? <Lock size={10} /> : <Crown size={10} color={COLORS.orange} />}
       {label}
     </span>
@@ -6145,10 +6161,10 @@ function UsageMeter({ label, used, limit }) {
   return (
     <div>
       <div className="flex items-center justify-between text-sm mb-1.5">
-        <span style={{ color: "#B9AFA5" }}>{label}</span>
-        <span className="font-semibold text-white">{unlimited ? "Illimité" : `${used} / ${limit}`}</span>
+        <span style={{ color: COLORS.onDarkMuted }}>{label}</span>
+        <span className="font-semibold text-sur-sombre">{unlimited ? "Illimité" : `${used} / ${limit}`}</span>
       </div>
-      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: "#2C241C" }}>
+      <div className="h-1.5 rounded-full overflow-hidden" style={{ background: COLORS.darkLine }}>
         <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: unlimited ? "#4ADE80" : full ? "#F87171" : COLORS.orange }} />
       </div>
     </div>
@@ -6163,7 +6179,7 @@ function ModalFrame({ onClose, children, labelledBy, maxWidth = "max-w-md" }) {
   }, [onClose]);
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-4" style={{ background: "rgba(15,11,8,0.55)" }} onClick={onClose}>
-      <div role="dialog" aria-modal="true" aria-labelledby={labelledBy} className={`w-full ${maxWidth} rounded-lg bg-white max-h-[92vh] overflow-y-auto`} onClick={(e) => e.stopPropagation()}>
+      <div role="dialog" aria-modal="true" aria-labelledby={labelledBy} className={`w-full ${maxWidth} rounded-lg bg-surface max-h-[92vh] overflow-y-auto`} onClick={(e) => e.stopPropagation()}>
         {children}
       </div>
     </div>
@@ -6185,15 +6201,15 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
 
   return (
     <ModalFrame onClose={onClose} labelledBy="upgrade-title">
-      <div className="p-6" style={{ background: "#1A130E" }}>
+      <div className="p-6" style={{ background: COLORS.dark }}>
         <div className="flex items-start justify-between gap-4">
-          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: "#2C241C" }}>
+          <div className="w-10 h-10 rounded-full flex items-center justify-center" style={{ background: COLORS.darkLine }}>
             <Crown size={18} color={COLORS.orange} />
           </div>
-          <button type="button" onClick={onClose} aria-label="Fermer" className="text-xl leading-none" style={{ color: "#8A8078" }}>×</button>
+          <button type="button" onClick={onClose} aria-label="Fermer" className="text-xl leading-none" style={{ color: COLORS.onDarkSubtle }}>×</button>
         </div>
-        <h3 id="upgrade-title" className="text-lg font-bold text-white mt-4 mb-1">{reason.titre}</h3>
-        <p className="text-sm" style={{ color: "#B9AFA5" }}>{reason.texte}</p>
+        <h3 id="upgrade-title" className="text-lg font-bold text-sur-sombre mt-4 mb-1">{reason.titre}</h3>
+        <p className="text-sm" style={{ color: COLORS.onDarkMuted }}>{reason.texte}</p>
       </div>
 
       {target ? (
@@ -6213,7 +6229,7 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
             <button type="button" onClick={() => { onClose(); onNavigate("abonnement"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
               Comparer les profils
             </button>
-            <button type="button" onClick={() => { onClose(); api.startPayment(target.id, "mensuel"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+            <button type="button" onClick={() => { onClose(); api.startPayment(target.id, "mensuel"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
               Passer à {target.nom}
             </button>
           </div>
@@ -6261,7 +6277,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
     }, 2200);
   }
 
-  const inputCls = "w-full rounded-md border px-3 py-2.5 text-sm outline-none focus:border-orange-400";
+  const inputCls = "w-full rounded-md border px-3 py-2.5 text-sm outline-none focus:border-primaire-400";
 
   return (
     <ModalFrame onClose={step === "pending" ? () => {} : onClose} labelledBy="pay-title">
@@ -6278,7 +6294,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
           <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Durée</p>
           <div className="grid grid-cols-2 gap-2 mb-5">
             {[{ id: "mensuel", label: "Mensuel", sub: `${fcfa(target.prixMensuel)} / mois` }, { id: "annuel", label: "Annuel", sub: `${fcfa(target.prixMensuel * 10)} · 2 mois offerts` }].map((c) => (
-              <button key={c.id} type="button" onClick={() => setCycle(c.id)} aria-pressed={cycle === c.id} className="rounded-md border px-3 py-2.5 text-left" style={{ borderColor: cycle === c.id ? COLORS.orange : COLORS.border, background: cycle === c.id ? COLORS.orangeSoft : "#fff" }}>
+              <button key={c.id} type="button" onClick={() => setCycle(c.id)} aria-pressed={cycle === c.id} className="rounded-md border px-3 py-2.5 text-left" style={{ borderColor: cycle === c.id ? COLORS.orange : COLORS.border, background: cycle === c.id ? COLORS.orangeSoft : COLORS.surface }}>
                 <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{c.label}</p>
                 <p className="text-xs" style={{ color: COLORS.slateLight }}>{c.sub}</p>
               </button>
@@ -6288,7 +6304,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
           <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Moyen de paiement</p>
           <div className="grid grid-cols-2 gap-2 mb-5">
             {PAYMENT_METHODS.map((pm) => (
-              <button key={pm.id} type="button" onClick={() => { setMethod(pm.id); setTouched(false); }} aria-pressed={method === pm.id} className="rounded-md border px-3 py-2.5 flex items-center gap-2.5 text-sm font-medium" style={{ borderColor: method === pm.id ? COLORS.orange : COLORS.border, color: COLORS.slate, background: method === pm.id ? COLORS.orangeSoft : "#fff" }}>
+              <button key={pm.id} type="button" onClick={() => { setMethod(pm.id); setTouched(false); }} aria-pressed={method === pm.id} className="rounded-md border px-3 py-2.5 flex items-center gap-2.5 text-sm font-medium" style={{ borderColor: method === pm.id ? COLORS.orange : COLORS.border, color: COLORS.slate, background: method === pm.id ? COLORS.orangeSoft : COLORS.surface }}>
                 <span className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: pm.couleur }}>
                   {pm.type === "mobile" ? <Smartphone size={12} color="#fff" /> : <CreditCard size={12} color="#fff" />}
                 </span>
@@ -6301,7 +6317,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
             <div className="mb-5">
               <label htmlFor="pay-phone" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Numéro {m.nom}</label>
               <div className="flex">
-                <span className="rounded-l-md border border-r-0 px-3 py-2.5 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight, background: "#F7F5F2" }}>+221</span>
+                <span className="rounded-l-md border border-r-0 px-3 py-2.5 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight, background: COLORS.soft }}>+221</span>
                 <input id="pay-phone" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputCls} rounded-l-none`} style={{ borderColor: touched && !phoneValid ? COLORS.danger : COLORS.border }} />
               </div>
               {touched && !phoneValid && <p className="text-xs mt-1" style={{ color: COLORS.danger }}>Saisissez un numéro sénégalais à 9 chiffres, par exemple 77 123 45 67.</p>}
@@ -6324,12 +6340,12 @@ function PaymentModal({ planId, initialCycle, onClose }) {
             </div>
           )}
 
-          <div className="rounded-md px-4 py-3 mb-5 flex items-center justify-between" style={{ background: "#F7F5F2" }}>
+          <div className="rounded-md px-4 py-3 mb-5 flex items-center justify-between" style={{ background: COLORS.soft }}>
             <span className="text-sm" style={{ color: COLORS.slateLight }}>Total à payer</span>
             <span className="text-lg font-bold" style={{ color: COLORS.slate }}>{fcfa(montant)}</span>
           </div>
 
-          <button type="button" onClick={pay} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={pay} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
             Payer {fcfa(montant)}
           </button>
           <p className="text-xs text-center mt-3 flex items-center justify-center gap-1.5" style={{ color: COLORS.slateLight }}>
@@ -6359,12 +6375,12 @@ function PaymentModal({ planId, initialCycle, onClose }) {
           <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>
             Votre profil {target.nom} est actif. Prochain renouvellement le {receipt.prochain}.
           </p>
-          <div className="rounded-md px-4 py-3 mb-6 text-left text-sm flex flex-col gap-1.5" style={{ background: "#F7F5F2" }}>
+          <div className="rounded-md px-4 py-3 mb-6 text-left text-sm flex flex-col gap-1.5" style={{ background: COLORS.soft }}>
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Référence</span><span className="font-semibold" style={{ color: COLORS.slate }}>{receipt.ref}</span></div>
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Montant</span><span className="font-semibold" style={{ color: COLORS.slate }}>{fcfa(receipt.montant)}</span></div>
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Moyen</span><span className="font-semibold" style={{ color: COLORS.slate }}>{m.nom}</span></div>
           </div>
-          <button type="button" onClick={onClose} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Terminer</button>
+          <button type="button" onClick={onClose} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Terminer</button>
         </div>
       )}
     </ModalFrame>
@@ -6387,18 +6403,18 @@ function AbonnementScreen() {
       <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Mon abonnement</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Choisissez le profil adapté à votre activité. Vous pouvez changer ou résilier à tout moment.</p>
 
-      <div className="rounded-lg p-6 mb-8 grid grid-cols-1 md:grid-cols-[1fr,1fr] gap-6" style={{ background: "#1A130E" }}>
+      <div className="rounded-lg p-6 mb-8 grid grid-cols-1 md:grid-cols-[1fr,1fr] gap-6" style={{ background: COLORS.dark }}>
         <div>
-          <p className="text-sm mb-1" style={{ color: "#B9AFA5" }}>Profil actuel</p>
-          <p className="text-2xl font-bold text-white flex items-center gap-2">
+          <p className="text-sm mb-1" style={{ color: COLORS.onDarkMuted }}>Profil actuel</p>
+          <p className="text-2xl font-bold text-sur-sombre flex items-center gap-2">
             {plan.nom} {isPaid && <Crown size={20} color={COLORS.orange} />}
           </p>
           <p className="text-sm mt-1" style={{ color: COLORS.orange }}>
             {isPaid ? `${fcfa(sub.cycle === "annuel" ? plan.prixMensuel * 10 : plan.prixMensuel)} / ${sub.cycle === "annuel" ? "an" : "mois"} · renouvellement le ${sub.prochain}` : "Sans engagement, sans frais"}
           </p>
-          {plan.commission !== undefined && <p className="text-sm mt-3" style={{ color: "#B9AFA5" }}>Commission sur vos missions : <span className="text-white font-semibold">{plan.commission} %</span></p>}
+          {plan.commission !== undefined && <p className="text-sm mt-3" style={{ color: COLORS.onDarkMuted }}>Commission sur vos missions : <span className="text-sur-sombre font-semibold">{plan.commission} %</span></p>}
           {isPaid && (
-            <button type="button" onClick={() => setConfirmDowngrade(true)} className="text-xs font-semibold mt-4 underline" style={{ color: "#B9AFA5" }}>
+            <button type="button" onClick={() => setConfirmDowngrade(true)} className="text-xs font-semibold mt-4 underline" style={{ color: COLORS.onDarkMuted }}>
               Résilier l'abonnement
             </button>
           )}
@@ -6412,9 +6428,9 @@ function AbonnementScreen() {
 
       <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
         <h2 className="text-xl font-bold" style={{ color: COLORS.slate }}>Choisir votre profil</h2>
-        <div className="inline-flex rounded-md border p-0.5" style={{ borderColor: COLORS.border, background: "#fff" }} role="group" aria-label="Durée de facturation">
+        <div className="inline-flex rounded-md border p-0.5" style={{ borderColor: COLORS.border, background: COLORS.surface }} role="group" aria-label="Durée de facturation">
           {[{ id: "mensuel", label: "Mensuel" }, { id: "annuel", label: "Annuel · 2 mois offerts" }].map((c) => (
-            <button key={c.id} type="button" onClick={() => setCycle(c.id)} aria-pressed={cycle === c.id} className="rounded px-3 py-1.5 text-sm font-semibold" style={{ background: cycle === c.id ? COLORS.slate : "transparent", color: cycle === c.id ? "#fff" : COLORS.slateLight }}>
+            <button key={c.id} type="button" onClick={() => setCycle(c.id)} aria-pressed={cycle === c.id} className="rounded px-3 py-1.5 text-sm font-semibold" style={{ background: cycle === c.id ? COLORS.dark : "transparent", color: cycle === c.id ? COLORS.onDark : COLORS.slateLight }}>
               {c.label}
             </button>
           ))}
@@ -6433,7 +6449,7 @@ function AbonnementScreen() {
           else if (isCurrent) cta = { label: cycle === "annuel" ? "Passer en annuel" : "Passer en mensuel", onClick: () => api.startPayment(p.id, cycle) };
           else cta = { label: p.prixMensuel > plan.prixMensuel ? `Passer à ${p.nom}` : `Choisir ${p.nom}`, onClick: () => api.startPayment(p.id, cycle) };
           return (
-            <div key={p.id} className="rounded-lg bg-white p-6 flex flex-col relative" style={{ border: `${isCurrent ? 2 : 1}px solid ${isCurrent ? COLORS.orange : COLORS.border}` }}>
+            <div key={p.id} className="rounded-lg bg-surface p-6 flex flex-col relative" style={{ border: `${isCurrent ? 2 : 1}px solid ${isCurrent ? COLORS.orange : COLORS.border}` }}>
               <div className="flex items-center justify-between mb-1 min-h-[24px]">
                 <p className="font-bold text-lg" style={{ color: COLORS.slate }}>{p.nom}</p>
                 {p.recommande && !isCurrent && <PremiumChip label="Recommandé" />}
@@ -6456,7 +6472,7 @@ function AbonnementScreen() {
                 disabled={cta.disabled}
                 onClick={cta.onClick}
                 className="w-full rounded-md px-4 py-2.5 text-sm font-semibold"
-                style={cta.disabled ? { background: "#F1F1F1", color: COLORS.slateLight, cursor: "default" } : cta.secondary ? { border: `1px solid ${COLORS.border}`, color: COLORS.slate } : { background: COLORS.orange, color: "#fff" }}
+                style={cta.disabled ? { background: COLORS.softStrong, color: COLORS.slateLight, cursor: "default" } : cta.secondary ? { border: `1px solid ${COLORS.border}`, color: COLORS.slate } : { background: COLORS.orange, color: COLORS.onOrange }}
               >
                 {cta.label}
               </button>
@@ -6466,7 +6482,7 @@ function AbonnementScreen() {
       </div>
 
       <h2 className="text-xl font-bold mb-4" style={{ color: COLORS.slate }}>Historique des paiements</h2>
-      <div className="rounded-lg border bg-white overflow-x-auto" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
         {history.length === 0 ? (
           <div className="p-6 text-sm flex items-center gap-2" style={{ color: COLORS.slateLight }}>
             <Receipt size={16} /> Aucun paiement pour l'instant. Vos reçus apparaîtront ici après votre premier abonnement.
@@ -6508,7 +6524,7 @@ function AbonnementScreen() {
               ))}
             </ul>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setConfirmDowngrade(false)} className="rounded-md px-4 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Garder mon offre</button>
+              <button type="button" onClick={() => setConfirmDowngrade(false)} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Garder mon offre</button>
               <button type="button" onClick={() => { api.downgrade(); setConfirmDowngrade(false); }} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Résilier</button>
             </div>
           </div>
@@ -6561,20 +6577,20 @@ function AbonnementsAdminScreen() {
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4 mb-8">
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Revenus des abonnements (6 derniers mois)</h3>
           <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
               <BarChart data={REVENUS_MOIS}>
                 <XAxis dataKey="mois" tick={{ fontSize: 12, fill: COLORS.slateLight }} axisLine={false} tickLine={false} />
                 <YAxis tick={{ fontSize: 11, fill: COLORS.slateLight }} axisLine={false} tickLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}k`} width={40} />
-                <Tooltip formatter={(v) => fcfa(v)} cursor={{ fill: "#F7F5F2" }} />
+                <Tooltip formatter={(v) => fcfa(v)} cursor={{ fill: COLORS.soft }} />
                 <Bar dataKey="montant" fill={COLORS.orange} radius={[4, 4, 0, 0]} />
               </BarChart>
             </ResponsiveContainer>
           </div>
         </div>
-        <div className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Encaissements par moyen de paiement</h3>
           <div style={{ height: 150 }}>
             <ResponsiveContainer width="100%" height="100%">
@@ -6599,7 +6615,7 @@ function AbonnementsAdminScreen() {
 
       <div className="flex flex-wrap gap-2 mb-5">
         {tabs.map((t) => (
-          <button key={t.id} type="button" onClick={() => { setTab(t.id); setPage(1); }} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t.id ? COLORS.orange : "#fff", color: tab === t.id ? "#fff" : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}>
+          <button key={t.id} type="button" onClick={() => { setTab(t.id); setPage(1); }} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}>
             {t.label}
           </button>
         ))}
@@ -6608,7 +6624,7 @@ function AbonnementsAdminScreen() {
       {tab !== "tarifs" && (
         <>
           <div className="flex flex-wrap gap-3 mb-4">
-            <input type="text" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder={tab === "abonnes" ? "Rechercher un abonné..." : "Rechercher un client ou une référence..."} className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-orange-400 flex-1 max-w-xs" style={{ borderColor: COLORS.border }} />
+            <input type="text" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder={tab === "abonnes" ? "Rechercher un abonné..." : "Rechercher un client ou une référence..."} className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs" style={{ borderColor: COLORS.border }} />
             <select value={espaceFilter} onChange={(e) => { setEspaceFilter(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }} aria-label="Filtrer par espace">
               <option value="tous">Tous les espaces</option>
               <option value="chercheur">Chercheurs d'emploi</option>
@@ -6617,7 +6633,7 @@ function AbonnementsAdminScreen() {
             </select>
           </div>
 
-          <div className="rounded-lg border bg-white overflow-x-auto" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
             <table className="w-full text-sm min-w-[760px]">
               <thead>
                 <tr style={{ color: COLORS.slateLight, borderBottom: `1px solid ${COLORS.border}` }}>
@@ -6670,20 +6686,20 @@ function AbonnementsAdminScreen() {
           <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Les prix et quotas modifiés ici s'appliquent immédiatement aux écrans « Abonnement » de chaque espace.</p>
           <div className="flex flex-col gap-4">
             {Object.keys(draft).map((esp) => (
-              <div key={esp} className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+              <div key={esp} className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
                 <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>{ESPACE_LABELS[esp]}</h3>
                 <div className={`grid grid-cols-1 ${draft[esp].length === 3 ? "md:grid-cols-3" : "md:grid-cols-2"} gap-3`}>
                   {draft[esp].map((p) => {
                     const limitKey = Object.keys(p.limits)[0];
                     const lim = p.limits[limitKey];
                     return (
-                      <div key={p.id} className="rounded-md p-4" style={{ background: "#F7F5F2" }}>
+                      <div key={p.id} className="rounded-md p-4" style={{ background: COLORS.soft }}>
                         <p className="font-semibold mb-3" style={{ color: COLORS.slate }}>{p.nom}</p>
                         <label className="block text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }} htmlFor={`prix-${esp}-${p.id}`}>Prix mensuel (FCFA)</label>
-                        <input id={`prix-${esp}-${p.id}`} type="number" min={0} step={500} disabled={p.prixMensuel === 0 && p.id === draft[esp][0].id} value={p.prixMensuel} onChange={(e) => setPlanField(esp, p.id, "prix", Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-md border px-3 py-2 text-sm mb-3 bg-white outline-none focus:border-orange-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
+                        <input id={`prix-${esp}-${p.id}`} type="number" min={0} step={500} disabled={p.prixMensuel === 0 && p.id === draft[esp][0].id} value={p.prixMensuel} onChange={(e) => setPlanField(esp, p.id, "prix", Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-md border px-3 py-2 text-sm mb-3 bg-surface outline-none focus:border-primaire-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
                         <label className="block text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }} htmlFor={`lim-${esp}-${p.id}`}>{LIMIT_LABELS[limitKey]}</label>
                         <div className="flex items-center gap-2">
-                          <input id={`lim-${esp}-${p.id}`} type="number" min={1} disabled={lim === UNLIMITED} value={lim === UNLIMITED ? "" : lim} placeholder="Illimité" onChange={(e) => setPlanField(esp, p.id, limitKey, Math.max(1, Number(e.target.value) || 1))} className="flex-1 min-w-0 rounded-md border px-3 py-2 text-sm bg-white outline-none focus:border-orange-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
+                          <input id={`lim-${esp}-${p.id}`} type="number" min={1} disabled={lim === UNLIMITED} value={lim === UNLIMITED ? "" : lim} placeholder="Illimité" onChange={(e) => setPlanField(esp, p.id, limitKey, Math.max(1, Number(e.target.value) || 1))} className="flex-1 min-w-0 rounded-md border px-3 py-2 text-sm bg-surface outline-none focus:border-primaire-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
                           <label className="flex items-center gap-1.5 text-xs whitespace-nowrap" style={{ color: COLORS.slate }}>
                             <input type="checkbox" checked={lim === UNLIMITED} onChange={(e) => setPlanField(esp, p.id, limitKey, e.target.checked ? UNLIMITED : 5)} /> Illimité
                           </label>
@@ -6697,7 +6713,7 @@ function AbonnementsAdminScreen() {
           </div>
           <div className="flex justify-end gap-2 mt-5">
             <button type="button" disabled={!dirty} onClick={() => setDraft(api.plans)} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate, opacity: dirty ? 1 : 0.5 }}>Annuler les modifications</button>
-            <button type="button" disabled={!dirty} onClick={() => { api.setPlans(draft); notify("Tarifs et quotas enregistrés."); }} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange, opacity: dirty ? 1 : 0.5 }}>Enregistrer les tarifs</button>
+            <button type="button" disabled={!dirty} onClick={() => { api.setPlans(draft); notify("Tarifs et quotas enregistrés."); }} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: dirty ? 1 : 0.5 }}>Enregistrer les tarifs</button>
           </div>
         </div>
       )}
@@ -6746,11 +6762,11 @@ function isPremiumPlan(plan) {
 function TierBadge({ premium, size = "md" }) {
   const cls = size === "sm" ? "text-[11px] px-2 py-0.5" : "text-xs px-3 py-1";
   return premium ? (
-    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: "#1A130E", color: "#F9E4C4" }}>
+    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.dark, color: COLORS.brandPale }}>
       <Crown size={size === "sm" ? 10 : 12} color={COLORS.orange} /> Premium
     </span>
   ) : (
-    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: "#F1F1F1", color: COLORS.slateLight }}>
+    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.softStrong, color: COLORS.slateLight }}>
       Essentiel
     </span>
   );
@@ -6770,18 +6786,18 @@ function ProfileTierCard() {
   const rows = PROFILE_TIER_PERKS[api.espace] || [];
 
   return (
-    <div className="rounded-lg bg-white mb-4 overflow-hidden" style={{ border: `1px solid ${premium ? COLORS.orange : COLORS.border}` }}>
-      <div className="px-6 py-4 flex items-center justify-between flex-wrap gap-3" style={{ background: premium ? "#1A130E" : "#F7F5F2" }}>
+    <div className="rounded-lg bg-surface mb-4 overflow-hidden" style={{ border: `1px solid ${premium ? COLORS.orange : COLORS.border}` }}>
+      <div className="px-6 py-4 flex items-center justify-between flex-wrap gap-3" style={{ background: premium ? COLORS.dark : COLORS.soft }}>
         <div>
-          <p className="font-semibold" style={{ color: premium ? "#fff" : COLORS.slate }}>
+          <p className="font-semibold" style={{ color: premium ? COLORS.onDark : COLORS.slate }}>
             {premium ? "Votre profil est Premium" : "Votre profil est Essentiel"}
           </p>
-          <p className="text-sm" style={{ color: premium ? "#B9AFA5" : COLORS.slateLight }}>
+          <p className="text-sm" style={{ color: premium ? COLORS.onDarkMuted : COLORS.slateLight }}>
             {premium ? `Actif jusqu'au ${api.sub.prochain || "prochain renouvellement"}.` : "Passez au profil Premium pour être vu en priorité."}
           </p>
         </div>
         {!premium && premiumPlan && (
-          <button type="button" onClick={() => api.startPayment(premiumPlan.id, "mensuel")} className="rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={() => api.startPayment(premiumPlan.id, "mensuel")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
             <Crown size={14} /> Passer au profil Premium · {fcfa(premiumPlan.prixMensuel)}/mois
           </button>
         )}
@@ -6825,8 +6841,8 @@ function ProfileTierCard() {
             {rows.map(([label, ess, prem]) => (
               <tr key={label} style={{ borderTop: `1px solid ${COLORS.border}` }}>
                 <td className="px-6 py-2.5" style={{ color: COLORS.slate }}>{label}</td>
-                <td className="px-4 py-2.5" style={{ color: COLORS.slateLight, background: !premium ? "#FFF8EE" : "transparent" }}>{ess}</td>
-                <td className="px-4 py-2.5 font-medium" style={{ color: COLORS.slate, background: premium ? "#FFF8EE" : "transparent" }}>{prem}</td>
+                <td className="px-4 py-2.5" style={{ color: COLORS.slateLight, background: !premium ? COLORS.orangeSubtle : "transparent" }}>{ess}</td>
+                <td className="px-4 py-2.5 font-medium" style={{ color: COLORS.slate, background: premium ? COLORS.orangeSubtle : "transparent" }}>{prem}</td>
               </tr>
             ))}
           </tbody>
@@ -6919,12 +6935,12 @@ function BookingPanel({ profile, title, submitLabel, onConfirm, onCancel }) {
   const [format, setFormat] = useState(profile.formats[0]);
   const [message, setMessage] = useState("");
   return (
-    <div className="rounded-lg border bg-white p-5 mb-4" style={{ borderColor: COLORS.orange }}>
+    <div className="rounded-lg border bg-surface p-5 mb-4" style={{ borderColor: COLORS.orange }}>
       <h4 className="font-semibold mb-3" style={{ color: COLORS.slate }}>{title}</h4>
       <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Créneaux disponibles</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
         {slots.map((s) => (
-          <button key={s} type="button" onClick={() => setSlot(s)} aria-pressed={slot === s} className="rounded-md border px-3 py-2 text-sm text-left" style={{ borderColor: slot === s ? COLORS.orange : COLORS.border, background: slot === s ? COLORS.orangeSoft : "#fff", color: COLORS.slate }}>
+          <button key={s} type="button" onClick={() => setSlot(s)} aria-pressed={slot === s} className="rounded-md border px-3 py-2 text-sm text-left" style={{ borderColor: slot === s ? COLORS.orange : COLORS.border, background: slot === s ? COLORS.orangeSoft : COLORS.surface, color: COLORS.slate }}>
             {s}
           </button>
         ))}
@@ -6945,10 +6961,10 @@ function BookingPanel({ profile, title, submitLabel, onConfirm, onCancel }) {
       </div>
       <label className="block text-xs font-semibold mb-4" style={{ color: COLORS.slateLight }}>
         Message au mentor (facultatif)
-        <textarea rows={2} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Ce que vous aimeriez travailler pendant la séance…" className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
+        <textarea rows={2} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Ce que vous aimeriez travailler pendant la séance…" className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
       </label>
       <div className="flex gap-2">
-        <button type="button" disabled={!slot} onClick={() => onConfirm({ date: slot, theme, format, message })} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange, opacity: slot ? 1 : 0.5 }}>{submitLabel}</button>
+        <button type="button" disabled={!slot} onClick={() => onConfirm({ date: slot, theme, format, message })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: slot ? 1 : 0.5 }}>{submitLabel}</button>
         <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
       </div>
     </div>
@@ -6998,17 +7014,17 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
         <ArrowLeft size={14} /> Retour aux mentors
       </button>
 
-      <div className="rounded-lg p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-5" style={{ background: "#1A130E" }}>
+      <div className="rounded-lg p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-5" style={{ background: COLORS.dark }}>
         <div className="flex items-center gap-4 min-w-0">
           <SafeImg src={mentor.photo} alt={mentor.nom} className="w-16 h-16 rounded-full object-cover border-2 shrink-0" style={{ borderColor: COLORS.orange }} />
           <div className="min-w-0">
-            <p className="text-xl font-bold text-white">{mentor.nom}</p>
+            <p className="text-xl font-bold text-sur-sombre">{mentor.nom}</p>
             <p className="text-sm mb-1" style={{ color: COLORS.orange }}>{mentor.role} · {mentor.exp} ans d'expérience</p>
             <p className="text-sm text-white/60">{profile.bio}</p>
-            <p className="text-xs mt-2" style={{ color: "#8A8078" }}>Parle {profile.langues.join(", ")} · {profile.formats.join(", ")}</p>
+            <p className="text-xs mt-2" style={{ color: COLORS.onDarkSubtle }}>Parle {profile.langues.join(", ")} · {profile.formats.join(", ")}</p>
           </div>
         </div>
-        <button type="button" onClick={openBooking} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white shrink-0 inline-flex items-center gap-1.5 self-start md:self-auto" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={openBooking} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre shrink-0 inline-flex items-center gap-1.5 self-start md:self-auto" style={{ background: COLORS.orange }}>
           {locked ? <Lock size={14} /> : <Calendar size={14} />} Réserver un coaching
         </button>
       </div>
@@ -7022,7 +7038,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
 
       <div className="flex flex-wrap gap-2 mb-5" role="tablist">
         {tabs.map((t) => (
-          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t.id ? COLORS.orange : "#fff", color: tab === t.id ? "#fff" : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}>
+          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}>
             {t.label}
           </button>
         ))}
@@ -7030,7 +7046,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
 
       {tab === "profil" && (
         <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4">
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Parcours professionnel</h3>
             <ol className="relative">
               {profile.parcours.map((p, i) => (
@@ -7048,7 +7064,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
               ))}
             </ol>
           </div>
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Domaines d'accompagnement</h3>
             <div className="flex flex-wrap gap-2">
               {(mentor.competences || profile.themes).map((c) => (
@@ -7071,16 +7087,16 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
             />
           )}
           {coachings.upcoming.length === 0 && !booking && (
-            <div className="rounded-lg border bg-white p-6 text-center" style={{ borderColor: COLORS.border }}>
+            <div className="rounded-lg border bg-surface p-6 text-center" style={{ borderColor: COLORS.border }}>
               <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>Aucun coaching prévu avec {prenom}. Réservez un créneau pour commencer.</p>
-              <button type="button" onClick={openBooking} className="rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+              <button type="button" onClick={openBooking} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
                 {locked && <Lock size={13} />} Réserver un coaching
               </button>
             </div>
           )}
           <div className="flex flex-col gap-3">
             {coachings.upcoming.map((u) => (
-              <div key={u.id} className="rounded-lg border bg-white p-5 flex flex-col md:flex-row md:items-center justify-between gap-4" style={{ borderColor: COLORS.border }}>
+              <div key={u.id} className="rounded-lg border bg-surface p-5 flex flex-col md:flex-row md:items-center justify-between gap-4" style={{ borderColor: COLORS.border }}>
                 <div className="flex items-start gap-3">
                   <div className="w-10 h-10 rounded-md flex items-center justify-center shrink-0" style={{ background: COLORS.orangeSoft }}>
                     {u.format === "Visio" ? <Video size={17} color={COLORS.orange} /> : u.format === "Téléphone" ? <Phone size={17} color={COLORS.orange} /> : <MapPin size={17} color={COLORS.orange} />}
@@ -7099,7 +7115,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
                 ) : (
                   <div className="flex gap-2 flex-wrap">
                     {u.format !== "Présentiel à Dakar" && (
-                      <button type="button" onClick={() => notify(`Connexion à la séance avec ${mentor.nom}…`)} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Rejoindre</button>
+                      <button type="button" onClick={() => notify(`Connexion à la séance avec ${mentor.nom}…`)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Rejoindre</button>
                     )}
                     <button type="button" onClick={() => setBooking({ mode: "move", id: u.id })} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Reprogrammer</button>
                     <button type="button" onClick={() => setToCancel(u.id)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ color: COLORS.danger }}>Annuler</button>
@@ -7114,12 +7130,12 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
       {tab === "historique" && (
         <div className="flex flex-col gap-3">
           {coachings.history.length === 0 && (
-            <div className="rounded-lg border bg-white p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>
+            <div className="rounded-lg border bg-surface p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>
               Vous n'avez pas encore eu de séance avec {prenom}. Les comptes rendus apparaîtront ici après chaque coaching.
             </div>
           )}
           {coachings.history.map((h) => (
-            <div key={h.id} className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+            <div key={h.id} className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <div className="flex items-start justify-between gap-3 flex-wrap mb-2">
                 <div>
                   <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{h.theme}</p>
@@ -7145,7 +7161,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
 
       {tab === "documents" && (
         <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Documents partagés</h3>
             {mentor.documents ? (
               <div className="flex flex-col divide-y">
@@ -7166,10 +7182,10 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
               <p className="text-sm" style={{ color: COLORS.slateLight }}>{prenom} partagera ses documents après votre première séance.</p>
             )}
           </div>
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Mes notes personnelles</h3>
-            <textarea value={note} onChange={(e) => { setNote(e.target.value); setSaved(false); }} placeholder="Ajoutez vos notes ici..." rows={4} className="w-full rounded-md border px-4 py-3 text-sm outline-none focus:border-orange-400 mb-3" style={{ borderColor: COLORS.border }} />
-            <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Enregistrer</button>
+            <textarea value={note} onChange={(e) => { setNote(e.target.value); setSaved(false); }} placeholder="Ajoutez vos notes ici..." rows={4} className="w-full rounded-md border px-4 py-3 text-sm outline-none focus:border-primaire-400 mb-3" style={{ borderColor: COLORS.border }} />
+            <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Enregistrer</button>
             {saved && <span className="ml-3 text-sm" style={{ color: "#047857" }}>Note enregistrée.</span>}
           </div>
         </div>
@@ -7265,7 +7281,7 @@ const PLACEMENTS_AUTRES = [
   { id: "pl3", nom: "Awa Ndiaye", entreprise: "Teranga Capital", poste: "Assistante comptable", jour: 74, statut: "En période d'essai" },
 ];
 
-function ProgressBar({ pct, color = COLORS.orange, track = "#F1F1F1" }) {
+function ProgressBar({ pct, color = COLORS.orange, track = COLORS.softStrong }) {
   return (
     <div className="h-1.5 rounded-full overflow-hidden" style={{ background: track }}>
       <div className="h-full rounded-full" style={{ width: `${Math.min(100, Math.max(0, pct))}%`, background: color }} />
@@ -7294,11 +7310,11 @@ function CheckinForm({ jalon, onSubmit, onCancel }) {
   const [commentaire, setCommentaire] = useState("");
   const complete = humeur > 0 && CHECKIN_QUESTIONS.every((q) => rep[q.id]);
   return (
-    <div className="rounded-md p-4 mt-3" style={{ background: "#F7F5F2" }}>
+    <div className="rounded-md p-4 mt-3" style={{ background: COLORS.soft }}>
       <p className="text-sm font-semibold mb-2" style={{ color: COLORS.slate }}>Comment se passe votre poste en ce moment ?</p>
       <div className="flex flex-wrap gap-1.5 mb-4">
         {HUMEURS.map((h, i) => (
-          <button key={h} type="button" onClick={() => setHumeur(i + 1)} aria-pressed={humeur === i + 1} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: humeur === i + 1 ? COLORS.orange : COLORS.border, background: humeur === i + 1 ? COLORS.orange : "#fff", color: humeur === i + 1 ? "#fff" : COLORS.slate }}>
+          <button key={h} type="button" onClick={() => setHumeur(i + 1)} aria-pressed={humeur === i + 1} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: humeur === i + 1 ? COLORS.orange : COLORS.border, background: humeur === i + 1 ? COLORS.orange : COLORS.surface, color: humeur === i + 1 ? COLORS.onOrange : COLORS.slate }}>
             {h}
           </button>
         ))}
@@ -7308,17 +7324,17 @@ function CheckinForm({ jalon, onSubmit, onCancel }) {
           <span className="text-sm" style={{ color: COLORS.slate }}>{q.label}</span>
           <div className="flex gap-1">
             {["Oui", "En partie", "Non"].map((o) => (
-              <button key={o} type="button" onClick={() => setRep((r) => ({ ...r, [q.id]: o }))} aria-pressed={rep[q.id] === o} className="rounded-md px-2.5 py-1 text-xs font-semibold border" style={{ borderColor: rep[q.id] === o ? COLORS.slate : COLORS.border, background: rep[q.id] === o ? COLORS.slate : "#fff", color: rep[q.id] === o ? "#fff" : COLORS.slate }}>
+              <button key={o} type="button" onClick={() => setRep((r) => ({ ...r, [q.id]: o }))} aria-pressed={rep[q.id] === o} className="rounded-md px-2.5 py-1 text-xs font-semibold border" style={{ borderColor: rep[q.id] === o ? COLORS.slate : COLORS.border, background: rep[q.id] === o ? COLORS.dark : COLORS.surface, color: rep[q.id] === o ? COLORS.onDark : COLORS.slate }}>
                 {o}
               </button>
             ))}
           </div>
         </div>
       ))}
-      <textarea rows={2} value={commentaire} onChange={(e) => setCommentaire(e.target.value)} placeholder="Un commentaire pour votre référente LIGGEEY (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-3 outline-none focus:border-orange-400 bg-white" style={{ borderColor: COLORS.border }} />
+      <textarea rows={2} value={commentaire} onChange={(e) => setCommentaire(e.target.value)} placeholder="Un commentaire pour votre référente LIGGEEY (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-3 outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border }} />
       <div className="flex gap-2 mt-3">
-        <button type="button" disabled={!complete} onClick={() => onSubmit({ humeur, reponses: rep, commentaire })} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange, opacity: complete ? 1 : 0.5 }}>Envoyer le point de suivi</button>
-        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-white" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Plus tard</button>
+        <button type="button" disabled={!complete} onClick={() => onSubmit({ humeur, reponses: rep, commentaire })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: complete ? 1 : 0.5 }}>Envoyer le point de suivi</button>
+        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Plus tard</button>
       </div>
       {!complete && <p className="text-xs mt-2" style={{ color: COLORS.slateLight }}>Répondez à toutes les questions pour envoyer le point de suivi.</p>}
     </div>
@@ -7329,21 +7345,21 @@ function SignalementForm({ types, onSubmit, onCancel, intro }) {
   const [type, setType] = useState(types[0]);
   const [description, setDescription] = useState("");
   return (
-    <div className="rounded-md p-4" style={{ background: "#F7F5F2" }}>
+    <div className="rounded-md p-4" style={{ background: COLORS.soft }}>
       {intro && <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>{intro}</p>}
       <label className="block text-xs font-semibold mb-3" style={{ color: COLORS.slateLight }}>
         Type de difficulté
-        <select value={type} onChange={(e) => setType(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none bg-white" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
+        <select value={type} onChange={(e) => setType(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
           {types.map((t) => <option key={t}>{t}</option>)}
         </select>
       </label>
       <label className="block text-xs font-semibold mb-3" style={{ color: COLORS.slateLight }}>
         Décrivez la situation
-        <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400 bg-white" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
+        <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
       </label>
       <div className="flex gap-2">
-        <button type="button" disabled={!description.trim()} onClick={() => onSubmit({ type, description })} className="rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center gap-1.5" style={{ background: COLORS.orange, opacity: description.trim() ? 1 : 0.5 }}><Flag size={14} /> Envoyer le signalement</button>
-        {onCancel && <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-white" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>}
+        <button type="button" disabled={!description.trim()} onClick={() => onSubmit({ type, description })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange, opacity: description.trim() ? 1 : 0.5 }}><Flag size={14} /> Envoyer le signalement</button>
+        {onCancel && <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>}
       </div>
     </div>
   );
@@ -7375,23 +7391,23 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
       <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Suivi post-embauche</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>LIGGEEY reste à vos côtés pendant les six premiers mois de votre nouveau poste.</p>
 
-      <div className="rounded-lg p-6 mb-6" style={{ background: "#1A130E" }}>
+      <div className="rounded-lg p-6 mb-6" style={{ background: COLORS.dark }}>
         <div className="flex items-start justify-between flex-wrap gap-4 mb-5">
           <div>
-            <p className="text-xl font-bold text-white">{e.poste} · {e.entreprise}</p>
-            <p className="text-sm" style={{ color: "#B9AFA5" }}>{e.contrat} · {e.ville} · Responsable : {e.manager}</p>
+            <p className="text-xl font-bold text-sur-sombre">{e.poste} · {e.entreprise}</p>
+            <p className="text-sm" style={{ color: COLORS.onDarkMuted }}>{e.contrat} · {e.ville} · Responsable : {e.manager}</p>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#2C241C", color: COLORS.orange }}>En poste depuis {jour} jours</span>
+          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.darkLine, color: COLORS.orange }}>En poste depuis {jour} jours</span>
         </div>
         <div className="flex justify-between text-sm mb-1.5">
-          <span style={{ color: "#B9AFA5" }}>Période d'essai</span>
-          <span className="text-white font-semibold">{jour >= DUREE_ESSAI ? "Terminée" : `Jour ${jour} sur ${DUREE_ESSAI} · fin le ${frLongDate(finEssai)}`}</span>
+          <span style={{ color: COLORS.onDarkMuted }}>Période d'essai</span>
+          <span className="text-sur-sombre font-semibold">{jour >= DUREE_ESSAI ? "Terminée" : `Jour ${jour} sur ${DUREE_ESSAI} · fin le ${frLongDate(finEssai)}`}</span>
         </div>
-        <ProgressBar pct={(jour / DUREE_ESSAI) * 100} track="#2C241C" />
+        <ProgressBar pct={(jour / DUREE_ESSAI) * 100} track={COLORS.darkLine} />
       </div>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr,1fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Points de suivi</h3>
           <ol>
             {JALONS.map((j, i) => {
@@ -7400,7 +7416,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
               return (
                 <li key={j.id} className="flex gap-3 pb-5 last:pb-0">
                   <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0" style={{ background: statut === "Fait" ? "#DCFCE7" : statut === "À compléter" ? COLORS.orange : "#F1F1F1", color: statut === "Fait" ? "#16A34A" : statut === "À compléter" ? "#fff" : COLORS.slateLight }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0" style={{ background: statut === "Fait" ? "#DCFCE7" : statut === "À compléter" ? COLORS.orange : COLORS.softStrong, color: statut === "Fait" ? "#16A34A" : statut === "À compléter" ? COLORS.onOrange : COLORS.slateLight }}>
                       {statut === "Fait" ? <Check size={12} /> : i + 1}
                     </div>
                     {i < JALONS.length - 1 && <div className="w-px flex-1 mt-1" style={{ background: COLORS.border }} />}
@@ -7412,7 +7428,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
                         <p className="text-xs" style={{ color: COLORS.slateLight }}>Jour {j.jour} · {frLongDate(jalonDate(e.dateIso, j.jour))}</p>
                       </div>
                       {statut === "À compléter" && openJalon !== j.id ? (
-                        <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-white" style={{ background: COLORS.orange }}>Répondre</button>
+                        <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Répondre</button>
                       ) : (
                         <StatusBadge status={statut} />
                       )}
@@ -7431,7 +7447,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
         </div>
 
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Votre référente</h3>
             <div className="flex items-center gap-3 mb-4">
               <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(e.referent.nom)}</div>
@@ -7446,7 +7462,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
             </div>
           </div>
 
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center justify-between mb-2">
               <h3 className="font-semibold" style={{ color: COLORS.slate }}>Objectifs d'intégration</h3>
               <span className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>{objectifsFaits}/{OBJECTIFS_INTEGRATION.length}</span>
@@ -7454,7 +7470,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
             <div className="mb-3"><ProgressBar pct={(objectifsFaits / OBJECTIFS_INTEGRATION.length) * 100} color="#16A34A" /></div>
             {OBJECTIFS_INTEGRATION.map((o) => (
               <label key={o.id} className="flex items-start gap-2.5 py-1.5 cursor-pointer">
-                <input type="checkbox" className="mt-0.5 accent-orange-500" checked={!!suivi.objectifs[o.id]} onChange={(ev) => setSuivi((s) => ({ ...s, objectifs: { ...s.objectifs, [o.id]: ev.target.checked } }))} />
+                <input type="checkbox" className="mt-0.5 accent-primaire-500" checked={!!suivi.objectifs[o.id]} onChange={(ev) => setSuivi((s) => ({ ...s, objectifs: { ...s.objectifs, [o.id]: ev.target.checked } }))} />
                 <span className="text-sm" style={{ color: suivi.objectifs[o.id] ? COLORS.slateLight : COLORS.slate, textDecoration: suivi.objectifs[o.id] ? "line-through" : "none" }}>{o.label}</span>
               </label>
             ))}
@@ -7462,7 +7478,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
           <div>
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Une difficulté dans votre poste ?</h3>
@@ -7480,7 +7496,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
         {mesSignalements.length > 0 && (
           <div className="mt-4 flex flex-col gap-2">
             {mesSignalements.map((s) => (
-              <div key={s.id} className="flex items-start justify-between gap-3 rounded-md px-4 py-3" style={{ background: "#F7F5F2" }}>
+              <div key={s.id} className="flex items-start justify-between gap-3 rounded-md px-4 py-3" style={{ background: COLORS.soft }}>
                 <div>
                   <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{s.type}</p>
                   <p className="text-xs" style={{ color: COLORS.slateLight }}>Envoyé le {s.date} · {s.description}</p>
@@ -7499,14 +7515,14 @@ function EvaluationRecrueForm({ onSubmit, onCancel }) {
   const [v, setV] = useState({ competences: 0, integration: 0, ponctualite: 0, commentaire: "" });
   const ok = v.competences && v.integration && v.ponctualite;
   return (
-    <div className="rounded-md p-4 mt-3" style={{ background: "#F7F5F2" }}>
+    <div className="rounded-md p-4 mt-3" style={{ background: COLORS.soft }}>
       <RatingInput label="Compétences techniques" value={v.competences} onChange={(n) => setV((s) => ({ ...s, competences: n }))} />
       <RatingInput label="Intégration dans l'équipe" value={v.integration} onChange={(n) => setV((s) => ({ ...s, integration: n }))} />
       <RatingInput label="Ponctualité et assiduité" value={v.ponctualite} onChange={(n) => setV((s) => ({ ...s, ponctualite: n }))} />
-      <textarea rows={2} value={v.commentaire} onChange={(e) => setV((s) => ({ ...s, commentaire: e.target.value }))} placeholder="Commentaire (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-2 outline-none focus:border-orange-400 bg-white" style={{ borderColor: COLORS.border }} />
+      <textarea rows={2} value={v.commentaire} onChange={(e) => setV((s) => ({ ...s, commentaire: e.target.value }))} placeholder="Commentaire (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-2 outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border }} />
       <div className="flex gap-2 mt-3">
-        <button type="button" disabled={!ok} onClick={() => onSubmit(v)} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange, opacity: ok ? 1 : 0.5 }}>Enregistrer l'évaluation</button>
-        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-white" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+        <button type="button" disabled={!ok} onClick={() => onSubmit(v)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: ok ? 1 : 0.5 }}>Enregistrer l'évaluation</button>
+        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
       </div>
     </div>
   );
@@ -7526,7 +7542,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
         </div>
         <div className="flex gap-2 flex-wrap">
           {r.statut !== "Confirmé" && (
-            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-white inline-flex items-center gap-1.5" style={{ background: "#16A34A" }}><UserCheck size={14} /> Confirmer l'embauche</button>
+            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: "#16A34A" }}><UserCheck size={14} /> Confirmer l'embauche</button>
           )}
           <button type="button" onClick={() => setSignalOpen((o) => !o)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}><Flag size={14} /> Signaler un problème</button>
         </div>
@@ -7544,7 +7560,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
       )}
 
       <div className="grid grid-cols-1 lg:grid-cols-[1.5fr,1fr] gap-4">
-        <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Évaluations aux points de suivi</h3>
           {JALONS.map((j) => {
             const ev = r.evaluations[j.id];
@@ -7557,7 +7573,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
                     <p className="text-xs" style={{ color: COLORS.slateLight }}>{frLongDate(jalonDate(r.dateIso, j.jour))}</p>
                   </div>
                   {statut === "À compléter" && openJalon !== j.id ? (
-                    <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-white" style={{ background: COLORS.orange }}>Évaluer</button>
+                    <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Évaluer</button>
                   ) : (
                     <StatusBadge status={statut} />
                   )}
@@ -7575,12 +7591,12 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
           })}
         </div>
         <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Période d'essai</h3>
             <p className="text-sm mb-2" style={{ color: COLORS.slateLight }}>{jour >= DUREE_ESSAI ? "Terminée" : `Jour ${jour} sur ${DUREE_ESSAI} · fin le ${frLongDate(jalonDate(r.dateIso, DUREE_ESSAI))}`}</p>
             <ProgressBar pct={(jour / DUREE_ESSAI) * 100} />
           </div>
-          <div className="rounded-lg border bg-white p-6" style={{ borderColor: COLORS.border }}>
+          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Ressenti de la recrue</h3>
             <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>Partagé par la recrue lors de son dernier point de suivi.</p>
             <p className="text-lg font-bold" style={{ color: r.ressenti <= 2 ? COLORS.danger : r.ressenti >= 4 ? "#16A34A" : COLORS.slate }}>{HUMEURS[r.ressenti - 1]}</p>
@@ -7613,7 +7629,7 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
           const jour = joursDepuis(r.dateIso);
           const next = JALONS.find((j) => !r.evaluations[j.id]);
           return (
-            <button key={r.id} type="button" onClick={() => setSelectedId(r.id)} className="w-full text-left rounded-lg border bg-white px-5 py-4 grid grid-cols-1 md:grid-cols-[1.4fr,1.2fr,1fr,auto] gap-3 md:items-center hover:shadow-md transition-shadow" style={{ borderColor: r.statut === "À risque" ? "#FCA5A5" : COLORS.border }}>
+            <button key={r.id} type="button" onClick={() => setSelectedId(r.id)} className="w-full text-left rounded-lg border bg-surface px-5 py-4 grid grid-cols-1 md:grid-cols-[1.4fr,1.2fr,1fr,auto] gap-3 md:items-center hover:shadow-md transition-shadow" style={{ borderColor: r.statut === "À risque" ? "#FCA5A5" : COLORS.border }}>
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(r.nom)}</div>
                 <div className="min-w-0">
@@ -7656,7 +7672,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
       <h2 className="text-lg font-bold mb-3" style={{ color: COLORS.slate }}>Signalements</h2>
       <div className="flex flex-col gap-3 mb-8">
         {signalements.map((s) => (
-          <div key={s.id} className="rounded-lg border bg-white p-5 flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: s.statut === "Ouvert" ? "#FCA5A5" : COLORS.border }}>
+          <div key={s.id} className="rounded-lg border bg-surface p-5 flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: s.statut === "Ouvert" ? "#FCA5A5" : COLORS.border }}>
             <div>
               <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{s.type}</p>
               <p className="text-xs mb-1" style={{ color: COLORS.slateLight }}>{s.date} · par {s.auteur} ({ESPACE_LABELS[s.espace]}) · concerne {s.concerne}</p>
@@ -7667,7 +7683,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
               {s.statut === "Ouvert" && (
                 <>
                   <button type="button" onClick={() => notify(`Prise de contact avec ${s.auteur} enregistrée.`)} className="rounded-md px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Contacter</button>
-                  <button type="button" onClick={() => { setSignalements((l) => l.map((x) => (x.id === s.id ? { ...x, statut: "Traité" } : x))); notify("Signalement marqué comme traité."); }} className="rounded-md px-3 py-1.5 text-xs font-semibold text-white" style={{ background: COLORS.orange }}>Marquer traité</button>
+                  <button type="button" onClick={() => { setSignalements((l) => l.map((x) => (x.id === s.id ? { ...x, statut: "Traité" } : x))); notify("Signalement marqué comme traité."); }} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Marquer traité</button>
                 </>
               )}
             </div>
@@ -7676,7 +7692,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
       </div>
 
       <h2 className="text-lg font-bold mb-3" style={{ color: COLORS.slate }}>Placements en cours de suivi</h2>
-      <div className="rounded-lg border bg-white overflow-x-auto" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
         <table className="w-full text-sm min-w-[640px]">
           <thead>
             <tr style={{ color: COLORS.slateLight, borderBottom: `1px solid ${COLORS.border}` }}>
@@ -7745,10 +7761,10 @@ function RegulStepCard({ step, index, onChange }) {
   const ready = (!needsValue || valeur.trim()) && (file || step.choix);
 
   return (
-    <div className="rounded-lg border bg-white" style={{ borderColor: step.statut === "Refusé" ? "#FCA5A5" : COLORS.border }}>
+    <div className="rounded-lg border bg-surface" style={{ borderColor: step.statut === "Refusé" ? "#FCA5A5" : COLORS.border }}>
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: step.statut === "Validé" ? "#DCFCE7" : "#F1F1F1", color: step.statut === "Validé" ? "#16A34A" : COLORS.slate }}>
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: step.statut === "Validé" ? "#DCFCE7" : COLORS.softStrong, color: step.statut === "Validé" ? "#16A34A" : COLORS.slate }}>
             {step.statut === "Validé" ? <Check size={13} /> : index + 1}
           </div>
           <div className="min-w-0">
@@ -7775,7 +7791,7 @@ function RegulStepCard({ step, index, onChange }) {
               {step.champ && (
                 <label className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>
                   {step.champ}
-                  <input value={valeur} onChange={(e) => setValeur(e.target.value)} className="mt-1 w-full max-w-sm block rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
+                  <input value={valeur} onChange={(e) => setValeur(e.target.value)} className="mt-1 w-full max-w-sm block rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
                 </label>
               )}
               {step.choix && (
@@ -7794,7 +7810,7 @@ function RegulStepCard({ step, index, onChange }) {
                 {file && <span className="text-sm" style={{ color: COLORS.slate }}>{file}</span>}
               </div>
               <div>
-                <button type="button" disabled={!ready} onClick={() => onChange({ statut: "En vérification", valeur, document: file || "—", envoyeLe: todayFr(), motif: null })} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.orange, opacity: ready ? 1 : 0.5 }}>
+                <button type="button" disabled={!ready} onClick={() => onChange({ statut: "En vérification", valeur, document: file || "—", envoyeLe: todayFr(), motif: null })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: ready ? 1 : 0.5 }}>
                   Envoyer pour vérification
                 </button>
               </div>
@@ -7819,27 +7835,27 @@ function RegularisationScreen({ steps, setSteps }) {
       </div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Formalisez votre activité pour rassurer vos clients et accéder aux missions des entreprises.</p>
 
-      <div className="rounded-lg p-6 mb-6 grid grid-cols-1 md:grid-cols-[1fr,1.2fr] gap-6" style={{ background: "#1A130E" }}>
+      <div className="rounded-lg p-6 mb-6 grid grid-cols-1 md:grid-cols-[1fr,1.2fr] gap-6" style={{ background: COLORS.dark }}>
         <div>
-          <p className="text-sm mb-1" style={{ color: "#B9AFA5" }}>Étapes obligatoires validées</p>
-          <p className="text-3xl font-bold text-white mb-3">{valides} / {total}</p>
-          <ProgressBar pct={(valides / total) * 100} color={complete ? "#4ADE80" : COLORS.orange} track="#2C241C" />
-          <p className="text-sm mt-3" style={{ color: "#B9AFA5" }}>{complete ? "Votre activité est régularisée. Le badge s'affiche sur votre profil." : enVerif ? `${enVerif} document${enVerif > 1 ? "s" : ""} en cours de vérification.` : "Complétez les étapes ci-dessous pour obtenir le badge."}</p>
+          <p className="text-sm mb-1" style={{ color: COLORS.onDarkMuted }}>Étapes obligatoires validées</p>
+          <p className="text-3xl font-bold text-sur-sombre mb-3">{valides} / {total}</p>
+          <ProgressBar pct={(valides / total) * 100} color={complete ? "#4ADE80" : COLORS.orange} track={COLORS.darkLine} />
+          <p className="text-sm mt-3" style={{ color: COLORS.onDarkMuted }}>{complete ? "Votre activité est régularisée. Le badge s'affiche sur votre profil." : enVerif ? `${enVerif} document${enVerif > 1 ? "s" : ""} en cours de vérification.` : "Complétez les étapes ci-dessous pour obtenir le badge."}</p>
         </div>
         <div>
-          <p className="text-sm font-semibold text-white mb-2">Ce que la régularisation vous apporte</p>
+          <p className="text-sm font-semibold text-sur-sombre mb-2">Ce que la régularisation vous apporte</p>
           {["Badge « Activité régularisée » visible par les clients", "Accès aux missions proposées par les entreprises", "Factures et devis conformes", "Dossier prêt pour un crédit ou un microfinancement"].map((a) => (
-            <p key={a} className="text-sm flex items-start gap-2 py-0.5" style={{ color: "#B9AFA5" }}><Check size={14} color={COLORS.orange} className="mt-0.5 shrink-0" /> {a}</p>
+            <p key={a} className="text-sm flex items-start gap-2 py-0.5" style={{ color: COLORS.onDarkMuted }}><Check size={14} color={COLORS.orange} className="mt-0.5 shrink-0" /> {a}</p>
           ))}
         </div>
       </div>
 
-      <div className="rounded-lg border bg-white p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderColor: accompOk ? COLORS.border : COLORS.orange }}>
+      <div className="rounded-lg border bg-surface p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderColor: accompOk ? COLORS.border : COLORS.orange }}>
         <div>
           <p className="font-semibold flex items-center gap-2" style={{ color: COLORS.slate }}>Accompagnement par un conseiller {!accompOk && <PremiumChip locked />}</p>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Un conseiller LIGGEEY vous aide à préparer vos dossiers et vous oriente vers les bons guichets.</p>
         </div>
-        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="rounded-md px-4 py-2 text-sm font-semibold text-white shrink-0 inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre shrink-0 inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
           {!accompOk && <Lock size={13} />} Être rappelé(e) par un conseiller
         </button>
       </div>
@@ -7881,9 +7897,9 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
       </div>
 
       <div className="flex flex-col gap-3 mb-6">
-        {demandes.length === 0 && <div className="rounded-lg border bg-white p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>Aucun justificatif en attente. Les nouveaux envois apparaîtront ici.</div>}
+        {demandes.length === 0 && <div className="rounded-lg border bg-surface p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>Aucun justificatif en attente. Les nouveaux envois apparaîtront ici.</div>}
         {demandes.map((d) => (
-          <div key={d.id} className="rounded-lg border bg-white p-5" style={{ borderColor: COLORS.border }}>
+          <div key={d.id} className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex flex-col md:flex-row md:items-center justify-between gap-3">
               <div>
                 <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{d.prestataire} · {d.etape}</p>
@@ -7893,14 +7909,14 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
               {refusing !== d.id && (
                 <div className="flex gap-2 shrink-0">
                   <button type="button" onClick={() => setRefusing(d.id)} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Refuser</button>
-                  <button type="button" onClick={() => decide(d, "Validé")} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: "#16A34A" }}>Valider</button>
+                  <button type="button" onClick={() => decide(d, "Validé")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: "#16A34A" }}>Valider</button>
                 </div>
               )}
             </div>
             {refusing === d.id && (
               <div className="mt-3 flex flex-col sm:flex-row gap-2">
-                <input value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Motif du refus, visible par le prestataire" className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:border-orange-400" style={{ borderColor: COLORS.border }} />
-                <button type="button" disabled={!motif.trim()} onClick={() => decide(d, "Refusé", motif)} className="rounded-md px-4 py-2 text-sm font-semibold text-white" style={{ background: COLORS.danger, opacity: motif.trim() ? 1 : 0.5 }}>Confirmer le refus</button>
+                <input value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Motif du refus, visible par le prestataire" className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
+                <button type="button" disabled={!motif.trim()} onClick={() => decide(d, "Refusé", motif)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.danger, opacity: motif.trim() ? 1 : 0.5 }}>Confirmer le refus</button>
                 <button type="button" onClick={() => { setRefusing(null); setMotif(""); }} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
               </div>
             )}
@@ -7913,7 +7929,7 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
           <h2 className="text-lg font-bold mb-3" style={{ color: COLORS.slate }}>Traités récemment</h2>
           <div className="flex flex-col gap-2">
             {traitees.map((d) => (
-              <div key={d.id} className="rounded-md border bg-white px-4 py-3 flex items-center justify-between" style={{ borderColor: COLORS.border }}>
+              <div key={d.id} className="rounded-md border bg-surface px-4 py-3 flex items-center justify-between" style={{ borderColor: COLORS.border }}>
                 <span className="text-sm" style={{ color: COLORS.slate }}>{d.prestataire} · {d.etape}</span>
                 <StatusBadge status={d.statut} />
               </div>
@@ -7957,7 +7973,7 @@ function ProfilInfoModal({ nom, fields, values, onSave, onClose }) {
                 type={f.type || "text"}
                 value={v[f.key] || ""}
                 onChange={(e) => setV((s) => ({ ...s, [f.key]: e.target.value }))}
-                className="mt-1 w-full block rounded-md border px-3 py-2.5 text-sm outline-none focus:border-orange-400"
+                className="mt-1 w-full block rounded-md border px-3 py-2.5 text-sm outline-none focus:border-primaire-400"
                 style={{ borderColor: touched && (!String(v[f.key] || "").trim() || (f.key === "email" && !emailOk)) ? COLORS.danger : COLORS.border, color: COLORS.slate }}
               />
             </label>
@@ -7967,7 +7983,7 @@ function ProfilInfoModal({ nom, fields, values, onSave, onClose }) {
         </div>
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={save} className="rounded-md px-4 py-2.5 text-sm font-semibold text-white" style={{ background: COLORS.orange }}>Enregistrer</button>
+          <button type="button" onClick={save} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Enregistrer</button>
         </div>
       </div>
     </ModalFrame>
@@ -8094,13 +8110,13 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
         onClick={() => setOpen((o) => !o)}
         aria-expanded={open}
         className="rounded-full pl-3 pr-3.5 py-1.5 text-xs font-semibold shadow-md flex items-center gap-1.5"
-        style={{ background: "#1A130E", color: "#F9E4C4" }}
+        style={{ background: COLORS.dark, color: COLORS.brandPale }}
       >
         <FlaskConical size={13} color={COLORS.orange} /> Mode test · {faits}/{total}
       </button>
 
       {open && (
-        <div className="mt-2 w-[min(360px,calc(100vw-24px))] max-h-[80vh] overflow-y-auto rounded-lg bg-white shadow-xl" style={{ border: `1px solid ${COLORS.border}` }} role="dialog" aria-label="Mode test">
+        <div className="mt-2 w-[min(360px,calc(100vw-24px))] max-h-[80vh] overflow-y-auto rounded-lg bg-surface shadow-xl" style={{ border: `1px solid ${COLORS.border}` }} role="dialog" aria-label="Mode test">
           <div className="p-4" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
             <div className="flex items-start justify-between gap-3">
               <p className="font-semibold" style={{ color: COLORS.slate }}>Version de test de LIGGEEY</p>
@@ -8109,7 +8125,7 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
             <p className="text-xs mt-1" style={{ color: COLORS.slateLight }}>
               Paiements, e-mails, appels et documents sont simulés. Vos actions sont enregistrées dans ce navigateur uniquement. Pour vous connecter, gardez les identifiants déjà saisis et choisissez un espace.
             </p>
-            <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{ background: "#F1F1F1" }}>
+            <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{ background: COLORS.softStrong }}>
               <div className="h-full rounded-full" style={{ width: `${(faits / total) * 100}%`, background: "#16A34A" }} />
             </div>
           </div>
@@ -8122,7 +8138,7 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
                 </p>
                 {groups[esp].map((s) => (
                   <div key={s.id} className="flex items-start gap-2 py-1">
-                    <input type="checkbox" className="mt-1 accent-orange-500" checked={!!done[s.id]} onChange={(e) => setDone((d) => ({ ...d, [s.id]: e.target.checked }))} aria-label={`Scénario terminé : ${s.label}`} />
+                    <input type="checkbox" className="mt-1 accent-primaire-500" checked={!!done[s.id]} onChange={(e) => setDone((d) => ({ ...d, [s.id]: e.target.checked }))} aria-label={`Scénario terminé : ${s.label}`} />
                     <button type="button" onClick={() => { onNavigate(s.to, { espace: s.espace }); setOpen(false); }} className="text-sm text-left hover:underline" style={{ color: done[s.id] ? COLORS.slateLight : COLORS.slate, textDecoration: done[s.id] ? "line-through" : undefined }}>
                       {s.label}
                     </button>
@@ -8134,7 +8150,7 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
 
           <div className="p-4 flex flex-col gap-2" style={{ borderTop: `1px solid ${COLORS.border}` }}>
             {commentState !== "off" ? (
-              <button type="button" disabled={commentState === "busy"} onClick={comment} className="w-full rounded-md px-3 py-2 text-sm font-semibold text-white flex items-center justify-center gap-1.5" style={{ background: COLORS.orange }}>
+              <button type="button" disabled={commentState === "busy"} onClick={comment} className="w-full rounded-md px-3 py-2 text-sm font-semibold text-sur-sombre flex items-center justify-center gap-1.5" style={{ background: COLORS.orange }}>
                 <MessageCircle size={14} /> Commenter cet écran
               </button>
             ) : (
@@ -8148,8 +8164,8 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
               <div className="rounded-md p-3" style={{ background: "#FEF2F2" }}>
                 <p className="text-xs mb-2" style={{ color: "#B91C1C" }}>Toutes vos actions de test seront effacées et la démo repartira de zéro.</p>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => { clearSnapshot(); window.location.reload(); }} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold text-white" style={{ background: COLORS.danger }}>Tout effacer</button>
-                  <button type="button" onClick={() => setConfirmReset(false)} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold border bg-white" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+                  <button type="button" onClick={() => { clearSnapshot(); window.location.reload(); }} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.danger }}>Tout effacer</button>
+                  <button type="button" onClick={() => setConfirmReset(false)} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
                 </div>
               </div>
             )}
@@ -8313,7 +8329,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     if (screen === "evaluations" && espace === "prestataire") return <EvaluationsScreen onNavigate={navigate} />;
     if (screen === "realisations" && espace === "prestataire") return <RealisationsScreen onBack={() => navigate("profil")} />;
     return (
-      <div className="rounded-lg border bg-white p-8 text-center" style={{ borderColor: COLORS.border }}>
+      <div className="rounded-lg border bg-surface p-8 text-center" style={{ borderColor: COLORS.border }}>
         <p className="text-sm" style={{ color: COLORS.slateLight }}>
           Écran « {navItems.find((n) => n.id === screen)?.label || screen} » — prochaine étape du prototype.
         </p>
