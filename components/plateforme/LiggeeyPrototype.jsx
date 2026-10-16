@@ -186,14 +186,15 @@ function Logo({ color = COLORS.brandPale, iconColor, height = 24, iconOnly = fal
 }
 
 /* ---------- Coquille des écrans de connexion et d'inscription ----------
-   Écran partagé : panneau de marque à gauche (fond orange, texte ardoise, comme la charte),
+   Écran partagé : panneau de marque à gauche (dégradé bleu ardoise, accents orange),
    formulaire à droite. Le panneau change de message selon le mode : connexion ou inscription.
-   Sur mobile, le panneau est remplacé par un bandeau orange compact au-dessus du formulaire. */
+   Sur mobile, le panneau est remplacé par un bandeau ardoise compact au-dessus du formulaire. */
 
 const AUTH_PANNEAU = {
   connexion: {
     surtitre: "Espace LIGGEEY",
-    titre: "Rendons l'insertion plus facile et plus juste.",
+    titre: "Rendons l'insertion",
+    accent: "plus facile et plus juste.",
     texte: "Retrouvez vos candidatures, vos missions et votre accompagnement là où vous les avez laissés.",
     liste: [
       { icon: ShieldCheck, titre: "Offres et profils vérifiés", texte: "Chaque entreprise et chaque offre sont contrôlées avant publication." },
@@ -203,7 +204,8 @@ const AUTH_PANNEAU = {
   },
   inscription: {
     surtitre: "Créer votre compte",
-    titre: "Un profil, trois parcours.",
+    titre: "Un profil,",
+    accent: "trois parcours.",
     texte: "Choisissez le vôtre : LIGGEEY vous accompagne avant, pendant et après l'embauche.",
     liste: [
       { icon: Briefcase, titre: "Talents", texte: "Valorisez vos compétences et postulez à des offres vérifiées." },
@@ -216,41 +218,49 @@ const AUTH_PANNEAU = {
 function AuthPanneau({ mode }) {
   const t = AUTH_PANNEAU[mode] || AUTH_PANNEAU.connexion;
   return (
-    <aside className="relative hidden md:flex flex-col overflow-hidden bg-marque text-sur-marque px-10 py-10 lg:px-14 lg:py-12" style={{ minHeight: "100vh" }}>
-      {/* Décor : grand monogramme en filigrane et halo plus clair, sans contenu */}
-      <div className="pointer-events-none absolute -right-28 -bottom-24 opacity-[0.08]" aria-hidden="true">
-        <Logo iconOnly height={560} color="rgb(var(--neutre-800))" />
+    <aside
+      className="relative hidden md:flex flex-col overflow-hidden text-sur-sombre px-10 py-10 lg:px-14 lg:py-12"
+      style={{
+        minHeight: "100vh",
+        background: "linear-gradient(155deg, rgb(var(--neutre-750)) 0%, rgb(var(--neutre-800)) 45%, rgb(var(--neutre-900)) 100%)",
+      }}
+    >
+      {/* Décor : reflet orange discret en haut, grand monogramme en filigrane en bas */}
+      <div className="pointer-events-none absolute -left-40 -top-40 h-[28rem] w-[28rem] rounded-full blur-3xl" style={{ background: "rgb(var(--primaire-500) / 0.11)" }} aria-hidden="true" />
+      <div className="pointer-events-none absolute -right-28 -bottom-24 opacity-[0.035]" aria-hidden="true">
+        <Logo iconOnly height={560} color="rgb(var(--neutre-50))" />
       </div>
-      <div className="pointer-events-none absolute -left-32 -top-32 h-96 w-96 rounded-full" style={{ background: "rgb(var(--primaire-300) / 0.45)" }} aria-hidden="true" />
 
       {/* Haut : logo et liens vers le site */}
       <div className="relative flex items-center justify-between gap-4">
         <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex">
-          <Logo color="rgb(var(--texte-sur-marque))" height={26} />
+          <Logo color="rgb(var(--texte-sur-sombre))" iconColor={COLORS.orange} height={26} />
         </a>
-        <a href={`${SITE_URL}#offres`} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold underline decoration-2 underline-offset-4 hover:no-underline">
+        <a href={`${SITE_URL}#offres`} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium text-white/80 transition-colors hover:text-marque-vif">
           Voir les offres <ChevronRight size={15} aria-hidden="true" />
         </a>
       </div>
 
       {/* Centre : message et points clés */}
       <div className="relative flex flex-1 flex-col justify-center py-12">
-        <p className="flex items-center gap-2.5 text-sm font-semibold uppercase tracking-wider">
-          <span className="h-0.5 w-9 bg-current" aria-hidden="true" />
+        <p className="flex items-center gap-2.5 text-sm font-semibold uppercase tracking-wider text-marque-vif">
+          <span className="h-0.5 w-9 bg-marque" aria-hidden="true" />
           {t.surtitre}
         </p>
-        <p className="mt-4 max-w-md text-balance text-[34px] font-semibold leading-[1.15] lg:text-[42px]">{t.titre}</p>
-        <p className="mt-4 max-w-md text-base leading-relaxed">{t.texte}</p>
+        <p className="mt-4 max-w-md text-balance text-[34px] font-semibold leading-[1.15] lg:text-[42px]">
+          {t.titre} <span className="text-marque-vif">{t.accent}</span>
+        </p>
+        <p className="mt-4 max-w-md text-base leading-relaxed text-white/75">{t.texte}</p>
 
         <ul className="mt-9 flex max-w-md flex-col gap-3">
           {t.liste.map(({ icon: Icon, titre, texte }) => (
-            <li key={titre} className="flex items-start gap-4 rounded-lg bg-marque-doux p-4 shadow-sm">
-              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg bg-sombre text-marque-vif">
+            <li key={titre} className="flex items-start gap-4 rounded-lg border border-white/10 bg-white/[0.04] p-4">
+              <span className="grid h-10 w-10 shrink-0 place-items-center rounded-lg text-marque-vif" style={{ background: "rgb(var(--primaire-500) / 0.14)" }}>
                 <Icon size={19} aria-hidden="true" />
               </span>
               <span>
                 <span className="block font-semibold">{titre}</span>
-                <span className="block text-sm leading-relaxed">{texte}</span>
+                <span className="block text-sm leading-relaxed text-white/70">{texte}</span>
               </span>
             </li>
           ))}
@@ -259,18 +269,18 @@ function AuthPanneau({ mode }) {
 
       {/* Bas : aide et mentions */}
       <div className="relative flex flex-col gap-4">
-        <div className="flex flex-wrap items-center justify-between gap-3 rounded-lg bg-sombre px-5 py-4 text-sur-sombre">
+        <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
           <span>
             <span className="block text-sm font-semibold">Besoin d'aide pour vous inscrire ?</span>
-            <span className="flex items-center gap-1.5 text-xs text-white/75">
+            <span className="flex items-center gap-1.5 text-xs text-white/65">
               <MapPin size={12} aria-hidden="true" /> {site.bureau.adresse}, {site.bureau.ville}
             </span>
           </span>
-          <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-2 rounded bg-whatsapp px-4 text-sm font-semibold text-sur-marque hover:brightness-95">
+          <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-2 rounded border border-white/25 px-4 text-sm font-semibold transition-colors hover:border-whatsapp hover:text-whatsapp">
             <MessageCircle size={16} aria-hidden="true" /> WhatsApp
           </a>
         </div>
-        <p className="text-xs">© 2026 LIGGEEY · Insertion professionnelle au Sénégal</p>
+        <p className="text-xs text-white/50">© 2026 LIGGEEY · Insertion professionnelle au Sénégal</p>
       </div>
     </aside>
   );
@@ -283,10 +293,10 @@ function AuthShell({ children, mode = "connexion" }) {
       <AuthPanneau mode={mode} />
 
       <div className="flex flex-col bg-surface">
-        {/* Mobile : bandeau orange compact à la place du panneau */}
-        <div className="md:hidden flex items-center justify-between gap-4 bg-marque px-6 py-4 text-sur-marque">
+        {/* Mobile : bandeau ardoise compact à la place du panneau */}
+        <div className="md:hidden flex items-center justify-between gap-4 px-6 py-4 text-sur-sombre" style={{ background: "linear-gradient(120deg, rgb(var(--neutre-750)), rgb(var(--neutre-900)))" }}>
           <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex">
-            <Logo color="rgb(var(--texte-sur-marque))" height={22} />
+            <Logo color="rgb(var(--texte-sur-sombre))" iconColor={COLORS.orange} height={22} />
           </a>
           <a href={SITE_URL} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold">
             <ArrowLeft size={15} aria-hidden="true" /> Retour au site
