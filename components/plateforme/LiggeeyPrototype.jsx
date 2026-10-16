@@ -431,7 +431,7 @@ function ConnexionScreen({ onNavigate }) {
             <p className="text-xs mb-5" style={{ color: resetTouched && !resetEmailValid ? COLORS.danger : COLORS.slateLight }}>
               {resetTouched && !resetEmailValid ? "Veuillez saisir une adresse e-mail valide." : "Utilisez l'adresse associée à votre compte LIGGEEY"}
             </p>
-            <button type="submit" className="w-full rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
+            <button type="submit" className="w-full rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
               Envoyer le lien
             </button>
           </>
@@ -515,7 +515,7 @@ function ConnexionScreen({ onNavigate }) {
         <span className="text-sm" style={{ color: COLORS.slate }}>Se souvenir de moi</span>
       </label>
 
-      <button type="submit" onClick={handleSubmit} className="w-full rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
+      <button type="submit" onClick={handleSubmit} className="w-full rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90" style={{ background: COLORS.orange }}>
         Se connecter
       </button>
 
@@ -587,7 +587,7 @@ function SignupChoiceScreen({ onNavigate }) {
       <button
         type="button"
         onClick={() => onNavigate("signup-info", { profile: selected })}
-        className="w-full rounded-md py-3 mt-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
+        className="w-full rounded-md py-3 mt-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
         style={{ background: COLORS.orange }}
       >
         Continuer
@@ -742,7 +742,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
         <button
           type="submit"
           onClick={handleSubmit}
-          className="flex-1 rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
+          className="flex-1 rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
           style={{ background: COLORS.orange }}
         >
           Créer mon compte
@@ -774,7 +774,7 @@ function ConfirmationScreen({ profile, onNavigate }) {
       <button
         type="button"
         onClick={() => onNavigate("dashboard", { espace: profile })}
-        className="w-full rounded-md py-3 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90 mb-3"
+        className="w-full rounded-md py-3 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90 mb-3"
         style={{ background: COLORS.orange }}
       >
         Accéder à mon tableau de bord
@@ -1147,7 +1147,7 @@ function DashboardScreen({ user, onNavigate, todos }) {
         <button
           type="button"
           onClick={() => onNavigate("profil")}
-          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
           style={{ background: COLORS.orange }}
         >
           Compléter mon profil
@@ -1384,7 +1384,7 @@ function OfferModal({ offre, onClose }) {
             <button
               type="button"
               onClick={postuler}
-              className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
+              className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
               style={{ background: COLORS.orange }}
             >
               Postuler
@@ -1635,12 +1635,12 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
       <div className="flex items-start justify-between flex-wrap gap-3 mb-1">
         <h1 className="text-2xl font-bold" style={{ color: COLORS.slate }}>{formation.nom}</h1>
         {!enrolled && (
-          <button type="button" onClick={onToggleEnroll} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={onToggleEnroll} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
             S'inscrire à cette formation
           </button>
         )}
         {isComplete && (
-          <button type="button" onClick={onViewCertificate} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={onViewCertificate} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
             Voir mon certificat
           </button>
         )}
@@ -1690,7 +1690,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
                 </div>
                 <div className="flex items-center gap-3 shrink-0">
                   {status === "En cours" && (
-                    <button type="button" onClick={onAdvanceModule} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+                    <button type="button" onClick={onAdvanceModule} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
                       Marquer comme terminé
                     </button>
                   )}
@@ -1747,7 +1747,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
       </div>
 
       <div className="flex gap-3 mb-8">
-        <button type="button" onClick={() => setFeedback("téléchargé")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Télécharger (PDF)</button>
+        <button type="button" onClick={() => setFeedback("téléchargé")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Télécharger (PDF)</button>
         <button type="button" onClick={() => setFeedback("partagé")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Partager</button>
         {feedback && <span className="self-center text-sm" style={{ color: "#047857" }}>Certificat {feedback} (démo).</span>}
       </div>
@@ -2148,7 +2148,7 @@ function ProfilScreen({ onNavigate }) {
           </div>
         ) : (
           <div className="flex gap-3">
-            <button type="button" onClick={() => setDocumentsSubmitted(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+            <button type="button" onClick={() => setDocumentsSubmitted(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
               Transmettre mes documents
             </button>
             <button type="button" onClick={() => setShowVerifInfo((v) => !v)} aria-expanded={showVerifInfo} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
@@ -2232,7 +2232,7 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
         <button
           type="button"
           onClick={() => onNavigate("profil")}
-          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre transition-opacity hover:opacity-90"
+          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
           style={{ background: COLORS.orange }}
         >
           Compléter mon profil
@@ -2368,7 +2368,7 @@ function ServiceForm({ initial, onSave, onCancel }) {
           type="button"
           disabled={!valid}
           onClick={() => onSave({ ...values, id: initial?.id || values.nom.toLowerCase().replace(/\s+/g, "-") })}
-          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre"
+          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque"
           style={{ background: COLORS.orange, opacity: valid ? 1 : 0.5 }}
         >
           Enregistrer
@@ -2531,7 +2531,7 @@ function ServicesScreen() {
     <div>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mes services</h1>
-        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Ajouter un service
         </button>
       </div>
@@ -2606,7 +2606,7 @@ function MissionCard({ m, onOpen, onAccept, onRefuse }) {
         </div>
         {m.statut === "En attente" ? (
           <div className="flex gap-2">
-            <button type="button" onClick={() => onAccept(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Accepter</button>
+            <button type="button" onClick={() => onAccept(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Accepter</button>
             <button type="button" onClick={() => onRefuse(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Refuser</button>
           </div>
         ) : (
@@ -2641,7 +2641,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
             <button type="button" onClick={() => (planApi ? planApi.gate("contreOffre", () => setCounterMode(true)) : setCounterMode(true))} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}>
               {planApi && !planApi.can("contreOffre") && <Lock size={13} />} Proposer un autre tarif
             </button>
-            <button type="button" onClick={() => onAccept(mission.id)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+            <button type="button" onClick={() => onAccept(mission.id)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
               Accepter la mission
             </button>
           </div>
@@ -2666,7 +2666,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
             type="button"
             disabled={!counterValue.trim()}
             onClick={() => { onCounterOffer(mission.id, counterValue); setCounterMode(false); }}
-            className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre"
+            className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque"
             style={{ background: COLORS.orange, opacity: counterValue.trim() ? 1 : 0.5 }}
           >
             Envoyer
@@ -3142,7 +3142,7 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
             <div className="h-1.5 rounded-full" style={{ width: "85%", background: COLORS.orange }} />
           </div>
         </div>
-        <button type="button" onClick={() => onNavigate("profil")} className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => onNavigate("profil")} className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           Compléter mon profil
         </button>
       </div>
@@ -3266,7 +3266,7 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
             competences: v.competencesTxt.split(",").map((s) => s.trim()).filter(Boolean),
             candidats: initial?.candidats || [],
           })}
-          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre"
+          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque"
           style={{ background: COLORS.orange, opacity: valid ? 1 : 0.5 }}
         >
           {initial ? "Enregistrer" : "Publier l'offre"}
@@ -3357,7 +3357,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
           Modifier
         </button>
         {offre.statut !== "Clôturée" && (
-          <button type="button" onClick={onToggleStatut} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={onToggleStatut} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
             Clôturer l'offre
           </button>
         )}
@@ -3421,7 +3421,7 @@ function MesOffresScreen({ offres, setOffres }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mes offres d'emploi</h1>
-        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Nouvelle offre
         </button>
       </div>
@@ -3588,7 +3588,7 @@ function CandidatureEntrepriseDetail({ candidat, onDecide, onBack }) {
         <button type="button" onClick={() => onDecide(candidat.id, "En cours")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.orange, color: COLORS.orange }}>
           Planifier entretien
         </button>
-        <button type="button" onClick={() => onDecide(candidat.id, "Retenu")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => onDecide(candidat.id, "Retenu")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           Retenir la candidature
         </button>
       </div>
@@ -3799,7 +3799,7 @@ function PrestataireProfilDetail({ p, onBack }) {
       ) : (
         <div className="flex gap-3">
           <button type="button" onClick={() => gateContact(() => setContactOpen((o) => !o))} aria-expanded={contactOpen} className="rounded-md px-5 py-2.5 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}>{!contactOk && <Lock size={13} />} Contacter</button>
-          <button type="button" onClick={() => gateContact(() => setProposed(true))} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>{!contactOk && <Lock size={13} />} Proposer une mission</button>
+          <button type="button" onClick={() => gateContact(() => setProposed(true))} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>{!contactOk && <Lock size={13} />} Proposer une mission</button>
         </div>
       )}
       {contactOpen && (
@@ -3807,7 +3807,7 @@ function PrestataireProfilDetail({ p, onBack }) {
           <label htmlFor="contact-msg" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Message à {p.nom}</label>
           <textarea id="contact-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Bonjour, je souhaiterais échanger sur un besoin…" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
           <div className="flex gap-2 mt-3">
-            <button type="button" disabled={!message.trim()} onClick={() => { notify(`Message envoyé à ${p.nom}.`); setMessage(""); setContactOpen(false); }} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: message.trim() ? 1 : 0.5 }}>
+            <button type="button" disabled={!message.trim()} onClick={() => { notify(`Message envoyé à ${p.nom}.`); setMessage(""); setContactOpen(false); }} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: message.trim() ? 1 : 0.5 }}>
               <Send size={14} /> Envoyer
             </button>
             <button type="button" onClick={() => setContactOpen(false)} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
@@ -4001,7 +4001,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
 
         <div className="flex gap-3">
           <button type="button" onClick={onCancel} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={() => onSave(v)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Enregistrer</button>
+          <button type="button" onClick={() => onSave(v)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Enregistrer</button>
         </div>
       </div>
     </div>
@@ -4031,7 +4031,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
           <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Profil entreprise</h1>
           <ProfileTierBadge />
         </div>
-        <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           <Pencil size={14} /> Modifier le profil
         </button>
       </div>
@@ -5198,7 +5198,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Décision de contrôle</h3>
             <p className="text-xs mb-4" style={{ color: COLORS.slateLight }}>Confirmez uniquement après avoir vérifié toutes les informations visibles.</p>
-            <button type="button" onClick={() => onDecide(doc.id, "Validé")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-sombre mb-2" style={{ background: COLORS.orange }}>Valider</button>
+            <button type="button" onClick={() => onDecide(doc.id, "Validé")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-marque mb-2" style={{ background: COLORS.orange }}>Valider</button>
             <button type="button" onClick={() => onDecide(doc.id, "Rejeté")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.danger }}>Rejeter</button>
           </div>
         </div>
@@ -5385,7 +5385,7 @@ function MessagerieTab() {
                     {last ? (last.de === "moi" ? "Vous : " : "") + last.texte : ""}
                   </p>
                 </div>
-                {c.nonLu > 0 && <span className="text-[11px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 text-sur-sombre" style={{ background: COLORS.orange }}>{c.nonLu}</span>}
+                {c.nonLu > 0 && <span className="text-[11px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 text-sur-marque" style={{ background: COLORS.orange }}>{c.nonLu}</span>}
               </button>
             );
           })}
@@ -5429,7 +5429,7 @@ function MessagerieTab() {
               className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400 resize-none"
               style={{ borderColor: COLORS.border }}
             />
-            <button type="button" onClick={send} disabled={!draft.trim()} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: draft.trim() ? 1 : 0.5 }}>
+            <button type="button" onClick={send} disabled={!draft.trim()} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: draft.trim() ? 1 : 0.5 }}>
               <Send size={14} /> Envoyer
             </button>
           </div>
@@ -5624,7 +5624,7 @@ function EventForm({ defaultDate, onSave, onCancel }) {
         {error && <p className="text-xs mb-3" style={{ color: COLORS.danger }}>{error}</p>}
         <div className="flex gap-2 justify-end">
           <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Ajouter l'événement</button>
+          <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Ajouter l'événement</button>
         </div>
       </div>
     </div>
@@ -5682,7 +5682,7 @@ function PlanningScreen() {
           <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Planning</h1>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Gérez le calendrier des formations, événements et activités de la plateforme LIGGEEY</p>
         </div>
-        <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre shrink-0" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque shrink-0" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Ajouter un événement
         </button>
       </div>
@@ -5910,7 +5910,7 @@ function PasswordChanger() {
       ))}
       {error && <p className="text-xs mb-3" style={{ color: COLORS.danger }}>{error}</p>}
       <div className="flex gap-2">
-        <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Changer le mot de passe</button>
+        <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Changer le mot de passe</button>
         <button type="button" onClick={() => { setOpen(false); setError(""); }} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
       </div>
     </div>
@@ -5967,7 +5967,7 @@ function ParametresScreen() {
         ))}
       </div>
 
-      <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+      <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
         Enregistrer les modifications
       </button>
       {saved && <span className="ml-3 text-sm" style={{ color: "#047857" }}>Préférences enregistrées.</span>}
@@ -6229,7 +6229,7 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
             <button type="button" onClick={() => { onClose(); onNavigate("abonnement"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
               Comparer les profils
             </button>
-            <button type="button" onClick={() => { onClose(); api.startPayment(target.id, "mensuel"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+            <button type="button" onClick={() => { onClose(); api.startPayment(target.id, "mensuel"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
               Passer à {target.nom}
             </button>
           </div>
@@ -6345,7 +6345,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
             <span className="text-lg font-bold" style={{ color: COLORS.slate }}>{fcfa(montant)}</span>
           </div>
 
-          <button type="button" onClick={pay} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={pay} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
             Payer {fcfa(montant)}
           </button>
           <p className="text-xs text-center mt-3 flex items-center justify-center gap-1.5" style={{ color: COLORS.slateLight }}>
@@ -6380,7 +6380,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Montant</span><span className="font-semibold" style={{ color: COLORS.slate }}>{fcfa(receipt.montant)}</span></div>
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Moyen</span><span className="font-semibold" style={{ color: COLORS.slate }}>{m.nom}</span></div>
           </div>
-          <button type="button" onClick={onClose} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Terminer</button>
+          <button type="button" onClick={onClose} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Terminer</button>
         </div>
       )}
     </ModalFrame>
@@ -6524,7 +6524,7 @@ function AbonnementScreen() {
               ))}
             </ul>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setConfirmDowngrade(false)} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Garder mon offre</button>
+              <button type="button" onClick={() => setConfirmDowngrade(false)} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Garder mon offre</button>
               <button type="button" onClick={() => { api.downgrade(); setConfirmDowngrade(false); }} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Résilier</button>
             </div>
           </div>
@@ -6713,7 +6713,7 @@ function AbonnementsAdminScreen() {
           </div>
           <div className="flex justify-end gap-2 mt-5">
             <button type="button" disabled={!dirty} onClick={() => setDraft(api.plans)} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate, opacity: dirty ? 1 : 0.5 }}>Annuler les modifications</button>
-            <button type="button" disabled={!dirty} onClick={() => { api.setPlans(draft); notify("Tarifs et quotas enregistrés."); }} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: dirty ? 1 : 0.5 }}>Enregistrer les tarifs</button>
+            <button type="button" disabled={!dirty} onClick={() => { api.setPlans(draft); notify("Tarifs et quotas enregistrés."); }} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: dirty ? 1 : 0.5 }}>Enregistrer les tarifs</button>
           </div>
         </div>
       )}
@@ -6797,7 +6797,7 @@ function ProfileTierCard() {
           </p>
         </div>
         {!premium && premiumPlan && (
-          <button type="button" onClick={() => api.startPayment(premiumPlan.id, "mensuel")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={() => api.startPayment(premiumPlan.id, "mensuel")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
             <Crown size={14} /> Passer au profil Premium · {fcfa(premiumPlan.prixMensuel)}/mois
           </button>
         )}
@@ -6964,7 +6964,7 @@ function BookingPanel({ profile, title, submitLabel, onConfirm, onCancel }) {
         <textarea rows={2} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Ce que vous aimeriez travailler pendant la séance…" className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
       </label>
       <div className="flex gap-2">
-        <button type="button" disabled={!slot} onClick={() => onConfirm({ date: slot, theme, format, message })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: slot ? 1 : 0.5 }}>{submitLabel}</button>
+        <button type="button" disabled={!slot} onClick={() => onConfirm({ date: slot, theme, format, message })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: slot ? 1 : 0.5 }}>{submitLabel}</button>
         <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
       </div>
     </div>
@@ -7024,7 +7024,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
             <p className="text-xs mt-2" style={{ color: COLORS.onDarkSubtle }}>Parle {profile.langues.join(", ")} · {profile.formats.join(", ")}</p>
           </div>
         </div>
-        <button type="button" onClick={openBooking} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre shrink-0 inline-flex items-center gap-1.5 self-start md:self-auto" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={openBooking} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque shrink-0 inline-flex items-center gap-1.5 self-start md:self-auto" style={{ background: COLORS.orange }}>
           {locked ? <Lock size={14} /> : <Calendar size={14} />} Réserver un coaching
         </button>
       </div>
@@ -7089,7 +7089,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
           {coachings.upcoming.length === 0 && !booking && (
             <div className="rounded-lg border bg-surface p-6 text-center" style={{ borderColor: COLORS.border }}>
               <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>Aucun coaching prévu avec {prenom}. Réservez un créneau pour commencer.</p>
-              <button type="button" onClick={openBooking} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+              <button type="button" onClick={openBooking} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
                 {locked && <Lock size={13} />} Réserver un coaching
               </button>
             </div>
@@ -7115,7 +7115,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
                 ) : (
                   <div className="flex gap-2 flex-wrap">
                     {u.format !== "Présentiel à Dakar" && (
-                      <button type="button" onClick={() => notify(`Connexion à la séance avec ${mentor.nom}…`)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Rejoindre</button>
+                      <button type="button" onClick={() => notify(`Connexion à la séance avec ${mentor.nom}…`)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Rejoindre</button>
                     )}
                     <button type="button" onClick={() => setBooking({ mode: "move", id: u.id })} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Reprogrammer</button>
                     <button type="button" onClick={() => setToCancel(u.id)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ color: COLORS.danger }}>Annuler</button>
@@ -7185,7 +7185,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
           <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Mes notes personnelles</h3>
             <textarea value={note} onChange={(e) => { setNote(e.target.value); setSaved(false); }} placeholder="Ajoutez vos notes ici..." rows={4} className="w-full rounded-md border px-4 py-3 text-sm outline-none focus:border-primaire-400 mb-3" style={{ borderColor: COLORS.border }} />
-            <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Enregistrer</button>
+            <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Enregistrer</button>
             {saved && <span className="ml-3 text-sm" style={{ color: "#047857" }}>Note enregistrée.</span>}
           </div>
         </div>
@@ -7333,7 +7333,7 @@ function CheckinForm({ jalon, onSubmit, onCancel }) {
       ))}
       <textarea rows={2} value={commentaire} onChange={(e) => setCommentaire(e.target.value)} placeholder="Un commentaire pour votre référente LIGGEEY (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-3 outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border }} />
       <div className="flex gap-2 mt-3">
-        <button type="button" disabled={!complete} onClick={() => onSubmit({ humeur, reponses: rep, commentaire })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: complete ? 1 : 0.5 }}>Envoyer le point de suivi</button>
+        <button type="button" disabled={!complete} onClick={() => onSubmit({ humeur, reponses: rep, commentaire })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: complete ? 1 : 0.5 }}>Envoyer le point de suivi</button>
         <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Plus tard</button>
       </div>
       {!complete && <p className="text-xs mt-2" style={{ color: COLORS.slateLight }}>Répondez à toutes les questions pour envoyer le point de suivi.</p>}
@@ -7358,7 +7358,7 @@ function SignalementForm({ types, onSubmit, onCancel, intro }) {
         <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
       </label>
       <div className="flex gap-2">
-        <button type="button" disabled={!description.trim()} onClick={() => onSubmit({ type, description })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: COLORS.orange, opacity: description.trim() ? 1 : 0.5 }}><Flag size={14} /> Envoyer le signalement</button>
+        <button type="button" disabled={!description.trim()} onClick={() => onSubmit({ type, description })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange, opacity: description.trim() ? 1 : 0.5 }}><Flag size={14} /> Envoyer le signalement</button>
         {onCancel && <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>}
       </div>
     </div>
@@ -7428,7 +7428,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
                         <p className="text-xs" style={{ color: COLORS.slateLight }}>Jour {j.jour} · {frLongDate(jalonDate(e.dateIso, j.jour))}</p>
                       </div>
                       {statut === "À compléter" && openJalon !== j.id ? (
-                        <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Répondre</button>
+                        <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Répondre</button>
                       ) : (
                         <StatusBadge status={statut} />
                       )}
@@ -7521,7 +7521,7 @@ function EvaluationRecrueForm({ onSubmit, onCancel }) {
       <RatingInput label="Ponctualité et assiduité" value={v.ponctualite} onChange={(n) => setV((s) => ({ ...s, ponctualite: n }))} />
       <textarea rows={2} value={v.commentaire} onChange={(e) => setV((s) => ({ ...s, commentaire: e.target.value }))} placeholder="Commentaire (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-2 outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border }} />
       <div className="flex gap-2 mt-3">
-        <button type="button" disabled={!ok} onClick={() => onSubmit(v)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: ok ? 1 : 0.5 }}>Enregistrer l'évaluation</button>
+        <button type="button" disabled={!ok} onClick={() => onSubmit(v)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: ok ? 1 : 0.5 }}>Enregistrer l'évaluation</button>
         <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
       </div>
     </div>
@@ -7573,7 +7573,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
                     <p className="text-xs" style={{ color: COLORS.slateLight }}>{frLongDate(jalonDate(r.dateIso, j.jour))}</p>
                   </div>
                   {statut === "À compléter" && openJalon !== j.id ? (
-                    <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Évaluer</button>
+                    <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Évaluer</button>
                   ) : (
                     <StatusBadge status={statut} />
                   )}
@@ -7683,7 +7683,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
               {s.statut === "Ouvert" && (
                 <>
                   <button type="button" onClick={() => notify(`Prise de contact avec ${s.auteur} enregistrée.`)} className="rounded-md px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Contacter</button>
-                  <button type="button" onClick={() => { setSignalements((l) => l.map((x) => (x.id === s.id ? { ...x, statut: "Traité" } : x))); notify("Signalement marqué comme traité."); }} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Marquer traité</button>
+                  <button type="button" onClick={() => { setSignalements((l) => l.map((x) => (x.id === s.id ? { ...x, statut: "Traité" } : x))); notify("Signalement marqué comme traité."); }} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Marquer traité</button>
                 </>
               )}
             </div>
@@ -7810,7 +7810,7 @@ function RegulStepCard({ step, index, onChange }) {
                 {file && <span className="text-sm" style={{ color: COLORS.slate }}>{file}</span>}
               </div>
               <div>
-                <button type="button" disabled={!ready} onClick={() => onChange({ statut: "En vérification", valeur, document: file || "—", envoyeLe: todayFr(), motif: null })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange, opacity: ready ? 1 : 0.5 }}>
+                <button type="button" disabled={!ready} onClick={() => onChange({ statut: "En vérification", valeur, document: file || "—", envoyeLe: todayFr(), motif: null })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: ready ? 1 : 0.5 }}>
                   Envoyer pour vérification
                 </button>
               </div>
@@ -7855,7 +7855,7 @@ function RegularisationScreen({ steps, setSteps }) {
           <p className="font-semibold flex items-center gap-2" style={{ color: COLORS.slate }}>Accompagnement par un conseiller {!accompOk && <PremiumChip locked />}</p>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Un conseiller LIGGEEY vous aide à préparer vos dossiers et vous oriente vers les bons guichets.</p>
         </div>
-        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre shrink-0 inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque shrink-0 inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
           {!accompOk && <Lock size={13} />} Être rappelé(e) par un conseiller
         </button>
       </div>
@@ -7983,7 +7983,7 @@ function ProfilInfoModal({ nom, fields, values, onSave, onClose }) {
         </div>
         <div className="flex justify-end gap-2">
           <button type="button" onClick={onClose} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={save} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.orange }}>Enregistrer</button>
+          <button type="button" onClick={save} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Enregistrer</button>
         </div>
       </div>
     </ModalFrame>
@@ -8150,7 +8150,7 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
 
           <div className="p-4 flex flex-col gap-2" style={{ borderTop: `1px solid ${COLORS.border}` }}>
             {commentState !== "off" ? (
-              <button type="button" disabled={commentState === "busy"} onClick={comment} className="w-full rounded-md px-3 py-2 text-sm font-semibold text-sur-sombre flex items-center justify-center gap-1.5" style={{ background: COLORS.orange }}>
+              <button type="button" disabled={commentState === "busy"} onClick={comment} className="w-full rounded-md px-3 py-2 text-sm font-semibold text-sur-marque flex items-center justify-center gap-1.5" style={{ background: COLORS.orange }}>
                 <MessageCircle size={14} /> Commenter cet écran
               </button>
             ) : (
