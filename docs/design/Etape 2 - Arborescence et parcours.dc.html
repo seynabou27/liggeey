@@ -1,0 +1,492 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LIGGEEY · Étape 2 · Arborescence et parcours</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+body{margin:0;background:#FFFFFF;-webkit-font-smoothing:antialiased}
+a{color:#1E2733;text-decoration-color:#F0891D;text-underline-offset:3px}
+a:hover{color:#A85A0F}
+</style>
+</helmet>
+<div style="font-family:Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color:#1E2733; background:#FFFFFF; min-height:100vh;">
+
+<header data-screen-label="En-tête" style="background:#1E2733; color:#FFFFFF; padding:36px 24px 48px;">
+  <div style="max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:32px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+      <img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:20px; width:auto; display:block;">
+      <div style="display:flex; gap:8px; align-items:center; font-size:13px; flex-wrap:wrap;">
+        <span style="background:#F0891D; color:#1E2733; font-weight:600; padding:4px 11px; border-radius:999px;">Étape 2 sur 7</span>
+        <span style="border:1px solid #6B7480; color:#FFFFFF; padding:4px 11px; border-radius:999px;">Validé</span>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; max-width:780px;">
+      <h1 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:clamp(34px, 5.4vw, 56px); line-height:1.05; margin:0; text-wrap:balance;">Arborescence et parcours visiteurs</h1>
+      <p style="margin:0; font-size:17px; line-height:1.6; color:#E2E5E9; text-wrap:pretty;">Les 12 rubriques demandées, 3 ajouts et 2 modèles de pages. Chaque parcours mène à une seule action : créer son compte (talents, indépendants) ou demander une démo (entreprises).</p>
+    </div>
+  </div>
+</header>
+
+<section style="border-bottom:1px solid #E2E5E9; padding:18px 24px;">
+  <div style="max-width:1120px; margin:0 auto; display:flex; flex-wrap:wrap; gap:8px; align-items:center;">
+    <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480; margin-right:6px;">Choix de l'étape 1</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Accès direct : Connexion et Inscription</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Tarifs du brief</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Offres en vitrine sur l'accueil</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">« Rendons l'insertion plus facile et plus juste. »</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Chiffres sourcés : enquête + ANSD</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Engagements plutôt qu'avis</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Français, prêt pour wolof et anglais</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Équipe complète</span>
+    <span style="font-size:13px; padding:5px 11px; border:1px solid #E2E5E9; border-radius:999px;">Next.js</span>
+  </div>
+</section>
+
+<section data-screen-label="01 Arborescence" style="padding:56px 24px;">
+  <div style="max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:24px;">
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <span style="font-size:13px; font-weight:600; color:#A85A0F;">01</span>
+      <h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:clamp(28px, 3.6vw, 38px); line-height:1.1; margin:0;">Arborescence</h2>
+      <p style="margin:0; color:#6B7480; font-size:15px; line-height:1.6; max-width:700px; text-wrap:pretty;">Chaque page a un objectif et une action principale. Les adresses sont courtes, en français, sans préfixe de langue.</p>
+    </div>
+
+    <div style="display:flex; flex-wrap:wrap; gap:16px; align-items:center; font-size:13px; color:#6B7480;">
+      <span style="display:flex; align-items:center; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Action</span> bouton principal</span>
+      <span style="display:flex; align-items:center; gap:6px;"><span style="background:#FDEBD3; color:#1E2733; font-weight:600; font-size:11px; padding:3px 9px; border-radius:999px;">Ajout</span> hors de votre liste, validé</span>
+      <span style="display:flex; align-items:center; gap:6px;"><span style="border:1px solid #C7CCD1; color:#1E2733; font-weight:600; font-size:11px; padding:2px 9px; border-radius:999px;">Modèle</span> page répétée (événement, article)</span>
+    </div>
+
+    <div style="background:#FDEBD3; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:12px;">
+      <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">Sur toutes les pages</span>
+      <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:12px 24px; font-size:14px; line-height:1.5;">
+        <p style="margin:0;"><strong>En-tête</strong> : logo, menu, Connexion, Inscription</p>
+        <p style="margin:0;"><strong>Bouton WhatsApp</strong> flottant, toujours visible sur mobile</p>
+        <p style="margin:0;"><strong>Pied de page</strong> : newsletter, bureau de Dakar, Wave et Orange Money, liens légaux</p>
+      </div>
+    </div>
+
+    <div style="background:#1E2733; color:#FFFFFF; border-radius:14px; padding:18px 20px; display:flex; flex-wrap:wrap; gap:12px 24px; align-items:center; justify-content:space-between;">
+      <div style="display:flex; flex-direction:column; gap:4px;">
+        <div style="display:flex; gap:10px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:18px;">Accueil</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#E2E5E9;">/</code></div>
+        <p style="margin:0; font-size:14px; color:#E2E5E9;">Orienter chaque visiteur vers son parcours dès le premier écran.</p>
+      </div>
+      <div style="display:flex; gap:6px; flex-wrap:wrap;">
+        <span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Créer mon compte</span>
+        <span style="background:#FFFFFF; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Je recrute</span>
+      </div>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(250px, 1fr)); gap:28px 18px;">
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480; padding-bottom:8px; border-bottom:2px solid #1E2733;">Parcours</span>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Pour les talents</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/talents</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Montrer comment décrocher une opportunité sans réseau ni expérience.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Créer mon compte</span></div>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Pour les indépendants</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/independants</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Deux chemins dès le haut de page : formaliser son activité, ou trouver un emploi. Vidéos ou audios courts en wolof.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Créer mon compte</span><span style="border:1px solid #E2E5E9; font-weight:600; font-size:12px; padding:2px 10px; border-radius:999px;">WhatsApp</span></div>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Pour les entreprises</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/entreprises</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Recrutement accompagné, puis suivi des 90 premiers jours.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Demander une démo</span></div>
+        </div>
+        <sc-if value="{{ ajouts }}" hint-placeholder-val="{{ true }}">
+          <div style="margin-left:18px; border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">↳ Demande de démo</strong><span style="background:#FDEBD3; font-weight:600; font-size:11px; padding:3px 9px; border-radius:999px;">Ajout</span></div>
+            <code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/entreprises/demande-de-demo</code>
+            <p style="margin:0; font-size:13.5px; line-height:1.5;">Qualifier le besoin : postes, secteur, service souhaité, contact.</p>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Envoyer ma demande</span></div>
+          </div>
+        </sc-if>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480; padding-bottom:8px; border-bottom:2px solid #1E2733;">Services</span>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Formations et mentorat</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/formations-mentorat</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Formations, ateliers et mentorat, et ce que Premium inclut.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Créer mon compte</span></div>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Job Dating</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/job-dating</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Rencontres trimestrielles entre talents et entreprises : dates, déroulé, prix. Partage WhatsApp.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Je m'inscris</span></div>
+        </div>
+        <div style="margin-left:18px; border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">↳ Fiche événement</strong><span style="border:1px solid #C7CCD1; font-weight:600; font-size:11px; padding:2px 9px; border-radius:999px;">Modèle</span></div>
+          <code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/job-dating/[evenement]</code>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Date, lieu, programme, inscription.</p>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Tarifs</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/tarifs</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Prix affichés tels quels, par public, avec Wave et Orange Money. Mini-guide « Quelle formule pour moi ? ».</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Une action par public</span></div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480; padding-bottom:8px; border-bottom:2px solid #1E2733;">LIGGEEY</span>
+        <sc-if value="{{ ajouts }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Comment nous vérifions</strong><span style="background:#FDEBD3; font-weight:600; font-size:11px; padding:3px 9px; border-radius:999px;">Ajout</span></div>
+            <code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/verification</code>
+            <p style="margin:0; font-size:13.5px; line-height:1.5;">Ce que l'équipe contrôle (entreprises, offres, diplômes, références) et comment.</p>
+            <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Créer mon compte</span></div>
+          </div>
+        </sc-if>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">À propos</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/a-propos</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Mission, genèse, équipe de quatre personnes, partenaires visés.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Devenir partenaire</span></div>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Ressources</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/ressources</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Deux articles par mois, filtrés par public.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">S'abonner à la newsletter</span></div>
+        </div>
+        <div style="margin-left:18px; border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">↳ Article</strong><span style="border:1px solid #C7CCD1; font-weight:600; font-size:11px; padding:2px 9px; border-radius:999px;">Modèle</span></div>
+          <code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/ressources/[article]</code>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Article, public visé, articles liés, newsletter.</p>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">FAQ</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/faq</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Réponses par public : fiabilité, prix, données, pilote.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="border:1px solid #E2E5E9; font-weight:600; font-size:12px; padding:2px 10px; border-radius:999px;">Écrire sur WhatsApp</span></div>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Contact</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/contact</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Formulaire avec motif, WhatsApp, carte et horaires du bureau.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:6px;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:12px; padding:3px 10px; border-radius:999px;">Envoyer</span></div>
+        </div>
+      </div>
+
+      <div style="display:flex; flex-direction:column; gap:10px;">
+        <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480; padding-bottom:8px; border-bottom:2px solid #1E2733;">Accès et cadre légal</span>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Mentions légales</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/mentions-legales</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Éditeur, hébergeur, NINEA et RCCM [à fournir].</p>
+        </div>
+        <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+          <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">CGU</strong><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/cgu</code></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Règles d'usage, abonnements, paiement, vérification des offres.</p>
+        </div>
+        <sc-if value="{{ ajouts }}" hint-placeholder-val="{{ true }}">
+          <div style="border:1px solid #E2E5E9; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:6px;">
+            <div style="display:flex; justify-content:space-between; gap:8px; align-items:baseline; flex-wrap:wrap;"><strong style="font-size:15px;">Confidentialité</strong><span style="background:#FDEBD3; font-weight:600; font-size:11px; padding:3px 9px; border-radius:999px;">Ajout</span></div>
+            <code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:12px; color:#6B7480;">/confidentialite</code>
+            <p style="margin:0; font-size:13.5px; line-height:1.5;">Données collectées, finalités, droits des personnes, contact.</p>
+          </div>
+        </sc-if>
+        <div style="border:1px dashed #6B7480; border-radius:12px; padding:14px 16px; display:flex; flex-direction:column; gap:8px; margin-top:6px;">
+          <strong style="font-size:15px;">Application LIGGEEY (existante)</strong>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;"><strong>Connexion</strong> : lien direct depuis l'en-tête.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;"><strong>Inscription</strong> : directe, depuis l'en-tête ou un bouton « Créer mon compte », profil présélectionné (talent, indépendant, entreprise).</p>
+        </div>
+      </div>
+
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="02 Navigation" style="padding:56px 24px; background:#FDEBD3;">
+  <div style="max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:24px;">
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <span style="font-size:13px; font-weight:600; color:#A85A0F;">02</span>
+      <h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:clamp(28px, 3.6vw, 38px); line-height:1.1; margin:0;">Navigation</h2>
+      <p style="margin:0; font-size:15px; line-height:1.6; max-width:700px; text-wrap:pretty;">Six entrées dans l'en-tête. Le reste va dans le menu mobile et le pied de page.</p>
+    </div>
+
+    <div style="background:#FFFFFF; border-radius:14px; padding:14px 18px; display:flex; flex-wrap:wrap; align-items:center; gap:10px 22px; font-size:14px;">
+      <img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY" style="height:15px; width:auto; display:block; margin-right:8px;">
+      <span style="font-weight:500;">Talents</span>
+      <span style="font-weight:500;">Indépendants</span>
+      <span style="font-weight:500;">Entreprises</span>
+      <span style="font-weight:500;">Formations et mentorat</span>
+      <span style="font-weight:500;">Job Dating</span>
+      <span style="font-weight:500;">Tarifs</span>
+      <span style="flex:1 1 0; min-width:0;"></span>
+      <span style="font-weight:600;">Connexion</span>
+      <span style="background:#F0891D; color:#1E2733; font-weight:600; padding:8px 14px; border-radius:8px;">Inscription</span>
+    </div>
+
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px;">
+      <div style="background:#FFFFFF; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:12px;">
+        <strong style="font-size:15px;">Menu mobile</strong>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; font-size:14px; line-height:1.7;">
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">Parcours</span><br>Talents<br>Indépendants<br>Entreprises</div>
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">Services</span><br>Formations et mentorat<br>Job Dating<br>Tarifs</div>
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">LIGGEEY</span><br>À propos<br>Comment nous vérifions<br>Ressources<br>FAQ<br>Contact</div>
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">Compte</span><br>Connexion<br>Inscription</div>
+        </div>
+      </div>
+      <div style="background:#FFFFFF; border-radius:14px; padding:18px 20px; display:flex; flex-direction:column; gap:12px;">
+        <strong style="font-size:15px;">Pied de page</strong>
+        <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; font-size:14px; line-height:1.7;">
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">Parcours et services</span><br>Les six entrées de l'en-tête</div>
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">LIGGEEY</span><br>À propos, Comment nous vérifions, Ressources, FAQ, Contact</div>
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">Nous trouver</span><br>Bureau de Dakar [à fournir]<br>WhatsApp, e-mail</div>
+          <div><span style="font-size:11px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:#6B7480;">Cadre</span><br>Mentions légales, CGU, Confidentialité<br>Wave · Orange Money</div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="03 Parcours" style="padding:56px 24px;">
+  <div style="max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:28px;">
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <span style="font-size:13px; font-weight:600; color:#A85A0F;">03</span>
+      <h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:clamp(28px, 3.6vw, 38px); line-height:1.1; margin:0;">Parcours visiteurs</h2>
+      <p style="margin:0; color:#6B7480; font-size:15px; line-height:1.6; max-width:700px; text-wrap:pretty;">Cinq temps par parcours, avec la question que se pose le visiteur et la réponse que le site lui apporte.</p>
+    </div>
+
+    <article style="border:1px solid #E2E5E9; border-radius:16px; overflow:hidden;">
+      <div style="background:#FDEBD3; padding:20px 22px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:6px; max-width:640px;">
+          <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">Parcours 1</span>
+          <h3 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:28px; margin:0;">Talents</h3>
+          <p style="margin:0; font-size:14px; line-height:1.55;">Persona du mémoire : Moussa, 23 ans, jeune diplômé. On lui demande de l'expérience, même pour un stage.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
+          <span style="font-size:12px; color:#1E2733;">Action visée</span>
+          <span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:5px 12px; border-radius:999px;">Créer mon compte</span>
+        </div>
+      </div>
+      <ol style="list-style:none; margin:0; padding:22px; display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:22px 18px;">
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">1</span><strong style="font-size:15px;">Arrivée</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Google, réseaux sociaux, lien WhatsApp, école ou université. Arrive sur l'accueil ou /talents.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; font-style:italic; color:#6B7480;">« Est-ce que c'est pour moi ? »</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Slogan, trois parcours, offres vérifiées en vitrine.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">2</span><strong style="font-size:15px;">Découverte</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">/talents : profil et compétences, suivi des candidatures, mentorat, formations.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; font-style:italic; color:#6B7480;">« Sans expérience, j'ai mes chances ? »</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Les compétences comptent autant que le diplôme. Formations et mentors pour progresser.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">3</span><strong style="font-size:15px;">Réassurance</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Engagements, Tarifs (Essentiel 1 500, Premium 3 000 FCFA par mois), FAQ.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; font-style:italic; color:#6B7480;">« Et si c'était une arnaque ? »</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Offres vérifiées, prix affichés, Wave et Orange Money, bureau à Dakar.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#F0891D; color:#1E2733; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">4</span><strong style="font-size:15px;">Action</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Inscription dans l'app, profil « chercheur d'emploi » présélectionné : nom, e-mail, téléphone.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; color:#6B7480;">Autres sorties : WhatsApp, newsletter, Job Dating.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">5</span><strong style="font-size:15px;">Après</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Compte créé : profil et compétences à compléter, premières candidatures, choix entre Essentiel et Premium.</p>
+        </li>
+      </ol>
+    </article>
+
+    <article style="border:1px solid #E2E5E9; border-radius:16px; overflow:hidden;">
+      <div style="background:#FDEBD3; padding:20px 22px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:6px; max-width:640px;">
+          <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">Parcours 2</span>
+          <h3 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:28px; margin:0;">Indépendants</h3>
+          <p style="margin:0; font-size:14px; line-height:1.55;">Persona du mémoire : Ndeye Fatou, des années en restauration, un vrai savoir-faire, aucun document pour le prouver.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
+          <span style="font-size:12px; color:#1E2733;">Action visée</span>
+          <span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:5px 12px; border-radius:999px;">Créer mon compte</span>
+        </div>
+      </div>
+      <ol style="list-style:none; margin:0; padding:22px; display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:22px 18px;">
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">1</span><strong style="font-size:15px;">Arrivée</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">WhatsApp, réseaux sociaux, bouche-à-oreille, bureau d'accueil. Arrive sur /independants.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; font-style:italic; color:#6B7480;">« J'ai un métier, pas de diplôme. »</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Le savoir-faire se valorise ici, avec ou sans diplôme.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">2</span><strong style="font-size:15px;">Choix du chemin</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;"><strong>A.</strong> Formaliser mon activité : identité, NINEA, immatriculation, régime fiscal, protection sociale, assurance.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;"><strong>B.</strong> Faire reconnaître mes compétences : profil, réalisations, offres.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">3</span><strong style="font-size:15px;">Réassurance</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Accompagnement à la formalisation : 5 000 FCFA. Bureau d'accueil, WhatsApp, FAQ.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; font-style:italic; color:#6B7480;">« Je ne suis pas à l'aise avec Internet. »</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">On vous aide au bureau ou sur WhatsApp.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#F0891D; color:#1E2733; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">4</span><strong style="font-size:15px;">Action</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Inscription dans l'app, profil « prestataire » présélectionné, chemin A ou B déjà indiqué.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; color:#6B7480;">Autres sorties : WhatsApp, visite au bureau.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">5</span><strong style="font-size:15px;">Après</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Espace prestataire dans l'app : suivi de la régularisation (A), ou profil et services visibles des recruteurs (B).</p>
+        </li>
+      </ol>
+    </article>
+
+    <article style="border:1px solid #E2E5E9; border-radius:16px; overflow:hidden;">
+      <div style="background:#1E2733; color:#FFFFFF; padding:20px 22px; display:flex; flex-wrap:wrap; justify-content:space-between; align-items:flex-end; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:6px; max-width:640px;">
+          <span style="font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase;">Parcours 3</span>
+          <h3 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:28px; margin:0;">Entreprises</h3>
+          <p style="margin:0; font-size:14px; line-height:1.55; color:#E2E5E9;">Persona du mémoire : un recruteur qui passe trop de temps à chercher et trier des candidatures.</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:6px; align-items:flex-start;">
+          <span style="font-size:12px; color:#E2E5E9;">Action visée</span>
+          <span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:5px 12px; border-radius:999px;">Demander une démo</span>
+        </div>
+      </div>
+      <ol style="list-style:none; margin:0; padding:22px; display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:22px 18px;">
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">1</span><strong style="font-size:15px;">Arrivée</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">LinkedIn, Google, prospection directe, Job Dating. Arrive sur /entreprises.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; font-style:italic; color:#6B7480;">« Pourquoi pas une simple annonce ? »</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">LIGGEEY trie et vérifie pour vous, puis présente une short-list.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">2</span><strong style="font-size:15px;">Découverte</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Analyse du besoin, publication, préqualification (diplômes, références, compétences), short-list.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Suivi post-embauche : points à J+7, J+30, J+60, J+90.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">3</span><strong style="font-size:15px;">Réassurance</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Abonnement 40 000 FCFA, suivi post-embauche 25 000 FCFA, données protégées, FAQ entreprises.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; font-style:italic; color:#6B7480;">« Les profils sont-ils fiables ? »</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Ce qui est vérifié, et comment, expliqué étape par étape.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#F0891D; color:#1E2733; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">4</span><strong style="font-size:15px;">Action</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">/entreprises/demande-de-demo : entreprise, secteur, postes, service souhaité, contact.</p>
+          <p style="margin:0; font-size:13.5px; line-height:1.5; color:#6B7480;">Autres sorties : WhatsApp, Job Dating.</p>
+        </li>
+        <li style="display:flex; flex-direction:column; gap:8px;">
+          <div style="display:flex; align-items:center; gap:8px;"><span style="width:24px; height:24px; border-radius:50%; background:#1E2733; color:#FFFFFF; font-size:12px; font-weight:600; display:grid; place-items:center; flex:none;">5</span><strong style="font-size:15px;">Après</strong></div>
+          <p style="margin:0; font-size:13.5px; line-height:1.5;">Rappel par l'équipe [délai à définir], démo, abonnement, publication des offres dans l'app.</p>
+        </li>
+      </ol>
+    </article>
+
+    <div style="background:#FDEBD3; border-radius:14px; padding:20px 22px; display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:14px 28px; align-items:start;">
+      <div style="display:flex; flex-direction:column; gap:6px;">
+        <strong style="font-size:16px;">Pour les moins à l'aise avec le numérique</strong>
+        <p style="margin:0; font-size:12.5px; line-height:1.5;">35,5 % des répondants veulent passer par WhatsApp, 19 % préfèrent un agent. Source : enquête LIGGEEY 2026, 200 répondants.</p>
+      </div>
+      <p style="margin:0; font-size:14px; line-height:1.55;">Chaque parcours garde trois portes : <strong>WhatsApp</strong> sur toutes les pages, le <strong>bureau d'accueil</strong> (carte et horaires sur Contact) et l'<strong>aide à l'inscription</strong>, motif du formulaire de contact.</p>
+    </div>
+  </div>
+</section>
+
+<section data-screen-label="04 Accueil" style="padding:56px 24px; border-top:1px solid #E2E5E9;">
+  <div style="max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:24px;">
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <span style="font-size:13px; font-weight:600; color:#A85A0F;">04</span>
+      <h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:clamp(28px, 3.6vw, 38px); line-height:1.1; margin:0;">L'accueil, section par section</h2>
+      <p style="margin:0; color:#6B7480; font-size:15px; line-height:1.6; max-width:700px; text-wrap:pretty;">L'enchaînement de la capture JobStock, adapté : ce qui demandait des avis, des logos ou des volumes est remplacé par du réel.</p>
+    </div>
+    <ol style="list-style:none; margin:0; padding:0; display:flex; flex-direction:column; border-top:1px solid #E2E5E9;">
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">1</span>
+        <div><strong style="font-size:15px;">Bandeau d'accueil</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Grande photo à bord arrondi, slogan, recherche (métier, ville), Créer mon compte, Je recrute.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Capture : bandeau et recherche</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">2</span>
+        <div><strong style="font-size:15px;">Trois parcours</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Talents, indépendants, entreprises : une phrase et un lien chacun.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Remplace la rangée de logos clients</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">3</span>
+        <div><strong style="font-size:15px;">Offres en vitrine</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">4 à 6 offres vérifiées, chacune partageable sur WhatsApp. « Voir toutes les offres » mène à l'app.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Capture : grille d'offres</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">4</span>
+        <div><strong style="font-size:15px;">Le constat</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Trois chiffres de l'enquête et un de l'ANSD, sources citées.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Remplace la grille de catégories</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">5</span>
+        <div><strong style="font-size:15px;">Comment ça marche</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Quatre étapes autour d'un téléphone qui montre l'app.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Capture : étapes et téléphone</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">6</span>
+        <div><strong style="font-size:15px;">Nos engagements</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Offres vérifiées, données protégées, suivi transparent, accompagnement humain. Lien vers « Comment nous vérifions ».</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Remplace les avis clients</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">7</span>
+        <div><strong style="font-size:15px;">À venir</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Prochain Job Dating, formations et mentorat.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Nouveau</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">8</span>
+        <div><strong style="font-size:15px;">Besoin d'aide ?</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Bureau d'accueil à Dakar et WhatsApp, pour s'inscrire accompagné.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Nouveau</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">9</span>
+        <div><strong style="font-size:15px;">Newsletter</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Un champ, un bouton, la promesse des deux articles par mois.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Capture : bandeau newsletter</span>
+      </li>
+      <li style="display:grid; grid-template-columns:36px minmax(0, 1fr) minmax(0, 220px); gap:6px 16px; padding:14px 0; border-bottom:1px solid #E2E5E9; align-items:baseline;">
+        <span style="font-family:Georgia, serif; font-size:20px; color:#A85A0F;">10</span>
+        <div><strong style="font-size:15px;">Pied de page</strong><p style="margin:2px 0 0; font-size:14px; line-height:1.5;">Sans badges App Store ni Google Play : aucune app mobile n'est annoncée.</p></div>
+        <span style="font-size:12.5px; color:#6B7480;">Capture : pied de page</span>
+      </li>
+    </ol>
+  </div>
+</section>
+
+<section data-screen-label="05 Points à valider" style="padding:56px 24px 72px; background:#1E2733; color:#FFFFFF;">
+  <div style="max-width:1120px; margin:0 auto; display:flex; flex-direction:column; gap:24px;">
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <span style="font-size:13px; font-weight:600; color:#F0891D;">05</span>
+      <h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:clamp(28px, 3.6vw, 38px); line-height:1.1; margin:0;">Points à valider</h2>
+      <p style="margin:0; color:#E2E5E9; font-size:15px; line-height:1.6; max-width:700px;">Mes choix par défaut. Il suffit de me dire les numéros à changer.</p>
+    </div>
+    <ol style="margin:0; padding:0; list-style:none; display:grid; grid-template-columns:repeat(auto-fit, minmax(300px, 1fr)); gap:18px 32px; font-size:14.5px; line-height:1.55;">
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">1</span><span><strong>Accès direct</strong> <span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:11px; padding:2px 8px; border-radius:999px; margin-left:4px;">Validé</span> : Connexion et Inscription dans l'en-tête mènent à l'app. Les boutons « Créer mon compte » présélectionnent le bon profil.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">2</span><span><strong>Recherche du bandeau</strong> : elle filtre les offres en vitrine. « Voir toutes les offres » mène à l'app (connexion ou inscription), sans page Offres publique.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">3</span><span><strong>Demande entreprise</strong> : une page dédiée, plus simple à mesurer et à cibler en publicité.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">4</span><span><strong>Job Dating</strong> : inscription sur le site et paiement par lien Wave ou Orange Money, sans obliger à créer un compte. Sinon, inscription dans l'app.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">5</span><span><strong>Confidentialité</strong> : une page à part des CGU, car la protection des données est un message de confiance.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">6</span><span><strong>Un seul formulaire de contact</strong>, avec un motif : question, aide à l'inscription, rendez-vous au bureau, offre suspecte, partenariat.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">7</span><span><strong>Ressources</strong> : une page filtrable par public, sans pages de catégories tant qu'il y a peu d'articles.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">8</span><span><strong>Langues</strong> : /wo et /en viendront ensuite. Le sélecteur reste masqué tant qu'il n'y a qu'une langue.</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">9</span><span><strong>À prévoir dans l'app</strong> : un lien d'inscription qui présélectionne le profil (talent, indépendant, entreprise).</span></li>
+      <li style="display:flex; gap:12px;"><span style="color:#F0891D; font-weight:700; flex:none; width:20px;">10</span><span><strong>Restent [à fournir]</strong> : coordonnées, adresse du bureau, unités de prix des services, délais de réponse annoncés.</span></li>
+    </ol>
+    <p style="margin:12px 0 0; padding-top:20px; border-top:1px solid #6B7480; font-size:14px; color:#E2E5E9;">Étape suivante, après validation : rédaction des contenus de chaque page.</p>
+  </div>
+</section>
+
+</div>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;afficherAjouts&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;, &quot;section&quot;: &quot;Arborescence&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { ajouts: this.props.afficherAjouts ?? true };
+  }
+}
+</script>
+</body>
+</html>

@@ -1,0 +1,62 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    scroll-behavior: smooth;
+    -webkit-text-size-adjust: 100%;
+  }
+  body {
+    @apply bg-white text-[15px] leading-normal text-ardoise antialiased;
+  }
+  /* Les ancres ne passent pas sous l'en-tête fixe */
+  [id] {
+    scroll-margin-top: 88px;
+  }
+  :focus-visible {
+    outline: 3px solid #f0891d;
+    outline-offset: 2px;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    html {
+      scroll-behavior: auto;
+    }
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      transition-duration: 0.01ms !important;
+    }
+  }
+}
+
+@layer components {
+  .lien {
+    @apply font-semibold underline decoration-orange decoration-2 underline-offset-4 hover:text-orange-texte;
+  }
+  .surtitre {
+    @apply flex items-center gap-2.5 text-base font-medium text-orange-texte;
+  }
+  /* Contenu des articles (Markdown) */
+  .article h2 {
+    @apply mt-10 font-sans text-2xl font-semibold text-ardoise;
+  }
+  .article p,
+  .article ul,
+  .article ol {
+    @apply mt-4 text-lg leading-relaxed;
+  }
+  .article ul {
+    @apply list-disc pl-6;
+  }
+  .article ol {
+    @apply list-decimal pl-6;
+  }
+  .article a {
+    @apply lien;
+  }
+  .article blockquote {
+    @apply mt-8 rounded-lg bg-orange-clair p-6 font-sans text-ardoise;
+  }
+}

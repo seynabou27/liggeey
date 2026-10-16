@@ -1,0 +1,1144 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet data-dc-atomics>
+<meta name="design_doc_mode" content="canvas">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LIGGEEY · Étape 4 · Wireframes</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Kalam:wght@400;700&amp;display=swap" rel="stylesheet">
+<style>
+body{margin:0;background:#f0eee9;font-family:system-ui,sans-serif}
+a{color:#1E2733}a:hover{color:#A85A0F}
+.dv-turn{padding:40px 44px 32px;border-bottom:1px solid rgba(0,0,0,.08);scroll-margin-top:16px}.dv-thd{display:flex;align-items:baseline;gap:10px;margin:0 0 12px}.dv-tid{font:600 10px ui-monospace,Menlo,monospace;padding:3px 7px;background:#1a1a1a;color:#fff;border-radius:4px;text-decoration:none}.dv-tname{font:600 13px/1.2 system-ui,sans-serif;color:#1a1a1a}.dv-opts{display:flex;flex-wrap:wrap;gap:28px;align-items:flex-start}.dv-opt{flex:none;display:flex;flex-direction:column;gap:9px;scroll-margin-top:16px}.dv-oid{font:600 10.5px ui-monospace,Menlo,monospace;padding:3px 7px;background:rgba(0,0,0,.08);color:#1a1a1a;border-radius:5px;text-decoration:none}.dv-olabel{display:flex;align-items:baseline;gap:8px;font:400 11px/1.3 system-ui,sans-serif;color:rgba(0,0,0,.55)}.dv-card{max-width:100%;background:#fff;border:1px solid rgba(0,0,0,.08);border-radius:8px;box-shadow:0 1px 3px rgba(0,0,0,.06);overflow:hidden}.dv-opt:target .dv-oid{background:#2a78d6;color:#fff}.dv-next{margin:22px 0 0;font:12px/1.5 system-ui,sans-serif;color:rgba(0,0,0,.5)}
+.wf{font-family:'Kalam',cursive;color:#1E2733;font-size:14px;line-height:1.35;background:#fff}
+.wf *{box-sizing:border-box}
+.wf-hd{display:flex;align-items:center;justify-content:space-between;gap:8px;padding:10px 14px;border-bottom:2px solid #1E2733;background:#fff}
+.wf-hd img{height:13px;width:auto;display:block}
+.wf-bg{width:22px;height:16px;display:flex;flex-direction:column;justify-content:space-between}
+.wf-bg i{display:block;height:2px;background:#1E2733;border-radius:2px}
+.wf-s{padding:18px 16px;display:flex;flex-direction:column;gap:10px;border-bottom:1.5px dashed #C7CCD1}
+.wf-k{font-size:12px;font-weight:700;color:#A85A0F}
+.wf-h1{font-size:25px;font-weight:700;line-height:1.1}
+.wf-h2{font-size:20px;font-weight:700;line-height:1.15}
+.wf-h3{font-size:15px;font-weight:700;line-height:1.2}
+.wf-t{font-size:13px;color:#4A525C;line-height:1.35}
+.wf-ls{display:flex;flex-direction:column;gap:6px}
+.wf-l{height:7px;background:#D9DCE0;border-radius:4px}
+.wf-l.m{width:82%}.wf-l.s{width:58%}
+.wf-img{border:2px solid #1E2733;border-radius:10px;background:repeating-linear-gradient(45deg,#F2F2EF 0 7px,#fff 7px 14px);display:grid;place-items:center;color:#6B7480;font-size:12px;text-align:center;padding:6px}
+.wf-b{border:2px solid #1E2733;border-radius:8px;padding:7px 12px;font-weight:700;text-align:center;font-size:14px;background:#fff;color:#1E2733}
+.wf-b.p{background:#F0891D}
+.wf-b.sm{padding:4px 9px;font-size:12.5px}
+.wf-a{font-weight:700;text-decoration:underline;text-decoration-color:#F0891D;text-decoration-thickness:2px;text-underline-offset:3px;font-size:13.5px}
+.wf-in{border:2px solid #1E2733;border-radius:8px;padding:7px 10px;color:#6B7480;font-size:13px;background:#fff;min-height:36px}
+.wf-c{border:2px solid #1E2733;border-radius:10px;padding:10px;display:flex;flex-direction:column;gap:6px;background:#fff;color:#1E2733}
+.wf-r{display:flex;gap:8px;align-items:center;flex-wrap:wrap}
+.wf-g2{display:grid;grid-template-columns:1fr 1fr;gap:8px}
+.wf-ch{border:1.5px solid #1E2733;border-radius:999px;padding:1px 9px;font-size:12px;background:#fff;color:#1E2733}
+.wf-ch.on{background:#1E2733;color:#fff}
+.wf-ic{width:30px;height:30px;border:2px solid #1E2733;border-radius:50%;flex:none;background:#FDEBD3}
+.wf-n{width:24px;height:24px;border-radius:50%;background:#1E2733;color:#fff;display:grid;place-items:center;font-size:12px;font-weight:700;flex:none}
+.wf-st{display:flex;gap:8px;align-items:flex-start}
+.wf-st > div{flex:1;display:flex;flex-direction:column;gap:3px}
+.wf-note{font-size:12.5px;color:#A85A0F;line-height:1.25}
+.wf-note::before{content:"↳ "}
+[data-notes="off"] .wf-note{display:none}
+.wf-dk{background:#1E2733;color:#fff}
+.wf-dk .wf-l{background:#4A5563}.wf-dk .wf-t{color:#C9CED4}
+.wf-sf{background:#FDEBD3}
+.wf-acc{display:flex;justify-content:space-between;gap:8px;padding:8px 0;border-bottom:1.5px solid #1E2733;font-weight:700;font-size:13.5px}
+.wf-acc::after{content:"+"}
+.wf-acc.op::after{content:"−"}
+.wf-hs{display:flex;gap:8px;overflow:hidden}
+.wf-hs > *{flex:0 0 78%}
+.wf-ck{display:flex;gap:8px;align-items:flex-start;font-size:13px}
+.wf-ck::before{content:"";width:14px;height:14px;border:2px solid #1E2733;border-radius:3px;flex:none;margin-top:2px;background:#fff}
+.wf-ck.on::before{background:#1E2733}
+.wf-big{font-size:30px;font-weight:700;line-height:1}
+.wf-wa{width:52px;height:52px;border-radius:50%;border:2px solid #1E2733;background:#fff;display:grid;place-items:center;font-size:10px;font-weight:700}
+.wf-ph{width:150px;height:270px;border:3px solid #1E2733;border-radius:24px;padding:10px 8px;display:flex;flex-direction:column;margin:0 auto;background:#fff}
+.wf-f{display:flex;flex-direction:column;gap:3px}
+.wf-f > span:first-child{font-size:12.5px;color:#4A525C}
+</style>
+</helmet>
+<section class="dv-turn" id="t2" data-notes="{{ notes }}">
+<div class="dv-thd"><a class="dv-tid" href="#t2">2</a><span class="dv-tname">Accueil sur le modèle JobStock, à partir de <a class="dv-oid" href="#1b">1b</a></span></div>
+<p style="margin:0 0 22px; font:13px/1.5 system-ui, sans-serif; color:rgba(0,0,0,.6); max-width:820px;">Même enchaînement et mêmes compositions que le modèle, avec l'identité et les contenus LIGGEEY. Les blocs du modèle qui demandaient des compteurs, des logos clients ou des avis sont remplacés par du réel.</p>
+<div class="dv-opts">
+
+<div class="dv-opt" id="2a"><div class="dv-olabel"><a class="dv-oid" href="#2a">2a</a>Accueil · ordinateur, modèle JobStock</div><div class="dv-card" style="width:1200px"><div class="wf">
+  <div style="position:relative; height:672px; overflow:hidden; background:#FFFFFF;">
+    <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#2A3441 0 9px,#323D4B 9px 18px);"></div>
+    <svg viewBox="0 0 1200 672" preserveAspectRatio="none" aria-hidden="true" style="position:absolute; inset:0; width:100%; height:100%; display:block;"><path d="M0 601 C40 640 100 660 200 657 C420 650 700 520 1200 238 L1200 672 L0 672 Z" fill="#FFFFFF"></path></svg>
+    <span style="position:absolute; left:420px; top:96px; font-size:12px; color:#C9CED4;">Photo assombrie : une personne au travail, Dakar</span>
+    <div style="position:relative; display:flex; align-items:center; height:57px; padding:0 60px; color:#FFFFFF; border-bottom:1px solid rgba(255,255,255,.16);">
+      <img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:22px; width:auto; display:block; margin-right:44px;">
+      <div style="display:flex; align-items:center; gap:19px; font-size:13.5px; font-weight:700; flex:1;"><span style="color:#F0891D;">Accueil</span><span>Talents</span><span>Indépendants</span><span>Entreprises</span><span>Formations et mentorat</span><span>Job Dating</span><span>Tarifs</span></div>
+      <span style="display:flex; align-items:center; gap:6px; font-size:14px; font-weight:700; margin-right:18px;">⇥ Connexion</span>
+      <span style="display:flex; align-items:center; gap:8px; height:41px; padding:0 18px; background:#F0891D; color:#1E2733; border-radius:4px; font-size:14px; font-weight:700;">◯ Inscription</span>
+    </div>
+    <div style="position:absolute; left:60px; top:158px; width:620px; display:flex; flex-direction:column; color:#FFFFFF;">
+      <span style="display:flex; align-items:center; gap:9px; font-size:14px; font-weight:700; color:#F0891D;"><span style="width:34px; height:2px; background:#F0891D; flex:none;"></span>Emploi, compétences et accompagnement au Sénégal</span>
+      <span style="margin-top:22px; font-size:52px; font-weight:700; line-height:1.12;">Rendons l'insertion plus facile et plus juste.</span>
+      <span style="margin-top:28px; font-size:17px; line-height:1.75; max-width:510px;">Des offres vérifiées, un profil qui montre ce que vous savez faire, et une équipe qui vous accompagne.</span>
+      <div style="margin-top:28px; display:flex; gap:46px;">
+        <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-size:46px; line-height:1;">90<span style="color:#F0891D; font-size:46px; margin-left:7px;">j</span></span><span style="font-size:14px;">de suivi après l'embauche</span></div>
+        <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-size:46px; line-height:1;">48<span style="color:#F0891D; font-size:46px; margin-left:7px;">h</span></span><span style="font-size:14px;">pour vérifier un profil</span></div>
+        <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-size:46px; line-height:1;">1 500<span style="color:#F0891D; font-size:24px; margin-left:7px;">FCFA</span></span><span style="font-size:14px;">par mois, pour démarrer</span></div>
+      </div>
+    </div>
+    <div style="position:absolute; left:702px; top:72px; width:438px; background:#FFFFFF; border-radius:8px; box-shadow:0 14px 34px rgba(30,39,51,.16); padding:30px 25px 32px; display:flex; flex-direction:column; color:#1E2733;">
+      <span style="font-size:36px; font-weight:700; line-height:1.18; margin-left:-7px;">Trouvez un emploi avec<br><span style="color:#D9770F;">LIGGEEY</span></span>
+      <span style="margin-top:16px; height:47px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; gap:10px; padding:0 14px; font-size:14px; color:#6B7480;">⌖ Rechercher un métier, un mot-clé…</span>
+      <div style="margin-top:16px; display:grid; grid-template-columns:1fr 1fr; gap:16px 20px;">
+        <div style="display:flex; flex-direction:column; gap:6px;"><span style="font-size:12px; font-weight:700;">Secteur</span><span style="height:44px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; color:#6B7480;">Tous les secteurs <span>⌄</span></span></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><span style="font-size:12px; font-weight:700;">Type de contrat</span><span style="height:44px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; color:#6B7480;">Tous <span>⌄</span></span></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><span style="font-size:12px; font-weight:700;">Ville</span><span style="height:44px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; color:#6B7480;">Dakar <span>⌄</span></span></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><span style="font-size:12px; font-weight:700;">Expérience</span><span style="height:44px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; color:#6B7480;">Toutes <span>⌄</span></span></div>
+      </div>
+      <div style="margin-top:16px;"><div style="display:flex; flex-direction:column; gap:6px;"><span style="font-size:12px; font-weight:700;">Niveau d'études</span><span style="height:44px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; color:#6B7480;">Tous niveaux, avec ou sans diplôme <span>⌄</span></span></div></div>
+      <span style="margin-top:24px; height:45px; background:#F0891D; color:#1E2733; border-radius:4px; display:grid; place-items:center; font-size:15px; font-weight:700;">Rechercher</span>
+    </div>
+    <span class="wf-wa" style="position:absolute; right:20px; bottom:14px;">WA</span>
+  </div>
+  <div style="padding:6px 60px 0; display:flex; gap:10px 28px; flex-wrap:wrap;"><span class="wf-note">Calqué sur la capture : mêmes proportions, filet sous l'en-tête, vague qui remonte vers la droite sous la carte</span><span class="wf-note">« Inscription » remplace « Register Today » ; « Niveau d'études » remplace le salaire ; repères réels à la place des compteurs</span></div>
+  <div class="wf-s" style="padding:40px; align-items:center; text-align:center; gap:18px;">
+    <span class="wf-h3" style="font-size:17px; max-width:440px;">Une plateforme, trois parcours : choisissez le vôtre.</span>
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:24px; width:100%; max-width:920px;">
+      <div class="wf-r" style="justify-content:center; gap:10px;"><span class="wf-ic"></span><span class="wf-h3" style="font-size:18px;">Je cherche un emploi →</span></div>
+      <div class="wf-r" style="justify-content:center; gap:10px;"><span class="wf-ic"></span><span class="wf-h3" style="font-size:18px;">Je travaille à mon compte →</span></div>
+      <div class="wf-r" style="justify-content:center; gap:10px;"><span class="wf-ic"></span><span class="wf-h3" style="font-size:18px;">Je recrute →</span></div>
+    </div>
+    <span class="wf-note">À la place de la rangée de logos clients</span>
+  </div>
+  <div class="wf-s" style="padding:44px 40px; align-items:center; gap:22px;">
+    <div class="wf-ls" style="align-items:center; text-align:center; gap:8px;"><span class="wf-h2" style="font-size:28px;">Des offres vérifiées, en ce moment</span><div class="wf-l" style="width:420px;"></div><div class="wf-l" style="width:300px;"></div></div>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:18px; width:100%;">
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">CDI</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">Stage</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">CDD</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">Mission</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">CDI</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">Temps partiel</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">Stage</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:12px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">CDI</span></div><span class="wf-ic" style="width:52px; height:52px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between; padding-top:4px;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+    </div>
+    <span class="wf-b">Voir toutes les offres</span>
+    <span class="wf-note">4 à 8 offres réelles issues de l'app ; ↗ partage sur WhatsApp</span>
+  </div>
+  <div class="wf-s" style="padding:44px 40px; align-items:center; gap:22px; background:#F4F5F7;">
+    <div class="wf-ls" style="align-items:center; text-align:center; gap:8px;"><span class="wf-h2" style="font-size:28px;">Explorer par secteur</span><div class="wf-l" style="width:420px;"></div></div>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:18px; width:100%;">
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Commerce et vente</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Comptabilité et finance</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Informatique et digital</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Restauration et hôtellerie</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Coiffure et beauté</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Artisanat et couture</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">BTP et électricité</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px; padding:20px 12px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Transport et logistique</span><span class="wf-t" style="font-size:12px;">Voir les offres</span></div>
+    </div>
+    <span class="wf-note">Nombre d'offres affiché seulement quand il y en a ; un clic ouvre les offres du secteur dans l'app</span>
+  </div>
+  <div class="wf-s" style="padding:48px 40px; align-items:center; gap:26px;">
+    <div class="wf-ls" style="align-items:center; text-align:center; gap:8px;"><span class="wf-h2" style="font-size:28px;">Comment ça marche</span><div class="wf-l" style="width:420px;"></div></div>
+    <div style="display:grid; grid-template-columns:1fr 280px 1fr; gap:40px; width:100%; align-items:center;">
+      <div class="wf-ls" style="gap:24px;">
+        <span class="wf-k">Talents et indépendants</span>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Créez votre compte</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Montrez ce que vous savez faire</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Postulez en confiance</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Progressez</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      </div>
+      <div class="wf-ph" style="width:260px; height:500px; border-radius:36px; padding:16px 12px;"><div class="wf-img" style="flex:1; border-radius:20px;">Capture de l'app : inscription</div></div>
+      <div class="wf-ls" style="gap:24px;">
+        <span class="wf-k">Entreprises</span>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Analyse du besoin</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Préqualification</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Short-list</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+        <div class="wf-ls" style="gap:4px;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Suivi pendant 90 jours</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      </div>
+    </div>
+    <div class="wf-r" style="gap:16px;"><span class="wf-b p">Créer mon compte</span><span class="wf-b">Demander une démo</span></div>
+  </div>
+  <div class="wf-dk" style="background:repeating-linear-gradient(45deg,#2A3441 0 9px,#323D4B 9px 18px); padding:64px 40px; display:flex; flex-direction:column; align-items:center; gap:22px; text-align:center;">
+    <span style="font-size:12px; color:#C9CED4;">Photo pleine largeur, assombrie</span>
+    <span class="wf-h2" style="font-size:30px; max-width:640px;">Trouver un emploi ne devrait pas dépendre de qui vous connaissez.</span>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:28px; width:100%; max-width:960px;">
+      <div class="wf-ls" style="align-items:center; gap:6px;"><span class="wf-big" style="font-size:42px;">78,5 %</span><div class="wf-l" style="width:150px;"></div><div class="wf-l" style="width:110px;"></div></div>
+      <div class="wf-ls" style="align-items:center; gap:6px;"><span class="wf-big" style="font-size:42px;">33,5 %</span><div class="wf-l" style="width:150px;"></div><div class="wf-l" style="width:110px;"></div></div>
+      <div class="wf-ls" style="align-items:center; gap:6px;"><span class="wf-big" style="font-size:42px;">81,5 %</span><div class="wf-l" style="width:150px;"></div><div class="wf-l" style="width:110px;"></div></div>
+      <div class="wf-ls" style="align-items:center; gap:6px;"><span class="wf-big" style="font-size:42px;">22,9 %</span><div class="wf-l" style="width:150px;"></div><div class="wf-l" style="width:110px;"></div></div>
+    </div>
+    <span class="wf-t" style="font-size:12px;">Sources : enquête LIGGEEY 2026 · ANSD 2026</span>
+    <span class="wf-note" style="color:#F0891D;">Emplacement de la vidéo du modèle : bouton ▶ si une vidéo de présentation est produite</span>
+  </div>
+  <div class="wf-s" style="padding:48px 40px; align-items:center; gap:20px;">
+    <div class="wf-ls" style="align-items:center; text-align:center; gap:8px;"><span class="wf-h2" style="font-size:28px;">Nos engagements</span><div class="wf-l" style="width:420px;"></div></div>
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:18px; width:100%;">
+      <div class="wf-c" style="padding:16px; gap:8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic"></span><span class="wf-h3">Des offres vérifiées</span><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-c" style="padding:16px; gap:8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic"></span><span class="wf-h3">Vos données protégées</span><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-c" style="padding:16px; gap:8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic"></span><span class="wf-h3">Un suivi transparent</span><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l s"></div></div>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(2, 1fr); gap:18px; width:66%;">
+      <div class="wf-c" style="padding:16px; gap:8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic"></span><span class="wf-h3">Une équipe joignable</span><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-c" style="padding:16px; gap:8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic"></span><span class="wf-h3">Un paiement simple : Wave, Orange Money</span><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l s"></div></div>
+    </div>
+    <span class="wf-a">Comment nous vérifions →</span>
+    <span class="wf-note">À la place des avis clients : aucun témoignage tant qu'il n'y en a pas de réels</span>
+  </div>
+  <div class="wf-s" style="padding:40px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:18px;">
+      <div class="wf-c" style="flex-direction:row; gap:14px; align-items:center;"><div style="border:2px solid #1E2733; border-radius:8px; padding:8px 12px; text-align:center; font-weight:700; line-height:1.1; font-size:18px; background:#FDEBD3;">12<br>DÉC.</div><div class="wf-ls" style="flex:1;"><span class="wf-h3">Prochain Job Dating</span><span class="wf-t">Dakar Plateau · 9 h – 14 h</span><div class="wf-r"><span class="wf-b p sm">Je m'inscris</span><span class="wf-a">Partager sur WhatsApp</span></div></div></div>
+      <div class="wf-c" style="flex-direction:row; gap:14px; align-items:center;"><div class="wf-img" style="width:120px; height:96px; flex:none;">Photo</div><div class="wf-ls" style="flex:1;"><span class="wf-h3">Formations et mentorat</span><div class="wf-l"></div><span class="wf-a">Voir les formations →</span></div></div>
+    </div>
+  </div>
+  <div style="background:#F0891D; padding:56px 40px; display:flex; flex-direction:column; align-items:center; gap:14px; text-align:center;">
+    <span class="wf-h2" style="font-size:28px;">Recevez nos nouveaux articles</span>
+    <span class="wf-t" style="color:#1E2733;">Conseils emploi, compétences et recrutement, et les dates des Job Dating.</span>
+    <div style="display:flex; align-items:center; width:560px; background:#fff; border:2px solid #1E2733; border-radius:10px; padding:5px 5px 5px 14px; gap:8px;"><span class="wf-t" style="flex:1; text-align:left;">Votre adresse e-mail</span><span class="wf-b sm" style="background:#1E2733; color:#fff;">Je m'abonne</span></div>
+  </div>
+  <div class="wf-dk" style="padding:48px 40px 0;">
+    <div style="display:grid; grid-template-columns:1.5fr 1fr 1fr 1fr 1.3fr; gap:28px;">
+      <div class="wf-ls" style="gap:10px;"><img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:16px; width:auto; align-self:flex-start;"><span class="wf-t">Hann Maristes 1, Îlot J, Villa n° 63, Dakar</span><div class="wf-r" style="gap:6px;"><span class="wf-ic" style="width:26px; height:26px; background:transparent; border-color:#6B7480;"></span><span class="wf-ic" style="width:26px; height:26px; background:transparent; border-color:#6B7480;"></span><span class="wf-ic" style="width:26px; height:26px; background:transparent; border-color:#6B7480;"></span><span class="wf-ic" style="width:26px; height:26px; background:transparent; border-color:#6B7480;"></span></div></div>
+      <div class="wf-ls" style="gap:8px;"><span class="wf-h3">Parcours</span><span class="wf-t">Talents</span><span class="wf-t">Indépendants</span><span class="wf-t">Entreprises</span></div>
+      <div class="wf-ls" style="gap:8px;"><span class="wf-h3">Services</span><span class="wf-t">Formations et mentorat</span><span class="wf-t">Job Dating</span><span class="wf-t">Tarifs</span></div>
+      <div class="wf-ls" style="gap:8px;"><span class="wf-h3">LIGGEEY</span><span class="wf-t">À propos</span><span class="wf-t">Comment nous vérifions</span><span class="wf-t">Ressources</span><span class="wf-t">FAQ</span><span class="wf-t">Contact</span></div>
+      <div class="wf-ls" style="gap:10px;"><span class="wf-h3">Besoin d'aide ?</span>
+        <div style="display:flex; align-items:center; gap:10px; border:2px solid #4A5563; border-radius:10px; padding:8px 12px;"><span class="wf-ic" style="width:26px; height:26px;"></span><div class="wf-ls" style="gap:0;"><span class="wf-t" style="font-size:11px;">Écrivez-nous</span><span class="wf-h3">WhatsApp</span></div></div>
+        <div style="display:flex; align-items:center; gap:10px; border:2px solid #4A5563; border-radius:10px; padding:8px 12px;"><span class="wf-ic" style="width:26px; height:26px;"></span><div class="wf-ls" style="gap:0;"><span class="wf-t" style="font-size:11px;">Venez nous voir</span><span class="wf-h3">Bureau d'accueil</span></div></div>
+      </div>
+    </div>
+    <div style="display:flex; justify-content:space-between; align-items:center; gap:16px; margin-top:36px; padding:16px 0; border-top:1px solid #4A5563;">
+      <span class="wf-t" style="font-size:12px;">© 2026 LIGGEEY · Mentions légales · CGU · Confidentialité</span>
+      <div class="wf-r" style="gap:8px;"><span class="wf-t" style="font-size:12px;">Paiement</span><span class="wf-ch">Wave</span><span class="wf-ch">Orange Money</span><span class="wf-b p sm" style="padding:3px 9px;">↑</span></div>
+    </div>
+    <span class="wf-note" style="color:#F0891D; display:block; padding-bottom:14px;">« Besoin d'aide » à la place des boutons App Store et Google Play ; moyens de paiement à la place des compteurs</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="2b"><div class="dv-olabel"><a class="dv-oid" href="#2b">2b</a>Accueil · mobile, même structure</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div style="position:relative; height:560px; overflow:hidden; background:#FFFFFF;">
+    <div style="position:absolute; inset:0; background:repeating-linear-gradient(45deg,#2A3441 0 8px,#323D4B 8px 16px);"></div>
+    <svg viewBox="0 0 360 560" preserveAspectRatio="none" aria-hidden="true" style="position:absolute; inset:0; width:100%; height:100%; display:block;"><path d="M0 515 C12 538 30 548 70 547 C160 544 250 505 360 430 L360 560 L0 560 Z" fill="#FFFFFF"></path></svg>
+    <div style="position:relative; display:flex; align-items:center; justify-content:space-between; height:50px; padding:0 14px; border-bottom:1px solid rgba(255,255,255,.16);"><img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:15px; width:auto; display:block;"><div class="wf-r" style="gap:10px;"><span style="background:#F0891D; color:#1E2733; border-radius:4px; padding:5px 10px; font-size:12.5px; font-weight:700;">Inscription</span><span class="wf-bg"><i style="background:#fff;"></i><i style="background:#fff;"></i><i style="background:#fff;"></i></span></div></div>
+    <div style="position:relative; padding:26px 16px 0; display:flex; flex-direction:column; color:#FFFFFF;">
+      <span style="display:flex; align-items:center; gap:8px; font-size:12.5px; font-weight:700; color:#F0891D;"><span style="width:26px; height:2px; background:#F0891D; flex:none;"></span>Emploi et accompagnement au Sénégal</span>
+      <span style="margin-top:14px; font-size:30px; font-weight:700; line-height:1.12;">Rendons l'insertion plus facile et plus juste.</span>
+      <span style="margin-top:14px; font-size:14px; line-height:1.6;">Des offres vérifiées, un profil qui montre ce que vous savez faire, et une équipe qui vous accompagne.</span>
+      <div style="margin-top:18px; display:flex; gap:22px;">
+        <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-size:28px; line-height:1;">90<span style="color:#F0891D; font-size:28px; margin-left:7px;">j</span></span><span style="font-size:11.5px;">de suivi</span></div>
+        <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-size:28px; line-height:1;">48<span style="color:#F0891D; font-size:28px; margin-left:7px;">h</span></span><span style="font-size:11.5px;">vérification</span></div>
+        <div style="display:flex; flex-direction:column; gap:8px;"><span style="font-size:28px; line-height:1;">1 500<span style="color:#F0891D; font-size:28px; margin-left:7px;">F</span></span><span style="font-size:11.5px;">par mois</span></div>
+      </div>
+    </div>
+  </div>
+  <div style="padding:0 14px; margin-top:-196px; position:relative;">
+    <div style="background:#FFFFFF; border-radius:8px; box-shadow:0 12px 28px rgba(30,39,51,.18); padding:18px 16px 20px; display:flex; flex-direction:column; color:#1E2733;">
+      <span style="font-size:22px; font-weight:700; line-height:1.18;">Trouvez un emploi avec <span style="color:#D9770F;">LIGGEEY</span></span>
+      <span style="margin-top:12px; height:42px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; gap:8px; padding:0 12px; font-size:13px; color:#6B7480;">⌖ Métier ou mot-clé…</span>
+      <div style="margin-top:12px; display:grid; grid-template-columns:1fr 1fr; gap:12px;"><div style="display:flex; flex-direction:column; gap:6px;"><span style="font-size:12px; font-weight:700;">Secteur</span><span style="height:40px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; color:#6B7480;">Tous <span>⌄</span></span></div><div style="display:flex; flex-direction:column; gap:6px;"><span style="font-size:12px; font-weight:700;">Ville</span><span style="height:40px; border:1px solid #E2E5E9; border-radius:4px; display:flex; align-items:center; justify-content:space-between; padding:0 14px; font-size:14px; color:#6B7480;">Dakar <span>⌄</span></span></div></div>
+      <span style="margin-top:16px; height:42px; background:#F0891D; color:#1E2733; border-radius:4px; display:grid; place-items:center; font-size:14px; font-weight:700;">Rechercher</span>
+    </div>
+  </div>
+  <div class="wf-s" style="padding-top:12px;">
+    <span class="wf-note">Même vague que sur ordinateur ; la carte de recherche chevauche le bas de la photo. Deux filtres sur mobile</span>
+  </div>
+  <div class="wf-s" style="align-items:center; text-align:center;">
+    <span class="wf-h3">Une plateforme, trois parcours</span>
+    <div class="wf-r" style="width:100%; flex-wrap:nowrap; padding:8px 0; border-bottom:1.5px solid #E2E5E9;"><span class="wf-ic"></span><span class="wf-h3" style="flex:1; text-align:left;">Je cherche un emploi</span><span style="font-weight:700;">→</span></div>
+    <div class="wf-r" style="width:100%; flex-wrap:nowrap; padding:8px 0; border-bottom:1.5px solid #E2E5E9;"><span class="wf-ic"></span><span class="wf-h3" style="flex:1; text-align:left;">Je travaille à mon compte</span><span style="font-weight:700;">→</span></div>
+    <div class="wf-r" style="width:100%; flex-wrap:nowrap; padding:8px 0;"><span class="wf-ic"></span><span class="wf-h3" style="flex:1; text-align:left;">Je recrute</span><span style="font-weight:700;">→</span></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2" style="text-align:center;">Des offres vérifiées, en ce moment</span>
+    <div class="wf-hs" style="padding-bottom:2px;">
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">CDI</span></div><span class="wf-ic" style="width:48px; height:48px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+      <div class="wf-c" style="align-items:center; text-align:center; gap:8px;"><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-ch on" style="font-size:11px;">✓ Vérifiée</span><span class="wf-ch" style="font-size:11px;">Stage</span></div><span class="wf-ic" style="width:48px; height:48px; border-radius:12px;"></span><span class="wf-h3">Poste</span><div class="wf-l m"></div><div class="wf-r" style="width:100%; justify-content:space-between;"><span class="wf-t">Ville</span><div class="wf-r" style="gap:6px;"><span class="wf-ch">↗</span><span class="wf-b p sm" style="border-radius:999px;">Voir</span></div></div></div>
+    </div>
+    <span class="wf-note">Défilement horizontal</span>
+    <span class="wf-b">Voir toutes les offres</span>
+  </div>
+  <div class="wf-s" style="background:#F4F5F7;">
+    <span class="wf-h2" style="text-align:center;">Explorer par secteur</span>
+    <div class="wf-g2">
+      <div class="wf-c" style="align-items:center; text-align:center; padding:12px 8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3" style="font-size:13.5px;">Commerce et vente</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; padding:12px 8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3" style="font-size:13.5px;">Comptabilité et finance</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; padding:12px 8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3" style="font-size:13.5px;">Informatique et digital</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; padding:12px 8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3" style="font-size:13.5px;">Restauration et hôtellerie</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; padding:12px 8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3" style="font-size:13.5px;">Coiffure et beauté</span></div>
+      <div class="wf-c" style="align-items:center; text-align:center; padding:12px 8px; border-width:0; box-shadow:0 0 0 2px #E2E5E9;"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3" style="font-size:13.5px;">Artisanat et couture</span></div>
+    </div>
+    <span class="wf-a" style="text-align:center;">Tous les secteurs →</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2" style="text-align:center;">Comment ça marche</span>
+    <div style="display:grid; grid-template-columns:1fr 1fr; border:2px solid #1E2733; border-radius:10px; overflow:hidden; font-weight:700; text-align:center; font-size:13px;"><span style="background:#1E2733; color:#fff; padding:6px;">Talents et indépendants</span><span style="padding:6px;">Entreprises</span></div>
+    <div class="wf-ph"><div class="wf-img" style="flex:1; border-radius:12px;">Capture de l'app</div></div>
+    <div class="wf-st"><span class="wf-n">1</span><div><span class="wf-h3">Créez votre compte</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">2</span><div><span class="wf-h3">Montrez ce que vous savez faire</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">3</span><div><span class="wf-h3">Postulez en confiance</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">4</span><div><span class="wf-h3">Progressez</span><div class="wf-l m"></div></div></div>
+    <span class="wf-note">L'onglet Entreprises affiche les quatre étapes du recrutement accompagné</span>
+    <span class="wf-b p">Créer mon compte</span>
+  </div>
+  <div class="wf-s wf-dk" style="background:repeating-linear-gradient(45deg,#2A3441 0 8px,#323D4B 8px 16px); text-align:center;">
+    <span class="wf-h2">Trouver un emploi ne devrait pas dépendre de qui vous connaissez.</span>
+    <div class="wf-g2" style="gap:14px 10px;">
+      <div class="wf-ls" style="align-items:center;"><span class="wf-big">78,5 %</span><div class="wf-l" style="width:100%;"></div></div>
+      <div class="wf-ls" style="align-items:center;"><span class="wf-big">33,5 %</span><div class="wf-l" style="width:100%;"></div></div>
+      <div class="wf-ls" style="align-items:center;"><span class="wf-big">81,5 %</span><div class="wf-l" style="width:100%;"></div></div>
+      <div class="wf-ls" style="align-items:center;"><span class="wf-big">22,9 %</span><div class="wf-l" style="width:100%;"></div></div>
+    </div>
+    <span class="wf-t" style="font-size:11.5px;">Sources : enquête LIGGEEY 2026 · ANSD 2026</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2" style="text-align:center;">Nos engagements</span>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Des offres vérifiées</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Vos données protégées</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Un suivi transparent</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Une équipe joignable</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Un paiement simple</span><div class="wf-l m"></div></div></div>
+    <span class="wf-a" style="text-align:center;">Comment nous vérifions →</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-c"><div class="wf-r" style="flex-wrap:nowrap; align-items:flex-start;"><div style="border:2px solid #1E2733; border-radius:8px; padding:4px 8px; text-align:center; font-weight:700; line-height:1.1; flex:none; background:#FDEBD3;">12<br>DÉC.</div><div class="wf-ls" style="gap:2px;"><span class="wf-h3">Prochain Job Dating</span><span class="wf-t">Dakar Plateau · 9 h – 14 h</span></div></div><div class="wf-r"><span class="wf-b p sm">Je m'inscris</span><span class="wf-a">Partager</span></div></div>
+    <div class="wf-c"><div class="wf-img" style="height:90px;">Photo : formation</div><span class="wf-h3">Formations et mentorat</span><span class="wf-a">Voir les formations →</span></div>
+  </div>
+  <div style="background:#F0891D; padding:24px 16px; display:flex; flex-direction:column; gap:10px; text-align:center;">
+    <span class="wf-h2">Recevez nos nouveaux articles</span>
+    <div style="display:flex; align-items:center; background:#fff; border:2px solid #1E2733; border-radius:10px; padding:4px 4px 4px 10px; gap:6px;"><span class="wf-t" style="flex:1; text-align:left;">Votre e-mail</span><span class="wf-b sm" style="background:#1E2733; color:#fff;">Je m'abonne</span></div>
+  </div>
+  <div class="wf-s wf-dk" style="border-bottom:0;">
+    <img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:13px; width:auto; align-self:flex-start;">
+    <span class="wf-t">Hann Maristes 1, Îlot J, Villa n° 63, Dakar</span>
+    <div class="wf-acc" style="border-color:#4A5563;">Parcours</div>
+    <div class="wf-acc" style="border-color:#4A5563;">Services</div>
+    <div class="wf-acc" style="border-color:#4A5563;">LIGGEEY</div>
+    <span class="wf-h3">Besoin d'aide ?</span>
+    <div class="wf-g2"><div style="border:2px solid #4A5563; border-radius:10px; padding:8px; text-align:center; font-weight:700;">WhatsApp</div><div style="border:2px solid #4A5563; border-radius:10px; padding:8px; text-align:center; font-weight:700;">Bureau</div></div>
+    <div class="wf-r"><span class="wf-ch">Wave</span><span class="wf-ch">Orange Money</span></div>
+    <span class="wf-t" style="font-size:11.5px;">© 2026 · Mentions légales · CGU · Confidentialité</span>
+  </div>
+</div></div></div>
+
+</div>
+<p class="dv-next">Pistes : « Garder <a class="dv-oid" href="#2a">2a</a> et appliquer ce style aux autres pages » · « Bandeau d'accueil clair, sans photo assombrie » · « Validé, passe au code »</p>
+</section>
+<section class="dv-turn" id="t1" data-notes="{{ notes }}">
+<div class="dv-thd"><a class="dv-tid" href="#t1">1</a><span class="dv-tname">Étape 4 · Wireframes : chaque page sur mobile, l'accueil aussi sur ordinateur</span></div>
+<p style="margin:0 0 22px; font:13px/1.5 system-ui, sans-serif; color:rgba(0,0,0,.6); max-width:820px;">Mobile d'abord, 360 px de large. Orange : action principale. Hachures : photo ou média. Notes orange : comportement à prévoir. Les textes sont ceux de l'étape 3, raccourcis.</p>
+<div class="dv-opts">
+
+<div class="dv-opt" id="1a"><div class="dv-olabel"><a class="dv-oid" href="#1a">1a</a>Accueil · mobile</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div style="position:relative;">
+    <div class="wf-img" style="height:210px; border-width:0 0 2px 0; border-radius:0 0 0 64px;">Photo : une personne au travail, Dakar</div>
+    <span class="wf-wa" style="position:absolute; right:12px; bottom:-26px;">WA</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-note">Bouton WhatsApp flottant, sur toutes les pages</span>
+    <span class="wf-k">Emploi, compétences et accompagnement au Sénégal</span>
+    <span class="wf-h1">Rendons l'insertion plus facile et plus juste.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l s"></div></div>
+    <div class="wf-c" style="gap:8px;"><span class="wf-in">Métier ou mot-clé</span><span class="wf-in">Ville</span><span class="wf-b">Rechercher</span></div>
+    <span class="wf-note">Filtre les offres en vitrine, plus bas</span>
+    <span class="wf-b p">Créer mon compte</span>
+    <span class="wf-a" style="text-align:center;">Je recrute</span>
+    <div class="wf-r" style="justify-content:center;"><span class="wf-ch">Offres vérifiées</span><span class="wf-ch">Accompagnement humain</span><span class="wf-ch">Wave · Orange Money</span></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Par où commencer ?</span>
+    <div class="wf-c" style="flex-direction:row; align-items:flex-start; gap:10px;"><span class="wf-ic"></span><div class="wf-ls" style="flex:1;"><span class="wf-h3">Je cherche un emploi</span><div class="wf-l m"></div><span class="wf-a">Espace talents →</span></div></div>
+    <div class="wf-c" style="flex-direction:row; align-items:flex-start; gap:10px;"><span class="wf-ic"></span><div class="wf-ls" style="flex:1;"><span class="wf-h3">Je travaille à mon compte</span><div class="wf-l m"></div><span class="wf-a">Espace indépendants →</span></div></div>
+    <div class="wf-c" style="flex-direction:row; align-items:flex-start; gap:10px;"><span class="wf-ic"></span><div class="wf-ls" style="flex:1;"><span class="wf-h3">Je recrute</span><div class="wf-l m"></div><span class="wf-a">Offre entreprises →</span></div></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Des offres vérifiées, en ce moment</span>
+    <div class="wf-l s"></div>
+    <div class="wf-hs">
+      <div class="wf-c"><div class="wf-r" style="flex-wrap:nowrap;"><span class="wf-ic" style="border-radius:8px;"></span><div class="wf-ls" style="flex:1; gap:2px;"><span class="wf-h3">Poste</span><span class="wf-t">Entreprise · Ville</span></div></div><div class="wf-r"><span class="wf-ch">CDI</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+      <div class="wf-c"><div class="wf-r" style="flex-wrap:nowrap;"><span class="wf-ic" style="border-radius:8px;"></span><div class="wf-ls" style="flex:1; gap:2px;"><span class="wf-h3">Poste</span><span class="wf-t">Entreprise · Ville</span></div></div><div class="wf-r"><span class="wf-ch">Stage</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+    </div>
+    <span class="wf-note">Défilement horizontal, 4 à 6 offres. « Partager » ouvre WhatsApp</span>
+    <span class="wf-a">Voir toutes les offres →</span>
+  </div>
+  <div class="wf-s wf-dk">
+    <span class="wf-h2">Trouver un emploi ne devrait pas dépendre de qui vous connaissez.</span>
+    <div class="wf-g2" style="gap:14px 10px;">
+      <div class="wf-ls"><span class="wf-big">78,5 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-big">33,5 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-big">81,5 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-big">22,9 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+    </div>
+    <span class="wf-t" style="font-size:11.5px;">Sources : enquête LIGGEEY 2026 · ANSD 2026</span>
+    <span class="wf-a">Pourquoi LIGGEEY existe →</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Comment ça marche</span>
+    <div class="wf-ph"><div class="wf-img" style="flex:1; border-radius:12px;">Capture de l'app</div></div>
+    <div class="wf-st"><span class="wf-n">1</span><div><span class="wf-h3">Créez votre compte</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">2</span><div><span class="wf-h3">Montrez ce que vous savez faire</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">3</span><div><span class="wf-h3">Postulez en confiance</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">4</span><div><span class="wf-h3">Progressez</span><div class="wf-l m"></div></div></div>
+    <span class="wf-b p">Créer mon compte</span>
+    <span class="wf-a" style="text-align:center;">Vous recrutez ? Le recrutement accompagné</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Nos engagements</span>
+    <div class="wf-g2">
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Offres vérifiées</span><div class="wf-l"></div></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Données protégées</span><div class="wf-l"></div></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Suivi transparent</span><div class="wf-l"></div></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Équipe joignable</span><div class="wf-l"></div></div>
+    </div>
+    <span class="wf-a">Comment nous vérifions →</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-c">
+      <div class="wf-r" style="flex-wrap:nowrap; align-items:flex-start;"><div style="border:2px solid #1E2733; border-radius:8px; padding:4px 8px; text-align:center; font-weight:700; line-height:1.1; flex:none;">12<br>DÉC.</div><div class="wf-ls" style="gap:2px;"><span class="wf-h3">Prochain Job Dating</span><span class="wf-t">Dakar Plateau · 9 h – 14 h</span></div></div>
+      <div class="wf-r"><span class="wf-b p sm">Je m'inscris</span><span class="wf-a">Partager sur WhatsApp</span></div>
+    </div>
+    <div class="wf-c"><div class="wf-img" style="height:90px;">Photo : formation</div><span class="wf-h3">Formations et mentorat</span><div class="wf-l m"></div><span class="wf-a">Voir les formations →</span></div>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h2">Pas à l'aise avec Internet ? On vous aide.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-t">Hann Maristes 1 · du lundi au samedi</span>
+    <span class="wf-b p">Écrire sur WhatsApp</span>
+    <span class="wf-a" style="text-align:center;">Voir l'adresse du bureau</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Recevez nos nouveaux articles</span>
+    <div class="wf-l m"></div>
+    <span class="wf-in">Votre adresse e-mail</span>
+    <span class="wf-b p">Je m'abonne</span>
+  </div>
+  <div class="wf-s wf-dk" style="border-bottom:0;">
+    <img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:13px; width:auto; align-self:flex-start;">
+    <span class="wf-t">Rendons l'insertion plus facile et plus juste.</span>
+    <div class="wf-acc" style="border-color:#4A5563;">Parcours</div>
+    <div class="wf-acc" style="border-color:#4A5563;">Services</div>
+    <div class="wf-acc" style="border-color:#4A5563;">LIGGEEY</div>
+    <div class="wf-acc" style="border-color:#4A5563;">Nous trouver</div>
+    <div class="wf-r"><span class="wf-ch">Wave</span><span class="wf-ch">Orange Money</span></div>
+    <span class="wf-t" style="font-size:11.5px;">Mentions légales · CGU · Confidentialité · © 2026</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1b"><div class="dv-olabel"><a class="dv-oid" href="#1b">1b</a>Accueil · ordinateur</div><div class="dv-card" style="width:1080px"><div class="wf">
+  <div class="wf-hd" style="padding:14px 28px;"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY" style="height:15px;"><div class="wf-r" style="gap:22px; font-weight:700; font-size:14px;"><span>Talents</span><span>Indépendants</span><span>Entreprises</span><span>Formations et mentorat</span><span>Job Dating</span><span>Tarifs</span></div><div class="wf-r" style="gap:14px;"><span class="wf-a">Connexion</span><span class="wf-b p sm">Inscription</span></div></div>
+  <div style="display:grid; grid-template-columns:1.05fr 1fr; position:relative; border-bottom:1.5px dashed #C7CCD1;">
+    <div style="padding:48px 28px 80px; display:flex; flex-direction:column; gap:14px; justify-content:center;">
+      <span class="wf-k">Emploi, compétences et accompagnement au Sénégal</span>
+      <span class="wf-h1" style="font-size:40px;">Rendons l'insertion plus facile et plus juste.</span>
+      <div class="wf-ls" style="max-width:440px;"><div class="wf-l"></div><div class="wf-l m"></div></div>
+      <div class="wf-r" style="gap:16px;"><span class="wf-b p">Créer mon compte</span><span class="wf-a">Je recrute</span></div>
+      <div class="wf-r"><span class="wf-ch">Offres vérifiées</span><span class="wf-ch">Accompagnement humain</span><span class="wf-ch">Wave · Orange Money</span></div>
+    </div>
+    <div class="wf-img" style="min-height:400px; border-width:0 0 0 2px; border-radius:0 0 0 140px;">Grande photo à bord arrondi</div>
+    <div class="wf-c" style="position:absolute; left:28px; bottom:-34px; width:620px; flex-direction:row; align-items:center; gap:10px; box-shadow:4px 4px 0 #1E2733; z-index:1;"><span class="wf-in" style="flex:1.4;">Métier ou mot-clé</span><span class="wf-in" style="flex:1;">Ville</span><span class="wf-b p">Rechercher</span></div>
+    <span class="wf-wa" style="position:absolute; right:24px; bottom:24px;">WA</span>
+  </div>
+  <div class="wf-s" style="padding:64px 28px 28px;">
+    <span class="wf-h2" style="text-align:center;">Par où commencer ?</span>
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Je cherche un emploi</span><div class="wf-l"></div><div class="wf-l s"></div><span class="wf-a">Espace talents →</span></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Je travaille à mon compte</span><div class="wf-l"></div><div class="wf-l s"></div><span class="wf-a">Espace indépendants →</span></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Je recrute</span><div class="wf-l"></div><div class="wf-l s"></div><span class="wf-a">Offre entreprises →</span></div>
+    </div>
+  </div>
+  <div class="wf-s" style="padding:28px;">
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-h2">Des offres vérifiées, en ce moment</span><span class="wf-a">Voir toutes les offres →</span></div>
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:16px;">
+      <div class="wf-c"><div class="wf-r"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Poste</span></div><span class="wf-t">Entreprise · Ville</span><div class="wf-r"><span class="wf-ch">CDI</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+      <div class="wf-c"><div class="wf-r"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Poste</span></div><span class="wf-t">Entreprise · Ville</span><div class="wf-r"><span class="wf-ch">CDD</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+      <div class="wf-c"><div class="wf-r"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Poste</span></div><span class="wf-t">Entreprise · Ville</span><div class="wf-r"><span class="wf-ch">Stage</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+      <div class="wf-c"><div class="wf-r"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Poste</span></div><span class="wf-t">Entreprise · Ville</span><div class="wf-r"><span class="wf-ch">CDI</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+      <div class="wf-c"><div class="wf-r"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Poste</span></div><span class="wf-t">Entreprise · Ville</span><div class="wf-r"><span class="wf-ch">Mission</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+      <div class="wf-c"><div class="wf-r"><span class="wf-ic" style="border-radius:8px;"></span><span class="wf-h3">Poste</span></div><span class="wf-t">Entreprise · Ville</span><div class="wf-r"><span class="wf-ch">CDI</span><span class="wf-ch on">✓ Offre vérifiée</span></div><div class="wf-r" style="justify-content:space-between;"><span class="wf-b sm">Voir l'offre</span><span class="wf-a">Partager</span></div></div>
+    </div>
+  </div>
+  <div class="wf-s wf-dk" style="padding:32px 28px;">
+    <span class="wf-h2" style="max-width:560px;">Trouver un emploi ne devrait pas dépendre de qui vous connaissez.</span>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:20px;">
+      <div class="wf-ls"><span class="wf-big" style="font-size:40px;">78,5 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-big" style="font-size:40px;">33,5 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-big" style="font-size:40px;">81,5 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-big" style="font-size:40px;">22,9 %</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+    </div>
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-t" style="font-size:11.5px;">Sources : enquête LIGGEEY 2026 · ANSD 2026</span><span class="wf-a">Pourquoi LIGGEEY existe →</span></div>
+  </div>
+  <div class="wf-s" style="padding:32px 28px;">
+    <span class="wf-h2" style="text-align:center;">Comment ça marche</span>
+    <div style="display:grid; grid-template-columns:1fr 200px 1fr; gap:28px; align-items:center;">
+      <div class="wf-ls" style="gap:26px;">
+        <div class="wf-st"><span class="wf-n">1</span><div><span class="wf-h3">Créez votre compte</span><div class="wf-l"></div><div class="wf-l s"></div></div></div>
+        <div class="wf-st"><span class="wf-n">2</span><div><span class="wf-h3">Montrez ce que vous savez faire</span><div class="wf-l"></div><div class="wf-l s"></div></div></div>
+      </div>
+      <div class="wf-ph" style="width:180px; height:320px;"><div class="wf-img" style="flex:1; border-radius:14px;">Capture de l'app</div></div>
+      <div class="wf-ls" style="gap:26px;">
+        <div class="wf-st"><span class="wf-n">3</span><div><span class="wf-h3">Postulez en confiance</span><div class="wf-l"></div><div class="wf-l s"></div></div></div>
+        <div class="wf-st"><span class="wf-n">4</span><div><span class="wf-h3">Progressez</span><div class="wf-l"></div><div class="wf-l s"></div></div></div>
+      </div>
+    </div>
+    <div class="wf-r" style="justify-content:center; gap:16px;"><span class="wf-b p">Créer mon compte</span><span class="wf-a">Vous recrutez ? Le recrutement accompagné</span></div>
+  </div>
+  <div class="wf-s" style="padding:32px 28px;">
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-h2">Nos engagements</span><span class="wf-a">Comment nous vérifions →</span></div>
+    <div style="display:grid; grid-template-columns:repeat(4, 1fr); gap:16px;">
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Offres vérifiées</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Données protégées</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Suivi transparent</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+      <div class="wf-c"><span class="wf-ic"></span><span class="wf-h3">Équipe joignable</span><div class="wf-l"></div><div class="wf-l s"></div></div>
+    </div>
+  </div>
+  <div class="wf-s" style="padding:32px 28px;">
+    <div style="display:grid; grid-template-columns:1fr 1fr; gap:16px;">
+      <div class="wf-c" style="flex-direction:row; gap:14px; align-items:center;"><div style="border:2px solid #1E2733; border-radius:8px; padding:8px 12px; text-align:center; font-weight:700; line-height:1.1; font-size:18px;">12<br>DÉC.</div><div class="wf-ls" style="flex:1;"><span class="wf-h3">Prochain Job Dating</span><span class="wf-t">Dakar Plateau · 9 h – 14 h</span><div class="wf-r"><span class="wf-b p sm">Je m'inscris</span><span class="wf-a">Partager sur WhatsApp</span></div></div></div>
+      <div class="wf-c" style="flex-direction:row; gap:14px; align-items:center;"><div class="wf-img" style="width:120px; height:96px; flex:none;">Photo</div><div class="wf-ls" style="flex:1;"><span class="wf-h3">Formations et mentorat</span><div class="wf-l"></div><span class="wf-a">Voir les formations →</span></div></div>
+    </div>
+  </div>
+  <div class="wf-s wf-sf" style="padding:32px 28px;">
+    <div style="display:grid; grid-template-columns:1.2fr 1fr; gap:28px; align-items:center;">
+      <div class="wf-ls" style="gap:12px;"><span class="wf-h2">Pas à l'aise avec Internet ? On vous aide.</span><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-r" style="gap:16px;"><span class="wf-b p">Écrire sur WhatsApp</span><span class="wf-a">Voir l'adresse du bureau</span></div></div>
+      <div class="wf-img" style="height:150px;">Carte du bureau, chargée au clic</div>
+    </div>
+  </div>
+  <div class="wf-s" style="padding:32px 28px; align-items:center; text-align:center;">
+    <span class="wf-h2">Recevez nos nouveaux articles</span>
+    <div class="wf-l m" style="width:420px;"></div>
+    <div class="wf-r" style="flex-wrap:nowrap; width:520px;"><span class="wf-in" style="flex:1; text-align:left;">Votre adresse e-mail</span><span class="wf-b p">Je m'abonne</span></div>
+  </div>
+  <div class="wf-s wf-dk" style="padding:32px 28px; border-bottom:0;">
+    <div style="display:grid; grid-template-columns:1.4fr repeat(4, 1fr); gap:20px;">
+      <div class="wf-ls"><img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:15px; width:auto; align-self:flex-start;"><span class="wf-t">Rendons l'insertion plus facile et plus juste.</span><div class="wf-r"><span class="wf-ch">Wave</span><span class="wf-ch">Orange Money</span></div></div>
+      <div class="wf-ls"><span class="wf-h3">Parcours</span><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-h3">Services</span><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l s"></div></div>
+      <div class="wf-ls"><span class="wf-h3">LIGGEEY</span><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l s"></div><div class="wf-l m"></div></div>
+      <div class="wf-ls"><span class="wf-h3">Nous trouver</span><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l s"></div></div>
+    </div>
+    <span class="wf-t" style="font-size:11.5px;">Mentions légales · CGU · Confidentialité · © 2026 LIGGEEY</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1c"><div class="dv-olabel"><a class="dv-oid" href="#1c">1c</a>Menu mobile ouvert</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><span style="font-weight:700; font-size:20px; line-height:1;">✕</span></div>
+  <div class="wf-s">
+    <span class="wf-k">Parcours</span>
+    <span class="wf-h3">Talents</span><span class="wf-h3">Indépendants</span><span class="wf-h3">Entreprises</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-k">Services</span>
+    <span class="wf-h3">Formations et mentorat</span><span class="wf-h3">Job Dating</span><span class="wf-h3">Tarifs</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-k">LIGGEEY</span>
+    <span class="wf-h3">À propos</span><span class="wf-h3">Comment nous vérifions</span><span class="wf-h3">Ressources</span><span class="wf-h3">FAQ</span><span class="wf-h3">Contact</span>
+  </div>
+  <div class="wf-s" style="border-bottom:0;">
+    <span class="wf-b">Connexion</span>
+    <span class="wf-b p">Inscription</span>
+    <span class="wf-a" style="text-align:center;">Une question ? WhatsApp</span>
+    <span class="wf-note">Sélecteur de langue masqué tant que seul le français existe</span>
+  </div>
+</div></div></div>
+
+<div class="dv-opt" id="1d"><div class="dv-olabel"><a class="dv-oid" href="#1d">1d</a>Pour les talents</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-k">Pour les talents</span>
+    <span class="wf-h1">Votre première opportunité commence par vos compétences.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-b p">Créer mon compte</span>
+    <span class="wf-b">Voir les tarifs</span>
+    <div class="wf-img" style="height:170px; border-radius:10px 10px 10px 48px;">Photo : jeune diplômé(e)</div>
+    <span class="wf-note">« Créer mon compte » présélectionne le profil talent dans l'app</span>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h2">« Expérience exigée », même pour un stage ?</span>
+    <div class="wf-g2"><div class="wf-ls"><span class="wf-big">43,5 %</span><div class="wf-l"></div></div><div class="wf-ls"><span class="wf-big">78,5 %</span><div class="wf-l"></div></div></div>
+    <span class="wf-t" style="font-size:11.5px;">Source : enquête LIGGEEY 2026</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Ce que vous y trouvez</span>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Un profil qui vous ressemble</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Des offres vérifiées</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Vos candidatures suivies</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Un mentor</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Des formations pratiques</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Le badge « Profil vérifié »</span><div class="wf-l m"></div></div></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Comment ça marche</span>
+    <div class="wf-st"><span class="wf-n">1</span><div><span class="wf-h3">Créez votre compte</span><div class="wf-l s"></div></div></div>
+    <div class="wf-st"><span class="wf-n">2</span><div><span class="wf-h3">Complétez votre profil</span><div class="wf-l s"></div></div></div>
+    <div class="wf-st"><span class="wf-n">3</span><div><span class="wf-h3">Postulez</span><div class="wf-l s"></div></div></div>
+    <div class="wf-st"><span class="wf-n">4</span><div><span class="wf-h3">Progressez</span><div class="wf-l s"></div></div></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Deux formules</span>
+    <div class="wf-g2">
+      <div class="wf-c"><span class="wf-h3">Essentiel</span><span class="wf-big" style="font-size:22px;">1 500</span><span class="wf-t">FCFA / mois</span><div class="wf-l"></div></div>
+      <div class="wf-c wf-sf"><span class="wf-h3">Premium</span><span class="wf-big" style="font-size:22px;">3 000</span><span class="wf-t">FCFA / mois</span><div class="wf-l"></div></div>
+    </div>
+    <span class="wf-a">Comparer les formules →</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Et si c'était une arnaque ?</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-a">Comment nous vérifions →</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Questions</span>
+    <div class="wf-acc">Combien coûte LIGGEEY ?</div>
+    <div class="wf-acc">Sans expérience, puis-je m'inscrire ?</div>
+    <div class="wf-acc">Comment suivre mes candidatures ?</div>
+    <span class="wf-a">Toutes les questions →</span>
+  </div>
+  <div class="wf-s wf-dk">
+    <span class="wf-h2">Prêt à montrer ce que vous savez faire ?</span>
+    <span class="wf-b p">Créer mon compte</span>
+    <span class="wf-t" style="text-align:center;">Une question ? WhatsApp</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1e"><div class="dv-olabel"><a class="dv-oid" href="#1e">1e</a>Pour les indépendants</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-k">Pour les indépendants</span>
+    <span class="wf-h1">Votre savoir-faire mérite d'être reconnu.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <div class="wf-c wf-sf" style="flex-direction:row; align-items:center; gap:10px;"><span class="wf-n">A</span><span class="wf-h3" style="flex:1;">Formaliser mon activité</span><span style="font-weight:700;">→</span></div>
+    <div class="wf-c" style="flex-direction:row; align-items:center; gap:10px;"><span class="wf-n">B</span><span class="wf-h3" style="flex:1;">Trouver un emploi avec mon savoir-faire</span><span style="font-weight:700;">→</span></div>
+    <span class="wf-note">Chaque carte descend vers son chemin</span>
+    <span class="wf-ch" style="align-self:flex-start;">▶ Écouter en wolof · 1 min</span>
+    <div class="wf-img" style="height:150px; border-radius:10px 10px 10px 48px;">Photo : artisan(e) au travail</div>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-big" style="font-size:40px;">70 %</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-t" style="font-size:11.5px;">Source : enquête LIGGEEY 2026</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-r"><span class="wf-n">A</span><span class="wf-h2">Formaliser mon activité</span></div>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l s"></div></div>
+    <span class="wf-ck">Pièce d'identité</span>
+    <span class="wf-ck">NINEA</span>
+    <span class="wf-ck">Immatriculation (Registre des métiers ou RCCM)</span>
+    <span class="wf-ck">Régime fiscal</span>
+    <span class="wf-ck">Protection sociale · facultatif</span>
+    <span class="wf-ck">Assurance · facultatif</span>
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-t">Accompagnement</span><span class="wf-h3">5 000 FCFA / dossier</span></div>
+    <span class="wf-b p">Être accompagné</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-r"><span class="wf-n">B</span><span class="wf-h2">Faire reconnaître mes compétences</span></div>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l s"></div></div>
+    <div style="display:grid; grid-template-columns:repeat(3, 1fr); gap:6px;"><div class="wf-img" style="height:70px;">Réalisation</div><div class="wf-img" style="height:70px;">Réalisation</div><div class="wf-img" style="height:70px;">Réalisation</div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Des compétences évaluées</span><div class="wf-l s"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Des offres vérifiées</span><div class="wf-l s"></div></div></div>
+    <div class="wf-st"><span class="wf-ic"></span><div><span class="wf-h3">Des formations</span><div class="wf-l s"></div></div></div>
+    <span class="wf-b p">Créer mon profil</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Expliqué en wolof</span>
+    <div class="wf-hs">
+      <div class="wf-c"><div class="wf-img" style="height:90px;">▶ Vidéo</div><span class="wf-h3">C'est quoi LIGGEEY ?</span><span class="wf-t">1 min</span></div>
+      <div class="wf-c"><div class="wf-img" style="height:90px;">▶ Vidéo</div><span class="wf-h3">Formaliser mon activité</span><span class="wf-t">2 min</span></div>
+    </div>
+    <span class="wf-note">Lecture au clic seulement, pour économiser les données</span>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h2">On le fait avec vous</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <div class="wf-img" style="height:90px;">Carte du bureau</div>
+    <span class="wf-b p">Écrire sur WhatsApp</span>
+    <span class="wf-a" style="text-align:center;">Voir l'adresse</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h3">Tarifs</span>
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-t">Pack Essentiel</span><span class="wf-h3">1 500 / mois</span></div>
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-t">Premium</span><span class="wf-h3">3 000 / mois</span></div>
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-t">Formalisation</span><span class="wf-h3">5 000 / dossier</span></div>
+    <span class="wf-a">Voir tous les tarifs →</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-acc">LIGGEEY fait-il les démarches à ma place ?</div>
+    <div class="wf-acc">Sans diplôme, puis-je trouver un emploi ?</div>
+    <div class="wf-acc">Je ne suis pas à l'aise avec Internet.</div>
+  </div>
+  <div class="wf-s wf-dk">
+    <span class="wf-h2">Choisissez votre chemin.</span>
+    <span class="wf-b p">Formaliser mon activité</span>
+    <span class="wf-b">Trouver un emploi</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1f"><div class="dv-olabel"><a class="dv-oid" href="#1f">1f</a>Pour les entreprises</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-k">Pour les entreprises</span>
+    <span class="wf-h1">Recrutez les bons profils. Nous faisons le tri.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l s"></div></div>
+    <span class="wf-b p">Demander une démo</span>
+    <span class="wf-b">Voir les tarifs</span>
+    <div class="wf-img" style="height:160px; border-radius:10px 10px 10px 48px;">Photo : recruteur et candidat</div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Trouver le bon profil prend du temps.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-t" style="font-size:11.5px;">Source : entretiens LIGGEEY 2026</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Le recrutement accompagné</span>
+    <div class="wf-st"><span class="wf-n">1</span><div><span class="wf-h3">Analyse du besoin</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">2</span><div><span class="wf-h3">Publication et recherche</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">3</span><div><span class="wf-h3">Préqualification</span><div class="wf-l m"></div></div></div>
+    <div class="wf-st"><span class="wf-n">4</span><div><span class="wf-h3">Short-list</span><div class="wf-l m"></div></div></div>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h2">Après l'embauche, nous restons là.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <div style="position:relative; display:grid; grid-template-columns:repeat(4, 1fr); text-align:center; padding:4px 0;">
+      <div style="position:absolute; left:12%; right:12%; top:15px; height:2px; background:#1E2733;"></div>
+      <div style="position:relative; display:flex; flex-direction:column; align-items:center; gap:4px;"><span class="wf-n">7</span><span class="wf-t" style="font-size:11.5px;">1re semaine</span></div>
+      <div style="position:relative; display:flex; flex-direction:column; align-items:center; gap:4px;"><span class="wf-n">30</span><span class="wf-t" style="font-size:11.5px;">1er mois</span></div>
+      <div style="position:relative; display:flex; flex-direction:column; align-items:center; gap:4px;"><span class="wf-n">60</span><span class="wf-t" style="font-size:11.5px;">Mi-parcours</span></div>
+      <div style="position:relative; display:flex; flex-direction:column; align-items:center; gap:4px;"><span class="wf-n">90</span><span class="wf-t" style="font-size:11.5px;">Fin d'essai</span></div>
+    </div>
+    <div class="wf-r" style="justify-content:space-between;"><span class="wf-t">Suivi post-embauche</span><span class="wf-h3">25 000 FCFA / recrue</span></div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-c" style="flex-direction:row; align-items:center; gap:10px;"><span class="wf-ic"></span><div class="wf-ls" style="flex:1; gap:2px;"><span class="wf-h3">Job Dating chaque trimestre</span><span class="wf-a">Voir les prochaines dates →</span></div></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Tarifs</span>
+    <div class="wf-c"><span class="wf-h3">Abonnement Entreprise</span><span class="wf-big" style="font-size:22px;">40 000 <span class="wf-t">FCFA / mois</span></span><div class="wf-l m"></div></div>
+    <div class="wf-c"><span class="wf-h3">Suivi post-embauche</span><span class="wf-big" style="font-size:22px;">25 000 <span class="wf-t">FCFA / recrue</span></span><div class="wf-l m"></div></div>
+    <span class="wf-t">Wave · Orange Money · facture mensuelle</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-acc">Comment les candidats sont-ils vérifiés ?</div>
+    <div class="wf-acc">Puis-je publier mes offres moi-même ?</div>
+    <div class="wf-acc">Je suis un particulier employeur.</div>
+  </div>
+  <div class="wf-s wf-dk">
+    <span class="wf-h2">Parlons de votre prochain recrutement.</span>
+    <span class="wf-b p">Demander une démo</span>
+    <span class="wf-t" style="text-align:center;">Ou écrivez-nous sur WhatsApp</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1g"><div class="dv-olabel"><a class="dv-oid" href="#1g">1g</a>Demande de démo</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-t">← Entreprises</span>
+    <span class="wf-h1">Demander une démo</span>
+    <span class="wf-t">Nous vous recontactons sous 48 h ouvrées.</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-f"><span>Nom et prénom *</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Entreprise *</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Secteur d'activité</span><span class="wf-in" style="display:flex; justify-content:space-between;">Choisir <span>▾</span></span></div>
+    <div class="wf-f"><span>Nombre de salariés</span><div class="wf-r"><span class="wf-ch">1–10</span><span class="wf-ch on">11–50</span><span class="wf-ch">51–200</span><span class="wf-ch">200+</span></div></div>
+    <div class="wf-f"><span>Poste(s) à pourvoir</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Ce qui vous intéresse</span><span class="wf-ck on">Recrutement accompagné</span><span class="wf-ck">Publication d'offres</span><span class="wf-ck">Suivi post-embauche</span><span class="wf-ck">Job Dating</span></div>
+    <div class="wf-f"><span>Téléphone (WhatsApp) *</span><span class="wf-in">+221</span></div>
+    <div class="wf-f"><span>E-mail professionnel *</span><span class="wf-in" style="border-color:#A85A0F; border-style:dashed;">nom@</span><span class="wf-note" style="color:#A85A0F;">Indiquez une adresse e-mail valide.</span></div>
+    <div class="wf-f"><span>Votre message</span><span class="wf-in" style="height:70px;">&nbsp;</span></div>
+    <span class="wf-ck">J'accepte d'être recontacté au sujet de ma demande. Confidentialité</span>
+    <span class="wf-b p">Envoyer ma demande</span>
+    <span class="wf-t" style="font-size:11.5px;">* Champ obligatoire</span>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-t">Vous préférez écrire ? <span class="wf-a">WhatsApp</span></span>
+    <span class="wf-t">Abonnement 40 000 FCFA / mois · suivi 25 000 FCFA / recrue</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-k">Après envoi</span>
+    <div class="wf-c" style="align-items:center; text-align:center;"><span class="wf-ic" style="display:grid; place-items:center; font-weight:700; width:40px; height:40px;">✓</span><span class="wf-h3">Merci, votre demande est envoyée.</span><div class="wf-l m"></div></div>
+    <span class="wf-note">Remplace le formulaire, sans changer de page</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Pied de page commun, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1h"><div class="dv-olabel"><a class="dv-oid" href="#1h">1h</a>Tarifs</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-h1">Des tarifs clairs, pour chacun</span>
+    <div class="wf-l m"></div>
+    <div class="wf-r"><span class="wf-ch">Wave</span><span class="wf-ch">Orange Money</span></div>
+  </div>
+  <div class="wf-s wf-sf">
+    <div class="wf-c">
+      <span class="wf-h2">Quelle formule pour moi ?</span>
+      <span class="wf-t">1. Vous êtes…</span>
+      <div class="wf-r"><span class="wf-ch on">Je cherche un emploi</span><span class="wf-ch">Je travaille à mon compte</span><span class="wf-ch">Je recrute</span></div>
+      <span class="wf-t">2. Votre priorité ?</span>
+      <div class="wf-r"><span class="wf-ch">Chercher et postuler</span><span class="wf-ch on">Un mentor</span><span class="wf-ch">Me former</span></div>
+      <div style="border:2px dashed #1E2733; border-radius:10px; padding:10px; display:flex; flex-direction:column; gap:6px;"><span class="wf-t">Notre conseil</span><span class="wf-h3">Premium · 3 000 FCFA / mois</span><div class="wf-l m"></div><span class="wf-b p sm">Créer mon compte</span><span class="wf-a" style="text-align:center;">Recommencer</span></div>
+    </div>
+    <span class="wf-note">Réponse immédiate, sans rechargement</span>
+  </div>
+  <div class="wf-s">
+    <div style="display:grid; grid-template-columns:1fr 1fr; border:2px solid #1E2733; border-radius:10px; overflow:hidden; font-weight:700; text-align:center; font-size:13px;"><span style="background:#1E2733; color:#fff; padding:6px;">Talents et indépendants</span><span style="padding:6px;">Entreprises</span></div>
+    <div class="wf-c">
+      <span class="wf-h3">Pack Essentiel</span>
+      <span class="wf-big" style="font-size:24px;">1 500 <span class="wf-t">FCFA / mois</span></span>
+      <span class="wf-ck on">Profil vérifié</span><span class="wf-ck on">Offres vérifiées</span><span class="wf-ck on">5 candidatures par mois</span><span class="wf-ck on">Formations gratuites</span>
+      <span class="wf-b p">Choisir Essentiel</span>
+    </div>
+    <div class="wf-c" style="border-width:3px;">
+      <div class="wf-r" style="justify-content:space-between;"><span class="wf-h3">Premium</span><span class="wf-ch on">Mentorat inclus</span></div>
+      <span class="wf-big" style="font-size:24px;">3 000 <span class="wf-t">FCFA / mois</span></span>
+      <span class="wf-ck on">Tout Essentiel</span><span class="wf-ck on">Candidatures illimitées</span><span class="wf-ck on">Profil mis en avant</span><span class="wf-ck on">Formations premium</span>
+      <span class="wf-b p">Choisir Premium</span>
+    </div>
+    <span class="wf-note">Onglet Entreprises : abonnement 40 000 FCFA / mois et « Demander une démo »</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Services à la carte</span>
+    <div class="wf-r" style="justify-content:space-between; flex-wrap:nowrap; border-bottom:1.5px solid #E2E5E9; padding-bottom:6px;"><span class="wf-h3">Mentorat personnalisé</span><span class="wf-h3">15 000 <span class="wf-t">/ séance</span></span></div>
+    <div class="wf-r" style="justify-content:space-between; flex-wrap:nowrap; border-bottom:1.5px solid #E2E5E9; padding-bottom:6px;"><span class="wf-h3">Formations et ateliers</span><span class="wf-h3">40 000 <span class="wf-t">/ formation</span></span></div>
+    <div class="wf-r" style="justify-content:space-between; flex-wrap:nowrap; border-bottom:1.5px solid #E2E5E9; padding-bottom:6px;"><span class="wf-h3">Suivi post-embauche</span><span class="wf-h3">25 000 <span class="wf-t">/ recrue</span></span></div>
+    <div class="wf-r" style="justify-content:space-between; flex-wrap:nowrap; border-bottom:1.5px solid #E2E5E9; padding-bottom:6px;"><span class="wf-h3">Job Dating</span><span class="wf-h3">5 000 <span class="wf-t">/ participant</span></span></div>
+    <div class="wf-r" style="justify-content:space-between; flex-wrap:nowrap;"><span class="wf-h3">Formalisation</span><span class="wf-h3">5 000 <span class="wf-t">/ dossier</span></span></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Payer simplement</span>
+    <div class="wf-g2"><div class="wf-img" style="height:50px;">Logo Wave</div><div class="wf-img" style="height:50px;">Logo Orange Money</div></div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-acc">Comment payer ?</div>
+    <div class="wf-acc">Puis-je changer de formule ou arrêter ?</div>
+    <div class="wf-acc">Y a-t-il des réductions ?</div>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1i"><div class="dv-olabel"><a class="dv-oid" href="#1i">1i</a>Formations et mentorat</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-k">Formations et mentorat</span>
+    <span class="wf-h1">Apprenez auprès de ceux qui font le métier.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-b p">Créer mon compte</span>
+    <span class="wf-b">Voir les tarifs</span>
+    <div class="wf-img" style="height:150px; border-radius:10px 10px 10px 48px;">Photo : atelier pratique</div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Des formations pratiques</span>
+    <span class="wf-t">69,5 % veulent se former sur du concret · enquête 2026</span>
+    <div class="wf-r"><span class="wf-ch on">Tous</span><span class="wf-ch">Excel</span><span class="wf-ch">Développement web</span><span class="wf-ch">Leadership</span><span class="wf-ch">Entrepreneuriat</span><span class="wf-ch">Électricité</span><span class="wf-ch">Soudure</span></div>
+    <div class="wf-c" style="flex-direction:row; gap:10px;"><div class="wf-img" style="width:72px; height:72px; flex:none;">Image</div><div class="wf-ls" style="flex:1; gap:4px;"><span class="wf-h3">Titre de la formation</span><div class="wf-r" style="gap:4px;"><span class="wf-ch">3 h</span><span class="wf-ch">Certificat</span><span class="wf-ch on">Premium</span></div></div></div>
+    <div class="wf-c" style="flex-direction:row; gap:10px;"><div class="wf-img" style="width:72px; height:72px; flex:none;">Image</div><div class="wf-ls" style="flex:1; gap:4px;"><span class="wf-h3">Titre de la formation</span><div class="wf-r" style="gap:4px;"><span class="wf-ch">5 h</span><span class="wf-ch">Certificat</span></div></div></div>
+    <span class="wf-t">40 000 FCFA / formation · certaines incluses dans Premium</span>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h2">Un mentor à vos côtés</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <div class="wf-c" style="flex-direction:row; align-items:center; gap:10px;"><span class="wf-ic" style="width:44px; height:44px;"></span><div class="wf-ls" style="flex:1; gap:2px;"><span class="wf-h3">Mentor · Ressources humaines</span><span class="wf-t">Créneaux cette semaine</span></div><span class="wf-b sm">Réserver</span></div>
+    <div class="wf-c" style="flex-direction:row; align-items:center; gap:10px;"><span class="wf-ic" style="width:44px; height:44px;"></span><div class="wf-ls" style="flex:1; gap:2px;"><span class="wf-h3">Mentor · Finance</span><span class="wf-t">Créneaux cette semaine</span></div><span class="wf-b sm">Réserver</span></div>
+    <span class="wf-t">Collectif inclus dans Premium · individuel 15 000 FCFA / séance</span>
+    <span class="wf-note">Réservation dans l'app, après connexion</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Comment ça marche</span>
+    <div class="wf-st"><span class="wf-n">1</span><div><span class="wf-h3">Créez votre compte</span></div></div>
+    <div class="wf-st"><span class="wf-n">2</span><div><span class="wf-h3">Choisissez une formation ou un mentor</span></div></div>
+    <div class="wf-st"><span class="wf-n">3</span><div><span class="wf-h3">Réservez et payez</span></div></div>
+    <div class="wf-st"><span class="wf-n">4</span><div><span class="wf-h3">Progressez, certificat à la clé</span></div></div>
+  </div>
+  <div class="wf-s wf-dk">
+    <span class="wf-h2">Prêt à progresser ?</span>
+    <span class="wf-b p">Créer mon compte</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1j"><div class="dv-olabel"><a class="dv-oid" href="#1j">1j</a>Job Dating</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-k">Job Dating</span>
+    <span class="wf-h1">Rencontrez les recruteurs en face à face.</span>
+    <div class="wf-l m"></div>
+    <div class="wf-img" style="height:150px; border-radius:10px 10px 10px 48px;">Photo : Job Dating</div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-c" style="border-width:3px;">
+      <div class="wf-r" style="flex-wrap:nowrap; align-items:flex-start;"><div style="border:2px solid #1E2733; border-radius:8px; padding:6px 10px; text-align:center; font-weight:700; line-height:1.1; font-size:18px; flex:none; background:#FDEBD3;">12<br>DÉC.</div><div class="wf-ls" style="gap:2px;"><span class="wf-h3">Job Dating LIGGEEY · Décembre 2026</span><span class="wf-t">Samedi · 9 h – 14 h</span><span class="wf-t">Dakar Plateau</span></div></div>
+      <div class="wf-r"><span class="wf-ch">5 000 FCFA</span><span class="wf-ch">Talents et indépendants</span></div>
+      <span class="wf-b p">Je m'inscris</span>
+      <span class="wf-a" style="text-align:center;">Partager sur WhatsApp</span>
+    </div>
+    <span class="wf-note">Même bloc en tête de la fiche événement, avec programme et carte</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Comment ça se passe</span>
+    <div class="wf-st"><span class="wf-n">1</span><div><span class="wf-h3">Inscrivez-vous</span></div></div>
+    <div class="wf-st"><span class="wf-n">2</span><div><span class="wf-h3">Payez 5 000 FCFA</span></div></div>
+    <div class="wf-st"><span class="wf-n">3</span><div><span class="wf-h3">Recevez le programme sur WhatsApp</span></div></div>
+    <div class="wf-st"><span class="wf-n">4</span><div><span class="wf-h3">Venez avec votre CV</span></div></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Inscription</span>
+    <div class="wf-f"><span>Nom et prénom *</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Téléphone (WhatsApp) *</span><span class="wf-in">+221</span></div>
+    <div class="wf-f"><span>E-mail</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Vous êtes</span><div class="wf-r"><span class="wf-ch on">Je cherche un emploi</span><span class="wf-ch">Je travaille à mon compte</span></div></div>
+    <div class="wf-f"><span>Métier ou domaine</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Payer avec</span><div class="wf-g2"><div class="wf-c" style="align-items:center; border-width:3px;">Wave</div><div class="wf-c" style="align-items:center;">Orange Money</div></div></div>
+    <span class="wf-ck">J'accepte la politique de confidentialité</span>
+    <span class="wf-b p">Payer 5 000 FCFA et m'inscrire</span>
+    <span class="wf-note">Confirmation et programme envoyés sur WhatsApp</span>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h2">Vous recrutez ?</span>
+    <div class="wf-l m"></div>
+    <span class="wf-b">Participer en tant qu'entreprise</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0; background:#fff;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1k"><div class="dv-olabel"><a class="dv-oid" href="#1k">1k</a>Comment nous vérifions</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-k">Confiance</span>
+    <span class="wf-h1">Ce que nous vérifions, et comment.</span>
+    <div class="wf-l m"></div>
+    <div class="wf-c wf-sf"><span class="wf-big">1 sur 3</span><span class="wf-t">a déjà été victime d'une fausse offre</span><span class="wf-t" style="font-size:11px;">Enquête LIGGEEY 2026</span></div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-r"><span class="wf-ic"></span><span class="wf-h2">Les entreprises</span></div>
+    <div class="wf-l"></div>
+    <div class="wf-r"><span class="wf-ch">NINEA</span><span class="wf-ch">RCCM</span><span class="wf-ch">Coordonnées</span></div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-r"><span class="wf-ic"></span><span class="wf-h2">Les offres</span></div>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-r"><span class="wf-ic"></span><span class="wf-h2">Les profils</span></div>
+    <div class="wf-l m"></div>
+    <span class="wf-ck on">Nom identique au profil</span>
+    <span class="wf-ck on">Document lisible et complet</span>
+    <span class="wf-ck on">Institution identifiable</span>
+    <span class="wf-ck on">Date et signature</span>
+    <span class="wf-ck on">Cohérence avec les compétences</span>
+    <span class="wf-ch" style="align-self:flex-start;">48 h ouvrées</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-r"><span class="wf-ic"></span><span class="wf-h2">Références et compétences</span></div>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+  </div>
+  <div class="wf-s wf-sf">
+    <div class="wf-ls"><span class="wf-h3">Après l'embauche</span><div class="wf-l m"></div></div>
+    <div class="wf-ls"><span class="wf-h3">Ce que nous préparons</span><div class="wf-l m"></div></div>
+    <div class="wf-ls"><span class="wf-h3">Vos données</span><div class="wf-l m"></div></div>
+  </div>
+  <div class="wf-s wf-dk">
+    <span class="wf-h2">La confiance, ça se vérifie.</span>
+    <span class="wf-b p">Créer mon compte</span>
+    <span class="wf-b">Demander une démo</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1l"><div class="dv-olabel"><a class="dv-oid" href="#1l">1l</a>À propos</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-k">À propos</span>
+    <span class="wf-h1">« Liggeey » veut dire « travail » en wolof.</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <div class="wf-img" style="height:160px; border-radius:10px 10px 10px 48px;">Photo : l'équipe au bureau</div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Tout est parti d'un paradoxe.</span>
+    <div style="border-top:2px solid #1E2733; border-bottom:2px solid #1E2733; padding:8px 0; font-size:16px; font-weight:700; line-height:1.25;">Des talents cherchent des opportunités. Des entreprises cherchent des compétences.</div>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l"></div><div class="wf-l s"></div></div>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h3">Notre différence</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Nos valeurs</span>
+    <div class="wf-g2">
+      <div class="wf-c"><span class="wf-h3">Accessibilité</span><div class="wf-l"></div></div>
+      <div class="wf-c"><span class="wf-h3">Confiance</span><div class="wf-l"></div></div>
+      <div class="wf-c"><span class="wf-h3">Professionnalisation</span><div class="wf-l"></div></div>
+      <div class="wf-c"><span class="wf-h3">Accompagnement</span><div class="wf-l"></div></div>
+    </div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">L'équipe</span>
+    <div class="wf-g2" style="gap:14px 8px;">
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;"><div class="wf-img" style="width:72px; height:72px; border-radius:50%;">Photo</div><span class="wf-h3">Salimata MARENA</span><span class="wf-t">Cofondatrice, marketing et commercial</span></div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;"><div class="wf-img" style="width:72px; height:72px; border-radius:50%;">Photo</div><span class="wf-h3">Seynabou KA</span><span class="wf-t">Cofondatrice, développement et design</span></div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;"><div class="wf-img" style="width:72px; height:72px; border-radius:50%;">Photo</div><span class="wf-h3">Wagui DIANKHA</span><span class="wf-t">Chef de projet</span></div>
+      <div style="display:flex; flex-direction:column; align-items:center; gap:4px; text-align:center;"><div class="wf-img" style="width:72px; height:72px; border-radius:50%;">Photo</div><span class="wf-h3">Bamba DIOP</span><span class="wf-t">Comptable</span></div>
+    </div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Le bureau</span>
+    <div class="wf-img" style="height:100px;">Carte</div>
+    <span class="wf-t">Hann Maristes 1, Îlot J, Villa n° 63, Dakar</span>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h2">Construisons ensemble.</span>
+    <div class="wf-l m"></div>
+    <span class="wf-b p">Devenir partenaire</span>
+    <span class="wf-note">Ouvre Contact, motif « Partenariat » déjà choisi</span>
+  </div>
+  <div class="wf-s" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1m"><div class="dv-olabel"><a class="dv-oid" href="#1m">1m</a>Ressources</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-h1">Ressources</span>
+    <div class="wf-l m"></div>
+    <div class="wf-r"><span class="wf-ch on">Tous</span><span class="wf-ch">Talents</span><span class="wf-ch">Indépendants</span><span class="wf-ch">Entreprises</span></div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-c"><div class="wf-img" style="height:120px;">Image</div><span class="wf-ch" style="align-self:flex-start;">Talents</span><span class="wf-h3">Fausse offre d'emploi : 7 signaux qui doivent vous alerter</span><span class="wf-t">5 min · L'équipe LIGGEEY</span></div>
+    <div class="wf-c"><div class="wf-img" style="height:120px;">Image</div><span class="wf-ch" style="align-self:flex-start;">Indépendants</span><span class="wf-h3">NINEA, registre des métiers : par où commencer ?</span><span class="wf-t">6 min · L'équipe LIGGEEY</span></div>
+    <div class="wf-c"><div class="wf-img" style="height:120px;">Image</div><span class="wf-ch" style="align-self:flex-start;">Entreprises</span><span class="wf-h3">Préqualifier un candidat : les vérifications essentielles</span><span class="wf-t">4 min · L'équipe LIGGEEY</span></div>
+    <span class="wf-b">Voir plus d'articles</span>
+    <span class="wf-note">Images compressées, chargées au défilement</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1n"><div class="dv-olabel"><a class="dv-oid" href="#1n">1n</a>Article (modèle)</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-t">Ressources › Talents</span>
+    <span class="wf-h1">Fausse offre d'emploi : 7 signaux qui doivent vous alerter</span>
+    <span class="wf-t">Date · 5 min · L'équipe LIGGEEY</span>
+    <div class="wf-img" style="height:170px;">Image de l'article</div>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-h3">Intertitre</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l s"></div></div>
+    <div class="wf-c wf-sf"><span class="wf-h3">À retenir</span><span class="wf-ck on">Point clé</span><span class="wf-ck on">Point clé</span><span class="wf-ck on">Point clé</span></div>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <div class="wf-c wf-dk" style="border-color:#1E2733;"><span class="wf-h3">Postulez à des offres vérifiées</span><span class="wf-b p">Créer mon compte</span></div>
+    <span class="wf-note">Bouton selon le public : « Créer mon compte » ou « Demander une démo »</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h3">À lire aussi</span>
+    <div class="wf-r" style="flex-wrap:nowrap;"><div class="wf-img" style="width:64px; height:64px; flex:none;">Image</div><div class="wf-ls" style="flex:1;"><div class="wf-l"></div><div class="wf-l s"></div></div></div>
+    <div class="wf-r" style="flex-wrap:nowrap;"><div class="wf-img" style="width:64px; height:64px; flex:none;">Image</div><div class="wf-ls" style="flex:1;"><div class="wf-l"></div><div class="wf-l s"></div></div></div>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1o"><div class="dv-olabel"><a class="dv-oid" href="#1o">1o</a>FAQ</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-h1">Questions fréquentes</span>
+    <span class="wf-t">Pas trouvé ? <span class="wf-a">Écrivez-nous sur WhatsApp</span></span>
+    <div class="wf-r" style="flex-wrap:nowrap; overflow:hidden;"><span class="wf-ch on" style="flex:none;">Général</span><span class="wf-ch" style="flex:none;">Talents</span><span class="wf-ch" style="flex:none;">Indépendants</span><span class="wf-ch" style="flex:none;">Entreprises</span><span class="wf-ch" style="flex:none;">Paiement</span></div>
+    <span class="wf-note">Rubriques en défilement horizontal</span>
+  </div>
+  <div class="wf-s">
+    <span class="wf-k">Général</span>
+    <div class="wf-acc op" style="border-bottom:0;">Qu'est-ce que LIGGEEY ?</div>
+    <div class="wf-ls" style="padding-bottom:8px; border-bottom:1.5px solid #1E2733;"><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <div class="wf-acc">Que veut dire « Liggeey » ?</div>
+    <div class="wf-acc">Où se trouve votre bureau ?</div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-k">Paiement et données</span>
+    <div class="wf-acc">Quels moyens de paiement ?</div>
+    <div class="wf-acc">Changer de formule ou résilier ?</div>
+    <div class="wf-acc">Que faites-vous de mes documents ?</div>
+    <div class="wf-acc">Comment supprimer mon compte ?</div>
+  </div>
+  <div class="wf-s wf-sf">
+    <span class="wf-h3">Vous n'avez pas trouvé ?</span>
+    <span class="wf-b p">Écrire sur WhatsApp</span>
+  </div>
+  <div class="wf-s" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1p"><div class="dv-olabel"><a class="dv-oid" href="#1p">1p</a>Contact</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <span class="wf-h1">Parlons-en.</span>
+    <div class="wf-l m"></div>
+  </div>
+  <div class="wf-s">
+    <div class="wf-c"><div class="wf-r"><span class="wf-ic"></span><span class="wf-h3">WhatsApp</span></div><span class="wf-t">+221 77 000 00 00</span><span class="wf-b p sm">Écrire sur WhatsApp</span></div>
+    <div class="wf-c"><div class="wf-r"><span class="wf-ic"></span><span class="wf-h3">Bureau d'accueil</span></div><span class="wf-t">Hann Maristes 1, Îlot J, Villa n° 63</span><span class="wf-t">Lun.–ven. 9 h – 18 h · sam. 9 h – 13 h</span><span class="wf-a">Itinéraire</span></div>
+    <div class="wf-c"><div class="wf-r"><span class="wf-ic"></span><span class="wf-h3">E-mail</span></div><span class="wf-t">contact@liggeey.sn</span></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h2">Écrivez-nous</span>
+    <div class="wf-f"><span>Nom et prénom *</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Téléphone (WhatsApp) *</span><span class="wf-in">+221</span></div>
+    <div class="wf-f"><span>E-mail</span><span class="wf-in">&nbsp;</span></div>
+    <div class="wf-f"><span>Vous êtes</span><span class="wf-in" style="display:flex; justify-content:space-between;">Choisir <span>▾</span></span></div>
+    <div class="wf-f"><span>Motif *</span><span class="wf-in" style="display:flex; justify-content:space-between;">Aide à l'inscription <span>▾</span></span></div>
+    <span class="wf-note">Question, aide à l'inscription, rendez-vous au bureau, offre suspecte, partenariat, autre</span>
+    <div class="wf-f"><span>Message *</span><span class="wf-in" style="height:80px;">&nbsp;</span></div>
+    <span class="wf-ck">J'accepte la politique de confidentialité</span>
+    <span class="wf-b p">Envoyer</span>
+    <span class="wf-t" style="font-size:11.5px;">Réponse sous 24 h ouvrées</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-img" style="height:150px; position:relative;"><span class="wf-b sm">Afficher la carte</span></div>
+    <span class="wf-note">Carte chargée au clic, pour garder la page légère en 4G</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Newsletter et pied de page communs, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+<div class="dv-opt" id="1q"><div class="dv-olabel"><a class="dv-oid" href="#1q">1q</a>Pages légales (modèle)</div><div class="dv-card" style="width:360px"><div class="wf">
+  <div class="wf-hd"><img src="assets/logo-liggeey-ardoise.svg" alt="LIGGEEY"><div class="wf-r" style="gap:10px;"><span class="wf-b p sm">Inscription</span><span class="wf-bg"><i></i><i></i><i></i></span></div></div>
+  <div class="wf-s">
+    <div class="wf-r"><span class="wf-ch on">Mentions légales</span><span class="wf-ch">CGU</span><span class="wf-ch">Confidentialité</span></div>
+    <span class="wf-h1">Mentions légales</span>
+    <span class="wf-t">Mise à jour : date</span>
+  </div>
+  <div class="wf-s">
+    <div class="wf-c"><span class="wf-t">Sommaire</span><span class="wf-a">Éditeur</span><span class="wf-a">Publication</span><span class="wf-a">Hébergeur</span><span class="wf-a">Propriété intellectuelle</span></div>
+  </div>
+  <div class="wf-s">
+    <span class="wf-h3">Éditeur</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l m"></div><div class="wf-l s"></div></div>
+    <span class="wf-h3">Directrice de la publication</span>
+    <div class="wf-l m"></div>
+    <span class="wf-h3">Hébergeur</span>
+    <div class="wf-l s"></div>
+    <span class="wf-h3">Propriété intellectuelle</span>
+    <div class="wf-ls"><div class="wf-l"></div><div class="wf-l"></div><div class="wf-l m"></div></div>
+    <span class="wf-note">Même modèle pour les CGU et la confidentialité</span>
+  </div>
+  <div class="wf-s wf-sf" style="border-bottom:0;"><span class="wf-t">Pied de page commun, voir <a class="dv-oid" href="#1a">1a</a></span></div>
+</div></div></div>
+
+</div>
+<p class="dv-next">Pistes : « Accueil : la recherche au-dessus de la photo (<a class="dv-oid" href="#1a">1a</a>) » · « Tarifs : un tableau comparatif à la place des cartes (<a class="dv-oid" href="#1h">1h</a>) » · « Validé, passe au code »</p>
+</section>
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props="{&quot;annotations&quot;: {&quot;editor&quot;: &quot;boolean&quot;, &quot;default&quot;: true, &quot;tsType&quot;: &quot;boolean&quot;}}">
+class Component extends DCLogic {
+  renderVals() {
+    return { notes: (this.props.annotations ?? true) ? "on" : "off" };
+  }
+}
+</script>
+</body>
+</html>

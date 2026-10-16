@@ -1,0 +1,10 @@
+[
+  { "id": "demo-1", "titre": "Assistant(e) comptable", "entreprise": "Cabinet Exemple", "ville": "Dakar", "contrat": "CDI", "secteur": "finance", "experience": "1-3", "niveau": "bac3", "competences": ["Comptabilité", "Excel"] },
+  { "id": "demo-2", "titre": "Commis de cuisine", "entreprise": "Restaurant Exemple", "ville": "Dakar", "contrat": "CDD", "secteur": "restauration", "experience": "debutant", "niveau": "sans", "competences": ["Hygiène", "Préparation"] },
+  { "id": "demo-3", "titre": "Développeur(se) web junior", "entreprise": "Agence Exemple", "ville": "Dakar", "contrat": "Stage", "secteur": "informatique", "experience": "debutant", "niveau": "bac3", "competences": ["React", "HTML et CSS"] },
+  { "id": "demo-4", "titre": "Conseiller(e) de vente", "entreprise": "Boutique Exemple", "ville": "Thiès", "contrat": "CDI", "secteur": "commerce", "experience": "1-3", "niveau": "bac", "competences": ["Relation client", "Vente"] },
+  { "id": "demo-5", "titre": "Électricien(ne) bâtiment", "entreprise": "Entreprise Exemple", "ville": "Mbour", "contrat": "Mission", "secteur": "btp", "experience": "3-5", "niveau": "sans", "competences": ["Installation", "Sécurité"] },
+  { "id": "demo-6", "titre": "Coiffeur(se)", "entreprise": "Salon Exemple", "ville": "Dakar", "contrat": "Temps partiel", "secteur": "beaute", "experience": "1-3", "niveau": "sans", "competences": ["Coupe", "Tresses"] },
+  { "id": "demo-7", "titre": "Couturier(ère)", "entreprise": "Atelier Exemple", "ville": "Saint-Louis", "contrat": "CDD", "secteur": "artisanat", "experience": "3-5", "niveau": "sans", "competences": ["Couture", "Retouches"] },
+  { "id": "demo-8", "titre": "Chauffeur-livreur", "entreprise": "Logistique Exemple", "ville": "Dakar", "contrat": "CDI", "secteur": "transport", "experience": "1-3", "niveau": "sans", "competences": ["Permis B", "Ponctualité"] }
+]

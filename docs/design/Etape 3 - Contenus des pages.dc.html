@@ -1,0 +1,996 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>LIGGEEY · Étape 3 · Contenus des pages</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin="">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&amp;display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;background:#FFFFFF;-webkit-font-smoothing:antialiased}
+a{color:#1E2733;text-decoration-color:#F0891D;text-underline-offset:3px}
+a:hover{color:#A85A0F}
+</style>
+</helmet>
+<div style="font-family:Inter, system-ui, -apple-system, 'Segoe UI', sans-serif; color:#1E2733; background:#FFFFFF; min-height:100vh;">
+
+<header data-screen-label="En-tête" style="background:#1E2733; color:#FFFFFF; padding:36px 24px 44px;">
+  <div style="max-width:960px; margin:0 auto; display:flex; flex-direction:column; gap:28px;">
+    <div style="display:flex; align-items:center; justify-content:space-between; gap:16px; flex-wrap:wrap;">
+      <img src="assets/logo-liggeey-blanc.svg" alt="LIGGEEY" style="height:20px; width:auto; display:block;">
+      <div style="display:flex; gap:8px; align-items:center; font-size:13px; flex-wrap:wrap;">
+        <span style="background:#F0891D; color:#1E2733; font-weight:600; padding:4px 11px; border-radius:999px;">Étape 3 sur 7</span>
+        <span style="border:1px solid #6B7480; color:#FFFFFF; padding:4px 11px; border-radius:999px;">Validé</span>
+      </div>
+    </div>
+    <div style="display:flex; flex-direction:column; gap:14px; max-width:760px;">
+      <h1 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:clamp(34px, 5.4vw, 54px); line-height:1.05; margin:0; text-wrap:balance;">Contenus des pages</h1>
+      <p style="margin:0; font-size:17px; line-height:1.6; color:#E2E5E9; text-wrap:pretty;">Titres, textes et boutons de chaque page, dans l'ordre d'affichage. Les valeurs soulignées en pointillés sont provisoires (fictives ou déduites de vos documents), à remplacer avant la mise en ligne. Le surligné orange signale un média à fournir.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:10px 24px; font-size:14px; line-height:1.5; color:#E2E5E9; padding-top:20px; border-top:1px solid #6B7480;">
+      <p style="margin:0;"><strong style="color:#FFFFFF;">Ton</strong> : chaleureux, clair, rassurant. Vouvoiement.</p>
+      <p style="margin:0;"><strong style="color:#FFFFFF;">Phrases</strong> : 20 mots maximum, un message par bloc.</p>
+      <p style="margin:0;"><strong style="color:#FFFFFF;">Boutons</strong> : un verbe d'action, une seule action principale par bloc.</p>
+      <p style="margin:0;"><strong style="color:#FFFFFF;">Chiffres</strong> : toujours suivis de leur source.</p>
+    </div>
+  </div>
+</header>
+
+<nav aria-label="Pages" style="position:sticky; top:0; z-index:10; background:#FFFFFF; border-bottom:1px solid #E2E5E9; padding:10px 24px;">
+  <div style="max-width:960px; margin:0 auto; display:flex; gap:8px; overflow-x:auto; padding-bottom:2px;">
+    <a href="#communs" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Éléments communs</a>
+    <a href="#accueil" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Accueil</a>
+    <a href="#talents" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Talents</a>
+    <a href="#independants" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Indépendants</a>
+    <a href="#entreprises" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Entreprises</a>
+    <a href="#demo" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Demande de démo</a>
+    <a href="#tarifs" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Tarifs</a>
+    <a href="#formations" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Formations et mentorat</a>
+    <a href="#jobdating" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Job Dating</a>
+    <a href="#verification" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Comment nous vérifions</a>
+    <a href="#apropos" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">À propos</a>
+    <a href="#ressources" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Ressources</a>
+    <a href="#faq" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">FAQ</a>
+    <a href="#contact" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Contact</a>
+    <a href="#legal" style="flex:none; font-size:13px; font-weight:500; padding:6px 12px; border:1px solid #E2E5E9; border-radius:999px; text-decoration:none;">Pages légales</a>
+    <a href="#afournir" style="flex:none; font-size:13px; font-weight:600; padding:6px 12px; background:#FDEBD3; border-radius:999px; text-decoration:none;">Provisoire</a>
+  </div>
+</nav>
+
+<section id="communs" data-screen-label="Éléments communs" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Éléments communs</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">toutes les pages</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">En-tête</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">Talents · Indépendants · Entreprises · Formations et mentorat · Job Dating · Tarifs</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Connexion</span><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Inscription</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bouton WhatsApp</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">Libellé : « Une question ? » sur ordinateur, icône seule sur mobile.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Message prérempli : « Bonjour LIGGEEY, j'ai une question : »</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Nom lu par les lecteurs d'écran : « Écrire à LIGGEEY sur WhatsApp ». Numéro : <span style="border-bottom:2px dotted #A85A0F;">+221 77 000 00 00</span></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Newsletter</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25; text-wrap:balance;">Recevez nos nouveaux articles</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Conseils emploi, compétences et recrutement, et les dates des prochains Job Dating.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="border:1px solid #E2E5E9; color:#6B7480; font-size:13px; padding:6px 12px; border-radius:8px;">Votre adresse e-mail</span><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Je m'abonne</span></div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Désabonnement en un clic. Confirmation : « C'est fait ! Vous recevrez notre prochain envoi. »</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Pied de page</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Rendons l'insertion plus facile et plus juste.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Bureau d'accueil : <span style="border-bottom:2px dotted #A85A0F;">Hann Maristes 1, Îlot J, Villa n° 63</span>, Dakar · <span style="border-bottom:2px dotted #A85A0F;">du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h</span></p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">WhatsApp <span style="border-bottom:2px dotted #A85A0F;">+221 77 000 00 00</span> · E-mail <span style="border-bottom:2px dotted #A85A0F;">contact@liggeey.sn</span> · Réseaux sociaux <span style="border-bottom:2px dotted #A85A0F;">@liggeey sur LinkedIn, Facebook, Instagram et TikTok</span></p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Paiement : Wave · Orange Money</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Mentions légales · CGU · Confidentialité · © 2026 LIGGEEY</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="accueil" data-screen-label="Accueil" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Accueil</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">Emploi, compétences et accompagnement au Sénégal</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Rendons l'insertion plus facile et plus juste.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6; text-wrap:pretty;">LIGGEEY rapproche les compétences des opportunités : des offres vérifiées, un profil qui montre ce que vous savez faire, et une équipe qui vous accompagne, en ligne comme à notre bureau de Dakar.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Recherche : « Métier ou mot-clé » (ex. : comptable, cuisinière, électricien) · « Ville » (ex. : Dakar, Thiès) · « Rechercher »</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Je recrute</span></div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Offres vérifiées · Accompagnement humain · Paiement Wave et Orange Money</p>
+        <p style="margin:0; font-size:13px; line-height:1.5; color:#6B7480; font-style:italic;">Photo : une personne au travail, à Dakar <mark style="background:#FDEBD3; color:#1E2733; padding:0 4px; border-radius:4px; font-style:normal;">[photo à fournir]</mark></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Trois parcours</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Par où commencer ?</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Je cherche un emploi</p><p style="margin:0; font-size:15px; line-height:1.6;">Jeune diplômé ou en recherche : montrez vos compétences, postulez à des offres vérifiées, suivez chaque candidature.</p><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Espace talents</span></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Je travaille à mon compte</p><p style="margin:0; font-size:15px; line-height:1.6;">Restauration, coiffure, artisanat… Formalisez votre activité, ou faites reconnaître votre savoir-faire pour trouver un emploi.</p><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Espace indépendants</span></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Je recrute</p><p style="margin:0; font-size:15px; line-height:1.6;">Recevez une short-list de profils préqualifiés, puis un suivi de votre recrue pendant 90 jours.</p><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Offre entreprises</span></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Offres en vitrine</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Des offres vérifiées, en ce moment</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Chaque offre est contrôlée par notre équipe avant d'être publiée.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Carte</strong> : poste · entreprise · ville · contrat · badge « Offre vérifiée » · « Voir l'offre » · « Partager sur WhatsApp »</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Message partagé</strong> : « Offre vérifiée sur LIGGEEY : [poste] chez [entreprise], [ville]. [lien] »</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Aucun résultat</strong> : « Pas d'offre en vitrine pour cette recherche. Créez votre compte pour voir toutes les offres. »</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Voir toutes les offres</span></div>
+        <p style="margin:0; font-size:13px; line-height:1.5; color:#6B7480; font-style:italic;">Offres réelles issues de l'app. Pas d'exemples portant le nom de vraies entreprises.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Le constat</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25; text-wrap:balance;">Trouver un emploi ne devrait pas dépendre de qui vous connaissez.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(170px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:34px; line-height:1;">78,5&nbsp;%</p><p style="margin:0; font-size:14.5px; line-height:1.5;">citent le manque de réseau parmi leurs difficultés.</p></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:34px; line-height:1;">33,5&nbsp;%</p><p style="margin:0; font-size:14.5px; line-height:1.5;">ont déjà été victimes d'une fausse offre d'emploi ou d'une arnaque.</p></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:34px; line-height:1;">81,5&nbsp;%</p><p style="margin:0; font-size:14.5px; line-height:1.5;">ne se sentent pas assez accompagnés dans leur parcours.</p></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:34px; line-height:1;">22,9&nbsp;%</p><p style="margin:0; font-size:14.5px; line-height:1.5;">taux de chômage élargi au Sénégal, 1er trimestre 2026.</p></div>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Sources : enquête LIGGEEY auprès de 200 personnes (2026) ; ANSD, Enquête nationale sur l'emploi au Sénégal, 1er trimestre 2026 <mark style="background:#FDEBD3; color:#1E2733; padding:0 4px; border-radius:4px;">[à revérifier avant publication]</mark></p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Pourquoi LIGGEEY existe</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Comment ça marche</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Comment ça marche</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">1. Créez votre compte</p><p style="margin:0; font-size:15px; line-height:1.6;">En quelques minutes, depuis votre téléphone.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">2. Montrez ce que vous savez faire</p><p style="margin:0; font-size:15px; line-height:1.6;">Diplômes, expériences, savoir-faire : votre profil met vos compétences en avant.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">3. Postulez en confiance</p><p style="margin:0; font-size:15px; line-height:1.6;">Des offres vérifiées, et chaque candidature suivie : reçue, vue, entretien, réponse.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">4. Progressez</p><p style="margin:0; font-size:15px; line-height:1.6;">Formations pratiques et mentorat pour aller plus loin.</p></div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Vous recrutez ? Voir le recrutement accompagné</span></div>
+        <p style="margin:0; font-size:13px; line-height:1.5; color:#6B7480; font-style:italic;">Téléphone : capture du tableau de bord de l'app <mark style="background:#FDEBD3; color:#1E2733; padding:0 4px; border-radius:4px; font-style:normal;">[capture à fournir]</mark></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Nos engagements</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Nos engagements</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Des offres vérifiées</p><p style="margin:0; font-size:15px; line-height:1.6;">Chaque entreprise et chaque offre sont contrôlées avant publication.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Vos données protégées</p><p style="margin:0; font-size:15px; line-height:1.6;">Vos documents servent à vérifier votre profil, rien d'autre.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Un suivi transparent</p><p style="margin:0; font-size:15px; line-height:1.6;">Vous voyez où en est chaque candidature.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Une équipe joignable</p><p style="margin:0; font-size:15px; line-height:1.6;">Sur WhatsApp ou à notre bureau de Dakar, quelqu'un vous répond.</p></div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Comment nous vérifions</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">À venir</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:18px 24px;">
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <p style="margin:0; font-size:15.5px; font-weight:600;">Prochain Job Dating</p>
+          <p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Samedi 12 décembre 2026</span> · <span style="border-bottom:2px dotted #A85A0F;">Dakar Plateau</span></p>
+          <p style="margin:0; font-size:15px; line-height:1.6;">Rencontrez des recruteurs en face à face.</p>
+          <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Je m'inscris</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Partager sur WhatsApp</span></div>
+          <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Sans date : « Le prochain Job Dating sera annoncé ici. Abonnez-vous à la newsletter pour être prévenu. »</p>
+        </div>
+        <div style="display:flex; flex-direction:column; gap:8px;">
+          <p style="margin:0; font-size:15.5px; font-weight:600;">Formations et mentorat</p>
+          <p style="margin:0; font-size:15px; line-height:1.6;">Des formations pratiques et des mentors du métier pour progresser.</p>
+          <span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Voir les formations</span>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Besoin d'aide</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Pas à l'aise avec Internet ? On vous aide.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Venez à notre bureau de Dakar : nous créons votre profil avec vous. Vous pouvez aussi nous écrire sur WhatsApp.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Hann Maristes 1, Îlot J, Villa n° 63</span> · <span style="border-bottom:2px dotted #A85A0F;">du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h</span></p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Écrire sur WhatsApp</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Voir l'adresse du bureau</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="talents" data-screen-label="Talents" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Pour les talents</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/talents</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">Pour les talents</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Votre première opportunité commence par vos compétences.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6; text-wrap:pretty;">Jeune diplômé ou en recherche d'emploi : LIGGEEY vous aide à montrer ce que vous savez faire, à postuler à des offres vérifiées et à être accompagné à chaque étape.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Voir les tarifs</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Le constat</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">« Expérience exigée », même pour un stage ?</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Vous n'êtes pas seul. Parmi les personnes que nous avons interrogées, 43,5&nbsp;% citent le manque d'expérience et 78,5&nbsp;% le manque de réseau. Chez LIGGEEY, vos compétences comptent autant que votre CV.</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Source : enquête LIGGEEY auprès de 200 personnes (2026).</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Ce que vous y trouvez</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Un profil qui vous ressemble</p><p style="margin:0; font-size:15px; line-height:1.6;">Diplômes, stages, projets, compétences : tout ce qui intéresse un recruteur, au même endroit.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Des offres vérifiées</p><p style="margin:0; font-size:15px; line-height:1.6;">Entreprise identifiée, offre contrôlée : vous postulez sans craindre l'arnaque.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Vos candidatures suivies</p><p style="margin:0; font-size:15px; line-height:1.6;">Reçue, vue, entretien, réponse : vous savez toujours où vous en êtes.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Un mentor</p><p style="margin:0; font-size:15px; line-height:1.6;">Un professionnel de votre secteur pour préparer un entretien ou choisir une voie.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Des formations pratiques</p><p style="margin:0; font-size:15px; line-height:1.6;">Pour renforcer votre CV, avec un certificat à la fin.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Le badge « Profil vérifié »</p><p style="margin:0; font-size:15px; line-height:1.6;">Faites vérifier votre identité et vos diplômes : les recruteurs le voient.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Comment ça marche</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">1. Créez votre compte</p><p style="margin:0; font-size:15px; line-height:1.6;">Choisissez « Je cherche un emploi ».</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">2. Complétez votre profil</p><p style="margin:0; font-size:15px; line-height:1.6;">Ajoutez diplômes et compétences, puis faites-les vérifier.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">3. Postulez</p><p style="margin:0; font-size:15px; line-height:1.6;">Aux offres vérifiées qui vous correspondent.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">4. Progressez</p><p style="margin:0; font-size:15px; line-height:1.6;">Suivez vos candidatures, formez-vous, échangez avec un mentor.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Formules</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Deux formules pour avancer à votre rythme</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Pack Essentiel · 1&nbsp;500&nbsp;FCFA/mois</p><p style="margin:0; font-size:15px; line-height:1.6;">Les fonctionnalités essentielles pour chercher et postuler.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Premium · 3&nbsp;000&nbsp;FCFA/mois</p><p style="margin:0; font-size:15px; line-height:1.6;">Fonctionnalités avancées, mentorat et certaines formations incluses.</p></div>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Paiement par Wave ou Orange Money.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Comparer les formules</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Confiance</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Et si c'était une arnaque ? La question est légitime.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Un tiers des personnes que nous avons interrogées ont déjà été victimes d'une fausse offre. C'est pourquoi chaque entreprise et chaque offre sont vérifiées avant publication.</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Source : enquête LIGGEEY auprès de 200 personnes (2026).</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Comment nous vérifions</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Questions</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Combien coûte LIGGEEY ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Le Pack Essentiel coûte 1&nbsp;500&nbsp;FCFA par mois, l'abonnement Premium 3&nbsp;000&nbsp;FCFA par mois. Vous payez par Wave ou Orange Money.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Je n'ai pas d'expérience. Puis-je m'inscrire ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Oui, LIGGEEY est fait pour ça. Votre profil met en avant vos compétences, vos stages et vos projets, et les formations vous aident à progresser.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Comment suivre mes candidatures ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Dans votre espace, chaque candidature affiche son étape : reçue, vue, entretien, réponse.</p></div>
+        <span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Toutes les questions</span>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Appel final</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Prêt à montrer ce que vous savez faire ?</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Une question ? Écrivez-nous sur WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="independants" data-screen-label="Indépendants" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Pour les indépendants</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/independants</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">Pour les indépendants</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Votre savoir-faire mérite d'être reconnu.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6; text-wrap:pretty;">Restauration, coiffure, artisanat… Vous travaillez à votre compte ? LIGGEEY vous accompagne pour formaliser votre activité, ou pour faire reconnaître vos compétences et trouver un emploi.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Formaliser mon activité</span><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Trouver un emploi</span></div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Écouter la présentation en wolof</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Le constat</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Des années de pratique, mais aucun papier pour le prouver ?</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">C'est le cas de 70&nbsp;% des personnes que nous avons interrogées : aucun document officiel lié à leur activité. Votre expérience a pourtant de la valeur.</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Source : enquête LIGGEEY auprès de 200 personnes (2026).</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Chemin A : formaliser</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Formaliser mon activité</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Une activité déclarée rassure vos clients et les entreprises. Nous vous expliquons chaque démarche et vous orientons vers les bons guichets.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Pièce d'identité</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Carte d'identité ou passeport en cours de validité.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">NINEA</p><p style="margin:0; font-size:14.5px; line-height:1.55;">L'identifiant de votre activité auprès de l'administration fiscale.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Immatriculation</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Registre des métiers pour les artisans, RCCM pour une activité commerciale.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Régime fiscal</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Celui qui s'applique selon votre chiffre d'affaires.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Protection sociale</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Retraite ou mutuelle de santé. Facultatif.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Assurance</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Responsabilité civile professionnelle. Facultatif.</p></div>
+        </div>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Accompagnement à la formalisation : 5&nbsp;000&nbsp;FCFA <span style="border-bottom:2px dotted #A85A0F;">par dossier</span></p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Les démarches officielles se font auprès des organismes compétents. LIGGEEY vous accompagne et vous oriente.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Être accompagné</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Chemin B : emploi</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Faire reconnaître mes compétences</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Pas de diplôme ? Votre expérience compte. Montrez vos réalisations, faites évaluer vos compétences et accédez à des offres d'entreprises vérifiées.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Vos réalisations en photos</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Un profil qui montre votre travail.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Des compétences évaluées</p><p style="margin:0; font-size:14.5px; line-height:1.55;">En ligne ou à notre bureau. <span style="border-bottom:2px dotted #A85A0F;">Entretien avec un conseiller et mise en situation pratique.</span></p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Des offres vérifiées</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Des entreprises identifiées et contrôlées.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Des formations</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Pour aller plus loin dans votre métier.</p></div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon profil</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">En wolof</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Expliqué en wolof</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">De courtes vidéos pour tout comprendre, sans avoir à lire.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">C'est quoi LIGGEEY ?</p><p style="margin:0; font-size:14.5px; line-height:1.55; color:#6B7480;">Environ 1 minute</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Formaliser mon activité</p><p style="margin:0; font-size:14.5px; line-height:1.55; color:#6B7480;">Environ 2 minutes</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Créer mon profil sur mon téléphone</p><p style="margin:0; font-size:14.5px; line-height:1.55; color:#6B7480;">Environ 2 minutes</p></div>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Vidéos ou audios <mark style="background:#FDEBD3; color:#1E2733; padding:0 4px; border-radius:4px;">[à produire par l'équipe]</mark>, sous-titrés en français. Titres en wolof <mark style="background:#FDEBD3; color:#1E2733; padding:0 4px; border-radius:4px;">[à fournir]</mark>. Lecture uniquement au clic, pour économiser les données mobiles.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Aide humaine</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">On le fait avec vous</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Au bureau de Dakar, un conseiller crée votre profil avec vous et répond à vos questions. Sur WhatsApp aussi, on vous répond.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Hann Maristes 1, Îlot J, Villa n° 63</span> · <span style="border-bottom:2px dotted #A85A0F;">du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h</span></p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Écrire sur WhatsApp</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Voir l'adresse</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Tarifs</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">Pack Essentiel 1&nbsp;500&nbsp;FCFA/mois · Premium 3&nbsp;000&nbsp;FCFA/mois · Accompagnement à la formalisation 5&nbsp;000&nbsp;FCFA</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Paiement par Wave ou Orange Money.</p>
+        <span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Voir tous les tarifs</span>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Questions</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">LIGGEEY fait-il les démarches à ma place ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Nous vous expliquons chaque étape, préparons les dossiers avec vous et vous orientons vers les bons organismes. Les démarches restent à votre nom.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Sans diplôme, puis-je trouver un emploi ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Oui. Votre profil met en avant votre expérience et vos réalisations, et vos compétences peuvent être évaluées.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Je ne suis pas à l'aise avec Internet.</p><p style="margin:0; font-size:15px; line-height:1.6;">Venez au bureau ou écrivez-nous sur WhatsApp : nous vous aidons à chaque étape.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Appel final</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Choisissez votre chemin.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Formaliser mon activité</span><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Trouver un emploi</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="entreprises" data-screen-label="Entreprises" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Pour les entreprises</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/entreprises</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">Pour les entreprises</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Recrutez les bons profils. Nous faisons le tri.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6; text-wrap:pretty;">LIGGEEY analyse votre besoin, préqualifie les candidats et vous présente une short-list. Après l'embauche, nous suivons l'intégration de votre recrue pendant 90 jours.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Demander une démo</span><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Voir les tarifs</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Le constat</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Trouver le bon profil prend du temps.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Trier les candidatures, vérifier les diplômes, évaluer les compétences : les recruteurs que nous avons rencontrés décrivent une étape longue, surtout pour les profils spécialisés.</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Source : entretiens menés par LIGGEEY auprès de deux structures dakaroises (2026).</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Recrutement accompagné</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Le recrutement accompagné, en quatre étapes</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">1. Analyse du besoin</p><p style="margin:0; font-size:15px; line-height:1.6;">Nous définissons avec vous le poste, les compétences et le profil recherché.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">2. Publication et recherche</p><p style="margin:0; font-size:15px; line-height:1.6;">Votre offre est publiée et nous identifions les profils qui correspondent.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">3. Préqualification</p><p style="margin:0; font-size:15px; line-height:1.6;">Identité, diplômes, références et compétences sont vérifiés.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">4. Short-list</p><p style="margin:0; font-size:15px; line-height:1.6;">Vous recevez une sélection de profils conformes à vos critères.</p></div>
+        </div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Suivi post-embauche</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Après l'embauche, nous restons là.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Pendant 90 jours, nous recueillons les retours de votre recrue et les vôtres. Si une compétence est à renforcer, nous proposons une formation ciblée.</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr)); gap:12px 22px;">
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:24px; line-height:1.1;">J+7</p><p style="margin:0; font-size:14.5px; line-height:1.5;">Point de la première semaine</p></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:24px; line-height:1.1;">J+30</p><p style="margin:0; font-size:14.5px; line-height:1.5;">Bilan du premier mois</p></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:24px; line-height:1.1;">J+60</p><p style="margin:0; font-size:14.5px; line-height:1.5;">Point à mi-parcours</p></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:24px; line-height:1.1;">J+90</p><p style="margin:0; font-size:14.5px; line-height:1.5;">Fin de la période d'essai</p></div>
+        </div>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Suivi post-embauche : 25&nbsp;000&nbsp;FCFA <span style="border-bottom:2px dotted #A85A0F;">par recrue</span></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Job Dating</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">Rencontrez des candidats en face à face lors de nos Job Dating, chaque trimestre.</p>
+        <span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Voir les prochaines dates</span>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Tarifs</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Abonnement Entreprise · 40&nbsp;000&nbsp;FCFA<span style="border-bottom:2px dotted #A85A0F;">/mois</span></p><p style="margin:0; font-size:15px; line-height:1.6;">Publication de vos offres, sélection et short-list des profils par LIGGEEY.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Suivi post-embauche · 25&nbsp;000&nbsp;FCFA</p><p style="margin:0; font-size:15px; line-height:1.6;">L'intégration de votre recrue suivie pendant 90 jours.</p></div>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Paiement par Wave ou Orange Money. <span style="border-bottom:2px dotted #A85A0F;">Facture mensuelle envoyée par e-mail.</span></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Questions</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Comment les candidats sont-ils vérifiés ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Notre équipe contrôle l'identité, les diplômes et les références, et évalue les compétences. Tout est détaillé sur notre page « Comment nous vérifions ».</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Puis-je publier mes offres moi-même ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Oui, l'abonnement Entreprise inclut la publication d'offres. Nous nous chargeons ensuite de la sélection et de la short-list.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Je suis un particulier employeur. Est-ce pour moi ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Oui, l'espace recruteur est ouvert aux entreprises comme aux particuliers.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Appel final</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Parlons de votre prochain recrutement.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Demander une démo</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Ou écrivez-nous sur WhatsApp</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="demo" data-screen-label="Demande de démo" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Demande de démo</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/entreprises/demande-de-demo</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">En-tête</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15;">Demander une démo</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Dites-nous ce que vous cherchez. Nous vous recontactons <span style="border-bottom:2px dotted #A85A0F;">sous 48 h ouvrées</span> pour vous présenter LIGGEEY.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Formulaire</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <ul style="margin:0; padding-left:18px; font-size:15px; line-height:1.75;">
+          <li>Nom et prénom *</li>
+          <li>Entreprise *</li>
+          <li>Secteur d'activité</li>
+          <li>Nombre de salariés : 1 à 10 · 11 à 50 · 51 à 200 · plus de 200</li>
+          <li>Poste(s) à pourvoir</li>
+          <li>Ce qui vous intéresse : recrutement accompagné · publication d'offres · suivi post-embauche · Job Dating</li>
+          <li>Téléphone (WhatsApp) *</li>
+          <li>E-mail professionnel *</li>
+          <li>Votre message</li>
+          <li>« J'accepte d'être recontacté au sujet de ma demande. » Lien vers la politique de confidentialité *</li>
+        </ul>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Envoyer ma demande</span></div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">* Champ obligatoire</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Messages</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Erreurs</strong> : « Ce champ est obligatoire. » · « Indiquez un numéro valide, par exemple +221 77 000 00 00. » · « Indiquez une adresse e-mail valide. »</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Confirmation</strong> : « Merci, votre demande est envoyée. Nous vous recontactons <span style="border-bottom:2px dotted #A85A0F;">sous 48 h ouvrées</span> par téléphone ou sur WhatsApp. »</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>À côté du formulaire</strong> : « Vous préférez écrire ? WhatsApp » · rappel des prix : abonnement Entreprise 40&nbsp;000&nbsp;FCFA, suivi post-embauche 25&nbsp;000&nbsp;FCFA.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="tarifs" data-screen-label="Tarifs" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Tarifs</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/tarifs</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Des tarifs clairs, pour chacun</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Tous nos prix au même endroit. Paiement par Wave ou Orange Money, depuis votre téléphone.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Mini-guide</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Quelle formule pour moi ?</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Question 1</strong> · « Vous êtes… » Je cherche un emploi · Je travaille à mon compte · Je recrute</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Question 2</strong> · « Votre priorité ? » Chercher et postuler · Être conseillé par un mentor · Me former · Formaliser mon activité (indépendants seulement)</p>
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:14px 22px;">
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:14px; color:#6B7480;">Chercher et postuler</p><p style="margin:0; font-size:15px; line-height:1.55;"><strong>Pack Essentiel</strong>, 1&nbsp;500&nbsp;FCFA/mois.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:14px; color:#6B7480;">Mentor ou formations</p><p style="margin:0; font-size:15px; line-height:1.55;"><strong>Premium</strong>, 3&nbsp;000&nbsp;FCFA/mois : mentorat et certaines formations inclus.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:14px; color:#6B7480;">Formaliser mon activité</p><p style="margin:0; font-size:15px; line-height:1.55;"><strong>Accompagnement à la formalisation</strong>, 5&nbsp;000&nbsp;FCFA.</p></div>
+          <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:14px; color:#6B7480;">Je recrute</p><p style="margin:0; font-size:15px; line-height:1.55;"><strong>Abonnement Entreprise</strong>, 40&nbsp;000&nbsp;FCFA, et suivi post-embauche en option.</p></div>
+        </div>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Demander une démo</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Recommencer</span></div>
+        <p style="margin:0; font-size:13px; line-height:1.5; color:#6B7480; font-style:italic;">Deux questions au maximum, réponse immédiate sans rechargement. Le bouton affiché dépend du résultat.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Talents et indépendants</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Pack Essentiel · 1&nbsp;500&nbsp;FCFA/mois</p><p style="margin:0; font-size:15px; line-height:1.6;">Pour démarrer : les fonctionnalités essentielles de la plateforme.</p><ul style="margin:0; padding-left:18px; font-size:14.5px; line-height:1.7;"><li>Profil complet et badge « Profil vérifié »</li><li>Offres vérifiées</li><li>5 candidatures par mois</li><li>Suivi des candidatures</li><li>Formations gratuites avec certificat</li><li>Guide de formalisation en ligne</li></ul><div style="display:flex;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Choisir Essentiel</span></div></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Premium · 3&nbsp;000&nbsp;FCFA/mois</p><p style="margin:0; font-size:15px; line-height:1.6;">Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.</p><ul style="margin:0; padding-left:18px; font-size:14.5px; line-height:1.7;"><li>Tout le Pack Essentiel</li><li>Candidatures illimitées</li><li>Profil mis en avant auprès des recruteurs</li><li>Sessions de mentorat collectives</li><li>Formations premium incluses</li><li>Voir qui a consulté votre profil</li></ul><div style="display:flex;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Choisir Premium</span></div></div>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Contenu des formules <span style="border-bottom:2px dotted #A85A0F;">provisoire, repris du prototype</span>.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Entreprises</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:6px;">
+        <p style="margin:0; font-size:15.5px; font-weight:600;">Abonnement Entreprise · 40&nbsp;000&nbsp;FCFA<span style="border-bottom:2px dotted #A85A0F;">/mois</span></p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Publication d'offres, sélection et short-list des profils par LIGGEEY.</p>
+        <div style="display:flex;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Demander une démo</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Services à la carte</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:0;">
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 16px; padding:10px 0; border-bottom:1px solid #E2E5E9;"><div style="flex:1 1 260px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Mentorat personnalisé</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Un accompagnement individuel, adapté à votre profil et à vos objectifs.</p></div><p style="margin:0; font-size:15.5px; font-weight:600;">15&nbsp;000&nbsp;FCFA <span style="font-weight:400; color:#6B7480;"><span style="border-bottom:2px dotted #A85A0F;">/ séance</span></span></p></div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 16px; padding:10px 0; border-bottom:1px solid #E2E5E9;"><div style="flex:1 1 260px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Formations et ateliers</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Des formations pratiques pour renforcer votre employabilité.</p></div><p style="margin:0; font-size:15.5px; font-weight:600;">40&nbsp;000&nbsp;FCFA <span style="font-weight:400; color:#6B7480;"><span style="border-bottom:2px dotted #A85A0F;">/ formation</span></span></p></div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 16px; padding:10px 0; border-bottom:1px solid #E2E5E9;"><div style="flex:1 1 260px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Suivi post-embauche</p><p style="margin:0; font-size:14.5px; line-height:1.55;">L'intégration de votre recrue suivie pendant 90 jours.</p></div><p style="margin:0; font-size:15.5px; font-weight:600;">25&nbsp;000&nbsp;FCFA <span style="font-weight:400; color:#6B7480;"><span style="border-bottom:2px dotted #A85A0F;">/ recrue</span></span></p></div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 16px; padding:10px 0; border-bottom:1px solid #E2E5E9;"><div style="flex:1 1 260px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Job Dating</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Une rencontre directe entre candidats et entreprises.</p></div><p style="margin:0; font-size:15.5px; font-weight:600;">5&nbsp;000&nbsp;FCFA <span style="font-weight:400; color:#6B7480;"><span style="border-bottom:2px dotted #A85A0F;">/ participant</span></span></p></div>
+        <div style="display:flex; flex-wrap:wrap; justify-content:space-between; gap:4px 16px; padding:10px 0;"><div style="flex:1 1 260px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Accompagnement à la formalisation</p><p style="margin:0; font-size:14.5px; line-height:1.55;">Les démarches pour déclarer votre activité, expliquées et suivies.</p></div><p style="margin:0; font-size:15.5px; font-weight:600;">5&nbsp;000&nbsp;FCFA <span style="font-weight:400; color:#6B7480;"><span style="border-bottom:2px dotted #A85A0F;">/ dossier</span></span></p></div>
+        
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Paiement</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Payer simplement</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Wave et Orange Money, directement depuis votre téléphone.</p>
+        <p style="margin:0; font-size:13px; line-height:1.5; color:#6B7480; font-style:italic;">Logos officiels Wave et Orange Money <mark style="background:#FDEBD3; color:#1E2733; padding:0 4px; border-radius:4px; font-style:normal;">[à fournir]</mark></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Questions</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Comment payer ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Par Wave ou Orange Money, depuis votre espace LIGGEEY.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Puis-je changer de formule ou arrêter ?</p><p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Oui, sans engagement : changez de formule ou arrêtez quand vous voulez depuis votre espace. Votre formule reste active jusqu'à la fin du mois payé.</span></p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Y a-t-il des réductions ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Des réductions ponctuelles peuvent être proposées, par exemple au lancement ou pour les étudiants.</p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="formations" data-screen-label="Formations et mentorat" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Formations et mentorat</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/formations-mentorat</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">Formations et mentorat</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Apprenez auprès de ceux qui font le métier.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Des formations pratiques et des mentors expérimentés pour renforcer vos compétences et préparer votre insertion.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Voir les tarifs</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Formations</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Des formations pratiques</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">69,5&nbsp;% des personnes que nous avons interrogées veulent se former sur du concret. Nos formations s'appuient sur des cas réels et se terminent par un certificat.</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Source : enquête LIGGEEY auprès de 200 personnes (2026).</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Exemples de thèmes : bureautique (Excel), développement web, leadership, entrepreneuriat, électricité, soudure, peinture.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Formations et ateliers : 40&nbsp;000&nbsp;FCFA <span style="border-bottom:2px dotted #A85A0F;">par formation</span>. Certaines formations sont incluses dans Premium.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Mentorat</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Un mentor à vos côtés</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Un professionnel de votre secteur vous aide à préparer un entretien, à choisir une voie ou à lancer votre activité. Vous réservez un créneau depuis votre espace.</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">49,5&nbsp;% des personnes interrogées souhaitent un accompagnement personnalisé ou un mentorat. Source : enquête LIGGEEY (2026).</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Domaines : ressources humaines, marketing, informatique, finance, gestion de projet, droit, comptabilité, entrepreneuriat…</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Les sessions de mentorat collectives sont incluses dans Premium. En tête-à-tête, le mentorat personnalisé coûte 15&nbsp;000&nbsp;FCFA <span style="border-bottom:2px dotted #A85A0F;">la séance</span>.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Comment ça marche</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px 22px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">1. Créez votre compte</p><p style="margin:0; font-size:15px; line-height:1.6;">Talent ou indépendant.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">2. Choisissez</p><p style="margin:0; font-size:15px; line-height:1.6;">Une formation ou un mentor.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">3. Réservez et payez</p><p style="margin:0; font-size:15px; line-height:1.6;">Par Wave ou Orange Money.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">4. Progressez</p><p style="margin:0; font-size:15px; line-height:1.6;">Un certificat à la fin de chaque formation.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Appel final</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Prêt à progresser ?</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="jobdating" data-screen-label="Job Dating" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Job Dating</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/job-dating</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">Job Dating</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Rencontrez les recruteurs en face à face.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Chaque trimestre, LIGGEEY réunit talents et entreprises pour des échanges directs.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Je m'inscris au prochain</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Partager sur WhatsApp</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Prochain événement</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15.5px; font-weight:600;"><span style="border-bottom:2px dotted #A85A0F;">Job Dating LIGGEEY · Décembre 2026</span></p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Samedi 12 décembre 2026, 9 h – 14 h</span> · <span style="border-bottom:2px dotted #A85A0F;">Dakar Plateau, salle communiquée à l'inscription</span></p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Participation : 5&nbsp;000&nbsp;FCFA, payable par Wave ou Orange Money.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Je m'inscris</span><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Partager sur WhatsApp</span></div>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Message partagé</strong> : « Job Dating LIGGEEY le [date] à [lieu] : rencontrez des recruteurs en face à face. Inscription : [lien] »</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Sans date : « Aucune date annoncée pour l'instant. Abonnez-vous à la newsletter pour être prévenu en premier. »</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Comment ça se passe</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(180px, 1fr)); gap:16px 22px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">1. Inscrivez-vous</p><p style="margin:0; font-size:15px; line-height:1.6;">En ligne, en deux minutes.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">2. Payez</p><p style="margin:0; font-size:15px; line-height:1.6;">5&nbsp;000&nbsp;FCFA par Wave ou Orange Money.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">3. Préparez-vous</p><p style="margin:0; font-size:15px; line-height:1.6;">Nous vous envoyons le programme et nos conseils sur WhatsApp.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">4. Rencontrez</p><p style="margin:0; font-size:15px; line-height:1.6;">Venez avec votre CV et échangez directement avec les recruteurs.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Inscription</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <ul style="margin:0; padding-left:18px; font-size:15px; line-height:1.75;">
+          <li>Nom et prénom *</li>
+          <li>Téléphone (WhatsApp) *</li>
+          <li>E-mail</li>
+          <li>Vous êtes : je cherche un emploi · je travaille à mon compte</li>
+          <li>Métier ou domaine</li>
+          <li>Case de consentement, avec lien vers la politique de confidentialité *</li>
+        </ul>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Payer 5&nbsp;000&nbsp;FCFA et m'inscrire</span></div>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Confirmation</strong> : « C'est noté ! Vous recevrez la confirmation et le programme sur WhatsApp. »</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Entreprises</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Vous recrutez ?</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Venez rencontrer des candidats lors du prochain Job Dating. <span style="border-bottom:2px dotted #A85A0F;">Participation incluse dans l'abonnement Entreprise.</span></p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Participer en tant qu'entreprise</span></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Fiche événement (modèle)</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">Titre · date et heure · lieu avec carte · secteurs représentés · programme · prix · inscription · partage WhatsApp.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Entreprises participantes : affichées seulement si elles l'ont confirmé.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="verification" data-screen-label="Comment nous vérifions" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Comment nous vérifions</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/verification</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">Confiance</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">Ce que nous vérifions, et comment.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Un tiers des personnes que nous avons interrogées ont déjà été victimes d'une fausse offre. Voici ce que notre équipe contrôle avant toute mise en relation.</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Source : enquête LIGGEEY auprès de 200 personnes (2026).</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Contrôles</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(240px, 1fr)); gap:20px 26px;">
+        <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Les entreprises</p><p style="margin:0; font-size:15px; line-height:1.6;">Avant toute publication, nous vérifions l'existence de l'entreprise : NINEA, RCCM et coordonnées.</p></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Les offres</p><p style="margin:0; font-size:15px; line-height:1.6;">Chaque offre est relue avant d'être publiée : poste, missions, lieu, type de contrat. Une offre douteuse est suspendue.</p></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Les profils</p><p style="margin:0; font-size:15px; line-height:1.6;">Pour le badge « Profil vérifié », vous envoyez une pièce d'identité et vos diplômes. Nous contrôlons :</p><ul style="margin:0; padding-left:18px; font-size:15px; line-height:1.7;"><li>le nom, identique à celui du profil</li><li>un document lisible et complet</li><li>une institution identifiable</li><li>la date et la signature</li><li>la cohérence avec les compétences déclarées</li></ul><p style="margin:0; font-size:15px; line-height:1.6;">Délai : 48 h ouvrées</p></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Les références et compétences</p><p style="margin:0; font-size:15px; line-height:1.6;">Pour un recrutement accompagné, nous contactons les références et évaluons les compétences liées au poste. <span style="border-bottom:2px dotted #A85A0F;">Entretien avec un conseiller et mise en situation pratique.</span></p><p style="margin:0; font-size:15px; line-height:1.6;">Pour les indépendants : certifications et réalisations vérifiées.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Et ensuite</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:12px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Après l'embauche</strong> : pendant le suivi, la recrue peut nous signaler un problème, comme un salaire en retard, des missions différentes de l'offre ou des conditions de travail.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Ce que nous préparons</strong> : des partenariats avec les universités, les écoles et les institutions pour vérifier les diplômes à la source.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Vos données</strong> : vos documents servent à la vérification et à la mise en relation.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Appel final</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">La confiance, ça se vérifie.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Créer mon compte</span><span style="border:1px solid #1E2733; font-weight:600; font-size:13px; padding:6px 13px; border-radius:8px;">Demander une démo</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="apropos" data-screen-label="À propos" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">À propos</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/a-propos</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:13px; font-weight:600; color:#A85A0F;">À propos</p>
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15; text-wrap:balance;">« Liggeey » veut dire « travail » en wolof.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Notre mission : rendre l'insertion professionnelle plus facile et plus juste au Sénégal, en rapprochant les compétences des opportunités.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Notre histoire</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Tout est parti d'un paradoxe.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Des talents cherchent des opportunités. Des entreprises cherchent des compétences. Pourtant, la rencontre entre les deux n'est ni simple, ni rapide, ni sûre.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Un jeune diplômé entend « expérience exigée », même pour un stage. Une cuisinière expérimentée n'a aucun document pour prouver son savoir-faire. Un recruteur passe des jours à trier des candidatures.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Nous avons voulu un espace qui rapproche ces mondes et rend leur rencontre plus fiable. C'est ainsi qu'est né LIGGEEY.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Notre différence</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">Plus qu'un site d'offres : nous valorisons les compétences, vérifions les offres et les profils, et accompagnons chaque parcours, avant, pendant et après l'embauche.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Nos valeurs</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(200px, 1fr)); gap:16px 22px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Accessibilité</p><p style="margin:0; font-size:15px; line-height:1.6;">Des tarifs accessibles, un site simple sur téléphone, un bureau pour le face-à-face.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Confiance</p><p style="margin:0; font-size:15px; line-height:1.6;">Des offres et des profils vérifiés, des données protégées.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Professionnalisation</p><p style="margin:0; font-size:15px; line-height:1.6;">Formations, mentorat et formalisation des activités.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Accompagnement</p><p style="margin:0; font-size:15px; line-height:1.6;">Une équipe humaine à chaque étape.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">L'équipe</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Salimata MARENA</p><p style="margin:0; font-size:14.5px; line-height:1.5; color:#6B7480;">Cofondatrice, marketing et commercial</p></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Seynabou KA</p><p style="margin:0; font-size:14.5px; line-height:1.5; color:#6B7480;">Cofondatrice, développement et design UX/UI</p></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Wagui DIANKHA</p><p style="margin:0; font-size:14.5px; line-height:1.5; color:#6B7480;">Chef de projet</p></div>
+          <div style="display:flex; flex-direction:column; gap:2px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Bamba DIOP</p><p style="margin:0; font-size:14.5px; line-height:1.5; color:#6B7480;">Comptable</p></div>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;"><mark style="background:#FDEBD3; color:#1E2733; padding:0 4px; border-radius:4px;">[photos à fournir]</mark></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Le bureau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">À Dakar, notre bureau d'accueil reçoit celles et ceux qui préfèrent être accompagnés en personne. <span style="border-bottom:2px dotted #A85A0F;">Hann Maristes 1, Îlot J, Villa n° 63</span> · <span style="border-bottom:2px dotted #A85A0F;">du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h</span></p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Partenaires</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:22px; line-height:1.25;">Construisons ensemble.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Universités, écoles de formation, institutions : rejoignez-nous pour faire connaître LIGGEEY aux étudiants et renforcer la vérification des diplômes.</p>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Devenir partenaire</span></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="ressources" data-screen-label="Ressources" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Ressources</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/ressources</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15;">Ressources</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Des conseils pratiques pour trouver un emploi, développer votre activité et mieux recruter. Deux nouveaux articles chaque mois.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Filtres</strong> : Tous · Talents · Indépendants · Entreprises</p>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Rubrique vide : « Pas encore d'article ici. Le prochain arrive bientôt. »</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Premiers sujets</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(220px, 1fr)); gap:16px 22px;">
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#A85A0F;">Talents</p><p style="margin:0; font-size:15px; line-height:1.5;">Fausse offre d'emploi : 7 signaux qui doivent vous alerter</p><p style="margin:0; font-size:15px; line-height:1.5;">Premier emploi : valoriser ses stages et projets dans son CV</p></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#A85A0F;">Indépendants</p><p style="margin:0; font-size:15px; line-height:1.5;">NINEA, registre des métiers : par où commencer pour formaliser son activité ?</p><p style="margin:0; font-size:15px; line-height:1.5;">Photos de réalisations : bien montrer son savoir-faire</p></div>
+          <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#A85A0F;">Entreprises</p><p style="margin:0; font-size:15px; line-height:1.5;">Préqualifier un candidat : les vérifications essentielles</p><p style="margin:0; font-size:15px; line-height:1.5;">Les 90 premiers jours d'une recrue : réussir son intégration</p></div>
+        </div>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Titres à valider. La rédaction des articles ne fait pas partie de cette étape.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Article (modèle)</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">Fil d'Ariane · rubrique · titre · date et temps de lecture · auteur <span style="border-bottom:2px dotted #A85A0F;">L'équipe LIGGEEY</span> · texte · encadré « À retenir » · bouton selon le public (Créer mon compte ou Demander une démo) · articles liés · newsletter</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="faq" data-screen-label="FAQ" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">FAQ</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/faq</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15;">Questions fréquentes</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Vous ne trouvez pas la réponse ? Écrivez-nous sur WhatsApp.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Rubriques</strong> : Général · Talents · Indépendants · Entreprises · Paiement et données</p>
+        <p style="margin:0; font-size:13px; line-height:1.5; color:#6B7480; font-style:italic;">Les rubriques Talents, Indépendants et Entreprises reprennent les questions de leur page de parcours, plus celles ci-dessous.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Général</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Qu'est-ce que LIGGEEY ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Une plateforme sénégalaise d'insertion professionnelle. Elle rapproche talents, indépendants et entreprises, avec des offres vérifiées et un accompagnement humain.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Que veut dire « Liggeey » ?</p><p style="margin:0; font-size:15px; line-height:1.6;">« Travail », en wolof.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Où se trouve votre bureau ?</p><p style="margin:0; font-size:15px; line-height:1.6;">À Dakar, <span style="border-bottom:2px dotted #A85A0F;">Hann Maristes 1, Îlot J, Villa n° 63</span>. Ouvert <span style="border-bottom:2px dotted #A85A0F;">du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h</span>.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">En plus</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Comment obtenir le badge « Profil vérifié » ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Envoyez une pièce d'identité et vos diplômes depuis votre profil. Notre équipe les contrôle sous 48 h ouvrées.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Combien coûte l'abonnement Entreprise ?</p><p style="margin:0; font-size:15px; line-height:1.6;">40&nbsp;000&nbsp;FCFA<span style="border-bottom:2px dotted #A85A0F;">/mois</span>. Il comprend la publication d'offres, la sélection et la short-list des profils.</p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Paiement et données</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:14px;">
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Quels moyens de paiement acceptez-vous ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Wave et Orange Money.</p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Comment changer de formule ou résilier ?</p><p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Oui, sans engagement : changez de formule ou arrêtez quand vous voulez depuis votre espace. Votre formule reste active jusqu'à la fin du mois payé.</span></p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Que faites-vous de mes documents ?</p><p style="margin:0; font-size:15px; line-height:1.6;">Ils servent uniquement à vérifier votre profil et à vous mettre en relation. <span style="border-bottom:2px dotted #A85A0F;">Ils ne sont jamais vendus ni partagés sans votre accord.</span></p></div>
+        <div style="display:flex; flex-direction:column; gap:4px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Comment supprimer mon compte ?</p><p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Depuis vos paramètres, ou sur simple demande par WhatsApp ou e-mail. Vos documents sont alors effacés.</span></p></div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="contact" data-screen-label="Contact" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Contact</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/contact</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Bandeau</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-family:Georgia, 'Times New Roman', serif; font-size:30px; line-height:1.15;">Parlons-en.</p>
+        <p style="margin:0; font-size:15px; line-height:1.6;">Une question, besoin d'aide pour vous inscrire, envie de devenir partenaire ? Choisissez le moyen qui vous convient.</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Trois moyens</div>
+      <div style="flex:1 1 340px; min-width:0; display:grid; grid-template-columns:repeat(auto-fit, minmax(190px, 1fr)); gap:16px 22px;">
+        <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">WhatsApp</p><p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">+221 77 000 00 00</span></p><div style="display:flex;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Écrire sur WhatsApp</span></div></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">Bureau d'accueil</p><p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">Hann Maristes 1, Îlot J, Villa n° 63</span>, Dakar · <span style="border-bottom:2px dotted #A85A0F;">du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h</span></p><span style="font-weight:600; font-size:14px; text-decoration:underline; text-decoration-color:#F0891D; text-underline-offset:3px;">Itinéraire</span></div>
+        <div style="display:flex; flex-direction:column; gap:6px;"><p style="margin:0; font-size:15.5px; font-weight:600;">E-mail</p><p style="margin:0; font-size:15px; line-height:1.6;"><span style="border-bottom:2px dotted #A85A0F;">contact@liggeey.sn</span></p></div>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Formulaire</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <ul style="margin:0; padding-left:18px; font-size:15px; line-height:1.75;">
+          <li>Nom et prénom *</li>
+          <li>Téléphone (WhatsApp) *</li>
+          <li>E-mail</li>
+          <li>Vous êtes : talent · indépendant · entreprise · établissement ou institution · autre</li>
+          <li>Motif * : une question · aide à l'inscription · rendez-vous au bureau · signaler une offre suspecte · partenariat · autre</li>
+          <li>Message *</li>
+          <li>Case de consentement, avec lien vers la politique de confidentialité *</li>
+        </ul>
+        <div style="display:flex; flex-wrap:wrap; gap:8px 14px; align-items:center;"><span style="background:#F0891D; color:#1E2733; font-weight:600; font-size:13px; padding:7px 14px; border-radius:8px;">Envoyer</span></div>
+        <p style="margin:0; font-size:15px; line-height:1.6;"><strong>Confirmation</strong> : « Merci ! Nous vous répondons <span style="border-bottom:2px dotted #A85A0F;">sous 24 h ouvrées</span>. »</p>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Carte</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <p style="margin:0; font-size:15px; line-height:1.6;">« Bureau d'accueil LIGGEEY » · carte du quartier · bouton « Itinéraire » vers Google Maps.</p>
+        <p style="margin:0; font-size:13px; line-height:1.5; color:#6B7480; font-style:italic;">La carte se charge au clic, pour garder la page légère en 4G.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="legal" data-screen-label="Pages légales" style="padding:44px 24px 8px; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto;">
+    <div style="display:flex; flex-wrap:wrap; align-items:baseline; justify-content:space-between; gap:6px 16px; padding-bottom:14px; border-bottom:2px solid #1E2733;"><h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Pages légales</h2><code style="font-family:ui-monospace, SFMono-Regular, Menlo, monospace; font-size:13px; color:#6B7480;">/mentions-legales · /cgu · /confidentialite</code></div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Mentions légales</div>
+      <div style="flex:1 1 340px; min-width:0;">
+        <ul style="margin:0; padding-left:18px; font-size:15px; line-height:1.75;">
+          <li>Éditeur : <span style="border-bottom:2px dotted #A85A0F;">LIGGEEY SARL au capital de 1 000 000 FCFA, siège Hann Maristes 1, Îlot J, Villa n° 63, Dakar, NINEA et RCCM en cours d'attribution</span></li>
+          <li>Directrice de la publication : <span style="border-bottom:2px dotted #A85A0F;">la gérante de LIGGEEY SARL</span></li>
+          <li>Hébergeur : <span style="border-bottom:2px dotted #A85A0F;">Vercel Inc.</span></li>
+          <li>Contact · propriété intellectuelle · crédits photos</li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">CGU</div>
+      <div style="flex:1 1 340px; min-width:0;">
+        <ul style="margin:0; padding-left:18px; font-size:15px; line-height:1.75;">
+          <li>Objet · inscription et compte · profils et vérification</li>
+          <li>Offres et publication · abonnements, prix et paiement (Wave, Orange Money)</li>
+          <li>Services complémentaires · engagements des utilisateurs · responsabilité</li>
+          <li>Résiliation · droit applicable (Sénégal) · contact</li>
+        </ul>
+      </div>
+    </div>
+    <div style="display:flex; flex-wrap:wrap; gap:8px 28px; padding:22px 0; border-bottom:1px solid #E2E5E9;">
+      <div style="flex:0 0 140px; font-size:12px; font-weight:600; letter-spacing:0.05em; text-transform:uppercase; color:#6B7480; padding-top:5px;">Confidentialité</div>
+      <div style="flex:1 1 340px; min-width:0; display:flex; flex-direction:column; gap:10px;">
+        <ul style="margin:0; padding-left:18px; font-size:15px; line-height:1.75;">
+          <li>Responsable du traitement</li>
+          <li>Données collectées : identité, coordonnées, CV, diplômes, documents d'activité</li>
+          <li>Pourquoi : vérification, mise en relation, suivi, paiement</li>
+          <li>Destinataires · durée de conservation : <span style="border-bottom:2px dotted #A85A0F;">3 ans après la dernière connexion</span> · sécurité</li>
+          <li>Vos droits : accès, rectification, opposition, suppression</li>
+          <li>Réclamation auprès de la Commission de protection des données personnelles (CDP)</li>
+        </ul>
+        <p style="margin:0; font-size:12.5px; line-height:1.5; color:#6B7480;">Ces trois pages sont à rédiger ou à valider par votre conseil juridique.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<section id="afournir" data-screen-label="Provisoire" style="padding:56px 24px 72px; margin-top:40px; background:#1E2733; color:#FFFFFF; scroll-margin-top:60px;">
+  <div style="max-width:960px; margin:0 auto; display:flex; flex-direction:column; gap:24px;">
+    <div style="display:flex; flex-direction:column; gap:8px;">
+      <h2 style="font-family:Georgia, 'Times New Roman', serif; font-weight:400; font-size:34px; line-height:1.1; margin:0;">Valeurs provisoires</h2>
+      <p style="margin:0; color:#E2E5E9; font-size:15px; line-height:1.6;">Fictives ou déduites du mémoire et du prototype. À remplacer avant la mise en ligne.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px 32px; font-size:14.5px; line-height:1.55;">
+      <p style="margin:0;"><strong style="color:#F0891D;">Coordonnées</strong><br>WhatsApp +221 77 000 00 00, contact@liggeey.sn, @liggeey : fictifs.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">Bureau</strong><br>Hann Maristes 1, Îlot J, Villa n° 63 : siège prévu dans le mémoire. Horaires fictifs.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">Délais</strong><br>Démo : 48 h ouvrées. Contact : 24 h ouvrées. Vérification des documents : 48 h ouvrées, repris du prototype.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">Unités de prix</strong><br>Entreprise par mois, mentorat par séance, formation à l'unité, suivi par recrue, Job Dating par participant, formalisation par dossier.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">Formules</strong><br>Contenu d'Essentiel et de Premium repris du prototype. Sans engagement.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">Mentorat</strong><br>Sessions collectives incluses dans Premium, séance individuelle à 15 000 FCFA.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">Job Dating</strong><br>Samedi 12 décembre 2026, Dakar Plateau. Participation incluse pour les entreprises abonnées.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">Légal</strong><br>SARL au capital de 1 000 000 FCFA (mémoire), NINEA et RCCM en cours, hébergeur Vercel, conservation 3 ans.</p>
+    </div>
+    <div style="display:grid; grid-template-columns:repeat(auto-fit, minmax(260px, 1fr)); gap:18px 32px; font-size:14.5px; line-height:1.55; padding-top:20px; border-top:1px solid #6B7480;">
+      <p style="margin:0;"><strong style="color:#F0891D;">Médias à fournir</strong><br>Photos (accueil, parcours, équipe), captures de l'app, logos Wave et Orange Money, vidéos ou audios en wolof et leurs titres.</p>
+      <p style="margin:0;"><strong style="color:#F0891D;">À vérifier</strong><br>Le chiffre ANSD (22,9 %), à revérifier à la source avant publication.</p>
+    </div>
+    <p style="margin:12px 0 0; padding-top:20px; border-top:1px solid #6B7480; font-size:14px; color:#E2E5E9;">Étape 3 validée. Étape suivante : les wireframes.</p>
+  </div>
+</section>
+
+</div>
+</x-dc>
+</body>
+</html>
