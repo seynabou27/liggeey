@@ -1,0 +1,24 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Composants/Application/Bibliothèque/Introduction" />
+
+# Bibliothèque de l'application
+
+Les composants de `components/app/` donnent à la plateforme sa structure : celle d'une interface d'administration claire et aérée (le modèle Mifty), avec les couleurs, les tokens et la typographie de LIGGEEY.
+
+- **Coquille** : barre latérale claire, groupes titrés en petites capitales, élément actif teinté avec une barre orange à gauche ; barre du haut (salutation, recherche de page, notifications, compte) ; en-tête de page (titre et fil d'Ariane) ; pied de page. Sur mobile, le menu s'ouvre en tiroir.
+- **Cartes** : fond blanc, filet fin, coins de 8 px, sans ombre. `CarteStat` pour les chiffres clés, `CarteProfil` pour les fiches.
+- **Badges** : fonds doux et texte contrasté, d'après les tokens de statut (`bg-statut-succes-doux`, `text-statut-succes`…).
+- **Tableau** : en-tête sur fond doux, lignes séparées par un filet pointillé.
+
+On importe tout depuis `components/app` :
+
+```jsx
+import * as App from '@/components/app';
+
+<App.Carte titre="Dernières candidatures" actions={<App.Bouton petit variante="doux">Tout voir</App.Bouton>}>
+  <App.Tableau colonnes={…} lignes={…} />
+</App.Carte>
+```
+
+Dans le prototype (`LiggeeyPrototype.jsx`), la bibliothèque est importée sous le nom `App`.

@@ -1,6 +1,6 @@
 import { fn } from 'storybook/test';
 import { AlertCircle, Calendar, ClipboardList, HeartHandshake } from 'lucide-react';
-import { AuthShell, AppShell, Sidebar, IconRail, Breadcrumb, TodoPanel, NAV_ITEMS_BY_ESPACE, USER_BY_ESPACE } from '../../../components/plateforme/LiggeeyPrototype';
+import { AuthShell, AppShell, Sidebar, Breadcrumb, TodoPanel, NAV_ITEMS_BY_ESPACE, USER_BY_ESPACE } from '../../../components/plateforme/LiggeeyPrototype';
 import { AvecPlateforme, policeApp } from './_outils';
 
 const BarreLaterale = (espace, badges = {}, formule = 'essentiel') => ({
@@ -20,8 +20,6 @@ export const MenuChercheurPremium = { name: 'Sidebar · chercheur Premium', ...B
 export const MenuPrestataire = { name: 'Sidebar · prestataire', ...BarreLaterale('prestataire', { regularisation: 3, missions: 2 }) };
 export const MenuEntreprise = { name: 'Sidebar · entreprise', ...BarreLaterale('entreprise', { candidatures: 4, suivi: 2 }) };
 export const MenuAdmin = { name: 'Sidebar · admin', ...BarreLaterale('admin', { suivi: 1, regularisations: 2, abonnements: 1 }) };
-
-export const BarreIcones = { name: 'IconRail', render: () => <div className="flex h-[400px]"><IconRail /></div> };
 
 export const FilAriane = {
   name: 'Breadcrumb',
@@ -74,5 +72,5 @@ export const CoquilleAuthentification = {
 export default {
   title: 'Composants/Application/Navigation',
   decorators: [policeApp],
-  parameters: { docs: { description: { component: 'Coquilles et navigation de la plateforme : AuthShell (connexion, inscription), AppShell (IconRail + Sidebar + Breadcrumb), TodoPanel (« À faire maintenant »).' } } },
+  parameters: { docs: { description: { component: 'Coquilles et navigation de la plateforme : AuthShell (connexion, inscription), AppShell (Sidebar + barre du haut + en-tête de page, depuis components/app/Coquille.jsx), TodoPanel (« À faire maintenant »).' } } },
 };

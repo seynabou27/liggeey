@@ -72,7 +72,7 @@ const preview = {
             'Site',
             ['Actions', 'Formulaires', 'Navigation', 'Mise en page', 'Contenus', 'Médias', 'Offres', 'Accueil', 'Tarifs', 'Job Dating', 'Ressources', 'Gabarits'],
             'Application',
-            ['Identité', 'Actions', 'Badges et statuts', 'Indicateurs', 'Formulaires', 'Navigation', 'Cartes', 'Données', 'Retours et fenêtres'],
+            ['Bibliothèque', ['Introduction', 'Coquille', 'Cartes', 'Badges et avatars', 'Contrôles', 'Tableau', 'Progression', 'Messagerie'], 'Identité', 'Actions', 'Badges et statuts', 'Indicateurs', 'Formulaires', 'Navigation', 'Cartes', 'Données', 'Retours et fenêtres'],
           ],
           'Écrans',
           ['Plateforme complète', 'Authentification', 'Chercheur', 'Prestataire', 'Entreprise', 'Admin'],

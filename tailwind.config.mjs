@@ -23,6 +23,7 @@ export default {
         neutre: palette('neutre'), // bleu ardoise, 50 à 900
         sombre: v('fond-sombre'), // dégradés sur photo (from-sombre/90)
         whatsapp: '#25D366',
+        statut: groupe('statut'), // badges : bg-statut-succes-doux text-statut-succes, danger, alerte, info
       },
       backgroundColor: groupe('fond'), // bg-page, bg-surface, bg-doux, bg-sombre, bg-marque, bg-marque-survol…
       textColor: groupe('texte'), // text-principal, text-secondaire, text-discret, text-sur-marque, text-marque…

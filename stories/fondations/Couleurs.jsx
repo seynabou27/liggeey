@@ -31,7 +31,7 @@ function Note({ valeur }) {
   );
 }
 
-const PREFIXES = { fond: 'bg', texte: 'text', bordure: 'border', etat: 'ring / outline' };
+const PREFIXES = { fond: 'bg', texte: 'text', bordure: 'border', etat: 'ring / outline', statut: 'bg-statut / text-statut' };
 
 const NOMS_PALETTES = {
   primaire: { titre: 'Primaire — orange de marque', usage: 'Boutons, accents, éléments de marque. Référence : primaire-500.' },
@@ -94,7 +94,7 @@ export function TableSemantique({ groupe }) {
             {Object.entries(tokens).map(([nom, t]) => (
               <tr key={nom} className="bg-surface">
                 <td className="p-3 font-mono font-semibold">
-                  {groupe === 'etat' ? nom : `${PREFIXES[groupe]}-${nom}`}
+                  {groupe === 'etat' ? nom : groupe === 'statut' ? `statut-${nom}` : `${PREFIXES[groupe]}-${nom}`}
                 </td>
                 <td className="p-3 font-mono text-secondaire">{variable(groupe, nom)}</td>
                 <td className="p-3">

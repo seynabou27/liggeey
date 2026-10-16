@@ -65,16 +65,16 @@ export const avecPlateforme = (Story, { parameters }) => (
   </AvecPlateforme>
 );
 
-/** Police de l'application (le prototype utilise Inter en style en ligne). */
+/** Police de l'application : Plus Jakarta Sans, comme le site (font-sans). */
 export const policeApp = (Story) => (
-  <div style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+  <div className="font-sans">
     <Story />
   </div>
 );
 
 /** Fond gris de l'application, derrière les cartes. */
 export const fondApp = (Story) => (
-  <div className="rounded-lg bg-doux p-6" style={{ fontFamily: 'Inter, system-ui, -apple-system, sans-serif' }}>
+  <div className="rounded-lg bg-doux p-6 font-sans">
     <Story />
   </div>
 );

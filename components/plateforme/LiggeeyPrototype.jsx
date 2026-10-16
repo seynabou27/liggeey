@@ -58,6 +58,7 @@ import {
   Wrench,
   ClipboardList,
   Plus,
+  Wallet,
   Pencil,
   Send,
   Search,
@@ -100,7 +101,9 @@ import {
   TrendingUp,
   FlaskConical,
 } from "lucide-react";
-import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip } from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip, AreaChart, Area, CartesianGrid } from "recharts";
+// Bibliothèque de l'application (components/app) : coquille, cartes, badges, tableaux… sur les tokens LIGGEEY.
+import * as App from "../app";
 
 // Couleurs : tokens LIGGEEY (lib/tokens/couleurs.mjs), lus via les variables CSS du site.
 // Les noms d'origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
@@ -163,12 +166,12 @@ function readStore(data, key, initial) {
    Si la plateforme est un jour déployée à part, mettre ici l'adresse complète du site. */
 const SITE_URL = "/";
 
-function Logo({ color = COLORS.brandPale, height = 24, iconOnly = false }) {
+function Logo({ color = COLORS.brandPale, iconColor, height = 24, iconOnly = false }) {
   const viewW = iconOnly ? 658 : 3525;
   const width = height * (viewW / 690);
   return (
     <svg width={width} height={height} viewBox={`0 0 ${viewW} 690`} fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-      <path d="M377.581 135.382L82.6807 600.007L122.668 689.674H0V0H316.209L377.581 135.382ZM657.888 689.674H278.254L445.47 600.007V135.382L604.317 0H657.888V689.674Z" fill={color} />
+      <path d="M377.581 135.382L82.6807 600.007L122.668 689.674H0V0H316.209L377.581 135.382ZM657.888 689.674H278.254L445.47 600.007V135.382L604.317 0H657.888V689.674Z" fill={iconColor || color} />
       <path d="M991.291 571.692V117.982H1046.23V522.954H1257.14V571.692H991.291Z" fill={color} />
       <path d="M1397.15 117.982V571.692H1342.21V117.982H1397.15Z" fill={color} />
       <path d="M1817.46 259.766C1812.59 244.849 1806.16 231.483 1798.19 219.668C1790.36 207.705 1780.98 197.514 1770.05 189.096C1759.27 180.677 1747.01 174.253 1733.28 169.822C1719.54 165.391 1704.48 163.176 1688.08 163.176C1661.2 163.176 1636.76 170.117 1614.75 184C1592.75 197.883 1575.25 218.339 1562.25 245.366C1549.25 272.394 1542.75 305.551 1542.75 344.837C1542.75 384.123 1549.33 417.28 1562.47 444.308C1575.62 471.335 1593.41 491.791 1615.86 505.674C1638.31 519.557 1663.57 526.498 1691.63 526.498C1717.62 526.498 1740.51 520.96 1760.31 509.883C1780.24 498.658 1795.75 482.855 1806.83 462.474C1818.05 441.944 1823.67 417.797 1823.67 390.031L1840.5 393.575H1704.03V344.837H1876.83V393.575C1876.83 430.941 1868.86 463.434 1852.91 491.052C1837.11 518.67 1815.25 540.086 1787.33 555.298C1759.57 570.363 1727.67 577.895 1691.63 577.895C1651.46 577.895 1616.16 568.443 1585.73 549.538C1555.46 530.634 1531.83 503.754 1514.84 468.898C1498 434.043 1489.59 392.689 1489.59 344.837C1489.59 308.948 1494.39 276.677 1503.99 248.025C1513.73 219.225 1527.47 194.708 1545.19 174.474C1562.91 154.24 1583.89 138.733 1608.11 127.951C1632.33 117.17 1658.99 111.779 1688.08 111.779C1712.01 111.779 1734.31 115.397 1754.99 122.634C1775.81 129.723 1794.35 139.84 1810.59 152.985C1826.99 165.982 1840.65 181.563 1851.58 199.729C1862.51 217.748 1870.04 237.76 1874.18 259.766H1817.46Z" fill={color} />
@@ -183,7 +186,7 @@ function Logo({ color = COLORS.brandPale, height = 24, iconOnly = false }) {
 // Shared split-screen shell used by every auth screen
 function AuthShell({ children, onNavigate }) {
   return (
-    <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2" style={{ fontFamily: "Inter, system-ui, -apple-system, sans-serif" }}>
+    <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-2 font-sans">
       <div
         className="relative hidden md:flex flex-col justify-between p-10 md:p-14"
         style={{
@@ -274,26 +277,9 @@ function SSLNote() {
 }
 
 function Pagination({ page, pageSize, totalItems, onPageChange }) {
-  const totalPages = Math.max(1, Math.ceil(totalItems / pageSize));
-  const start = totalItems === 0 ? 0 : (page - 1) * pageSize + 1;
-  const end = Math.min(page * pageSize, totalItems);
-  const atStart = page <= 1;
-  const atEnd = page >= totalPages;
-
-  function go(p) {
-    onPageChange(Math.min(Math.max(1, p), totalPages));
-  }
-
   return (
-    <div
-      className="flex items-center justify-center gap-4 rounded-md border bg-surface py-3 text-sm mt-6"
-      style={{ borderColor: COLORS.border, color: COLORS.slateLight }}
-    >
-      <button type="button" disabled={atStart} onClick={() => go(1)} style={{ opacity: atStart ? 0.35 : 1 }}>«</button>
-      <button type="button" disabled={atStart} onClick={() => go(page - 1)} style={{ opacity: atStart ? 0.35 : 1 }}>‹</button>
-      <span>Affichage {start} à {end} sur {totalItems} résultats</span>
-      <button type="button" disabled={atEnd} onClick={() => go(page + 1)} style={{ opacity: atEnd ? 0.35 : 1 }}>›</button>
-      <button type="button" disabled={atEnd} onClick={() => go(totalPages)} style={{ opacity: atEnd ? 0.35 : 1 }}>»</button>
+    <div className="mt-6 rounded-lg border border-base bg-surface px-5 py-3">
+      <App.PaginationApp page={page} total={totalItems} parPage={pageSize} onChange={onPageChange} />
     </div>
   );
 }
@@ -408,7 +394,7 @@ function ConnexionScreen({ onNavigate }) {
         >
           <ArrowLeft size={14} /> Retour à la connexion
         </button>
-        <h2 className="text-3xl font-bold mb-2" style={{ color: COLORS.slate }}>Mot de passe oublié</h2>
+        <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Mot de passe oublié</h2>
         <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
           Saisissez votre adresse e-mail, nous vous enverrons un lien pour réinitialiser votre mot de passe.
         </p>
@@ -443,7 +429,7 @@ function ConnexionScreen({ onNavigate }) {
 
   return (
     <form onSubmit={handleSubmit} noValidate>
-      <h2 className="text-3xl font-bold mb-2" style={{ color: COLORS.slate }}>Bon retour parmi nous</h2>
+      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Bon retour parmi nous</h2>
       <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>
         Pas encore de compte ?{" "}
         <button type="button" onClick={() => onNavigate("signup-choice")} className="font-semibold hover:underline" style={{ color: COLORS.orange }}>
@@ -572,7 +558,7 @@ function SignupChoiceScreen({ onNavigate }) {
   return (
     <div>
       <Stepper step={1} />
-      <h2 className="text-3xl font-bold mb-2" style={{ color: COLORS.slate }}>Créer votre compte</h2>
+      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Créer votre compte</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
         Déjà inscrit ?{" "}
         <button type="button" onClick={() => onNavigate("login")} className="font-semibold hover:underline" style={{ color: COLORS.orange }}>
@@ -663,7 +649,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
       >
         {meta.badge}
       </span>
-      <h2 className="text-3xl font-bold mb-2" style={{ color: COLORS.slate }}>Créer votre compte</h2>
+      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Créer votre compte</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
         Remplissez les informations suivantes pour finaliser votre inscription {meta.tagline}.
       </p>
@@ -767,7 +753,7 @@ function ConfirmationScreen({ profile, onNavigate }) {
       >
         <Check size={26} color="#047857" />
       </div>
-      <h2 className="text-3xl font-bold mb-2" style={{ color: COLORS.slate }}>Compte créé avec succès</h2>
+      <h2 className="text-3xl font-semibold mb-2" style={{ color: COLORS.slate }}>Compte créé avec succès</h2>
       <p className="text-sm mb-8 leading-relaxed" style={{ color: COLORS.slateLight }}>
         Bienvenue sur LIGGEEY ! Votre compte <strong style={{ color: COLORS.slate }}>{meta.tagline}</strong> est prêt.
       </p>
@@ -858,151 +844,73 @@ const USER_BY_ESPACE = {
   admin: { name: "Admin LIGGEEY", role: "Super admin", initials: "AL" },
 };
 
-const RAIL_ICONS = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell];
+/* La coquille vient de la bibliothèque de l'application (components/app/Coquille.jsx) :
+   barre latérale claire, barre du haut, en-tête de page avec fil d'Ariane, pied de page.
+   Sidebar, Breadcrumb et AppShell gardent leur nom et leurs props d'origine. */
 
-function IconRail() {
-  return (
-    <div className="hidden md:flex flex-col items-center w-14 shrink-0 py-4 gap-3" style={{ background: COLORS.darkDeep }} aria-hidden="true">
-      {RAIL_ICONS.map((Icon, i) => (
-        <div key={i} className="w-8 h-8 rounded-md flex items-center justify-center" style={{ background: i === 0 ? COLORS.orange : "transparent" }}>
-          <Icon size={16} color={i === 0 ? "#fff" : i === RAIL_ICONS.length - 1 ? "#4ADE80" : COLORS.onDarkSubtle} />
-        </div>
-      ))}
-    </div>
-  );
-}
+const toElementsMenu = (navItems) => navItems.map((n) => ({ id: n.id, label: n.label, icone: n.icon, section: n.section }));
 
-function Sidebar({ navItems, active, onNavigate, user, badges = {} }) {
+const LogoMenu = () => (
+  <a href={SITE_URL} aria-label="LIGGEEY, retour au site" title="Retour au site" className="inline-flex">
+    <Logo color={COLORS.slate} iconColor={COLORS.orange} height={26} />
+  </a>
+);
+const LogoMenuReduit = () => (
+  <a href={SITE_URL} aria-label="LIGGEEY, retour au site" title="Retour au site" className="inline-flex">
+    <Logo iconOnly color={COLORS.orange} height={26} />
+  </a>
+);
+
+/* Encart du bas du menu : formule en cours, invitation à passer à la formule supérieure. */
+function EncartFormule({ onNavigate }) {
   const planApi = usePlan();
   const currentPlan = planApi && !planApi.isAdmin ? planApi.plan : null;
-  const upgradeTo = currentPlan && currentPlan.prixMensuel === 0 ? planApi.nextPlan() : null;
-  const [collapsed, setCollapsed] = useState(() => typeof window !== "undefined" && window.matchMedia && window.matchMedia("(max-width: 767px)").matches);
-
+  if (!currentPlan) return null;
+  const upgradeTo = currentPlan.prixMensuel === 0 ? planApi.nextPlan() : null;
   return (
-    <div className="flex flex-col shrink-0 py-5 px-3 transition-all sticky top-0 h-screen overflow-y-auto" style={{ background: COLORS.dark, width: collapsed ? 64 : 240 }}>
-      <div className={`flex items-center mb-6 px-1 ${collapsed ? "flex-col gap-3" : "justify-between"}`}>
-        <a href={SITE_URL} aria-label="LIGGEEY, retour au site" title="Retour au site" className="inline-flex">
-          {collapsed ? <Logo iconOnly height={22} /> : <Logo />}
-        </a>
-        <button
-          type="button"
-          onClick={() => setCollapsed((c) => !c)}
-          className="w-6 h-6 rounded border flex items-center justify-center shrink-0"
-          style={{ borderColor: COLORS.orange }}
-          aria-label={collapsed ? "Déplier le menu" : "Replier le menu"}
-          title={collapsed ? "Déplier le menu" : "Replier le menu"}
-        >
-          {collapsed ? <PanelLeft size={13} color={COLORS.orange} /> : <PanelLeftClose size={13} color={COLORS.orange} />}
-        </button>
-      </div>
-
-      <nav className="flex-1 flex flex-col gap-0.5" aria-label="Navigation principale">
-        {navItems.map((item, i) => {
-          const isActive = active === item.id;
-          const Icon = item.icon;
-          const newSection = item.section && (i === 0 || navItems[i - 1].section !== item.section);
-          const badge = badges[item.id] || 0;
-          return (
-            <React.Fragment key={item.id}>
-              {newSection && (collapsed ? (
-                i > 0 && <div className="my-2 mx-2 h-px" style={{ background: COLORS.darkLine }} />
-              ) : (
-                <p className={`text-[11px] font-semibold px-3 mb-1 ${i > 0 ? "mt-4" : ""}`} style={{ color: COLORS.onDarkSubtle }}>{item.section}</p>
-              ))}
-              <button
-                type="button"
-                onClick={() => onNavigate(item.id)}
-                title={collapsed ? item.label : undefined}
-                aria-current={isActive ? "page" : undefined}
-                className={`relative flex items-center gap-2.5 rounded-md py-2 text-sm text-left transition-colors ${collapsed ? "justify-center px-0" : "px-3"}`}
-                style={{ background: isActive ? COLORS.orange : "transparent", color: isActive ? COLORS.onOrange : COLORS.onDarkMuted, fontWeight: isActive ? 600 : 400 }}
-              >
-                <Icon size={17} />
-                {!collapsed && <span className="flex-1">{item.label}</span>}
-                {badge > 0 && (collapsed ? (
-                  <span className="absolute top-1 right-2 w-2 h-2 rounded-full" style={{ background: COLORS.orange }} aria-label={`${badge} à traiter`} />
-                ) : (
-                  <span className="text-[11px] font-bold rounded-full px-1.5 min-w-[20px] text-center" style={{ background: isActive ? COLORS.surface : COLORS.orange, color: isActive ? COLORS.orange : COLORS.onOrange }} aria-label={`${badge} à traiter`}>{badge}</span>
-                ))}
-              </button>
-            </React.Fragment>
-          );
-        })}
-      </nav>
-
-      <div className="pt-4 mt-4" style={{ borderTop: "1px solid #2C241C" }}>
-        <div className={`flex items-center gap-2.5 mb-3 ${collapsed ? "justify-center px-0" : "px-1"}`}>
-          <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orange, color: COLORS.onOrange }} title={collapsed ? `${user.name} · ${user.role}` : undefined}>
-            {user.initials}
-          </div>
-          {!collapsed && (
-            <div className="min-w-0">
-              <p className="text-sm font-semibold text-sur-sombre truncate">{user.name}</p>
-              <p className="text-xs truncate" style={{ color: COLORS.onDarkSubtle }}>{user.role}</p>
-            </div>
-          )}
-        </div>
-        {currentPlan && (
-          <button
-            type="button"
-            onClick={() => onNavigate("abonnement")}
-            title={collapsed ? `Profil ${currentPlan.nom}` : undefined}
-            className={`w-full rounded-md mb-3 flex items-center text-xs ${collapsed ? "justify-center py-2" : "justify-between px-3 py-2"}`}
-            style={{ background: COLORS.darkLine }}
-          >
-            {collapsed ? (
-              <Crown size={14} color={upgradeTo ? COLORS.onDarkSubtle : COLORS.orange} />
-            ) : (
-              <>
-                <span className="flex items-center gap-1.5" style={{ color: COLORS.onDarkMuted }}>
-                  {!upgradeTo && <Crown size={12} color={COLORS.orange} />} Profil {currentPlan.nom}
-                </span>
-                {upgradeTo && <span className="font-semibold" style={{ color: COLORS.orange }}>Passer {upgradeTo.nom}</span>}
-              </>
-            )}
-          </button>
-        )}
-        <button type="button" onClick={() => onNavigate("login")} title="Changer d'espace" className={`flex items-center gap-1.5 text-xs ${collapsed ? "justify-center w-full" : "px-1"}`} style={{ color: COLORS.onDarkSubtle }}>
-          <ArrowLeft size={12} /> {!collapsed && "Changer d'espace"}
-        </button>
-        <a href={SITE_URL} title="Retour au site" aria-label={collapsed ? "Retour au site" : undefined} className={`mt-3 flex items-center gap-1.5 text-xs hover:text-sur-sombre ${collapsed ? "justify-center w-full" : "px-1"}`} style={{ color: COLORS.onDarkSubtle }}>
-          <Home size={12} /> {!collapsed && "Retour au site"}
-        </a>
-      </div>
+    <div className="rounded-lg border border-base bg-surface p-4 text-center">
+      <span className="mx-auto mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-marque-doux text-marque" aria-hidden="true">
+        <Crown size={20} />
+      </span>
+      <p className="text-sm font-semibold text-principal">Profil {currentPlan.nom}</p>
+      <p className="mb-3 mt-1 text-xs text-secondaire">
+        {upgradeTo ? `Passez ${upgradeTo.nom} pour être vu en priorité par les recruteurs.` : "Toutes les fonctions sont ouvertes."}
+      </p>
+      <App.Bouton petit pleineLargeur variante={upgradeTo ? "principal" : "neutre"} onClick={() => onNavigate("abonnement")}>
+        {upgradeTo ? `Passer ${upgradeTo.nom}` : "Gérer ma formule"}
+      </App.Bouton>
     </div>
   );
 }
 
-function Breadcrumb({ items, onNavigate }) {
+function Sidebar({ navItems, active, onNavigate, badges = {}, replie = false }) {
   return (
-    <nav aria-label="Fil d'Ariane" className="flex items-center gap-1.5 text-sm mb-6 flex-wrap" style={{ color: COLORS.slateLight }}>
-      <button type="button" onClick={() => onNavigate("dashboard")} aria-label="Tableau de bord" className="hover:opacity-70"><Home size={14} /></button>
-      {items.map((it, i) => {
-        const last = i === items.length - 1;
-        return (
-          <React.Fragment key={i}>
-            <ChevronRight size={13} />
-            {!last && it.id ? (
-              <button type="button" onClick={() => onNavigate(it.id)} className="hover:underline">{it.label}</button>
-            ) : (
-              <span aria-current={last ? "page" : undefined} style={{ color: last ? COLORS.slate : COLORS.slateLight, fontWeight: last ? 500 : 400 }}>{it.label}</span>
-            )}
-          </React.Fragment>
-        );
-      })}
-    </nav>
+    <App.BarreLaterale
+      elements={toElementsMenu(navItems)}
+      actif={active}
+      onNaviguer={onNavigate}
+      compteurs={badges}
+      replie={replie}
+      logo={<LogoMenu />}
+      logoReduit={<LogoMenuReduit />}
+      encart={<EncartFormule onNavigate={onNavigate} />}
+    />
   );
 }
 
-function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, children }) {
+function Breadcrumb({ items, onNavigate, title }) {
+  return <App.EnTetePage titre={title || items[items.length - 1]?.label} filAriane={items} onNaviguer={onNavigate} />;
+}
+
+function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, todos = [], children }) {
   const mainRef = useRef(null);
   // Remonte en haut de page dès que l'écran (ou une vue détail) change.
   useEffect(() => {
     const el = mainRef.current;
     if (!el || typeof MutationObserver === "undefined") return undefined;
-    let last = el.querySelector("h1")?.textContent;
+    let last = el.querySelector("h2")?.textContent;
     const obs = new MutationObserver(() => {
-      const t = el.querySelector("h1")?.textContent;
+      const t = el.querySelector("h2")?.textContent;
       if (t !== last) {
         last = t;
         window.scrollTo(0, 0);
@@ -1012,15 +920,42 @@ function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, chil
     return () => obs.disconnect();
   }, []);
 
+  const estAdmin = user.role === "Super admin";
+  const prenom = user.name.split(" ")[0];
+  const menuCompte = [
+    !estAdmin && { label: "Mon profil", icone: UserCircle2, onClick: () => onNavigate("profil") },
+    !estAdmin && { label: "Abonnement", icone: Crown, onClick: () => onNavigate("abonnement") },
+    estAdmin && { label: "Paramètres", icone: Settings, onClick: () => onNavigate("parametres") },
+    { label: "Changer d'espace", icone: ArrowLeft, onClick: () => onNavigate("login") },
+    { label: "Retour au site", icone: Home, href: SITE_URL },
+  ].filter(Boolean);
+  const notifications = todos.map((t, i) => ({
+    id: `${t.to}-${i}`,
+    titre: t.label,
+    icone: t.icon,
+    urgent: t.urgent,
+    onClick: () => onNavigate(t.to, t.data),
+  }));
+
   return (
-    <div className="min-h-screen w-full flex" style={{ fontFamily: "Inter, system-ui, -apple-system, sans-serif", background: COLORS.soft }}>
-      <IconRail />
-      <Sidebar navItems={navItems} active={active} onNavigate={onNavigate} user={user} badges={badges} />
-      <main ref={mainRef} className="flex-1 min-w-0 px-4 sm:px-6 md:px-10 py-6 md:py-8 overflow-x-hidden">
-        <Breadcrumb items={breadcrumb} onNavigate={onNavigate} />
-        {children}
-      </main>
-    </div>
+    <App.Coquille
+      elements={toElementsMenu(navItems)}
+      actif={active}
+      onNaviguer={onNavigate}
+      compteurs={badges}
+      logo={<LogoMenu />}
+      logoReduit={<LogoMenuReduit />}
+      encart={<EncartFormule onNavigate={onNavigate} />}
+      salutation={estAdmin ? "Bonjour !" : `Bonjour, ${prenom} !`}
+      notifications={notifications}
+      utilisateur={{ nom: user.name, role: user.role }}
+      menuUtilisateur={menuCompte}
+      titre={breadcrumb[breadcrumb.length - 1]?.label}
+      filAriane={breadcrumb}
+      contenuRef={mainRef}
+    >
+      {children}
+    </App.Coquille>
   );
 }
 
@@ -1029,95 +964,82 @@ function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, chil
 function TodoPanel({ items, onNavigate }) {
   if (!items || items.length === 0) return null;
   return (
-    <div className="rounded-lg border bg-surface mb-6 overflow-hidden" style={{ borderColor: COLORS.border }}>
-      <p className="px-5 pt-4 pb-2 font-semibold" style={{ color: COLORS.slate }}>À faire maintenant</p>
-      {items.map((it) => {
-        const Icon = it.icon || AlertCircle;
-        return (
-          <button key={it.label} type="button" onClick={() => onNavigate(it.to, it.data)} className="w-full flex items-center justify-between gap-3 px-5 py-3 text-left transition-colors hover:bg-[#F7F5F2]" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-            <span className="flex items-center gap-3 min-w-0">
-              <span className="w-8 h-8 rounded-md flex items-center justify-center shrink-0" style={{ background: it.urgent ? "#FEE2E2" : COLORS.orangeSoft }}>
-                <Icon size={15} color={it.urgent ? "#B91C1C" : COLORS.orange} />
+    <App.Carte titre="À faire maintenant" sousTitre={`${items.length} ${items.length > 1 ? "actions" : "action"} en attente`} flush className="mb-6">
+      <ul className="px-3 pb-3">
+        {items.map((it) => (
+          <li key={it.label}>
+            <button type="button" onClick={() => onNavigate(it.to, it.data)} className="flex min-h-[52px] w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-left transition-colors hover:bg-doux">
+              <span className="flex min-w-0 items-center gap-3">
+                <App.PastilleIcone icone={it.icon || AlertCircle} ton={it.urgent ? "danger" : "marque"} taille="sm" />
+                <span className="text-sm text-principal">{it.label}</span>
               </span>
-              <span className="text-sm" style={{ color: COLORS.slate }}>{it.label}</span>
-            </span>
-            <ChevronRight size={16} color={COLORS.slateLight} className="shrink-0" />
-          </button>
-        );
-      })}
-    </div>
+              <ChevronRight size={16} className="shrink-0 text-discret" aria-hidden="true" />
+            </button>
+          </li>
+        ))}
+      </ul>
+    </App.Carte>
   );
 }
 
 /* ---------- Screen 5 : Dashboard (Chercheur d'emploi) ---------- */
 
-function StatCard({ icon: Icon, value, label }) {
-  return (
-    <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-      <div className="w-9 h-9 rounded-md flex items-center justify-center mb-4" style={{ background: COLORS.orangeSoft }}>
-        <Icon size={17} color={COLORS.orange} />
-      </div>
-      <p className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>{value}</p>
-      <p className="text-sm" style={{ color: COLORS.slateLight }}>{label}</p>
-    </div>
-  );
+function StatCard({ icon, value, label, detail, tone = "marque", onClick }) {
+  return <App.CarteStat icone={icon} ton={tone} titre={label} detail={detail} valeur={value} onClick={onClick} />;
 }
 
+/* Ton de badge de chaque statut (App.Badge : succes, alerte, danger, info, marque, neutre). */
+const STATUT_TONS = {
+  "Entretien programmé": "marque",
+  "Vue par le recruteur": "alerte",
+  "Réponse négative": "danger",
+  "Candidature reçue": "alerte",
+  "Candidature Retenue": "succes",
+  "En attente": "alerte",
+  "Payé": "succes",
+  "Refusé": "danger",
+  "Refusée": "danger",
+  "Acceptée": "succes",
+  "En cours": "marque",
+  "Terminée": "neutre",
+  "Nouveau": "info",
+  "Retenu": "succes",
+  "Rejeté": "danger",
+  "Disponible": "succes",
+  "Occupé": "marque",
+  "Vérifié": "succes",
+  "Validé": "succes",
+  "Suspendu": "danger",
+  "Suspendue": "danger",
+  "Actif": "succes",
+  "Active": "succes",
+  "En pause": "alerte",
+  "Complète": "neutre",
+  "Brouillon": "neutre",
+  "Expirée": "neutre",
+  "Inactif": "neutre",
+  "Annulée": "danger",
+  "Annulé": "danger",
+  "En révision": "alerte",
+  "En cours d'apprentissage": "marque",
+  "Apprenant": "marque",
+  "Mentoré": "marque",
+  "Remboursé": "neutre",
+  "Fait": "succes",
+  "À compléter": "alerte",
+  "À venir": "neutre",
+  "En période d'essai": "marque",
+  "À risque": "danger",
+  "Confirmé": "succes",
+  "Ouvert": "info",
+  "Traité": "succes",
+  "En vérification": "alerte",
+  "Échoué": "danger",
+  "Échec de paiement": "danger",
+};
+
 function StatusBadge({ status }) {
-  const styles = {
-    "Entretien programmé": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Vue par le recruteur": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Réponse négative": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Candidature reçue": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Candidature Retenue": { bg: "#DCFCE7", color: "#16A34A" },
-    "En attente": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Payé": { bg: "#DCFCE7", color: "#16A34A" },
-    "Refusé": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Refusée": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Acceptée": { bg: "#DCFCE7", color: "#16A34A" },
-    "En cours": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Terminée": { bg: COLORS.softStrong, color: COLORS.slateLight },
-    "Nouveau": { bg: "#DBEAFE", color: "#1D4ED8" },
-    "Retenu": { bg: "#DCFCE7", color: "#16A34A" },
-    "Rejeté": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Disponible": { bg: "#DCFCE7", color: "#16A34A" },
-    "Occupé": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Vérifié": { bg: "#DCFCE7", color: "#16A34A" },
-    "Validé": { bg: "#DCFCE7", color: "#16A34A" },
-    "Suspendu": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Suspendue": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Actif": { bg: "#DCFCE7", color: "#16A34A" },
-    "Active": { bg: "#DCFCE7", color: "#16A34A" },
-    "En pause": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Complète": { bg: COLORS.softStrong, color: COLORS.slateLight },
-    "Brouillon": { bg: COLORS.softStrong, color: COLORS.slateLight },
-    "Expirée": { bg: COLORS.softStrong, color: COLORS.slateLight },
-    "Inactif": { bg: COLORS.softStrong, color: COLORS.slateLight },
-    "Annulée": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Annulé": { bg: "#FEE2E2", color: "#B91C1C" },
-    "En révision": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "En cours d'apprentissage": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Apprenant": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Mentoré": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Remboursé": { bg: COLORS.softStrong, color: COLORS.slateLight },
-    "Fait": { bg: "#DCFCE7", color: "#16A34A" },
-    "À compléter": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "À venir": { bg: COLORS.softStrong, color: COLORS.slateLight },
-    "En période d'essai": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "À risque": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Confirmé": { bg: "#DCFCE7", color: "#16A34A" },
-    "Ouvert": { bg: "#DBEAFE", color: "#1D4ED8" },
-    "Traité": { bg: "#DCFCE7", color: "#16A34A" },
-    "En vérification": { bg: COLORS.orangeSoft, color: COLORS.orange },
-    "Échoué": { bg: "#FEE2E2", color: "#B91C1C" },
-    "Échec de paiement": { bg: "#FEE2E2", color: "#B91C1C" },
-  };
-  const s = styles[status] || { bg: COLORS.softStrong, color: COLORS.slateLight };
-  return (
-    <span className="text-xs font-semibold px-3 py-1.5 rounded-full whitespace-nowrap" style={{ background: s.bg, color: s.color }}>
-      {status}
-    </span>
-  );
+  return <App.Badge ton={STATUT_TONS[status] || "neutre"} taille="moyen">{status}</App.Badge>;
 }
 
 
@@ -1128,84 +1050,82 @@ function DashboardScreen({ user, onNavigate, todos }) {
   const prochainCoaching = (coachings[mentor.id] || defaultCoachings(mentor)).upcoming[0];
   const enAttente = candidatures.filter((c) => c.statut === "Candidature reçue" || c.statut === "Vue par le recruteur").length;
   const entretiens = candidatures.filter((c) => c.statut === "Entretien programmé").length;
+  const COMPLETION = 70;
+
+  /* Où en sont les candidatures : part de chaque statut */
+  const parStatut = Object.entries(candidatures.reduce((acc, c) => ({ ...acc, [c.statut]: (acc[c.statut] || 0) + 1 }), {}))
+    .sort((x, y) => y[1] - x[1])
+    .map(([statut, n]) => ({
+      id: statut,
+      libelle: statut,
+      pourcentage: Math.round((n / candidatures.length) * 100),
+      valeur: `${n} ${n > 1 ? "candidatures" : "candidature"}`,
+      visuel: <App.PastilleIcone icone={ClipboardList} ton={STATUT_TONS[statut] || "neutre"} taille="sm" />,
+    }));
+
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Bonjour, {user.name}</h1>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Voici un aperçu de votre recherche d'emploi et de votre nouveau poste.</p>
-      <TodoPanel items={todos} onNavigate={onNavigate} />
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Voici un aperçu de votre recherche d'emploi et de votre nouveau poste.</p>
 
-      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: COLORS.dark }}>
-        <div className="flex-1">
-          <p className="text-lg font-bold text-sur-sombre mb-1">Profil complété à 70%</p>
-          <p className="text-sm mb-3" style={{ color: COLORS.orange }}>
-            Les profils complets sont contactés bien plus souvent par les recruteurs.
-          </p>
-          <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.darkTrack }}>
-            <div className="h-1.5 rounded-full" style={{ width: "70%", background: COLORS.orange }} />
-          </div>
-        </div>
-        <button
-          type="button"
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard icon={FileText} value={candidatures.length} label="Candidatures envoyées" detail="Depuis votre inscription" onClick={() => onNavigate("candidatures")} />
+        <StatCard icon={CalendarCheck} value={entretiens} label="Entretiens programmés" detail={entretiens ? "Préparez-vous avec votre mentor" : "Aucun pour le moment"} tone="info" />
+        <StatCard icon={Clock} value={enAttente} label="En attente de retour" detail="Les recruteurs répondent sous 15 jours" tone="alerte" />
+        <App.CarteStat
+          icone={UserCircle2}
+          ton="succes"
+          titre="Profil complété"
+          detail="Un profil complet est vu plus souvent"
+          valeur={`${COMPLETION} %`}
+          visuel={<App.Anneau valeur={COMPLETION} taille={56} epaisseur={6} label={`Profil complété à ${COMPLETION} %`}>{" "}</App.Anneau>}
           onClick={() => onNavigate("profil")}
-          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
-          style={{ background: COLORS.orange }}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte
+          titre="Candidatures récentes"
+          className="xl:col-span-2"
+          actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("candidatures")}>Tout voir</App.Bouton>}
         >
-          Compléter mon profil
-        </button>
+          <App.Tableau
+            legende="Candidatures récentes"
+            cleLigne="poste"
+            lignes={candidatures.slice(0, 5)}
+            onLigne={() => onNavigate("candidatures")}
+            colonnes={[
+              { cle: "poste", titre: "Poste", rendu: (c) => <App.CelluleIdentite visuel={<App.Avatar nom={c.entreprise} taille="sm" ton="neutre" />} titre={c.poste} sousTitre={c.entreprise} /> },
+              { cle: "ville", titre: "Ville" },
+              { cle: "date", titre: "Envoyée le", masqueMobile: true },
+              { cle: "statut", titre: "Statut", rendu: (c) => <StatusBadge status={c.statut} /> },
+            ]}
+          />
+        </App.Carte>
+
+        <App.Carte titre="Mon mentor">
+          <div className="flex flex-col items-center text-center">
+            <SafeImg src={mentor.photo} alt={mentor.nom} className="mb-3 h-20 w-20 rounded-full object-cover" />
+            <p className="font-semibold text-principal">{mentor.nom}</p>
+            <p className="text-sm text-discret">{mentor.role}</p>
+          </div>
+          <div className="my-5 flex items-center gap-3 rounded-md bg-doux px-4 py-3.5 text-sm">
+            <App.PastilleIcone icone={CalendarDays} taille="sm" />
+            <span className="min-w-0">
+              <span className="block text-xs text-discret">Prochain coaching</span>
+              <span className="block font-semibold text-principal">{prochainCoaching ? prochainCoaching.date : "Aucun coaching prévu"}</span>
+            </span>
+          </div>
+          <App.Bouton pleineLargeur variante="neutre" onClick={() => onNavigate("mentors", { mentorId: mentor.id })}>
+            Voir mon mentor
+          </App.Bouton>
+        </App.Carte>
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-6">
-        <StatCard icon={FileText} value={candidatures.length} label="Candidatures envoyées" />
-        <StatCard icon={CalendarCheck} value={entretiens} label="Entretiens programmés" />
-        <StatCard icon={Clock} value={enAttente} label="En attente de retour" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold" style={{ color: COLORS.slate }}>Candidatures récentes</h3>
-            <button type="button" onClick={() => onNavigate("candidatures")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
-              Tout voir
-            </button>
-          </div>
-          <div className="flex flex-col divide-y" style={{ borderColor: COLORS.border }}>
-            {candidatures.slice(0, 3).map((c, i) => (
-              <div key={i} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>{c.poste}</p>
-                  <p className="text-xs" style={{ color: COLORS.slateLight }}>{c.entreprise} · {c.ville}</p>
-                </div>
-                <StatusBadge status={c.statut} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Mentors</h3>
-          <div className="flex flex-col items-center text-center mb-4">
-            <div
-              className="w-14 h-14 rounded-full flex items-center justify-center text-sm font-semibold mb-3"
-              style={{ background: COLORS.orangeSoft, color: COLORS.orange }}
-            >
-              CF
-            </div>
-            <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>Cheikh Fall</p>
-            <p className="text-xs" style={{ color: COLORS.slateLight }}>Mentor · Ressources humaines</p>
-          </div>
-          <div className="pt-4 mb-4 text-center" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-            <p className="text-xs mb-1" style={{ color: COLORS.orange }}>Prochain coaching</p>
-            <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{prochainCoaching ? prochainCoaching.date : "Aucun coaching prévu"}</p>
-          </div>
-          <button
-            type="button"
-            onClick={() => onNavigate("mentors", { mentorId: "cheikh-fall" })}
-            className="w-full rounded-md py-2.5 text-sm font-semibold border transition-colors hover:bg-doux"
-            style={{ borderColor: COLORS.border, color: COLORS.slate }}
-          >
-            Voir mon Mentor
-          </button>
-        </div>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte titre="Où en sont mes candidatures" sousTitre="Répartition par statut" className="xl:col-span-2">
+          <App.ListeClassee elements={parStatut} />
+        </App.Carte>
+        <TodoPanel items={todos} onNavigate={onNavigate} />
       </div>
     </div>
   );
@@ -1335,7 +1255,7 @@ function OfferModal({ offre, onClose }) {
         onClick={(e) => e.stopPropagation()}
       >
         <div className="flex items-start justify-between mb-4">
-          <h3 className="text-xl font-bold" style={{ color: COLORS.slate }}>{offre.titre}</h3>
+          <h3 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{offre.titre}</h3>
           <button type="button" onClick={onClose} className="text-discret hover:text-secondaire text-xl leading-none">×</button>
         </div>
 
@@ -1422,7 +1342,6 @@ function OffresScreen({ extraOffres = [] }) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Offres d'emploi</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
         Un statut réel pour chaque candidature, mis à jour à chaque étape – jamais de silence indéfini.
       </p>
@@ -1534,7 +1453,6 @@ function CandidaturesScreen({ onNavigate }) {
   const [candidatures] = useStore("candidatures-chercheur", CANDIDATURES);
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Mes candidatures</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
         Suivez en temps réel l'avancement de vos dossiers de candidature auprès des entreprises sénégalaises.
       </p>
@@ -1633,7 +1551,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
       </button>
 
       <div className="flex items-start justify-between flex-wrap gap-3 mb-1">
-        <h1 className="text-2xl font-bold" style={{ color: COLORS.slate }}>{formation.nom}</h1>
+        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{formation.nom}</h2>
         {!enrolled && (
           <button type="button" onClick={onToggleEnroll} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
             S'inscrire à cette formation
@@ -1725,14 +1643,14 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
         <ArrowLeft size={14} /> Retour à la formation
       </button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Certificat de formation</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Certificat de formation</h2>
       <p className="text-sm mb-6" style={{ color: "#16A34A" }}>Félicitations ! Vous avez complété la formation avec succès.</p>
 
       <div className="rounded-lg border-2 p-8 mb-6 text-center" style={{ borderColor: COLORS.orange }}>
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: COLORS.orangeSoft }}>
           <ShieldCheck size={28} color={COLORS.orange} />
         </div>
-        <h2 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>CERTIFICAT DE RÉUSSITE</h2>
+        <h2 className="text-2xl font-semibold mb-1" style={{ color: COLORS.slate }}>CERTIFICAT DE RÉUSSITE</h2>
         <p className="text-xs mb-5" style={{ color: COLORS.slateLight }}>Délivré par la plateforme nationale LIGGEEY pour l'insertion des professionnels</p>
         <p className="text-sm" style={{ color: COLORS.slateLight }}>Ce document atteste que</p>
         <p className="text-xl font-bold mb-3" style={{ color: COLORS.slate }}>{userName}</p>
@@ -1843,19 +1761,18 @@ function FormationsScreen({ initialTab, dataset, userName }) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Formations</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
         Développez vos compétences avec des formations pensées pour le marché sénégalais.
       </p>
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
         {[{ id: "toutes", label: "Toutes les formations" }, { id: "mes", label: "Mes formations" }].map((t) => (
           <button
             key={t.id}
             type="button"
             onClick={() => { setTab(t.id); setPage(1); }}
-            className="rounded-md px-4 py-2 text-sm font-semibold"
-            style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}
+            className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`}
+            
           >
             {t.label}
           </button>
@@ -1988,7 +1905,6 @@ function MentorsScreen({ initialMentorId, dataset }) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Mentors</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Un accompagnement personnalisé pour préparer votre insertion.</p>
       <input
         type="text"
@@ -2032,24 +1948,14 @@ function ProfilScreen({ onNavigate }) {
   const [showVerifInfo, setShowVerifInfo] = useState(false);
   const [documentsSubmitted, setDocumentsSubmitted] = useState(false);
 
+  const LANGUES = [{ l: "Français", n: "Courant" }, { l: "Wolof", n: "Langue maternelle" }, { l: "Anglais", n: "Intermédiaire" }];
+  const COMPETENCES = ["Gestion de projet", "Excel avancé", "Anglais professionnel", "Communication", "Comptabilité de base"];
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mon profil</h1>
-          <ProfileTierBadge />
-          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-            Vérification en cours
-          </span>
-        </div>
-        <button type="button" onClick={() => setEditing(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          Modifier le profil
-        </button>
-      </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">
         Gérez vos informations personnelles, suivez la progression de votre dossier et mettez en valeur vos compétences.
       </p>
-      <ProfileTierCard />
       {editing && (
         <ProfilInfoModal
           nom="Absatou Diallo"
@@ -2060,125 +1966,114 @@ function ProfilScreen({ onNavigate }) {
         />
       )}
 
-      <div className="rounded-lg border bg-surface p-6 mb-4 flex items-start gap-5" style={{ borderColor: COLORS.border }}>
-        <SafeImg src="https://randomuser.me/api/portraits/women/65.jpg" alt="Absatou Diallo" className="w-20 h-20 rounded-full object-cover shrink-0" />
-        <div className="flex flex-wrap gap-x-16 gap-y-3 flex-1">
-          <p className="text-lg font-bold w-full" style={{ color: COLORS.slate }}>Absatou Diallo</p>
-          <InfoField label="E-mail" value={info.email} />
-        <InfoField label="Ville" value={info.ville} />
-        <InfoField label="Profession" value={info.profession} />
-        <InfoField label="Téléphone" value={info.telephone} />
-        </div>
-      </div>
+      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr),minmax(0,1.6fr)]">
+        {/* Colonne fiche */}
+        <div className="space-y-6">
+          <App.CarteProfil
+            photo="https://randomuser.me/api/portraits/women/65.jpg"
+            nom="Absatou Diallo"
+            sousTitre={info.profession}
+            badges={
+              <>
+                <ProfileTierBadge />
+                <App.Badge ton="alerte" taille="moyen">Vérification en cours</App.Badge>
+                <App.Badge ton="succes" taille="moyen" point>Disponible immédiatement</App.Badge>
+              </>
+            }
+            infos={[
+              { icone: Mail, libelle: "E-mail", valeur: info.email },
+              { icone: Phone, libelle: "Téléphone", valeur: info.telephone },
+              { icone: MapPin, libelle: "Ville", valeur: info.ville },
+              { icone: Briefcase, libelle: "Profession", valeur: info.profession },
+            ]}
+            actions={
+              <>
+                <App.Bouton petit onClick={() => setEditing(true)}>Modifier le profil</App.Bouton>
+                <App.Bouton petit variante="neutre" onClick={() => onNavigate("candidatures")}>Mes candidatures</App.Bouton>
+              </>
+            }
+          />
 
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center justify-between mb-2">
-            <h3 className="font-semibold" style={{ color: COLORS.slate }}>Progression du profil</h3>
-            <span className="text-lg font-bold" style={{ color: COLORS.orange }}>75%</span>
-          </div>
-          <p className="text-xs mb-2" style={{ color: COLORS.slateLight }}>Complétion de dossier</p>
-          <div className="w-full h-1.5 rounded-full mb-4" style={{ background: COLORS.softStrong }}>
-            <div className="h-1.5 rounded-full" style={{ width: "75%", background: COLORS.orange }} />
-          </div>
-          <ChecklistItem label="Informations personnelles" done />
-          <ChecklistItem label="Compétences" done />
-          <ChecklistItem label="Disponibilité" done />
-          <ChecklistItem label="Vérification d'identité" done={false} />
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold" style={{ color: COLORS.slate }}>Disponibilité & CV</h3>
-              <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>Disponible immédiatement</span>
+          <App.Carte titre="Progression du profil" sousTitre="Complétion de votre dossier" actions={<span className="text-lg font-semibold text-marque">75 %</span>}>
+            <App.BarreProgression valeur={75} label="Profil complété à 75 %" />
+            <div className="mt-4">
+              <ChecklistItem label="Informations personnelles" done />
+              <ChecklistItem label="Compétences" done />
+              <ChecklistItem label="Disponibilité" done />
+              <ChecklistItem label="Vérification d'identité" done={false} />
             </div>
-            <div className="flex items-center justify-between rounded-md border px-4 py-3" style={{ borderColor: COLORS.border }}>
-              <div className="flex items-center gap-2">
-                <FileText size={16} color={COLORS.slateLight} />
-                <div>
-                  <p className="text-sm font-medium break-all" style={{ color: COLORS.slate }}>{cv.nom}</p>
-                  <p className="text-xs" style={{ color: COLORS.slateLight }}>Ajouté le {cv.date}</p>
+          </App.Carte>
+
+          <App.Carte titre="Langues" actions={<App.Badge ton="succes">{LANGUES.length} langues</App.Badge>}>
+            <ul className="divide-y divide-dashed divide-base">
+              {LANGUES.map((x) => (
+                <li key={x.l} className="flex items-center justify-between py-2.5 text-sm">
+                  <span className="font-medium text-principal">{x.l}</span>
+                  <span className="text-secondaire">{x.n}</span>
+                </li>
+              ))}
+            </ul>
+          </App.Carte>
+        </div>
+
+        {/* Colonne détail */}
+        <div className="space-y-6">
+          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+            <StatCard icon={FileText} value={5} label="Candidatures envoyées" detail="Voir mes candidatures" onClick={() => onNavigate("candidatures")} />
+            <StatCard icon={GraduationCap} value={5} label="Formations suivies" detail="Voir mes formations" tone="info" onClick={() => onNavigate("formations", { tab: "mes" })} />
+          </div>
+
+          <ProfileTierCard />
+
+          <App.Carte titre="Disponibilité et CV">
+            <div className="flex items-center justify-between gap-3 rounded-md border border-base px-4 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <App.PastilleIcone icone={FileText} taille="sm" />
+                <div className="min-w-0">
+                  <p className="break-all text-sm font-medium text-principal">{cv.nom}</p>
+                  <p className="text-xs text-discret">Ajouté le {cv.date}</p>
                 </div>
               </div>
               <FilePickerButton
                 accept=".pdf,.doc,.docx"
                 onPick={(f) => { setCv({ nom: f.name, date: demoNow().toLocaleDateString("fr-FR") }); notify("CV remplacé."); }}
-                className="text-sm font-semibold shrink-0"
-                style={{ color: COLORS.orange }}
+                className="shrink-0 rounded-md bg-marque-doux px-4 py-2 text-sm font-semibold text-marque-fort hover:bg-primaire-150"
               >
                 Remplacer
               </FilePickerButton>
             </div>
-          </div>
+          </App.Carte>
 
-          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <div className="flex items-center justify-between mb-3">
-              <h3 className="font-semibold" style={{ color: COLORS.slate }}>Langues</h3>
-              <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>3 langues</span>
+          <App.Carte titre="Compétences">
+            <div className="flex flex-wrap gap-2">
+              {COMPETENCES.map((c) => (
+                <App.Badge key={c} ton="marque" taille="moyen">{c}</App.Badge>
+              ))}
             </div>
-            {[{ l: "Français", n: "Courant" }, { l: "Wolof", n: "Langue maternelle" }, { l: "Anglais", n: "Intermédiaire" }].map((x) => (
-              <div key={x.l} className="flex items-center gap-2 text-sm py-0.5">
-                <Check size={14} color="#16A34A" />
-                <span className="font-medium" style={{ color: COLORS.slate }}>{x.l}</span>
-                <span style={{ color: COLORS.slateLight }}>{x.n}</span>
+          </App.Carte>
+
+          <App.Carte titre="Vérification d'identité" sousTitre="Obtenez le badge « profil vérifié »">
+            <p className="mb-4 text-sm text-secondaire">
+              Pour rassurer les employeurs sénégalais partenaires, transmettez une pièce d'identité en cours de validité ainsi que vos diplômes.
+            </p>
+            {documentsSubmitted ? (
+              <p className="inline-flex items-center gap-2 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
+                <CheckCircle2 size={16} aria-hidden="true" /> Documents transmis : vérification en cours sous 48 h.
+              </p>
+            ) : (
+              <div className="flex flex-wrap gap-3">
+                <App.Bouton petit onClick={() => setDocumentsSubmitted(true)}>Transmettre mes documents</App.Bouton>
+                <App.Bouton petit variante="neutre" onClick={() => setShowVerifInfo((v) => !v)} aria-expanded={showVerifInfo}>
+                  {showVerifInfo ? "Masquer" : "En savoir plus"}
+                </App.Bouton>
               </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
-        <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Compétences</h3>
-        <div className="flex flex-wrap gap-2">
-          {["Gestion de projet", "Excel avancé", "Anglais professionnel", "Communication", "Comptabilité de base"].map((c) => (
-            <span key={c} className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>
-          ))}
-        </div>
-      </div>
-
-      <div className="rounded-lg border bg-surface p-6 mb-6" style={{ borderColor: COLORS.border }}>
-        <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Vérification d'identité</h3>
-        <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>
-          Pour obtenir le badge « profil vérifié » et rassurer les employeurs sénégalais partenaires, transmettez une pièce d'identité en cours de validité ainsi que vos diplômes.
-        </p>
-        {documentsSubmitted ? (
-          <div className="rounded-md px-4 py-3 text-sm inline-block" style={{ background: "#ECFDF5", color: "#047857" }}>
-            Documents transmis — vérification en cours sous 48h.
-          </div>
-        ) : (
-          <div className="flex gap-3">
-            <button type="button" onClick={() => setDocumentsSubmitted(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-              Transmettre mes documents
-            </button>
-            <button type="button" onClick={() => setShowVerifInfo((v) => !v)} aria-expanded={showVerifInfo} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-              {showVerifInfo ? "Masquer" : "En savoir plus"}
-            </button>
-          </div>
-        )}
-        {showVerifInfo && !documentsSubmitted && (
-          <p className="text-sm mt-4 max-w-2xl leading-relaxed" style={{ color: COLORS.slateLight }}>
-            L'équipe LIGGEEY contrôle votre pièce d'identité et vos diplômes sous 48&nbsp;h ouvrées. Un profil vérifié affiche un badge auprès des recruteurs et remonte en priorité dans leurs recherches. Vos documents ne sont jamais partagés sans votre accord.
-          </p>
-        )}
-      </div>
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Mes candidatures</h3>
-          <p className="text-3xl font-bold mb-1" style={{ color: COLORS.orange }}>5</p>
-          <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Candidatures envoyées</p>
-          <button type="button" onClick={() => onNavigate("candidatures")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
-            Voir mes candidatures
-          </button>
-        </div>
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Mes formations</h3>
-          <p className="text-3xl font-bold mb-1" style={{ color: COLORS.orange }}>5</p>
-          <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Formations suivies</p>
-          <button type="button" onClick={() => onNavigate("formations", { tab: "mes" })} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
-            Voir mes formations
-          </button>
+            )}
+            {showVerifInfo && !documentsSubmitted && (
+              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondaire">
+                L'équipe LIGGEEY contrôle votre pièce d'identité et vos diplômes sous 48&nbsp;h ouvrées. Un profil vérifié affiche un badge auprès des recruteurs et remonte en priorité dans leurs recherches. Vos documents ne sont jamais partagés sans votre accord.
+              </p>
+            )}
+          </App.Carte>
         </div>
       </div>
     </div>
@@ -2213,64 +2108,66 @@ function DemandeCard({ d }) {
 }
 
 function PrestataireDashboardScreen({ user, onNavigate, todos }) {
+  const COMPLETION = 70;
+  const services = SERVICES_INITIAL.filter((sv) => sv.disponible);
+  const maxMissions = Math.max(...services.map((sv) => sv.missions), 1);
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Bonjour, {user.name}</h1>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Voici un aperçu de votre activité de prestataire.</p>
-      <TodoPanel items={todos} onNavigate={onNavigate} />
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Voici un aperçu de votre activité de prestataire.</p>
 
-      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: COLORS.dark }}>
-        <div className="flex-1">
-          <p className="text-lg font-bold text-sur-sombre mb-1">Profil complété à 70%</p>
-          <p className="text-sm mb-3" style={{ color: COLORS.orange }}>
-            Un profil complet et vérifié rassure vos futurs clients.
-          </p>
-          <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.darkTrack }}>
-            <div className="h-1.5 rounded-full" style={{ width: "70%", background: COLORS.orange }} />
-          </div>
-        </div>
-        <button
-          type="button"
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard icon={ClipboardList} value={3} label="Missions en cours" detail="À suivre cette semaine" onClick={() => onNavigate("missions")} />
+        <StatCard icon={Wallet} value="450 000 FCFA" label="Revenus générés" detail="Missions payées" tone="succes" />
+        <StatCard icon={Star} value="4,8/5" label="Note moyenne" detail="Avis de vos clients" tone="alerte" />
+        <App.CarteStat
+          icone={UserCircle2}
+          ton="info"
+          titre="Profil complété"
+          detail="Un profil vérifié rassure vos clients"
+          valeur={`${COMPLETION} %`}
+          visuel={<App.Anneau valeur={COMPLETION} taille={56} epaisseur={6} label={`Profil complété à ${COMPLETION} %`}>{" "}</App.Anneau>}
           onClick={() => onNavigate("profil")}
-          className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
-          style={{ background: COLORS.orange }}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte
+          titre="Dernières demandes"
+          className="xl:col-span-2"
+          actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("missions")}>Tout voir</App.Bouton>}
         >
-          Compléter mon profil
-        </button>
+          <App.Tableau
+            legende="Dernières demandes de mission"
+            cleLigne="titre"
+            lignes={DEMANDES_RECENTES}
+            onLigne={() => onNavigate("missions")}
+            colonnes={[
+              { cle: "titre", titre: "Demande", rendu: (d) => <App.CelluleIdentite visuel={<App.Avatar nom={d.client} taille="sm" />} titre={d.titre} sousTitre={`${d.client} · ${d.ville}`} /> },
+              { cle: "prix", titre: "Budget", rendu: (d) => <span className="font-medium text-principal">{d.prix}</span> },
+              { cle: "date", titre: "Reçue", masqueMobile: true },
+              { cle: "priorite", titre: "Priorité", rendu: (d) => <App.Badge ton={d.priorite === "Urgent" ? "danger" : "neutre"} taille="moyen">{d.priorite}</App.Badge> },
+            ]}
+          />
+        </App.Carte>
+
+        <App.Carte
+          titre="Mes services actifs"
+          sousTitre="Missions réalisées par service"
+          actions={<App.BoutonIcone icone={Plus} label="Ajouter un service" variante="doux" taille="sm" onClick={() => onNavigate("services")} />}
+        >
+          <App.ListeClassee
+            elements={services.slice(0, 5).map((sv) => ({
+              id: sv.id,
+              libelle: sv.nom,
+              pourcentage: Math.round((sv.missions / maxMissions) * 100),
+              valeur: `${sv.missions} missions`,
+              visuel: <App.PastilleIcone icone={Wrench} taille="sm" />,
+            }))}
+          />
+        </App.Carte>
       </div>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard icon={Wrench} value={6} label="Services actifs" />
-        <StatCard icon={FileText} value="450 000" label="Revenus générés (FCFA)" />
-        <StatCard icon={Check} value="4.8/5" label="Note moyenne" />
-        <StatCard icon={ClipboardList} value={3} label="Missions en cours" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold" style={{ color: COLORS.slate }}>Dernières demandes</h3>
-            <button type="button" onClick={() => onNavigate("missions")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
-              Tout voir
-            </button>
-          </div>
-          {DEMANDES_RECENTES.map((d, i) => (
-            <DemandeCard key={i} d={d} />
-          ))}
-        </div>
-
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold" style={{ color: COLORS.slate }}>Mes services actifs</h3>
-            <button type="button" onClick={() => onNavigate("services")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
-              Ajouter
-            </button>
-          </div>
-          {SERVICES_INITIAL.filter((s) => s.disponible).slice(0, 3).map((s) => (
-            <p key={s.id} className="text-sm py-1.5" style={{ color: COLORS.slate }}>{s.nom}</p>
-          ))}
-        </div>
-      </div>
+      <TodoPanel items={todos} onNavigate={onNavigate} />
     </div>
   );
 }
@@ -2382,7 +2279,7 @@ function ArchiveConfirm({ onCancel, onConfirm }) {
   return (
     <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(15,11,8,0.55)" }} onClick={onCancel}>
       <div className="w-full max-w-sm rounded-lg bg-surface p-6" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold mb-2" style={{ color: COLORS.slate }}>Archiver ce service ?</h3>
+        <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.slate }}>Archiver ce service ?</h3>
         <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>
           Ce service ne sera plus visible par vos clients. Vous pourrez le réactiver plus tard.
         </p>
@@ -2407,7 +2304,7 @@ function ServiceDetail({ service, onEdit, onDelete, onBack }) {
       </button>
 
       <div className="flex items-center justify-between mb-1 flex-wrap gap-3">
-        <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>{service.nom}</h1>
+        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{service.nom}</h2>
         <div className="flex gap-3">
           <button type="button" onClick={onEdit} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
             Modifier le service
@@ -2417,7 +2314,7 @@ function ServiceDetail({ service, onEdit, onDelete, onBack }) {
           </button>
         </div>
       </div>
-      <div className="flex flex-wrap gap-2 mb-6">
+      <div className="flex gap-1 overflow-x-auto border-b border-base mb-6">
         <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: service.disponible ? "#DCFCE7" : "#FEE2E2", color: service.disponible ? "#16A34A" : COLORS.danger }}>
           {service.disponible ? "Actif" : "Inactif"}
         </span>
@@ -2530,7 +2427,7 @@ function ServicesScreen() {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mes services</h1>
+        <span aria-hidden="true" />
         <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Ajouter un service
         </button>
@@ -2630,7 +2527,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
 
       <div className="flex items-start justify-between flex-wrap gap-3 mb-1">
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-bold" style={{ color: COLORS.slate }}>{mission.titre}</h1>
+          <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{mission.titre}</h2>
           <StatusBadge status={mission.statut} />
         </div>
         {mission.statut === "En attente" && !counterMode && (
@@ -2766,7 +2663,6 @@ function MissionsScreen() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Missions</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les demandes de prestations reçues de vos clients.</p>
 
       <div className="flex gap-2 mb-5 flex-wrap">
@@ -2775,8 +2671,8 @@ function MissionsScreen() {
             key={t.id}
             type="button"
             onClick={() => { setTab(t.id); setPage(1); }}
-            className="rounded-md px-4 py-2 text-sm font-semibold"
-            style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}
+            className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`}
+            
           >
             {t.label} ({counts[t.id]})
           </button>
@@ -2844,7 +2740,6 @@ function RealisationsScreen({ onBack }) {
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
         <ArrowLeft size={14} /> Retour au profil
       </button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Mes réalisations</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>{PORTFOLIO_REALISATIONS.length} réalisations mises en avant sur votre profil.</p>
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {PORTFOLIO_REALISATIONS.map((r) => (
@@ -2869,7 +2764,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mon profil</h1>
+          <span aria-hidden="true" />
           <ProfileTierBadge />
           <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>Vérifié</span>
         </div>
@@ -2926,7 +2821,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
         <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Compétences & Métiers</h3>
-          <div className="flex flex-wrap gap-2">
+          <div className="inline-flex flex-wrap gap-1 rounded-md bg-doux p-1">
             {["Électricité bâtiment", "Câblage réseau", "Installation solaire", "Dépannage", "Mise aux normes", "Tableau électrique"].map((c) => (
               <span key={c} className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>
             ))}
@@ -2957,7 +2852,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Langues & Zone d'intervention</h3>
           <div className="flex items-center gap-2 text-sm mb-1"><Check size={14} color="#16A34A" /><span style={{ color: COLORS.slate }}>Wolof</span><span style={{ color: COLORS.slateLight }}>natif</span></div>
           <div className="flex items-center gap-2 text-sm mb-3"><Check size={14} color="#16A34A" /><span style={{ color: COLORS.slate }}>Français</span><span style={{ color: COLORS.slateLight }}>courant</span></div>
-          <div className="flex flex-wrap gap-2">
+          <div className="inline-flex flex-wrap gap-1 rounded-md bg-doux p-1">
             {["Dakar", "Pikine", "Guédiawaye", "Rufisque", "Thiès"].map((v) => (
               <span key={v} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{v}</span>
             ))}
@@ -3023,7 +2918,6 @@ function EvaluationsScreen({ onNavigate }) {
       <button type="button" onClick={() => onNavigate("profil")} className="flex items-center gap-1.5 text-sm font-medium rounded-md border px-3 py-1.5 mb-5" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
         <ArrowLeft size={14} /> Retour
       </button>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Mes évaluations et avis</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez les retours de vos clients après chaque prestation.</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-6">
@@ -3066,8 +2960,8 @@ function EvaluationsScreen({ onNavigate }) {
             key={f.id}
             type="button"
             onClick={() => { setFilter(f.id); setPage(1); }}
-            className="rounded-md px-3 py-1.5 text-xs font-semibold"
-            style={{ background: filter === f.id ? COLORS.orange : COLORS.surface, color: filter === f.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${filter === f.id ? COLORS.orange : COLORS.border}` }}
+            className={`min-h-[32px] rounded px-3 text-xs font-semibold transition-colors ${filter === f.id ? "bg-surface text-principal shadow-[0_1px_2px_rgb(var(--neutre-800)/0.08)]" : "text-secondaire hover:text-principal"}`}
+            aria-pressed={filter === f.id}
           >
             {f.label}
           </button>
@@ -3125,64 +3019,65 @@ const OFFRES_ENTREPRISE_INITIAL = [
 
 function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
   const [candidaturesRecues] = useStore("candidatures-entreprise", CANDIDATURES_ENTREPRISE_INITIAL);
-  const dernieresCandidatures = candidaturesRecues.slice(0, 4).map((c) => ({ nom: c.nom, poste: c.offre, statut: c.statut }));
-  const actives = offres.filter((o) => o.statut !== "Clôturée").slice(0, 3);
-
+  const actives = offres.filter((o) => o.statut !== "Clôturée");
+  const COMPLETION = 85;
+  const maxCand = Math.max(...actives.map((o) => o.nbCandidatures || 0), 1);
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Bonjour, {user.name}</h1>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Voici un aperçu de vos recrutements chez Senegal Construction SARL.</p>
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Voici un aperçu de vos recrutements chez Senegal Construction SARL.</p>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard icon={Briefcase} value={offres.filter((o) => o.statut === "Active").length} label="Offres actives" detail="Visibles par les talents" onClick={() => onNavigate("offres")} />
+        <StatCard icon={FileText} value={47} label="Candidatures reçues" detail="Toutes offres confondues" tone="info" onClick={() => onNavigate("candidatures")} />
+        <StatCard icon={Users2} value={8} label="Prestataires engagés" detail="Missions confiées" tone="succes" />
+        <App.CarteStat
+          icone={Building2}
+          ton="alerte"
+          titre="Profil entreprise"
+          detail="Un profil complet attire plus de talents"
+          valeur={`${COMPLETION} %`}
+          visuel={<App.Anneau valeur={COMPLETION} taille={56} epaisseur={6} label={`Profil complété à ${COMPLETION} %`}>{" "}</App.Anneau>}
+          onClick={() => onNavigate("profil")}
+        />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte
+          titre="Dernières candidatures"
+          className="xl:col-span-2"
+          actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("candidatures")}>Tout voir</App.Bouton>}
+        >
+          <App.Tableau
+            legende="Dernières candidatures reçues"
+            lignes={candidaturesRecues.slice(0, 5)}
+            onLigne={() => onNavigate("candidatures")}
+            colonnes={[
+              { cle: "nom", titre: "Candidat", rendu: (c) => <IdentityCell nom={c.nom} sub={c.metier} photo={c.photo} /> },
+              { cle: "offre", titre: "Offre", rendu: (c) => <span className="text-principal">{c.offre}</span> },
+              { cle: "date", titre: "Reçue le", masqueMobile: true },
+              { cle: "statut", titre: "Statut", rendu: (c) => <StatusBadge status={c.statut} /> },
+            ]}
+          />
+        </App.Carte>
+
+        <App.Carte
+          titre="Mes offres actives"
+          sousTitre="Candidatures reçues par offre"
+          actions={<App.Bouton petit variante="neutre" onClick={() => onNavigate("offres")}>Gérer</App.Bouton>}
+        >
+          <App.ListeClassee
+            elements={actives.slice(0, 5).map((o) => ({
+              id: o.id,
+              libelle: o.titre,
+              pourcentage: Math.round(((o.nbCandidatures || 0) / maxCand) * 100),
+              valeur: `${o.nbCandidatures || 0}`,
+              visuel: <App.PastilleIcone icone={Briefcase} taille="sm" />,
+            }))}
+          />
+        </App.Carte>
+      </div>
+
       <TodoPanel items={todos} onNavigate={onNavigate} />
-
-      <div className="rounded-lg p-6 mb-6 flex items-center justify-between gap-6" style={{ background: COLORS.dark }}>
-        <div className="flex-1">
-          <p className="text-lg font-bold text-sur-sombre mb-1">Profil complété à 85%</p>
-          <p className="text-sm mb-3" style={{ color: COLORS.orange }}>Un profil complet augmente votre attractivité auprès des meilleurs talents.</p>
-          <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.darkTrack }}>
-            <div className="h-1.5 rounded-full" style={{ width: "85%", background: COLORS.orange }} />
-          </div>
-        </div>
-        <button type="button" onClick={() => onNavigate("profil")} className="shrink-0 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-          Compléter mon profil
-        </button>
-      </div>
-
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        <StatCard icon={Briefcase} value={offres.filter((o) => o.statut === "Active").length} label="Offres actives" />
-        <StatCard icon={FileText} value={47} label="Candidatures reçues" />
-        <StatCard icon={Star} value="4.6/5" label="Note moyenne" />
-        <StatCard icon={Users2} value={8} label="Prestataires engagés" />
-      </div>
-
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold" style={{ color: COLORS.slate }}>Dernières candidatures</h3>
-            <button type="button" onClick={() => onNavigate("candidatures")} className="text-sm font-medium" style={{ color: COLORS.orange }}>Tout voir</button>
-          </div>
-          <div className="flex flex-col divide-y" style={{ borderColor: COLORS.border }}>
-            {dernieresCandidatures.map((c, i) => (
-              <div key={i} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>{c.nom}</p>
-                  <p className="text-xs" style={{ color: COLORS.slateLight }}>{c.poste}</p>
-                </div>
-                <StatusBadge status={c.statut} />
-              </div>
-            ))}
-          </div>
-        </div>
-
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center justify-between mb-4">
-            <h3 className="font-semibold" style={{ color: COLORS.slate }}>Mes offres actives</h3>
-            <button type="button" onClick={() => onNavigate("offres")} className="text-sm font-medium" style={{ color: COLORS.orange }}>Gérer</button>
-          </div>
-          {actives.map((o) => (
-            <p key={o.id} className="text-sm py-1.5" style={{ color: COLORS.slate }}>{o.titre}</p>
-          ))}
-        </div>
-      </div>
     </div>
   );
 }
@@ -3292,7 +3187,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
         <ArrowLeft size={14} /> Retour aux offres
       </button>
-      <h1 className="text-2xl font-bold mb-6" style={{ color: COLORS.slate }}>{offre.titre}</h1>
+      <h2 className="text-xl font-semibold mb-6" style={{ color: COLORS.slate }}>{offre.titre}</h2>
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-4">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -3420,7 +3315,7 @@ function MesOffresScreen({ offres, setOffres }) {
   return (
     <div>
       <div className="flex items-center justify-between mb-1">
-        <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Mes offres d'emploi</h1>
+        <span aria-hidden="true" />
         <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Nouvelle offre
         </button>
@@ -3444,8 +3339,8 @@ function MesOffresScreen({ offres, setOffres }) {
             key={s}
             type="button"
             onClick={() => { setStatutFilter(s); setPage(1); }}
-            className="rounded-md px-3 py-1.5 text-xs font-semibold"
-            style={{ background: statutFilter === s ? COLORS.orange : COLORS.surface, color: statutFilter === s ? COLORS.onOrange : COLORS.slate, border: `1px solid ${statutFilter === s ? COLORS.orange : COLORS.border}` }}
+            className={`min-h-[32px] rounded px-3 text-xs font-semibold transition-colors ${statutFilter === s ? "bg-surface text-principal shadow-[0_1px_2px_rgb(var(--neutre-800)/0.08)]" : "text-secondaire hover:text-principal"}`}
+            aria-pressed={statutFilter === s}
           >
             {s}
           </button>
@@ -3625,7 +3520,6 @@ function CandidaturesEntrepriseScreen() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Candidatures reçues</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Visualisez et gérez toutes les candidatures reçues pour vos offres d'emploi.</p>
 
       <div className="flex flex-wrap gap-3 mb-6">
@@ -3838,7 +3732,6 @@ function PrestatairesSearchScreen() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Trouver un prestataire</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Trouvez des artisans et techniciens qualifiés pour vos besoins.</p>
 
       <div className="flex flex-wrap gap-3 mb-6">
@@ -3930,7 +3823,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
 
   return (
     <div>
-      <h1 className="text-2xl font-bold mb-6" style={{ color: COLORS.slate }}>Modifier le profil</h1>
+      <h2 className="text-xl font-semibold mb-6" style={{ color: COLORS.slate }}>Modifier le profil</h2>
       <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center gap-4 mb-6">
           {v.logo ? (
@@ -4028,7 +3921,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
     <div>
       <div className="flex items-center justify-between mb-1">
         <div className="flex items-center gap-3">
-          <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Profil entreprise</h1>
+          <span aria-hidden="true" />
           <ProfileTierBadge />
         </div>
         <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
@@ -4202,80 +4095,59 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
   });
   const paged = filtered.slice((page - 1) * ADMIN_PAGE_SIZE, page * ADMIN_PAGE_SIZE);
 
+  const colonnes = [
+    ...columns.map((c) => ({ cle: c.key, titre: c.label, rendu: c.render ? c.render : (row) => <span className="text-principal">{row[c.key]}</span> })),
+    {
+      cle: "__actions",
+      titre: "Actions",
+      alignement: "droite",
+      rendu: (row) => (
+        <App.BoutonIcone icone={Eye} label={`Voir le détail`} variante="fantome" taille="sm" onClick={(e) => { e.stopPropagation(); setSelectedId(row.id); }} />
+      ),
+    },
+  ];
+
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>{title}</h1>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>{subtitle}</p>
+      <p className="mb-6 text-sm text-secondaire">{subtitle}</p>
 
-      <div className="flex flex-wrap gap-3 mb-5">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-          placeholder={`Rechercher...`}
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
-          style={{ borderColor: COLORS.border }}
-        />
-        {filters.map((f) => (
-          <select
-            key={f.key}
-            value={filterValues[f.key]}
-            onChange={(e) => { setFilterValues((v) => ({ ...v, [f.key]: e.target.value })); setPage(1); }}
-            className="rounded-md border px-3 py-2.5 text-sm outline-none"
-            style={{ borderColor: COLORS.border, color: COLORS.slate }}
-          >
-            <option value="all">{f.label}</option>
-            {f.options.map((o) => <option key={o} value={o}>{o}</option>)}
-          </select>
-        ))}
-      </div>
-
-      <div className="rounded-lg border bg-surface overflow-hidden" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center px-5 py-3" style={{ background: COLORS.soft, borderBottom: `1px solid ${COLORS.border}` }}>
-          {columns.map((c) => (
-            <p key={c.key} className="text-xs font-semibold" style={{ flex: c.flex || 1, color: COLORS.slateLight }}>{c.label}</p>
+      <App.Carte titre={title} sousTitre={`${filtered.length} ${filtered.length > 1 ? "éléments" : "élément"}`} flush>
+        <div className="flex flex-wrap items-center gap-3 px-6 pb-4 pt-2">
+          <App.ChampRecherche
+            variante="carre"
+            valeur={query}
+            onChange={(v) => { setQuery(v); setPage(1); }}
+            placeholder="Rechercher…"
+            label={`Rechercher dans ${title.toLowerCase()}`}
+            className="w-full max-w-xs"
+          />
+          {filters.map((f) => (
+            <App.SelecteurPeriode
+              key={f.key}
+              icone={null}
+              label={f.label}
+              valeur={filterValues[f.key]}
+              onChange={(v) => { setFilterValues((fv) => ({ ...fv, [f.key]: v })); setPage(1); }}
+              options={[{ id: "all", label: f.label }, ...f.options.map((o) => ({ id: o, label: o }))]}
+            />
           ))}
-          <p className="text-xs font-semibold w-16 text-right" style={{ color: COLORS.slateLight }}>Actions</p>
         </div>
-        {paged.map((row) => (
-          <button
-            key={row.id}
-            type="button"
-            onClick={() => setSelectedId(row.id)}
-            className="w-full flex items-center px-5 py-3.5 text-left hover:bg-doux"
-            style={{ borderBottom: `1px solid ${COLORS.border}` }}
-          >
-            {columns.map((c) => (
-              <div key={c.key} style={{ flex: c.flex || 1 }} className="pr-3">
-                {c.render ? c.render(row) : <span className="text-sm" style={{ color: COLORS.slate }}>{row[c.key]}</span>}
-              </div>
-            ))}
-            <span className="w-16 text-right text-xs font-semibold shrink-0" style={{ color: COLORS.orange }}>Voir</span>
-          </button>
-        ))}
-        {paged.length === 0 && <p className="text-sm p-5" style={{ color: COLORS.slateLight }}>Aucun résultat.</p>}
-      </div>
-
-      <Pagination page={page} pageSize={ADMIN_PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+        <App.Tableau colonnes={colonnes} lignes={paged} onLigne={(row) => setSelectedId(row.id)} vide="Aucun résultat pour cette recherche." legende={title} className="px-6" />
+        <div className="px-6 py-4">
+          <App.PaginationApp page={page} total={filtered.length} parPage={ADMIN_PAGE_SIZE} onChange={setPage} />
+        </div>
+      </App.Carte>
     </div>
   );
 }
 
 function IdentityCell({ nom, sub, photo }) {
   return (
-    <div className="flex items-center gap-2.5 min-w-0">
-      {photo ? (
-        <SafeImg src={photo} alt={nom} className="w-8 h-8 rounded-full object-cover shrink-0" />
-      ) : (
-        <div className="w-8 h-8 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-          {initials(nom)}
-        </div>
-      )}
-      <div className="min-w-0">
-        <p className="text-sm font-semibold truncate" style={{ color: COLORS.slate }}>{nom}</p>
-        {sub && <p className="text-xs truncate" style={{ color: COLORS.slateLight }}>{sub}</p>}
-      </div>
-    </div>
+    <App.CelluleIdentite
+      visuel={photo ? <SafeImg src={photo} alt={nom} className="h-9 w-9 shrink-0 rounded-full object-cover" /> : <App.Avatar nom={nom} taille="sm" />}
+      titre={nom}
+      sousTitre={sub}
+    />
   );
 }
 
@@ -4287,9 +4159,9 @@ const INSCRIPTIONS_MENSUELLES = [
   { mois: "Jul", valeur: 560 }, { mois: "Aoû", valeur: 610 },
 ];
 const REPARTITION_PROFILS = [
-  { name: "Chercheurs", value: 58, color: "#3B82F6" },
-  { name: "Prestataires", value: 27, color: "#16A34A" },
-  { name: "Entreprises", value: 15, color: COLORS.orange },
+  { name: "Chercheurs", value: 58, color: "rgb(var(--primaire-500))" },
+  { name: "Prestataires", value: 27, color: "rgb(var(--neutre-800))" },
+  { name: "Entreprises", value: 15, color: "rgb(var(--primaire-250))" },
 ];
 const DERNIERES_INSCRIPTIONS = [
   { nom: "Amadou Diallo", type: "Chercheur d'emploi", ville: "Dakar", date: "12/07/2026", statut: "Nouveau" },
@@ -4299,97 +4171,119 @@ const DERNIERES_INSCRIPTIONS = [
   { nom: "Amadou Sow", type: "Prestataire", ville: "Thiès", date: "08/07/2026", statut: "Nouveau" },
 ];
 
-function AdminDashboardScreen({ onNavigate, todos }) {
+/* Infobulle des graphiques, aux couleurs de la bibliothèque */
+function InfoBulleGraphique({ active, payload, label, unite = "" }) {
+  if (!active || !payload?.length) return null;
   return (
-    <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Tableau de bord</h1>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Vue d'ensemble de la plateforme LIGGEEY et de ses utilisateurs.</p>
-      <TodoPanel items={todos} onNavigate={onNavigate} />
+    <div className="rounded-md border border-base bg-surface px-3 py-2 text-sm shadow-carte">
+      <p className="text-discret">{label}</p>
+      <p className="font-semibold text-principal">{payload[0].value.toLocaleString("fr-FR")}{unite}</p>
+    </div>
+  );
+}
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
-        {[
-          { label: "Utilisateurs totaux", value: "25 694", delta: "+12%" },
-          { label: "Offres actives", value: "847", delta: "+8%" },
-          { label: "Candidatures", value: "3 421", delta: "+15%" },
-          { label: "Missions en cours", value: "156", delta: "+5%" },
-        ].map((s) => (
-          <div key={s.label} className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <p className="text-xs mb-2" style={{ color: COLORS.slateLight }}>{s.label}</p>
-            <p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{s.value} <span className="text-xs font-semibold" style={{ color: "#16A34A" }}>{s.delta}</span></p>
-          </div>
+const AXE = { fontSize: 12, fill: COLORS.slateLight };
+
+function AdminDashboardScreen({ onNavigate, todos }) {
+  const kpis = [
+    { label: "Utilisateurs", value: "25 694", delta: "+12 % sur le mois", icon: Users2, to: "chercheurs" },
+    { label: "Offres actives", value: "847", delta: "+8 % sur le mois", icon: Briefcase, to: "offres" },
+    { label: "Candidatures", value: "3 421", delta: "+15 % sur le mois", icon: ClipboardList, to: "candidatures" },
+    { label: "Missions en cours", value: "156", delta: "+5 % sur le mois", icon: ClipboardCheck, to: "missions" },
+  ];
+  const alertes = [
+    { label: "Profils en attente de vérification", value: 23, target: "verifications", icon: ShieldCheck, ton: "alerte" },
+    { label: "Signalements en cours", value: 7, target: "candidatures", icon: Flag, ton: "danger" },
+    { label: "Utilisateurs suspendus", value: 4, target: "chercheurs", icon: Users2, ton: "neutre" },
+  ];
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Vue d'ensemble de la plateforme LIGGEEY et de ses utilisateurs.</p>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        {kpis.map((k) => (
+          <App.CarteStat key={k.label} icone={k.icon} titre={k.label} detail={k.delta} tendance="hausse" valeur={k.value} onClick={() => onNavigate(k.to)} />
         ))}
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-6">
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Inscriptions mensuelles</h3>
-          <div style={{ width: "100%", height: 220 }}>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte titre="Inscriptions mensuelles" sousTitre="Nouveaux comptes créés, tous profils" className="xl:col-span-2">
+          <div style={{ width: "100%", height: 280 }}>
             <ResponsiveContainer>
-              <BarChart data={INSCRIPTIONS_MENSUELLES}>
-                <XAxis dataKey="mois" tick={{ fontSize: 12, fill: COLORS.slateLight }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 12, fill: COLORS.slateLight }} axisLine={false} tickLine={false} />
-                <Tooltip />
-                <Bar dataKey="valeur" fill={COLORS.orange} radius={[4, 4, 0, 0]} />
-              </BarChart>
+              <AreaChart data={INSCRIPTIONS_MENSUELLES} margin={{ top: 10, right: 8, left: -12, bottom: 0 }}>
+                <defs>
+                  <linearGradient id="degradeInscriptions" x1="0" y1="0" x2="0" y2="1">
+                    <stop offset="0%" stopColor="rgb(var(--primaire-500))" stopOpacity={0.35} />
+                    <stop offset="100%" stopColor="rgb(var(--primaire-500))" stopOpacity={0.02} />
+                  </linearGradient>
+                </defs>
+                <CartesianGrid vertical={false} strokeDasharray="4 4" stroke="rgb(var(--bordure-base))" />
+                <XAxis dataKey="mois" tick={AXE} axisLine={false} tickLine={false} />
+                <YAxis tick={AXE} axisLine={false} tickLine={false} />
+                <Tooltip content={<InfoBulleGraphique unite=" inscriptions" />} cursor={{ stroke: "rgb(var(--bordure-forte))" }} />
+                <Area type="monotone" dataKey="valeur" stroke="rgb(var(--primaire-500))" strokeWidth={2.5} fill="url(#degradeInscriptions)" />
+              </AreaChart>
             </ResponsiveContainer>
           </div>
-        </div>
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Répartition des profils</h3>
-          <div className="flex items-center gap-6">
-            <div style={{ width: 160, height: 160 }}>
-              <ResponsiveContainer>
-                <PieChart>
-                  <Pie data={REPARTITION_PROFILS} dataKey="value" innerRadius={45} outerRadius={70} paddingAngle={2}>
-                    {REPARTITION_PROFILS.map((p) => <Cell key={p.name} fill={p.color} />)}
-                  </Pie>
-                </PieChart>
-              </ResponsiveContainer>
-            </div>
-            <div className="flex flex-col gap-2">
-              {REPARTITION_PROFILS.map((p) => (
-                <div key={p.name} className="flex items-center gap-2 text-sm">
-                  <span className="w-2.5 h-2.5 rounded-sm" style={{ background: p.color }} />
-                  <span style={{ color: COLORS.slate }}>{p.name}</span>
-                  <span className="font-semibold" style={{ color: COLORS.slate }}>{p.value}%</span>
-                </div>
-              ))}
-            </div>
+        </App.Carte>
+
+        <App.Carte titre="Répartition des profils" sousTitre="Part de chaque type de compte">
+          <div className="mx-auto" style={{ width: 200, height: 200 }}>
+            <ResponsiveContainer>
+              <PieChart>
+                <Pie data={REPARTITION_PROFILS} dataKey="value" innerRadius={68} outerRadius={92} paddingAngle={3} stroke="none">
+                  {REPARTITION_PROFILS.map((p) => <Cell key={p.name} fill={p.color} />)}
+                </Pie>
+              </PieChart>
+            </ResponsiveContainer>
           </div>
-        </div>
+          <ul className="mt-4 flex flex-wrap justify-center gap-x-4 gap-y-2 text-sm">
+            {REPARTITION_PROFILS.map((p) => (
+              <li key={p.name} className="flex items-center gap-2">
+                <span className="h-2.5 w-2.5 rounded-full" style={{ background: p.color }} aria-hidden="true" />
+                <span className="text-secondaire">{p.name}</span>
+                <span className="font-semibold text-principal">{p.value} %</span>
+              </li>
+            ))}
+          </ul>
+        </App.Carte>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center justify-between mb-3">
-            <h3 className="font-semibold" style={{ color: COLORS.slate }}>Dernières inscriptions</h3>
-            <span className="text-sm font-medium" style={{ color: COLORS.orange }}>Voir tout</span>
-          </div>
-          {DERNIERES_INSCRIPTIONS.map((d, i) => (
-            <div key={i} className="flex items-center justify-between py-2.5" style={{ borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none" }}>
-              <IdentityCell nom={d.nom} sub={`${d.type} · ${d.ville}`} />
-              <div className="flex items-center gap-3 shrink-0">
-                <span className="text-xs" style={{ color: COLORS.slateLight }}>{d.date}</span>
-                <StatusBadge status={d.statut} />
-              </div>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Alertes & Actions requises</h3>
-          {[
-            { label: "Profils en attente de vérification", value: 23, target: "verifications" },
-            { label: "Signalements en cours", value: 7, target: "candidatures" },
-            { label: "Utilisateurs suspendus", value: 4, target: "chercheurs" },
-          ].map((a) => (
-            <div key={a.label} className="flex items-center justify-between py-3" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-              <div>
-                <p className="text-xs" style={{ color: COLORS.slateLight }}>{a.label}</p>
-                <p className="text-xl font-bold" style={{ color: COLORS.slate }}>{a.value}</p>
-              </div>
-              <button type="button" onClick={() => onNavigate(a.target)} className="text-sm font-semibold" style={{ color: COLORS.orange }}>Voir</button>
-            </div>
-          ))}
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte
+          titre="Dernières inscriptions"
+          className="xl:col-span-2"
+          actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("chercheurs")}>Voir tout</App.Bouton>}
+        >
+          <App.Tableau
+            legende="Dernières inscriptions"
+            cleLigne="nom"
+            lignes={DERNIERES_INSCRIPTIONS}
+            colonnes={[
+              { cle: "nom", titre: "Utilisateur", rendu: (d) => <IdentityCell nom={d.nom} sub={d.type} /> },
+              { cle: "ville", titre: "Ville" },
+              { cle: "date", titre: "Inscription" },
+              { cle: "statut", titre: "Statut", rendu: (d) => <StatusBadge status={d.statut} /> },
+            ]}
+          />
+        </App.Carte>
+
+        <div className="space-y-4">
+          <TodoPanel items={todos} onNavigate={onNavigate} />
+          <App.Carte titre="Points de vigilance">
+            <ul className="divide-y divide-dashed divide-base">
+              {alertes.map((a) => (
+                <li key={a.label}>
+                  <button type="button" onClick={() => onNavigate(a.target)} className="flex w-full items-center gap-3 py-3 text-left">
+                    <App.PastilleIcone icone={a.icon} ton={a.ton} taille="sm" />
+                    <span className="min-w-0 flex-1 text-sm text-secondaire">{a.label}</span>
+                    <span className="text-lg font-semibold text-principal">{a.value}</span>
+                    <ChevronRight size={16} className="text-discret" aria-hidden="true" />
+                  </button>
+                </li>
+              ))}
+            </ul>
+          </App.Carte>
         </div>
       </div>
     </div>
@@ -4413,7 +4307,7 @@ function ChercheursAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du profil</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du profil</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce chercheur d'emploi</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -4488,7 +4382,7 @@ function PrestatairesAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du prestataire</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du prestataire</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce prestataire de services</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -4561,7 +4455,7 @@ function EntreprisesAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail de l'entreprise</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de l'entreprise</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de cette entreprise</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -4636,7 +4530,7 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
       <div className="flex items-start justify-between mb-1">
-        <h1 className="text-2xl font-bold" style={{ color: COLORS.slate }}>Détail de l'offre</h1>
+        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Détail de l'offre</h2>
       </div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez cette offre d'emploi</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6">
@@ -4718,7 +4612,7 @@ function FormationsAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail de la formation</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de la formation</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6 mt-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-3">
@@ -4798,7 +4692,7 @@ function MentoratAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du mentor</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du mentor</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6 mt-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex flex-col items-center text-center mb-4">
@@ -4878,7 +4772,7 @@ function ServicesAdminDetail(row, { onBack, update }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail du service</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du service</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6 mt-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-3">
@@ -4954,7 +4848,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-6" style={{ color: COLORS.slate }}>Détail de la candidature</h1>
+      <h2 className="text-xl font-semibold mb-6" style={{ color: COLORS.slate }}>Détail de la candidature</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.4fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-4">
@@ -5041,7 +4935,7 @@ function MissionsAdminDetail(row, { onBack, update }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
-      <h1 className="text-2xl font-bold mb-1" style={{ color: COLORS.slate }}>Détail de la mission</h1>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de la mission</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Mission #{row.refId}</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -5131,7 +5025,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
         <button type="button" onClick={onBack} className="hover:underline">Vérifications CV</button> / {doc.nom}
       </p>
       <div className="flex items-center justify-between mb-6">
-        <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Contrôle du document</h1>
+        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Contrôle du document</h2>
         <StatusBadge status={doc.statut} />
       </div>
 
@@ -5155,7 +5049,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             >
               <p className="text-xs tracking-widest mb-6" style={{ color: "#9A8F7A" }}>RÉPUBLIQUE DU SÉNÉGAL</p>
               <div className="w-14 h-14 rounded-full border-2 mx-auto mb-6" style={{ borderColor: "#C9A227" }} />
-              <h2 className="text-2xl font-bold mb-1" style={{ color: "#2B2B2B", fontFamily: "Georgia, serif" }}>Certificat d'Aptitude<br />Professionnelle</h2>
+              <h2 className="text-2xl font-semibold mb-1" style={{ color: "#2B2B2B", fontFamily: "Georgia, serif" }}>Certificat d'Aptitude<br />Professionnelle</h2>
               <p className="text-sm italic my-4" style={{ color: "#6B6259" }}>Électricité - Équipement industriel</p>
               <div className="w-full h-px my-4" style={{ background: "#E5E0D5" }} />
               <p className="text-xs" style={{ color: "#9A8F7A" }}>Décerné à</p>
@@ -5239,12 +5133,11 @@ function VerificationCVScreen() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Vérification des documents</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez les documents soumis. Les décisions sont prises sur la page de contrôle dédiée.</p>
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
         {["Tous", "En attente", "Validés", "Rejetés"].map((t) => (
-          <button key={t} type="button" onClick={() => { setTab(t); setPage(1); }} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t ? COLORS.orange : COLORS.surface, color: tab === t ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t ? COLORS.orange : COLORS.border}` }}>
+          <button key={t} type="button" onClick={() => { setTab(t); setPage(1); }} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
             {t} ({counts[t]})
           </button>
         ))}
@@ -5329,7 +5222,8 @@ const CONVERSATIONS_INITIAL = [
 
 function MessagerieTab() {
   const [convs, setConvs] = useState(CONVERSATIONS_INITIAL);
-  const [activeId, setActiveId] = useState(null);
+  // Sur ordinateur, la première conversation est ouverte d'emblée ; sur mobile, on part de la liste.
+  const [activeId, setActiveId] = useState(() => (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(min-width: 768px)").matches ? CONVERSATIONS_INITIAL[0]?.id ?? null : null));
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
   const endRef = useRef(null);
@@ -5347,8 +5241,8 @@ function MessagerieTab() {
     setConvs((list) => list.map((c) => (c.id === id ? { ...c, nonLu: 0 } : c)));
   }
 
-  function send() {
-    const texte = draft.trim();
+  function send(contenu) {
+    const texte = (contenu ?? draft).trim();
     if (!texte || !active) return;
     const heure = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
     setConvs((list) => list.map((c) => (c.id === active.id ? { ...c, messages: [...c.messages, { de: "moi", texte, heure }] } : c)));
@@ -5362,84 +5256,63 @@ function MessagerieTab() {
   }
 
   return (
-    <div className="rounded-lg border bg-surface overflow-hidden grid grid-cols-1 md:grid-cols-[300px,1fr]" style={{ borderColor: COLORS.border, minHeight: 480 }}>
-      <div className={`${active ? "hidden md:flex" : "flex"} flex-col`} style={{ borderRight: `1px solid ${COLORS.border}` }}>
-        <div className="p-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-          <div className="flex items-center gap-2 rounded-md border px-3 py-2" style={{ borderColor: COLORS.border }}>
-            <Search size={14} color={COLORS.slateLight} />
-            <input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Rechercher une conversation" aria-label="Rechercher une conversation" className="flex-1 text-sm outline-none bg-transparent min-w-0" />
-          </div>
-        </div>
-        <div className="flex-1 overflow-y-auto">
+    <div className="grid grid-cols-1 gap-4 md:grid-cols-[320px,1fr]">
+      <div className={`${active ? "hidden md:flex" : "flex"} min-w-0 flex-col gap-3`}>
+        <App.ChampRecherche valeur={query} onChange={setQuery} placeholder="Rechercher une conversation" label="Rechercher une conversation" />
+        <div className="flex max-h-[560px] flex-col gap-2 overflow-y-auto pr-1">
           {visible.map((c) => {
             const last = c.messages[c.messages.length - 1];
             return (
-              <button key={c.id} type="button" onClick={() => open(c.id)} className="w-full text-left px-4 py-3 flex items-start gap-3 hover:bg-doux" style={{ background: c.id === activeId ? COLORS.orangeSubtle : undefined, borderBottom: `1px solid ${COLORS.border}` }}>
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(c.nom)}</div>
-                <div className="flex-1 min-w-0">
-                  <div className="flex items-center justify-between gap-2">
-                    <p className="text-sm font-semibold truncate" style={{ color: COLORS.slate }}>{c.nom}</p>
-                    <span className="text-[11px] shrink-0" style={{ color: COLORS.slateLight }}>{last ? last.heure : ""}</span>
-                  </div>
-                  <p className="text-xs truncate" style={{ color: c.nonLu ? COLORS.slate : COLORS.slateLight, fontWeight: c.nonLu ? 600 : 400 }}>
-                    {last ? (last.de === "moi" ? "Vous : " : "") + last.texte : ""}
-                  </p>
-                </div>
-                {c.nonLu > 0 && <span className="text-[11px] font-bold rounded-full w-5 h-5 flex items-center justify-center shrink-0 text-sur-marque" style={{ background: COLORS.orange }}>{c.nonLu}</span>}
-              </button>
+              <App.ElementConversation
+                key={c.id}
+                nom={c.nom}
+                apercu={last ? (last.de === "moi" ? "Vous : " : "") + last.texte : c.role}
+                heure={last ? last.heure : ""}
+                nonLus={c.nonLu}
+                actif={c.id === activeId}
+                onClick={() => open(c.id)}
+              />
             );
           })}
-          {visible.length === 0 && <p className="text-sm p-4" style={{ color: COLORS.slateLight }}>Aucune conversation ne correspond à « {query} ».</p>}
+          {visible.length === 0 && <p className="p-4 text-sm text-secondaire">Aucune conversation ne correspond à « {query} ».</p>}
         </div>
       </div>
 
       {active ? (
-        <div className="flex flex-col min-w-0">
-          <div className="flex items-center justify-between gap-3 px-4 py-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-            <div className="flex items-center gap-3 min-w-0">
-              <button type="button" onClick={() => setActiveId(null)} className="md:hidden" aria-label="Retour aux conversations"><ArrowLeft size={16} color={COLORS.slate} /></button>
+        <App.Carte flush className="flex min-w-0 flex-col">
+          <div className="flex items-center justify-between gap-3 border-b border-base px-5 py-4">
+            <div className="flex min-w-0 items-center gap-3">
+              <App.BoutonIcone icone={ArrowLeft} label="Retour aux conversations" variante="fantome" taille="sm" className="md:hidden" onClick={() => setActiveId(null)} />
+              <App.Avatar nom={active.nom} taille="md" />
               <div className="min-w-0">
-                <p className="text-sm font-semibold truncate" style={{ color: COLORS.slate }}>{active.nom}</p>
-                <p className="text-xs truncate" style={{ color: COLORS.slateLight }}>{active.role}</p>
+                <p className="truncate font-semibold text-principal">{active.nom}</p>
+                <p className="truncate text-sm text-discret">{active.role}</p>
               </div>
             </div>
-            <button type="button" onClick={archive} className="flex items-center gap-1.5 rounded-md px-3 py-1.5 text-xs font-semibold border shrink-0" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-              <Archive size={13} /> Archiver
-            </button>
+            <App.BoutonIcone icone={Archive} label="Archiver la conversation" variante="fantome" onClick={archive} />
           </div>
-          <div className="flex-1 overflow-y-auto p-4 flex flex-col gap-3" style={{ background: COLORS.soft, maxHeight: 420 }}>
-            {active.messages.map((m, i) => (
-              <div key={i} className={`max-w-[80%] ${m.de === "moi" ? "self-end" : "self-start"}`}>
-                <div className="rounded-lg px-3.5 py-2.5 text-sm leading-relaxed" style={m.de === "moi" ? { background: COLORS.orange, color: COLORS.onOrange } : { background: COLORS.surface, color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
-                  {m.texte}
-                </div>
-                <p className={`text-[11px] mt-1 ${m.de === "moi" ? "text-right" : ""}`} style={{ color: COLORS.slateLight }}>{m.heure}</p>
-              </div>
-            ))}
+          <div className="flex max-h-[460px] min-h-[360px] flex-1 flex-col gap-4 overflow-y-auto px-5 py-5">
+            {active.messages.map((m, i) => {
+              const suivant = active.messages[i + 1];
+              return (
+                <App.BulleMessage
+                  key={i}
+                  texte={m.texte}
+                  heure={m.heure}
+                  moi={m.de === "moi"}
+                  nom={m.de === "moi" ? "Admin LIGGEEY" : active.nom}
+                  montrerAvatar={!suivant || suivant.de !== m.de}
+                />
+              );
+            })}
             <div ref={endRef} />
           </div>
-          <div className="flex items-end gap-2 p-3" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-            <textarea
-              rows={1}
-              value={draft}
-              onChange={(e) => setDraft(e.target.value)}
-              onKeyDown={(e) => { if (e.key === "Enter" && !e.shiftKey) { e.preventDefault(); send(); } }}
-              placeholder={`Écrire à ${active.nom}…`}
-              aria-label="Votre message"
-              className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400 resize-none"
-              style={{ borderColor: COLORS.border }}
-            />
-            <button type="button" onClick={send} disabled={!draft.trim()} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: draft.trim() ? 1 : 0.5 }}>
-              <Send size={14} /> Envoyer
-            </button>
-          </div>
-        </div>
+          <App.ZoneSaisie onEnvoyer={(texte) => send(texte)} placeholder={`Écrire à ${active.nom}…`} />
+        </App.Carte>
       ) : (
-        <div className="hidden md:flex flex-col items-center justify-center p-8 text-center">
-          <MessageCircle size={28} color={COLORS.slateLight} />
-          <p className="text-sm font-semibold mt-3" style={{ color: COLORS.slate }}>Sélectionnez une conversation</p>
-          <p className="text-sm mt-1 max-w-xs" style={{ color: COLORS.slateLight }}>Répondez aux chercheurs, prestataires et entreprises depuis un seul endroit.</p>
-        </div>
+        <App.Carte className="hidden md:block">
+          <App.EtatVide icone={MessageCircle} titre="Sélectionnez une conversation" texte="Répondez aux chercheurs, prestataires et entreprises depuis un seul endroit." />
+        </App.Carte>
       )}
     </div>
   );
@@ -5679,7 +5552,6 @@ function PlanningScreen() {
     <div>
       <div className="flex items-start justify-between gap-4 mb-1 flex-wrap">
         <div>
-          <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Planning</h1>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Gérez le calendrier des formations, événements et activités de la plateforme LIGGEEY</p>
         </div>
         <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque shrink-0" style={{ background: COLORS.orange }}>
@@ -5803,12 +5675,11 @@ function CommunicationScreen({ onNavigate }) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Centre de communication</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez les notifications, messages et archives de la plateforme LIGGEEY</p>
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
         {["Notifications", "Messagerie", "Archives"].map((t) => (
-          <button key={t} type="button" onClick={() => setMainTab(t)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: mainTab === t ? COLORS.orange : COLORS.surface, color: mainTab === t ? COLORS.onOrange : COLORS.slate, border: `1px solid ${mainTab === t ? COLORS.orange : COLORS.border}` }}>
+          <button key={t} type="button" onClick={() => setMainTab(t)} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${mainTab === t ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
             {t}
           </button>
         ))}
@@ -5933,7 +5804,6 @@ function ParametresScreen() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Paramètres</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez votre compte administrateur et les préférences de la plateforme LIGGEEY</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
@@ -6400,7 +6270,6 @@ function AbonnementScreen() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Mon abonnement</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Choisissez le profil adapté à votre activité. Vous pouvez changer ou résilier à tout moment.</p>
 
       <div className="rounded-lg p-6 mb-8 grid grid-cols-1 md:grid-cols-[1fr,1fr] gap-6" style={{ background: COLORS.dark }}>
@@ -6427,7 +6296,7 @@ function AbonnementScreen() {
       </div>
 
       <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-        <h2 className="text-xl font-bold" style={{ color: COLORS.slate }}>Choisir votre profil</h2>
+        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Choisir votre profil</h2>
         <div className="inline-flex rounded-md border p-0.5" style={{ borderColor: COLORS.border, background: COLORS.surface }} role="group" aria-label="Durée de facturation">
           {[{ id: "mensuel", label: "Mensuel" }, { id: "annuel", label: "Annuel · 2 mois offerts" }].map((c) => (
             <button key={c.id} type="button" onClick={() => setCycle(c.id)} aria-pressed={cycle === c.id} className="rounded px-3 py-1.5 text-sm font-semibold" style={{ background: cycle === c.id ? COLORS.dark : "transparent", color: cycle === c.id ? COLORS.onDark : COLORS.slateLight }}>
@@ -6481,7 +6350,7 @@ function AbonnementScreen() {
         })}
       </div>
 
-      <h2 className="text-xl font-bold mb-4" style={{ color: COLORS.slate }}>Historique des paiements</h2>
+      <h2 className="text-xl font-semibold mb-4" style={{ color: COLORS.slate }}>Historique des paiements</h2>
       <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
         {history.length === 0 ? (
           <div className="p-6 text-sm flex items-center gap-2" style={{ color: COLORS.slateLight }}>
@@ -6566,7 +6435,6 @@ function AbonnementsAdminScreen() {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Abonnements</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les revenus, gérez les abonnés et ajustez les profils de chaque espace.</p>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
@@ -6613,9 +6481,9 @@ function AbonnementsAdminScreen() {
         </div>
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-5">
+      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
         {tabs.map((t) => (
-          <button key={t.id} type="button" onClick={() => { setTab(t.id); setPage(1); }} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}>
+          <button key={t.id} type="button" onClick={() => { setTab(t.id); setPage(1); }} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
             {t.label}
           </button>
         ))}
@@ -7036,9 +6904,9 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
         <StatMini value={profile.stats.heures} label="Heures de mentorat" />
       </div>
 
-      <div className="flex flex-wrap gap-2 mb-5" role="tablist">
+      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5" role="tablist">
         {tabs.map((t) => (
-          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: tab === t.id ? COLORS.orange : COLORS.surface, color: tab === t.id ? COLORS.onOrange : COLORS.slate, border: `1px solid ${tab === t.id ? COLORS.orange : COLORS.border}` }}>
+          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
             {t.label}
           </button>
         ))}
@@ -7388,7 +7256,6 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Suivi post-embauche</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>LIGGEEY reste à vos côtés pendant les six premiers mois de votre nouveau poste.</p>
 
       <div className="rounded-lg p-6 mb-6" style={{ background: COLORS.dark }}>
@@ -7537,7 +7404,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}><ArrowLeft size={14} /> Retour aux recrues</button>
       <div className="flex items-start justify-between flex-wrap gap-3 mb-6">
         <div>
-          <h1 className="text-2xl font-bold flex items-center gap-3" style={{ color: COLORS.slate }}>{r.nom} <StatusBadge status={r.statut} /></h1>
+          <h2 className="text-xl font-semibold flex items-center gap-3" style={{ color: COLORS.slate }}>{r.nom} <StatusBadge status={r.statut} /></h2>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>{r.poste} · {r.contrat} · en poste depuis {jour} jours</p>
         </div>
         <div className="flex gap-2 flex-wrap">
@@ -7616,7 +7483,6 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
   const aEvaluer = recrues.reduce((n, r) => n + JALONS.filter((j) => jalonStatut(r.dateIso, j, r.evaluations[j.id]) === "À compléter").length, 0);
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Suivi des recrues</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Accompagnez vos nouvelles recrues jusqu'à la fin de leur période d'essai et au-delà.</p>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard icon={Users2} value={recrues.length} label="Recrues suivies" />
@@ -7660,7 +7526,6 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
   const ouverts = signalements.filter((s) => s.statut === "Ouvert");
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Suivi post-embauche</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les personnes placées via LIGGEEY et traitez les signalements des recrues et des employeurs.</p>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard icon={HeartHandshake} value={placements.length} label="Placements suivis" />
@@ -7669,7 +7534,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
         <StatCard icon={Flag} value={ouverts.length} label="Signalements ouverts" />
       </div>
 
-      <h2 className="text-lg font-bold mb-3" style={{ color: COLORS.slate }}>Signalements</h2>
+      <h2 className="text-lg font-semibold mb-3" style={{ color: COLORS.slate }}>Signalements</h2>
       <div className="flex flex-col gap-3 mb-8">
         {signalements.map((s) => (
           <div key={s.id} className="rounded-lg border bg-surface p-5 flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: s.statut === "Ouvert" ? "#FCA5A5" : COLORS.border }}>
@@ -7691,7 +7556,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
         ))}
       </div>
 
-      <h2 className="text-lg font-bold mb-3" style={{ color: COLORS.slate }}>Placements en cours de suivi</h2>
+      <h2 className="text-lg font-semibold mb-3" style={{ color: COLORS.slate }}>Placements en cours de suivi</h2>
       <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
         <table className="w-full text-sm min-w-[640px]">
           <thead>
@@ -7830,7 +7695,7 @@ function RegularisationScreen({ steps, setSteps }) {
   return (
     <div>
       <div className="flex items-center gap-3 flex-wrap mb-1">
-        <h1 className="text-3xl font-bold" style={{ color: COLORS.slate }}>Régularisation de l'activité</h1>
+        <span aria-hidden="true" />
         <RegulBadge />
       </div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Formalisez votre activité pour rassurer vos clients et accéder aux missions des entreprises.</p>
@@ -7888,7 +7753,6 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
 
   return (
     <div>
-      <h1 className="text-3xl font-bold mb-1" style={{ color: COLORS.slate }}>Régularisations</h1>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Vérifiez les justificatifs envoyés par les prestataires pour régulariser leur activité.</p>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <StatCard icon={FileCheck2} value={demandes.length} label="Justificatifs à vérifier" />
@@ -7926,7 +7790,7 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
 
       {traitees.length > 0 && (
         <>
-          <h2 className="text-lg font-bold mb-3" style={{ color: COLORS.slate }}>Traités récemment</h2>
+          <h2 className="text-lg font-semibold mb-3" style={{ color: COLORS.slate }}>Traités récemment</h2>
           <div className="flex flex-col gap-2">
             {traitees.map((d) => (
               <div key={d.id} className="rounded-md border bg-surface px-4 py-3 flex items-center justify-between" style={{ borderColor: COLORS.border }}>
@@ -8348,6 +8212,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
           user={currentUser}
           breadcrumb={breadcrumb}
           badges={BADGES[espace]}
+          todos={todos}
         >
           {renderContent()}
           {upgrade && <UpgradeModal reasonKey={upgrade} onClose={() => setUpgrade(null)} onNavigate={navigate} />}
@@ -8391,7 +8256,7 @@ export {
   ProfileRadioCard, PROFILES, EditableTags, Pagination, ServiceForm, OffreEntrepriseForm, EventForm,
   CheckinForm, SignalementForm, PasswordChanger, SERVICES_INITIAL, OFFRES_ENTREPRISE_INITIAL,
   // Navigation
-  AuthShell, AppShell, Sidebar, IconRail, Breadcrumb, TodoPanel,
+  AuthShell, AppShell, Sidebar, Breadcrumb, TodoPanel,
   // Cartes
   OfferCard, FormationCard, MentorCard, CandidatureCard, DemandeCard, ServiceCard, MissionCard,
   OffreEntrepriseCard, CandidatureEntrepriseRow, PrestataireSearchCard, IdentityCell,

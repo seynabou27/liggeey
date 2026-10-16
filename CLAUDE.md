@@ -91,6 +91,18 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
 
 Tout nouveau composant reçoit sa story, avec ses états. Simulations (`.storybook/`) : `lib/images` (lecture disque), envoi des formulaires (`parameters.formulaire` : `succes`, `erreur`, `attente`), absence de photos (`parameters.sansPhotos`). `.storybook/main.js` contient aussi un correctif de compatibilité Next 16.4 / Storybook 10.6.2, à retirer quand Storybook gérera `parentRenderTree`.
 
+## Bibliothèque de l'application (`components/app/`)
+
+Structure de la plateforme inspirée du modèle Mifty (https://mannatthemes.com/mifty/default/index.html), refaite avec les tokens, les couleurs et la police de LIGGEEY. Aucun code ni visuel de Mifty n'est copié.
+
+- `Coquille.jsx` : barre latérale claire (groupes en petites capitales, élément actif teinté avec barre orange, encart de formule en bas, repliable et retenu dans le navigateur ; tiroir sur mobile), barre du haut (salutation, recherche de page, notifications alimentées par les tâches « À faire », menu du compte), en-tête de page (titre et fil d'Ariane), pied de page.
+- `Carte.jsx` : `Carte`, `CarteStat`, `CarteProfil`, `PastilleIcone`, `LigneInfo`, `EtatVide`.
+- `Badge.jsx`, `Avatar.jsx`, `Controles.jsx` (boutons ronds, recherche, sélecteur, onglets, segments, pagination, interrupteur), `Tableau.jsx`, `Progression.jsx`, `Messagerie.jsx`.
+- Tout s'importe depuis `components/app` (`import * as App from "../app"` dans le prototype). Le `Bouton` du site a deux variantes de plus pour l'application : `doux` et `neutre`.
+- Le titre de chaque écran est affiché par la coquille (libellé du menu) : un écran ne remet pas de `h1`. Ses sous-titres sont des `h2` en demi-gras.
+- Couleurs de statut : tokens `statut` (`bg-statut-succes-doux`, `text-statut-danger`…). Les tons de `StatusBadge` sont dans `STATUT_TONS`.
+- Stories : `stories/composants/application/bibliotheque/`.
+
 ## Pages du site
 
 - **Accueil et parcours** : `/`, `/talents`, `/independants`, `/entreprises`, `/entreprises/demande-de-demo`.
