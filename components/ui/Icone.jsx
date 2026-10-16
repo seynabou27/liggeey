@@ -30,7 +30,7 @@ import {
  * Les fichiers de contenu désignent les icônes par leur nom (« BadgeCheck »…).
  * Ajouter ici toute nouvelle icône Lucide utilisée dans content/.
  */
-const ICONES = {
+export const ICONES = {
   Award,
   BadgeCheck,
   Briefcase,

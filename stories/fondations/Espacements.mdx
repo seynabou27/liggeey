@@ -1,0 +1,22 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Espaces, Cibles, PointsDeRupture } from './Fondations.jsx';
+
+<Meta title="Fondations/Espacements" />
+
+# Espacements et dimensions
+
+Le site suit le rythme du modèle JobStock : sections de 80 px en haut et en bas, conteneur centré de 1 320 px au maximum avec des marges de 12 px (`container`, réglé dans `tailwind.config.mjs`).
+
+<Unstyled><Espaces /></Unstyled>
+
+## Tailles minimales
+
+Le public utilise surtout un téléphone : toute zone cliquable fait **44 px** de haut au minimum.
+
+<Unstyled><Cibles /></Unstyled>
+
+## Points de rupture
+
+Le site est pensé d'abord pour le mobile. Les préfixes Tailwind ajoutent les réglages des écrans plus larges.
+
+<Unstyled><PointsDeRupture /></Unstyled>

@@ -80,6 +80,17 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
 - **Formes** : boutons à coins de 4 px, cartes à coins de 8 px, ombre `shadow-carte`.
 - **Logo** : `public/logo/` (versions ardoise, blanche, et monogramme orange).
 
+## Storybook
+
+`npm run storybook` (http://localhost:6006). Les stories vivent dans `stories/` :
+
+- `fondations/` : les tokens (couleurs, typographie, espacements, formes et ombres, icônes, logos, classes utilitaires) ;
+- `composants/site/` : un fichier par famille de composants du site (actions, formulaires, navigation, mise en page, contenus, médias, offres, accueil, tarifs, Job Dating, ressources, gabarits) ;
+- `composants/application/` : les composants de la plateforme, importés depuis le bloc d'exports de `LiggeeyPrototype.jsx`. `_outils.jsx` fournit `AvecPlateforme` (contextes d'abonnement et de mémoire partagée) ;
+- `ecrans/` : chaque écran de l'application, par espace, rendu par le composant racine (`_ecran.jsx`).
+
+Tout nouveau composant reçoit sa story, avec ses états. Simulations (`.storybook/`) : `lib/images` (lecture disque), envoi des formulaires (`parameters.formulaire` : `succes`, `erreur`, `attente`), absence de photos (`parameters.sansPhotos`). `.storybook/main.js` contient aussi un correctif de compatibilité Next 16.4 / Storybook 10.6.2, à retirer quand Storybook gérera `parentRenderTree`.
+
 ## Pages du site
 
 - **Accueil et parcours** : `/`, `/talents`, `/independants`, `/entreprises`, `/entreprises/demande-de-demo`.
@@ -105,7 +116,8 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
   - la directive `'use client'` et les props `ecranInitial`, `espaceInitial` et `profilInitial` du composant racine ;
   - la barre « Mode test » n'est plus affichée (les deux `<TestModeBar … />` du composant racine sont retirés ; la sauvegarde locale reste) ;
   - les liens de retour vers le site (constante `SITE_URL`) : logo cliquable, « Retour au site » sur la connexion et l'inscription, et en bas du menu de l'application ;
-  - le bouton « Découvrir les offres d'emploi » de la connexion mène aux offres du site (`/#offres`), plus aux offres internes.
+  - le bouton « Découvrir les offres d'emploi » de la connexion mène aux offres du site (`/#offres`), plus aux offres internes ;
+  - un bloc `export { … }` en fin de fichier, qui expose les composants et données de démo à Storybook (sans changer le comportement).
 - **Dépendances** : `recharts` et `lucide-react`. Si la compilation échoue sur une icône, vérifier son nom dans la version installée de `lucide-react`.
 
 ## Chantiers ouverts (ordre de priorité suggéré)

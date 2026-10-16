@@ -8369,3 +8369,36 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     </AuthShell>
   );
 }
+
+/* =====================================================================
+   EXPORTS POUR STORYBOOK (ajout au fichier d'origine)
+   Les composants et données de démo ci-dessous sont exposés pour être
+   présentés un à un dans Storybook (stories/composants/application/).
+   Le comportement de la plateforme ne change pas.
+   ===================================================================== */
+export {
+  // Fondations et contextes
+  COLORS, StoreContext, PlanContext, buildPlanApi, notify,
+  PLANS_INITIAL, SUBS_INITIAL, USAGE_INITIAL, TRANSACTIONS_INITIAL, UPGRADE_REASONS,
+  USER_BY_ESPACE, NAV_ITEMS_BY_ESPACE, REGUL_STEPS_INITIAL, TYPES_SIGNALEMENT, JALONS, TEST_STORAGE_KEY,
+  // Identité, actions
+  Logo, ActionButton, FilePickerButton,
+  // Badges et statuts
+  StatusBadge, TierBadge, PremiumChip, RegulBadge, EventChip, PLANNING_EVENTS_INITIAL,
+  // Indicateurs
+  StatCard, StatMini, ProgressBar, UsageMeter, Stars, RatingInput, Stepper, CandidatureStepper, ChecklistItem, SSLNote,
+  // Formulaires
+  ProfileRadioCard, PROFILES, EditableTags, Pagination, ServiceForm, OffreEntrepriseForm, EventForm,
+  CheckinForm, SignalementForm, PasswordChanger, SERVICES_INITIAL, OFFRES_ENTREPRISE_INITIAL,
+  // Navigation
+  AuthShell, AppShell, Sidebar, IconRail, Breadcrumb, TodoPanel,
+  // Cartes
+  OfferCard, FormationCard, MentorCard, CandidatureCard, DemandeCard, ServiceCard, MissionCard,
+  OffreEntrepriseCard, CandidatureEntrepriseRow, PrestataireSearchCard, IdentityCell,
+  OFFRES_DATA, CANDIDATURES, FORMATIONS_ALL, MENTORS, DEMANDES_RECENTES, MISSIONS_INITIAL,
+  CANDIDATURES_ENTREPRISE_INITIAL, PRESTATAIRES_SEARCH,
+  // Données
+  Row, InfoField, BorderedField, LockedRow, AdminInfoCard, AdminSubListCard, SafeImg, ProfileTierCard,
+  // Retours et fenêtres
+  Toaster, ModalFrame, ArchiveConfirm, OfferModal, UpgradeModal, PaymentModal, ProfilInfoModal,
+};

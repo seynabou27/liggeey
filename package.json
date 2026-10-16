@@ -23,6 +23,7 @@
     "react-is": "^19.0.0"
   },
   "devDependencies": {
+    "@storybook/addon-a11y": "^10.6.2",
     "@storybook/addon-docs": "10.6.2",
     "@storybook/nextjs-vite": "10.6.2",
     "autoprefixer": "^10.4.20",

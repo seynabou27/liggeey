@@ -1,0 +1,12 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { GrilleIcones } from './Fondations.jsx';
+
+<Meta title="Fondations/Icônes" />
+
+# Icônes
+
+Toutes les icônes viennent de [lucide-react](https://lucide.dev). Dans les composants, on les importe directement depuis `lucide-react`, toujours avec `aria-hidden="true"`.
+
+Les fichiers de contenu (`content/`) désignent une icône par son **nom**. Le composant `Icone` (`components/ui/Icone.jsx`) fait la correspondance. Voici les icônes qu'il connaît : pour en ajouter une, l'importer et l'ajouter à l'objet `ICONES`.
+
+<Unstyled><GrilleIcones /></Unstyled>

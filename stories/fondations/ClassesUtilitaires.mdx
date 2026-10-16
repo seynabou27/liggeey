@@ -1,0 +1,45 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+
+<Meta title="Fondations/Classes utilitaires" />
+
+# Classes utilitaires
+
+Quelques classes partagées, définies dans `app/globals.css` (`@layer components`).
+
+## `.lien`
+
+Lien souligné en orange, demi-gras.
+
+<Unstyled>
+  <p className="text-[15px]">
+    Lire <a href="#" className="lien">comment nous vérifions les offres</a>.
+  </p>
+</Unstyled>
+
+## `.surtitre`
+
+Petit titre orange au-dessus d'un titre de section. Souvent précédé d'un trait.
+
+<Unstyled>
+  <p className="surtitre">
+    <span className="h-0.5 w-9 bg-marque" aria-hidden="true" />
+    Le constat
+  </p>
+</Unstyled>
+
+## `.article`
+
+Mise en forme du contenu Markdown des articles (`/ressources/[slug]`).
+
+<Unstyled>
+  <div className="article max-w-2xl rounded-lg border border-base bg-surface p-6">
+    <p>Écrivez ici l'introduction de l'article, en deux ou trois phrases.</p>
+    <h2>Intertitre</h2>
+    <p>Un paragraphe avec <a href="#">un lien</a>.</p>
+    <ul>
+      <li>Premier point</li>
+      <li>Deuxième point</li>
+    </ul>
+    <blockquote>À retenir : une citation ou un encadré.</blockquote>
+  </div>
+</Unstyled>

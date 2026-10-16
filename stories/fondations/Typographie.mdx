@@ -1,0 +1,23 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Polices, EchelleTypo } from './Fondations.jsx';
+
+<Meta title="Fondations/Typographie" />
+
+# Typographie
+
+Deux polices, définies dans `tailwind.config.mjs` (`fontFamily`) :
+
+- **Plus Jakarta Sans** (`font-sans`) pour toute l'interface, chargée par `next/font` dans `app/layout.jsx` ;
+- **Georgia** (`font-serif`) pour les contenus éditoriaux (articles).
+
+Règles : texte courant en 15 px, interligne 1,5. Titres en demi-gras (`font-semibold`), jamais en gras.
+
+> La plateforme (prototype) utilise encore la pile `Inter, system-ui` en style en ligne.
+
+<Unstyled><Polices /></Unstyled>
+
+## Échelle
+
+Les tailles sont responsives : la flèche indique mobile → tablette → ordinateur. Changez la largeur avec l'outil **Viewport** de la barre d'outils.
+
+<Unstyled><EchelleTypo /></Unstyled>

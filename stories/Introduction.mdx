@@ -1,0 +1,37 @@
+import { Meta } from '@storybook/addon-docs/blocks';
+
+<Meta title="Introduction" />
+
+# Storybook LIGGEEY
+
+Le catalogue de tout l'écosystème LIGGEEY : le **site public** et la **plateforme** (l'application). Chaque composant s'affiche seul, avec ses variantes et ses états.
+
+## Organisation
+
+1. **Fondations** : les variables et tokens de la charte.
+   - Couleurs (palettes, tokens sémantiques, variables CSS, contrastes) ;
+   - typographie, espacements, formes et ombres ;
+   - icônes, logos et classes utilitaires.
+2. **Composants**, rangés par famille :
+   - **Site** : les composants de `components/` (boutons, formulaires, navigation, blocs, offres, accueil, tarifs…) ;
+   - **Application** : les composants de la plateforme, sortis de `components/plateforme/LiggeeyPrototype.jsx` (badges, cartes, navigation, fenêtres…).
+3. **Écrans** : les écrans complets de l'application, par espace (authentification, chercheur, prestataire, entreprise, admin), et la plateforme entière pour naviguer librement.
+
+## Utilisation
+
+- `npm run storybook` ouvre Storybook sur http://localhost:6006.
+- `npm run build-storybook` produit une version statique dans `storybook-static/`.
+- **Docs** : chaque composant a une page de documentation générée, avec toutes ses stories et le tableau de ses props.
+- **Controls** : modifiez les props en direct dans le panneau du bas.
+- **Actions** : les clics et les envois (`onClick`, `onVoir`, `onNavigate`…) s'affichent dans l'onglet *Actions*.
+- **Accessibility** : l'onglet vérifie les contrastes et les rôles ARIA de chaque story.
+- **Thème** (barre d'outils) : prévisualise le thème sombre, prêt mais pas encore activé sur le site.
+- **Viewport** (barre d'outils) : affiche une story en largeur mobile ou tablette.
+
+## Simulations
+
+Dans Storybook, rien ne part vers un serveur :
+
+- les formulaires simulent l'envoi (succès, erreur ou attente, selon la story) ;
+- la navigation Next.js (`next/navigation`) est simulée ;
+- les données de l'application sont celles de la démo, remises à zéro à chaque écran.
