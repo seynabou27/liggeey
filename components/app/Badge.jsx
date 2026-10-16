@@ -8,11 +8,12 @@ export const TONS = {
   info: 'bg-statut-info-doux text-statut-info',
   neutre: 'bg-doux-fort text-secondaire',
   plein: 'bg-marque text-sur-marque',
+  inverse: 'bg-surface text-marque-fort', // pastille sur un élément orange
 };
 
 /**
  * Petite étiquette de statut.
- * - ton : marque | succes | alerte | danger | info | neutre | plein
+ * - ton : marque | succes | alerte | danger | info | neutre | plein | inverse
  * - point : affiche une pastille ronde devant le texte
  * - taille : petit (tableaux, listes) | moyen
  */

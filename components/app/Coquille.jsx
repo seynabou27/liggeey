@@ -61,23 +61,51 @@ export function grouperParSection(elements) {
 
 /* ---------- Barre latérale ---------- */
 
+/* Deux habillages : sombre (bleu ardoise, par défaut, celui de LIGGEEY) et claire. */
+const HABILLAGES = {
+  sombre: {
+    fond: 'bg-sombre border-sur-sombre',
+    section: 'text-sur-sombre-discret',
+    filet: 'bg-[rgb(var(--bordure-sur-sombre))]',
+    actif: 'bg-marque font-semibold text-sur-marque',
+    iconeActive: '',
+    inactif: 'font-medium text-sur-sombre-secondaire hover:bg-sombre-doux hover:text-sur-sombre',
+    barre: false,
+    compteurActif: 'inverse',
+    fermer: 'sur-sombre',
+  },
+  claire: {
+    fond: 'bg-doux border-base',
+    section: 'text-discret',
+    filet: 'bg-[rgb(var(--bordure-forte))]',
+    actif: 'bg-marque-doux font-semibold text-marque-fort',
+    iconeActive: 'text-marque-vif',
+    inactif: 'font-medium text-secondaire hover:bg-surface hover:text-principal',
+    barre: true,
+    compteurActif: 'plein',
+    fermer: 'fantome',
+  },
+};
+
 /**
  * - elements : [{ id, label, icone, section }] (les sections suivent l'ordre)
  * - compteurs : { [id]: nombre } affichés en pastille
  * - replie : n'affiche que les icônes (ordinateur)
  * - encart : bloc en bas du menu (formule, aide…)
+ * - habillage : sombre (bleu ardoise) | claire
  */
-export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, replie = false, logo, logoReduit, encart, onFermer, mobile = false }) {
+export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, replie = false, logo, logoReduit, encart, onFermer, mobile = false, habillage = 'sombre' }) {
   const sections = useMemo(() => grouperParSection(elements), [elements]);
   const etroit = replie && !mobile;
+  const h = HABILLAGES[habillage] || HABILLAGES.sombre;
   return (
     <aside
-      className={`flex h-full flex-col border-r border-base bg-doux transition-[width] duration-200 ${etroit ? 'w-[76px]' : 'w-[264px]'}`}
+      className={`flex h-full flex-col border-r transition-[width] duration-200 ${h.fond} ${etroit ? 'w-[76px]' : 'w-[264px]'}`}
       aria-label="Menu de l'application"
     >
       <div className={`flex h-[72px] shrink-0 items-center ${etroit ? 'justify-center' : 'justify-between px-6'}`}>
         {etroit ? logoReduit : logo}
-        {mobile && <BoutonIcone icone={X} label="Fermer le menu" variante="fantome" onClick={onFermer} />}
+        {mobile && <BoutonIcone icone={X} label="Fermer le menu" variante={h.fermer} onClick={onFermer} />}
       </div>
 
       <nav className="flex-1 overflow-y-auto px-3 pb-4" aria-label="Navigation principale">
@@ -85,9 +113,9 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
           <div key={s.titre || i} className={i > 0 ? 'mt-5' : 'mt-2'}>
             {s.titre &&
               (etroit ? (
-                <div className="mx-auto mb-2 h-px w-6 bg-[rgb(var(--bordure-forte))]" aria-hidden="true" />
+                <div className={`mx-auto mb-2 h-px w-6 ${h.filet}`} aria-hidden="true" />
               ) : (
-                <p className="mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] text-discret">{s.titre}</p>
+                <p className={`mb-2 px-3 text-[11px] font-semibold uppercase tracking-[0.08em] ${h.section}`}>{s.titre}</p>
               ))}
             <ul className="space-y-1">
               {s.elements.map((el) => {
@@ -96,23 +124,21 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
                 const compte = compteurs[el.id] || 0;
                 return (
                   <li key={el.id} className="relative">
-                    {estActif && <span className="absolute -left-3 top-1.5 h-8 w-[3px] rounded-r bg-marque" aria-hidden="true" />}
+                    {estActif && h.barre && <span className="absolute -left-3 top-1.5 h-8 w-[3px] rounded-r bg-marque" aria-hidden="true" />}
                     <button
                       type="button"
                       onClick={() => onNaviguer(el.id)}
                       aria-current={estActif ? 'page' : undefined}
                       title={etroit ? el.label : undefined}
-                      className={`relative flex min-h-[44px] w-full items-center gap-3 rounded-md text-left text-sm transition-colors ${etroit ? 'justify-center px-0' : 'px-3'} ${
-                        estActif ? 'bg-marque-doux font-semibold text-marque-fort' : 'font-medium text-secondaire hover:bg-surface hover:text-principal'
-                      }`}
+                      className={`relative flex min-h-[44px] w-full items-center gap-3 rounded-md text-left text-sm transition-colors ${etroit ? 'justify-center px-0' : 'px-3'} ${estActif ? h.actif : h.inactif}`}
                     >
-                      {Icone && <Icone size={19} strokeWidth={estActif ? 2 : 1.75} aria-hidden="true" className={estActif ? 'text-marque-vif' : ''} />}
+                      {Icone && <Icone size={19} strokeWidth={estActif ? 2 : 1.75} aria-hidden="true" className={estActif ? h.iconeActive : ''} />}
                       {!etroit && <span className="flex-1 leading-tight">{el.label}</span>}
                       {compte > 0 &&
                         (etroit ? (
-                          <span className="absolute right-3 top-2 h-2 w-2 rounded-full bg-marque" aria-label={`${compte} à traiter`} />
+                          <span className={`absolute right-3 top-2 h-2 w-2 rounded-full ${estActif ? 'bg-surface' : 'bg-marque'}`} aria-label={`${compte} à traiter`} />
                         ) : (
-                          <Compteur valeur={compte} />
+                          <Compteur valeur={compte} ton={estActif ? h.compteurActif : 'plein'} />
                         ))}
                     </button>
                   </li>
@@ -131,7 +157,7 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
 /* ---------- Barre d'icônes ---------- */
 
 /**
- * Colonne étroite en bleu ardoise, placée avant la barre latérale (ordinateur seulement).
+ * Colonne étroite en bleu le plus foncé (neutre-900), placée avant la barre latérale (ordinateur seulement).
  * Rôle à définir : pour l'instant décorative (masquée aux lecteurs d'écran), sauf si les
  * éléments reçoivent un onClick, auquel cas ils deviennent des boutons avec leur libellé.
  * - elements : [{ icone, label, actif?, onClick? }]
@@ -139,7 +165,7 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
 export function BarreIcones({ elements = [] }) {
   const interactive = elements.some((e) => e.onClick);
   return (
-    <div className="flex h-full w-14 flex-col items-center gap-3 bg-sombre py-4" aria-hidden={interactive ? undefined : 'true'}>
+    <div className="flex h-full w-14 flex-col items-center gap-3 bg-sombre-profond py-4" aria-hidden={interactive ? undefined : 'true'}>
       {elements.map((el, i) => {
         const Icone = el.icone;
         const classes = `inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
@@ -415,6 +441,7 @@ export function Coquille({
   onNaviguer,
   compteurs,
   rail,
+  habillage = 'sombre',
   logo,
   logoReduit,
   encart,
@@ -455,7 +482,7 @@ export function Coquille({
     onNaviguer(id);
   };
 
-  const propsMenu = { elements, actif, onNaviguer: naviguer, compteurs, logo, logoReduit, encart };
+  const propsMenu = { elements, actif, onNaviguer: naviguer, compteurs, logo, logoReduit, encart, habillage };
 
   return (
     <div className="flex min-h-screen w-full bg-page font-sans text-principal">

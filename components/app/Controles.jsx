@@ -11,6 +11,7 @@ export function BoutonIcone({ icone: Icone, label, onClick, pastille = false, va
     contour: 'border border-base bg-surface text-secondaire hover:text-principal hover:border-forte',
     fantome: 'text-discret hover:bg-doux hover:text-principal',
     doux: 'bg-marque-doux text-marque hover:bg-primaire-150',
+    'sur-sombre': 'text-sur-sombre-secondaire hover:bg-sombre-doux hover:text-sur-sombre',
   }[variante];
   return (
     <button type="button" onClick={onClick} aria-label={label} title={label} className={`relative inline-flex shrink-0 items-center justify-center rounded-full transition-colors ${dims} ${styles} ${className}`} {...props}>

@@ -848,7 +848,7 @@ const USER_BY_ESPACE = {
    barre latérale claire, barre du haut, en-tête de page avec fil d'Ariane, pied de page.
    Sidebar, Breadcrumb et AppShell gardent leur nom et leurs props d'origine. */
 
-/* Barre d'icônes, en première position avant le menu (bleu ardoise). Son rôle reste à définir :
+/* Barre d'icônes, en première position avant le menu (bleu le plus foncé, neutre-900). Son rôle reste à définir :
    pour l'instant elle reprend les icônes d'origine du prototype et reste décorative. */
 const RAIL_ICONS = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell];
 
@@ -860,7 +860,7 @@ const toElementsMenu = (navItems) => navItems.map((n) => ({ id: n.id, label: n.l
 
 const LogoMenu = () => (
   <a href={SITE_URL} aria-label="LIGGEEY, retour au site" title="Retour au site" className="inline-flex">
-    <Logo color={COLORS.slate} iconColor={COLORS.orange} height={26} />
+    <Logo color={COLORS.onDark} iconColor={COLORS.orange} height={26} />
   </a>
 );
 const LogoMenuReduit = () => (
@@ -876,15 +876,15 @@ function EncartFormule({ onNavigate }) {
   if (!currentPlan) return null;
   const upgradeTo = currentPlan.prixMensuel === 0 ? planApi.nextPlan() : null;
   return (
-    <div className="rounded-lg border border-base bg-surface p-4 text-center">
-      <span className="mx-auto mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-marque-doux text-marque" aria-hidden="true">
+    <div className="rounded-lg border border-sur-sombre bg-sombre-doux p-4 text-center">
+      <span className="mx-auto mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-marque text-sur-marque" aria-hidden="true">
         <Crown size={20} />
       </span>
-      <p className="text-sm font-semibold text-principal">Profil {currentPlan.nom}</p>
-      <p className="mb-3 mt-1 text-xs text-secondaire">
+      <p className="text-sm font-semibold text-sur-sombre">Profil {currentPlan.nom}</p>
+      <p className="mb-3 mt-1 text-xs text-sur-sombre-secondaire">
         {upgradeTo ? `Passez ${upgradeTo.nom} pour être vu en priorité par les recruteurs.` : "Toutes les fonctions sont ouvertes."}
       </p>
-      <App.Bouton petit pleineLargeur variante={upgradeTo ? "principal" : "neutre"} onClick={() => onNavigate("abonnement")}>
+      <App.Bouton petit pleineLargeur variante={upgradeTo ? "principal" : "clair"} onClick={() => onNavigate("abonnement")}>
         {upgradeTo ? `Passer ${upgradeTo.nom}` : "Gérer ma formule"}
       </App.Bouton>
     </div>

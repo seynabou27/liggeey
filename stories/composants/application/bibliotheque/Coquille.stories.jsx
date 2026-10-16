@@ -16,13 +16,14 @@ const ELEMENTS = [
 
 const RAIL = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell].map((icone, i) => ({ icone, actif: i === 0 }));
 
-const Logo = () => <img src="/logo/liggeey-ardoise.svg" alt="LIGGEEY" className="h-6" />;
+const Logo = () => <img src="/logo/liggeey-blanc.svg" alt="LIGGEEY" className="h-6" />;
+const LogoArdoise = () => <img src="/logo/liggeey-ardoise.svg" alt="LIGGEEY" className="h-6" />;
 const LogoReduit = () => <img src="/logo/monogramme-orange.svg" alt="LIGGEEY" className="h-6" />;
 
 const Encart = () => (
-  <div className="rounded-lg border border-base bg-surface p-4 text-center">
-    <p className="text-sm font-semibold text-principal">Profil Essentiel</p>
-    <p className="mb-3 mt-1 text-xs text-secondaire">Passez Premium pour être vu en priorité.</p>
+  <div className="rounded-lg border border-sur-sombre bg-sombre-doux p-4 text-center">
+    <p className="text-sm font-semibold text-sur-sombre">Profil Essentiel</p>
+    <p className="mb-3 mt-1 text-xs text-sur-sombre-secondaire">Passez Premium pour être vu en priorité.</p>
     <Bouton petit pleineLargeur>Passer Premium</Bouton>
   </div>
 );
@@ -95,6 +96,13 @@ export const Menu = {
 };
 
 export const MenuReplie = { ...Menu, name: 'Barre latérale · repliée', args: { ...Menu.args, replie: true } };
+
+export const MenuClair = {
+  name: 'Barre latérale · habillage clair',
+  render: (args) => <BarreLaterale {...args} elements={ELEMENTS} logo={<LogoArdoise />} logoReduit={<LogoReduit />} habillage="claire" />,
+  args: { actif: 'dashboard', compteurs: { suivi: 1 }, onNaviguer: fn() },
+  decorators: [cadre],
+};
 
 export const Haut = {
   name: 'Barre du haut',
