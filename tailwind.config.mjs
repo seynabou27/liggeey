@@ -40,6 +40,8 @@ export default {
     function variablesDeCouleur({ addBase }) {
       addBase({
         ':root': { ...variablesCss('clair'), 'color-scheme': 'light' },
+        // Permet de forcer le clair sur un bloc à l'intérieur d'une page sombre (aperçus Storybook…)
+        '[data-theme="clair"]': { ...variablesCss('clair', { avecPalettes: false }), 'color-scheme': 'light' },
         '[data-theme="sombre"]': { ...variablesCss('sombre', { avecPalettes: false }),'color-scheme': 'dark' },
       });
     },

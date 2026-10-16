@@ -1,0 +1,43 @@
+import { Meta, Unstyled } from '@storybook/addon-docs/blocks';
+import { Nuancier, TableSemantique, ListeVariables, ApercuThemes } from './Couleurs.jsx';
+
+<Meta title="Fondations/Couleurs" />
+
+# Couleurs
+
+Deux couleurs de marque, partagées par le site et la plateforme :
+
+- **Primaire, l'orange (#F0891D)** : la couleur principale. Elle sert aux boutons, aux accents et aux éléments de marque.
+- **Neutre, le bleu ardoise (#1E2733)** : la couleur neutre. Elle sert aux textes, aux fonds, aux bordures et à l'en-tête.
+
+La source unique est `lib/tokens/couleurs.mjs`. Tailwind en tire les variables CSS et les classes, et cette page en tire ses tableaux. On ne met jamais de code couleur directement dans un composant.
+
+## Comment choisir
+
+1. **Dans un composant, on utilise un token sémantique** : `bg-marque`, `text-principal`, `border-base`… Le token dit à quoi sert la couleur, et il change de valeur avec le thème.
+2. **La palette (`primaire-500`, `neutre-300`…) reste pour les cas particuliers** : illustrations, graphiques, dégradés.
+3. **Le texte sur un fond orange est toujours en ardoise** (`text-sur-marque`, contraste de 6:1). Sur fond blanc, le texte orange utilise `text-marque` (primaire-700, contraste de 5:1).
+
+## Thèmes clair et sombre
+
+Le thème sombre est prêt, mais il n'est pas encore activé sur le site. Il suffira de poser `data-theme="sombre"` sur `<html>`. Le bouton **Thème** de la barre d'outils permet de le prévisualiser.
+
+<Unstyled><ApercuThemes /></Unstyled>
+
+## Palettes
+
+<Unstyled><Nuancier nom="primaire" /></Unstyled>
+<Unstyled><Nuancier nom="neutre" /></Unstyled>
+
+## Tokens sémantiques
+
+<Unstyled><TableSemantique groupe="fond" /></Unstyled>
+<Unstyled><TableSemantique groupe="texte" /></Unstyled>
+<Unstyled><TableSemantique groupe="bordure" /></Unstyled>
+<Unstyled><TableSemantique groupe="etat" /></Unstyled>
+
+## Variables CSS
+
+Toutes les variables injectées par Tailwind (`tailwind.config.mjs`). Leurs valeurs sont des canaux RVB, par exemple `240 137 29`, ce qui permet l'opacité : `bg-sombre/80`, ou `rgb(var(--fond-sombre) / 0.8)` en CSS. La dernière colonne montre la valeur appliquée dans le thème choisi.
+
+<Unstyled><ListeVariables /></Unstyled>

@@ -16,7 +16,7 @@ LIGGEEY (« travail » en wolof) est une plateforme sénégalaise d'insertion pr
 
 ## Ce dépôt
 
-Un seul projet Next.js 15 (App Router, JavaScript, Tailwind CSS 3), qui contient :
+Un seul projet Next.js 16 (App Router, JavaScript, Tailwind CSS 3), qui contient :
 
 1. **le site public** :
    - `app/` : les pages ;
@@ -25,7 +25,7 @@ Un seul projet Next.js 15 (App Router, JavaScript, Tailwind CSS 3), qui contient
    - `lib/` : la configuration et les liens ;
 2. **la plateforme** : le prototype React, servi sur `/plateforme` (`components/plateforme/`).
 
-Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build`. Copier `.env.example` en `.env.local`.
+Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build`, `npm run storybook` (http://localhost:6006, fondations et composants). Copier `.env.example` en `.env.local`.
 
 ## Règles à respecter
 
@@ -46,8 +46,8 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
   - Le wolof et l'anglais pourront s'ajouter plus tard dans `content/wo/` et `content/en/`.
 - **Accessibilité** :
   - contraste de 4,5:1 minimum ;
-  - l'orange #F0891D sert de fond (avec du texte ardoise) ou de couleur de grand titre ;
-  - le texte orange sur fond blanc utilise `orange-texte` (#A85A0F) ;
+  - l'orange (`bg-marque`, #F0891D) sert de fond, toujours avec du texte ardoise (`text-sur-marque`), ou de couleur de grand titre ;
+  - le texte orange sur fond blanc utilise `text-marque` (primaire-700, #A85A0F) ;
   - zones cliquables de 44 px minimum, focus visible, `alt` sur les images, un seul `h1` par page.
 - **Performance** :
   - pas de bibliothèque lourde sur les pages du site ;
@@ -55,15 +55,18 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
 
 ## Charte graphique
 
-- **Couleurs** (`tailwind.config.js`) :
-  - `orange` : #F0891D ;
-  - `orange-clair` : #FDEBD3 ;
-  - `orange-texte` : #A85A0F ;
-  - `ardoise` : #1E2733 ;
-  - `gris` : #6B7480 ;
-  - `gris-fonce` : #545C67 (texte secondaire) ;
-  - `gris-fond` : #F4F5F7 ;
-  - `bordure` : #E2E5E9.
+- **Couleurs** : source unique dans `lib/tokens/couleurs.mjs`, lue par `tailwind.config.mjs` et par Storybook (page « Fondations / Couleurs »). Aucun code couleur dans les composants.
+  - **Palettes** de 18 nuances (50 à 900) :
+    - `primaire` : l'orange de marque, la couleur principale (boutons, accents). Référence : `primaire-500` = #F0891D ;
+    - `neutre` : le bleu ardoise, la couleur neutre (textes, fonds, bordures). Référence : `neutre-800` = #1E2733.
+  - **Tokens sémantiques**, à utiliser en priorité. Chacun a une valeur claire et une valeur sombre :
+    - fonds : `bg-page`, `bg-surface`, `bg-doux`, `bg-sombre` (en-tête, pied de page, menu de l'application), `bg-marque`, `bg-marque-survol`, `bg-marque-doux`… ;
+    - textes : `text-principal`, `text-secondaire`, `text-discret`, `text-sur-sombre`, `text-sur-marque` (texte ardoise sur l'orange), `text-marque` (orange lisible sur blanc) ;
+    - bordures : `border-base`, `border-forte`, `border-principal`, `border-marque` ;
+    - focus : `ring-focus`, `outline-focus`.
+  - Dans le prototype (styles en ligne), l'objet `COLORS` pointe vers les mêmes variables CSS.
+  - **Thème sombre** : prêt mais inactif. Il s'active avec `data-theme="sombre"` sur `<html>`.
+  - Ajouter ou modifier une couleur : changer `lib/tokens/couleurs.mjs`, puis vérifier les contrastes dans Storybook.
 - **Polices** :
   - Plus Jakarta Sans pour l'interface (`font-sans`, chargée par `next/font`), comme le modèle JobStock ;
   - Georgia pour les contenus éditoriaux (`font-serif`).

@@ -1,5 +1,5 @@
 const FONDS = {
-  blanc: 'bg-surface',
+  blanc: 'bg-page',
   gris: 'bg-doux',
   clair: 'bg-marque-doux',
   sombre: 'bg-sombre text-sur-sombre',
