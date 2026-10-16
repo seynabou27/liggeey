@@ -26,7 +26,7 @@ export default function PageAPropos() {
 
       <Section etroit>
         <h2 className="text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">{t.histoire.titre}</h2>
-        <blockquote className="mt-8 border-y-2 border-ardoise py-6 font-serif text-2xl leading-snug md:text-3xl">{t.histoire.citation}</blockquote>
+        <blockquote className="mt-8 border-y-2 border-principal py-6 font-serif text-2xl leading-snug md:text-3xl">{t.histoire.citation}</blockquote>
         <div className="mt-8 flex flex-col gap-5 font-serif text-xl leading-relaxed">
           {t.histoire.paragraphes.map((p) => (
             <p key={p}>{p}</p>
@@ -49,11 +49,11 @@ export default function PageAPropos() {
         <ul className="grid grid-cols-2 gap-8 lg:grid-cols-4">
           {t.equipe.membres.map((m) => (
             <li key={m.nom} className="flex flex-col items-center gap-3 text-center">
-              <div className="relative grid h-32 w-32 place-items-center overflow-hidden rounded-full bg-orange-clair text-3xl font-semibold text-orange-texte">
+              <div className="relative grid h-32 w-32 place-items-center overflow-hidden rounded-full bg-marque-doux text-3xl font-semibold text-marque">
                 {imageExiste(m.photo) ? <Image src={m.photo} alt={`Portrait de ${m.nom}`} fill sizes="128px" className="object-cover" /> : <span aria-hidden="true">{initiales(m.nom)}</span>}
               </div>
               <h3 className="text-lg font-semibold">{m.nom}</h3>
-              <p className="text-gris-fonce">{m.role}</p>
+              <p className="text-secondaire">{m.role}</p>
             </li>
           ))}
         </ul>
@@ -67,7 +67,7 @@ export default function PageAPropos() {
             <p className="mt-4 font-semibold">
               {site.bureau.adresse}, {site.bureau.ville}
             </p>
-            <p className="text-gris-fonce">{site.bureau.horairesCourts}</p>
+            <p className="text-secondaire">{site.bureau.horairesCourts}</p>
           </div>
           <CarteBureau />
         </div>

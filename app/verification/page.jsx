@@ -18,9 +18,9 @@ export default function PageVerification() {
       <Section>
         <ul className="grid gap-6 md:grid-cols-2">
           {t.controles.map((c) => (
-            <li key={c.titre} className="flex flex-col gap-4 rounded-lg border border-bordure p-7">
+            <li key={c.titre} className="flex flex-col gap-4 rounded-lg border border-base p-7">
               <div className="flex items-center gap-4">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-orange-clair text-orange-texte">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-marque-doux text-marque">
                   <Icone nom={c.icone} />
                 </span>
                 <h2 className="text-2xl font-semibold">{c.titre}</h2>
@@ -30,7 +30,7 @@ export default function PageVerification() {
                 <ul className="flex flex-col gap-2">
                   {c.liste.map((point) => (
                     <li key={point} className="flex items-start gap-2.5">
-                      <Check className="mt-0.5 h-5 w-5 shrink-0 text-orange-texte" aria-hidden="true" />
+                      <Check className="mt-0.5 h-5 w-5 shrink-0 text-marque" aria-hidden="true" />
                       {point}
                     </li>
                   ))}

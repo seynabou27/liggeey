@@ -29,18 +29,18 @@ export default function BandeVideo({ avecPhoto }) {
   };
 
   return (
-    <section aria-labelledby="titre-video" className="relative overflow-hidden bg-ardoise">
+    <section aria-labelledby="titre-video" className="relative overflow-hidden bg-sombre">
       {avecPhoto && <Image src={t.image} alt="" fill sizes="100vw" className="object-cover" />}
-      <div className="absolute inset-0 bg-gradient-to-t from-ardoise/85 via-ardoise/40 to-ardoise/20" aria-hidden="true" />
+      <div className="absolute inset-0 bg-gradient-to-t from-sombre/85 via-sombre/40 to-sombre/20" aria-hidden="true" />
 
-      <div className="container relative flex min-h-[340px] flex-col items-center justify-center gap-5 py-20 text-center text-white md:min-h-[560px]">
+      <div className="container relative flex min-h-[340px] flex-col items-center justify-center gap-5 py-20 text-center text-sur-sombre md:min-h-[560px]">
         <button
           type="button"
           onClick={ouvrir}
           disabled={!t.src}
           aria-haspopup="dialog"
           aria-label={t.src ? t.lire : `${t.titre} : ${t.bientot}`}
-          className="group relative grid h-20 w-20 place-items-center rounded-full bg-white text-orange-texte shadow-carte transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100 md:h-24 md:w-24"
+          className="group relative grid h-20 w-20 place-items-center rounded-full bg-surface text-marque shadow-carte transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100 md:h-24 md:w-24"
         >
           {/* Halo qui pulse autour du bouton (désactivé si l'on a demandé à réduire les mouvements) */}
           {t.src && <span className="absolute inset-0 animate-ping rounded-full bg-white/40 motion-reduce:hidden" aria-hidden="true" />}
@@ -60,13 +60,13 @@ export default function BandeVideo({ avecPhoto }) {
         aria-label={t.titre}
         onClose={() => setLecture(false)}
         onClick={(e) => e.target === e.currentTarget && e.currentTarget.close()}
-        className="m-auto w-[calc(100%-24px)] max-w-4xl overflow-visible bg-transparent p-0 backdrop:bg-ardoise/85 backdrop:backdrop-blur-sm"
+        className="m-auto w-[calc(100%-24px)] max-w-4xl overflow-visible bg-transparent p-0 backdrop:bg-sombre/85 backdrop:backdrop-blur-sm"
       >
         <button
           type="button"
           onClick={() => ref.current?.close()}
           aria-label={t.fermer}
-          className="absolute -top-14 right-0 grid h-11 w-11 place-items-center rounded-full bg-white text-ardoise hover:bg-gris-fond"
+          className="absolute -top-14 right-0 grid h-11 w-11 place-items-center rounded-full bg-surface text-principal hover:bg-doux"
           autoFocus
         >
           <X className="h-5 w-5" aria-hidden="true" />

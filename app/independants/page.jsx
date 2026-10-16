@@ -13,7 +13,7 @@ export const metadata = { title: independants.meta.titre, description: independa
 
 function Lettre({ children }) {
   return (
-    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-ardoise font-semibold text-white" aria-hidden="true">
+    <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sombre font-semibold text-sur-sombre" aria-hidden="true">
       {children}
     </span>
   );
@@ -28,14 +28,14 @@ export default function PageIndependants() {
         <Bouton href="#emploi" variante="clair">
           {t.hero.choixB}
         </Bouton>
-        <Link href="#wolof" className="inline-flex min-h-[44px] items-center font-semibold underline decoration-orange decoration-2 underline-offset-4">
+        <Link href="#wolof" className="inline-flex min-h-[44px] items-center font-semibold underline decoration-primaire-500 decoration-2 underline-offset-4">
           {t.hero.audio}
         </Link>
       </EnTetePage>
 
       <Section fond="clair">
         <div className="grid gap-6 md:grid-cols-[auto_1fr] md:items-center md:gap-12">
-          <p className="text-7xl font-light text-orange-texte">{t.constat.valeur}</p>
+          <p className="text-7xl font-light text-marque">{t.constat.valeur}</p>
           <div>
             <h2 className="text-balance text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">{t.constat.titre}</h2>
             <p className="mt-3 text-lg">{t.constat.texte}</p>
@@ -51,20 +51,20 @@ export default function PageIndependants() {
           <Lettre>{t.cheminA.lettre}</Lettre>
           <h2 className="text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">{t.cheminA.titre}</h2>
         </div>
-        <p className="mt-4 max-w-2xl text-lg text-gris-fonce">{t.cheminA.texte}</p>
+        <p className="mt-4 max-w-2xl text-lg text-secondaire">{t.cheminA.texte}</p>
         <ol className="mt-8 grid gap-4 sm:grid-cols-2 lg:grid-cols-3">
           {t.cheminA.etapes.map((e) => (
-            <li key={e.titre} className="flex gap-3 rounded-lg border border-bordure p-5">
-              <Check className="mt-0.5 h-5 w-5 shrink-0 text-orange-texte" aria-hidden="true" />
+            <li key={e.titre} className="flex gap-3 rounded-lg border border-base p-5">
+              <Check className="mt-0.5 h-5 w-5 shrink-0 text-marque" aria-hidden="true" />
               <div>
                 <h3 className="font-semibold">{e.titre}</h3>
-                <p className="mt-1 text-gris-fonce">{e.texte}</p>
+                <p className="mt-1 text-secondaire">{e.texte}</p>
               </div>
             </li>
           ))}
         </ol>
         <p className="mt-8 text-lg font-semibold">{t.cheminA.prix}</p>
-        <p className="mt-2 text-gris-fonce">{t.cheminA.note}</p>
+        <p className="mt-2 text-secondaire">{t.cheminA.note}</p>
         <div className="mt-6">
           <Bouton href={lienInscription('independant', { objectif: 'formaliser' })}>{t.cheminA.bouton}</Bouton>
         </div>
@@ -75,7 +75,7 @@ export default function PageIndependants() {
           <Lettre>{t.cheminB.lettre}</Lettre>
           <h2 className="text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">{t.cheminB.titre}</h2>
         </div>
-        <p className="mb-8 mt-4 max-w-2xl text-lg text-gris-fonce">{t.cheminB.texte}</p>
+        <p className="mb-8 mt-4 max-w-2xl text-lg text-secondaire">{t.cheminB.texte}</p>
         <GrilleAtouts items={t.cheminB.items} colonnes={4} />
         <div className="mt-8">
           <Bouton href={lienInscription('independant', { objectif: 'emploi' })}>{t.cheminB.bouton}</Bouton>

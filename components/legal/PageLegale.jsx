@@ -16,14 +16,14 @@ export default function PageLegale({ cle }) {
               key={lien.href}
               href={lien.href}
               aria-current={lien.href === `/${cle}` ? 'page' : undefined}
-              className={`inline-flex min-h-[44px] items-center rounded-full border-2 px-4 text-sm font-semibold lg:rounded-lg ${lien.href === `/${cle}` ? 'border-ardoise bg-ardoise text-white' : 'border-bordure hover:border-ardoise'}`}
+              className={`inline-flex min-h-[44px] items-center rounded-full border-2 px-4 text-sm font-semibold lg:rounded-lg ${lien.href === `/${cle}` ? 'border-principal bg-sombre text-sur-sombre' : 'border-base hover:border-principal'}`}
             >
               {lien.label}
             </Link>
           ))}
         </nav>
         <article className="max-w-3xl">
-          <p role="note" className="rounded-lg bg-orange-clair p-4 font-medium">
+          <p role="note" className="rounded-lg bg-marque-doux p-4 font-medium">
             {legal.avertissement}
           </p>
           {page.sections.map((s) => (

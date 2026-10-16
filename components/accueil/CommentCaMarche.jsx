@@ -15,12 +15,12 @@ function Colonne({ id, groupe, visible }) {
       <ol className="flex flex-col gap-8">
         {groupe.items.map((etape) => (
           <li key={etape.titre} className="flex gap-4">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-orange-clair text-orange-texte">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-marque-doux text-marque">
               <Icone nom={etape.icone} />
             </span>
             <div>
               <h3 className="text-[15px] font-semibold uppercase">{etape.titre}</h3>
-              <p className="mt-1 text-sm leading-[1.7] text-gris-fonce">{etape.texte}</p>
+              <p className="mt-1 text-sm leading-[1.7] text-secondaire">{etape.texte}</p>
             </div>
           </li>
         ))}
@@ -39,11 +39,11 @@ export default function CommentCaMarche({ avecCapture }) {
   const [onglet, setOnglet] = useState('talents');
 
   return (
-    <section aria-labelledby="titre-etapes" className="bg-white py-20">
+    <section aria-labelledby="titre-etapes" className="bg-surface py-20">
       <div className="container">
         <TitreSection id="titre-etapes" centre titre={t.titre} texte={t.texte} />
 
-        <div className="mx-auto mb-8 grid max-w-md grid-cols-2 overflow-hidden rounded-lg border-2 border-ardoise lg:hidden">
+        <div className="mx-auto mb-8 grid max-w-md grid-cols-2 overflow-hidden rounded-lg border-2 border-principal lg:hidden">
           {['talents', 'entreprises'].map((id) => (
             <button
               key={id}
@@ -51,7 +51,7 @@ export default function CommentCaMarche({ avecCapture }) {
               aria-pressed={onglet === id}
               aria-controls={`etapes-${id}`}
               onClick={() => setOnglet(id)}
-              className={`min-h-[44px] px-3 text-sm font-semibold ${onglet === id ? 'bg-ardoise text-white' : 'bg-white'}`}
+              className={`min-h-[44px] px-3 text-sm font-semibold ${onglet === id ? 'bg-sombre text-sur-sombre' : 'bg-surface'}`}
             >
               {t[id].titre}
             </button>
@@ -61,7 +61,7 @@ export default function CommentCaMarche({ avecCapture }) {
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_280px_1fr] lg:gap-14">
           <Colonne id="talents" groupe={t.talents} visible={onglet === 'talents'} />
           <div className="order-first mx-auto w-[220px] lg:order-none lg:w-[260px]">
-            <div className="relative aspect-[9/18] overflow-hidden rounded-[36px] border-[10px] border-ardoise bg-orange-clair shadow-carte">
+            <div className="relative aspect-[9/18] overflow-hidden rounded-[36px] border-[10px] border-principal bg-marque-doux shadow-carte">
               {avecCapture ? (
                 <Image src={t.capture} alt="Écran de l'application LIGGEEY" fill sizes="260px" className="object-cover" />
               ) : (

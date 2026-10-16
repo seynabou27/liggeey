@@ -15,7 +15,7 @@ export default function PiedDePage() {
   const reseaux = site.contact.reseaux.filter((r) => r.url);
 
   return (
-    <footer className="bg-ardoise text-white">
+    <footer className="bg-sombre text-sur-sombre">
       <div className="container grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.3fr]">
         <div className="flex flex-col gap-4">
           <Image src="/logo/liggeey-blanc.svg" alt="LIGGEEY" width={123} height={24} />
@@ -28,7 +28,7 @@ export default function PiedDePage() {
             <ul className="flex flex-wrap gap-3 text-[13px] font-medium">
               {reseaux.map((r) => (
                 <li key={r.nom}>
-                  <a href={r.url} target="_blank" rel="noopener noreferrer" className="hover:text-orange">
+                  <a href={r.url} target="_blank" rel="noopener noreferrer" className="hover:text-marque-vif">
                     {r.nom}
                   </a>
                 </li>
@@ -43,7 +43,7 @@ export default function PiedDePage() {
             <ul className="mt-5 flex flex-col">
               {groupe.liens.map((lien) => (
                 <li key={lien.href}>
-                  <Link href={lien.href} className="inline-flex min-h-[36px] items-center text-[13px] font-medium text-white/85 hover:text-orange">
+                  <Link href={lien.href} className="inline-flex min-h-[36px] items-center text-[13px] font-medium text-white/85 hover:text-marque-vif">
                     {lien.label}
                   </Link>
                 </li>
@@ -55,15 +55,15 @@ export default function PiedDePage() {
         <div>
           <h2 className="text-[15px] font-semibold">{commun.aide.titre}</h2>
           <div className="mt-5 flex flex-col gap-3">
-            <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border-2 border-white/25 px-4 py-2.5 hover:border-orange">
-              <MessageCircle className="h-6 w-6 text-orange" aria-hidden="true" />
+            <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border-2 border-white/25 px-4 py-2.5 hover:border-marque">
+              <MessageCircle className="h-6 w-6 text-marque-vif" aria-hidden="true" />
               <span className="flex flex-col leading-tight">
                 <span className="text-xs text-white/80">{commun.aide.whatsapp[0]}</span>
                 <span className="text-xl font-semibold">{commun.aide.whatsapp[1]}</span>
               </span>
             </a>
-            <Link href="/contact#bureau" className="flex items-center gap-3 rounded-lg border-2 border-white/25 px-4 py-2.5 hover:border-orange">
-              <MapPin className="h-6 w-6 text-orange" aria-hidden="true" />
+            <Link href="/contact#bureau" className="flex items-center gap-3 rounded-lg border-2 border-white/25 px-4 py-2.5 hover:border-marque">
+              <MapPin className="h-6 w-6 text-marque-vif" aria-hidden="true" />
               <span className="flex flex-col leading-tight">
                 <span className="text-xs text-white/80">{commun.aide.bureau[0]}</span>
                 <span className="text-xl font-semibold">{commun.aide.bureau[1]}</span>
@@ -78,7 +78,7 @@ export default function PiedDePage() {
           <p className="flex flex-wrap gap-x-4 gap-y-1">
             <span>© {annee} LIGGEEY</span>
             {commun.legal.map((lien) => (
-              <Link key={lien.href} href={lien.href} className="hover:text-orange">
+              <Link key={lien.href} href={lien.href} className="hover:text-marque-vif">
                 {lien.label}
               </Link>
             ))}
@@ -86,9 +86,9 @@ export default function PiedDePage() {
           <div className="flex items-center gap-3">
             <span>{commun.paiement}</span>
             {/* À remplacer par les logos officiels Wave et Orange Money (public/paiement/) */}
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-ardoise">Wave</span>
-            <span className="rounded-full bg-white px-3 py-1 text-xs font-semibold text-ardoise">Orange Money</span>
-            <a href="#haut" aria-label="Revenir en haut de la page" className="ml-2 grid h-11 w-11 place-items-center rounded bg-orange text-ardoise hover:bg-orange-survol">
+            <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-principal">Wave</span>
+            <span className="rounded-full bg-surface px-3 py-1 text-xs font-semibold text-principal">Orange Money</span>
+            <a href="#haut" aria-label="Revenir en haut de la page" className="ml-2 grid h-11 w-11 place-items-center rounded bg-marque text-sur-marque hover:bg-marque-survol">
               <ArrowUp className="h-5 w-5" aria-hidden="true" />
             </a>
           </div>

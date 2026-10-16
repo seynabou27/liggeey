@@ -21,7 +21,7 @@ export default function PageFaq() {
             <ul className="flex gap-2 lg:sticky lg:top-24 lg:flex-col">
               {t.rubriques.map((r) => (
                 <li key={r.id} className="shrink-0">
-                  <a href={`#${r.id}`} className="inline-flex min-h-[44px] items-center rounded-full border-2 border-bordure px-4 text-sm font-semibold hover:border-ardoise lg:w-full lg:rounded-lg">
+                  <a href={`#${r.id}`} className="inline-flex min-h-[44px] items-center rounded-full border-2 border-base px-4 text-sm font-semibold hover:border-principal lg:w-full lg:rounded-lg">
                     {r.titre}
                   </a>
                 </li>

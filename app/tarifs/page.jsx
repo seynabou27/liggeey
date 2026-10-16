@@ -28,15 +28,15 @@ export default function PageTarifs() {
       </Section>
 
       <Section etroit>
-        <div className="flex flex-col gap-6 rounded-lg border border-bordure p-6 sm:flex-row sm:items-center sm:justify-between">
+        <div className="flex flex-col gap-6 rounded-lg border border-base p-6 sm:flex-row sm:items-center sm:justify-between">
           <div>
             <h2 className="text-2xl font-semibold">{t.paiement.titre}</h2>
-            <p className="mt-2 text-gris-fonce">{t.paiement.texte}</p>
+            <p className="mt-2 text-secondaire">{t.paiement.texte}</p>
           </div>
           {/* À remplacer par les logos officiels (fichiers fournis par Wave et Orange Money) */}
           <div className="flex gap-3">
-            <span className="rounded-lg border border-bordure px-5 py-3 font-semibold">Wave</span>
-            <span className="rounded-lg border border-bordure px-5 py-3 font-semibold">Orange Money</span>
+            <span className="rounded-lg border border-base px-5 py-3 font-semibold">Wave</span>
+            <span className="rounded-lg border border-base px-5 py-3 font-semibold">Orange Money</span>
           </div>
         </div>
         <div className="mt-14">

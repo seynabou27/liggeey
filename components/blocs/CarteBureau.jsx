@@ -16,7 +16,7 @@ export default function CarteBureau() {
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-bordure bg-gris-fond">
+      <div className="relative aspect-[16/10] overflow-hidden rounded-lg border border-base bg-doux">
         {affichee ? (
           <iframe
             src={lienCarteEmbed()}
@@ -27,12 +27,12 @@ export default function CarteBureau() {
           />
         ) : (
           <div className="absolute inset-0 flex flex-col items-center justify-center gap-3 p-6 text-center">
-            <MapPin className="h-8 w-8 text-orange-texte" aria-hidden="true" />
+            <MapPin className="h-8 w-8 text-marque" aria-hidden="true" />
             <p className="font-semibold">{t.titre}</p>
-            <button type="button" onClick={() => setAffichee(true)} className="min-h-[44px] rounded border-2 border-ardoise bg-white px-5 font-semibold hover:bg-ardoise hover:text-white">
+            <button type="button" onClick={() => setAffichee(true)} className="min-h-[44px] rounded border-2 border-principal bg-surface px-5 font-semibold hover:bg-sombre hover:text-sur-sombre">
               {t.afficher}
             </button>
-            <p className="text-sm text-gris-fonce">{t.note}</p>
+            <p className="text-sm text-secondaire">{t.note}</p>
           </div>
         )}
       </div>

@@ -21,27 +21,27 @@ export default async function PageContact({ searchParams }) {
 
       <Section>
         <ul className="grid gap-5 md:grid-cols-3">
-          <li className="flex flex-col gap-3 rounded-lg border border-bordure p-6">
-            <MessageCircle className="h-7 w-7 text-orange-texte" aria-hidden="true" />
+          <li className="flex flex-col gap-3 rounded-lg border border-base p-6">
+            <MessageCircle className="h-7 w-7 text-marque" aria-hidden="true" />
             <h2 className="text-xl font-semibold">{t.moyens.whatsapp}</h2>
             <p>{site.contact.whatsappAffiche}</p>
             <Bouton href={lienWhatsApp()} variante="whatsapp" nouvelOnglet className="self-start">
               {t.moyens.ecrire}
             </Bouton>
           </li>
-          <li className="flex flex-col gap-3 rounded-lg border border-bordure p-6">
-            <MapPin className="h-7 w-7 text-orange-texte" aria-hidden="true" />
+          <li className="flex flex-col gap-3 rounded-lg border border-base p-6">
+            <MapPin className="h-7 w-7 text-marque" aria-hidden="true" />
             <h2 className="text-xl font-semibold">{t.moyens.bureau}</h2>
             <p>
               {site.bureau.adresse}, {site.bureau.ville}
             </p>
-            <p className="flex items-start gap-2 text-gris-fonce">
+            <p className="flex items-start gap-2 text-secondaire">
               <Clock className="mt-0.5 h-4 w-4 shrink-0" aria-hidden="true" />
               {site.bureau.horairesCourts}
             </p>
           </li>
-          <li className="flex flex-col gap-3 rounded-lg border border-bordure p-6">
-            <Mail className="h-7 w-7 text-orange-texte" aria-hidden="true" />
+          <li className="flex flex-col gap-3 rounded-lg border border-base p-6">
+            <Mail className="h-7 w-7 text-marque" aria-hidden="true" />
             <h2 className="text-xl font-semibold">{t.moyens.email}</h2>
             <a href={`mailto:${site.contact.email}`} className="lien self-start">
               {site.contact.email}

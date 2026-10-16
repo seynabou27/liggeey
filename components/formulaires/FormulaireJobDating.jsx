@@ -18,8 +18,8 @@ export default function FormulaireJobDating({ evenement }) {
 
   if (etat === 'succes') {
     return (
-      <div role="status" className="flex flex-col gap-4 rounded-lg bg-orange-clair p-8">
-        <CheckCircle className="h-8 w-8 text-orange-texte" aria-hidden="true" />
+      <div role="status" className="flex flex-col gap-4 rounded-lg bg-marque-doux p-8">
+        <CheckCircle className="h-8 w-8 text-marque" aria-hidden="true" />
         <h3 className="text-2xl font-semibold">{t.succes.titre}</h3>
         <p className="text-lg">{t.succes.texte}</p>
         {PAIEMENT_WAVE || PAIEMENT_OM ? (

@@ -16,8 +16,8 @@ export default function FormulaireContact({ motifInitial = '' }) {
 
   if (etat === 'succes') {
     return (
-      <div role="status" className="flex items-start gap-3 rounded-lg bg-orange-clair p-6 text-lg">
-        <CheckCircle className="mt-1 h-6 w-6 shrink-0 text-orange-texte" aria-hidden="true" />
+      <div role="status" className="flex items-start gap-3 rounded-lg bg-marque-doux p-6 text-lg">
+        <CheckCircle className="mt-1 h-6 w-6 shrink-0 text-marque" aria-hidden="true" />
         {t.succes.replace('{delai}', site.delais.contact)}
       </div>
     );

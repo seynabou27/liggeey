@@ -7,7 +7,7 @@ import { useEffect } from 'react';
 const LiggeeyPrototype = dynamic(() => import('./LiggeeyPrototype'), {
   ssr: false,
   loading: () => (
-    <div className="grid min-h-screen place-items-center bg-ardoise text-white" role="status">
+    <div className="grid min-h-screen place-items-center bg-sombre text-sur-sombre" role="status">
       <p className="text-lg font-semibold">Chargement de la plateforme…</p>
     </div>
   ),

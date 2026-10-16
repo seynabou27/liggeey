@@ -1,11 +1,11 @@
 import Link from 'next/link';
 
 const VARIANTES = {
-  principal: 'bg-orange text-ardoise hover:bg-orange-survol', // texte ardoise sur orange : contraste 6:1
-  secondaire: 'border-2 border-ardoise text-ardoise hover:bg-ardoise hover:text-white',
-  clair: 'border-2 border-white text-white hover:bg-white hover:text-ardoise',
-  sombre: 'bg-ardoise text-white hover:bg-ardoise-800',
-  whatsapp: 'bg-whatsapp text-ardoise hover:brightness-95',
+  principal: 'bg-marque text-sur-marque hover:bg-marque-survol active:bg-marque-actif', // texte ardoise sur orange : contraste 6:1
+  secondaire: 'border-2 border-principal text-principal hover:bg-sombre hover:text-sur-sombre',
+  clair: 'border-2 border-white text-sur-sombre hover:bg-surface hover:text-principal',
+  sombre: 'bg-sombre text-sur-sombre hover:bg-sombre-doux',
+  whatsapp: 'bg-whatsapp text-sur-marque hover:brightness-95',
 };
 
 /**

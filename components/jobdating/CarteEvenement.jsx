@@ -10,8 +10,8 @@ export default function CarteEvenement({ evenement, lienDetails = false }) {
   const pastille = datePastille(evenement.date);
 
   return (
-    <article className="flex flex-col gap-6 rounded-lg border-[3px] border-ardoise bg-white p-6 md:flex-row md:items-start md:p-8">
-      <div className="grid h-24 w-24 shrink-0 place-items-center rounded-lg bg-orange-clair text-center font-semibold leading-tight" aria-hidden="true">
+    <article className="flex flex-col gap-6 rounded-lg border-[3px] border-principal bg-surface p-6 md:flex-row md:items-start md:p-8">
+      <div className="grid h-24 w-24 shrink-0 place-items-center rounded-lg bg-marque-doux text-center font-semibold leading-tight" aria-hidden="true">
         <span>
           <span className="block text-3xl">{pastille.jour}</span>
           <span className="block">{pastille.mois}</span>
@@ -19,7 +19,7 @@ export default function CarteEvenement({ evenement, lienDetails = false }) {
       </div>
       <div className="flex flex-1 flex-col gap-3">
         <h2 className="text-2xl font-semibold">{evenement.titre}</h2>
-        <ul className="flex flex-col gap-1.5 text-gris-fonce">
+        <ul className="flex flex-col gap-1.5 text-secondaire">
           <li className="flex items-center gap-2">
             <Calendar className="h-4 w-4" aria-hidden="true" />
             <span className="first-letter:uppercase">{dateLongue(evenement.date)}</span>
@@ -34,10 +34,10 @@ export default function CarteEvenement({ evenement, lienDetails = false }) {
           </li>
         </ul>
         <p className="flex flex-wrap gap-2">
-          <span className="rounded-full bg-ardoise px-3 py-1 text-sm font-semibold text-white">
+          <span className="rounded-full bg-sombre px-3 py-1 text-sm font-semibold text-sur-sombre">
             {t.participation} : {fcfa(evenement.prix)}
           </span>
-          <span className="rounded-full border border-bordure px-3 py-1 text-sm font-medium">{evenement.public}</span>
+          <span className="rounded-full border border-base px-3 py-1 text-sm font-medium">{evenement.public}</span>
         </p>
         <div className="mt-2 flex flex-wrap items-center gap-4">
           <Bouton href={`/job-dating/${evenement.slug}#inscription`}>{t.inscrire}</Bouton>

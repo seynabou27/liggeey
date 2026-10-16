@@ -24,7 +24,7 @@ export default function PageJobDating() {
 
       <Section>
         <TitreSection titre={t.prochain.titre} />
-        {evenement ? <CarteEvenement evenement={evenement} lienDetails /> : <p className="rounded-lg bg-orange-clair p-8 text-lg">{t.prochain.vide}</p>}
+        {evenement ? <CarteEvenement evenement={evenement} lienDetails /> : <p className="rounded-lg bg-marque-doux p-8 text-lg">{t.prochain.vide}</p>}
       </Section>
 
       <Section fond="gris">

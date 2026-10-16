@@ -15,16 +15,16 @@ export default function BandeauAccueil() {
   const avecPhoto = imageExiste(hero.image);
 
   return (
-    <section aria-labelledby="titre-accueil" className="relative overflow-hidden bg-ardoise text-white">
+    <section aria-labelledby="titre-accueil" className="relative overflow-hidden bg-sombre text-sur-sombre">
       {avecPhoto && <Image src={hero.image} alt="" fill priority sizes="100vw" className="object-cover" />}
       {/* Voile sombre sous le texte (contraste), plus léger à droite pour laisser vivre la photo */}
-      <div className="absolute inset-0 bg-ardoise/75 lg:bg-transparent lg:bg-gradient-to-r lg:from-ardoise/90 lg:via-ardoise/60 lg:to-ardoise/10" aria-hidden="true" />
+      <div className="absolute inset-0 bg-sombre/75 lg:bg-transparent lg:bg-gradient-to-r lg:from-sombre/90 lg:via-sombre/60 lg:to-sombre/10" aria-hidden="true" />
       <VagueAccueil />
 
       <div className="container relative grid gap-10 pb-12 pt-[124px] lg:min-h-[740px] lg:grid-cols-[minmax(0,1fr)_480px] lg:gap-14 lg:pb-32 lg:pt-[104px]">
         <div className="flex flex-col lg:pt-[78px]">
-          <p className="flex items-center gap-2.5 text-base font-medium text-orange">
-            <span className="h-0.5 w-9 bg-orange" aria-hidden="true" />
+          <p className="flex items-center gap-2.5 text-base font-medium text-marque-vif">
+            <span className="h-0.5 w-9 bg-marque" aria-hidden="true" />
             {hero.surtitre}
           </p>
           <h1 id="titre-accueil" className="mt-4 max-w-[640px] text-balance text-[25px] font-semibold leading-[1.3] sm:text-[40px] lg:text-[57px]">
@@ -37,7 +37,7 @@ export default function BandeauAccueil() {
                 <dt className="text-sm text-white/90 sm:text-base">{r.libelle}</dt>
                 <dd className="text-[32px] font-light leading-none sm:text-5xl">
                   <Compteur valeur={r.valeur} />
-                  <span className={`ml-1.5 text-orange ${r.petit ? 'text-2xl sm:text-3xl' : ''}`}>{r.unite}</span>
+                  <span className={`ml-1.5 text-marque-vif ${r.petit ? 'text-2xl sm:text-3xl' : ''}`}>{r.unite}</span>
                 </dd>
               </div>
             ))}

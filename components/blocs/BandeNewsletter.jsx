@@ -10,20 +10,20 @@ export default function BandeNewsletter() {
   const { etat, erreurs, envoyer } = useEnvoi('newsletter', ['email']);
 
   return (
-    <section aria-labelledby="titre-newsletter" className="bg-orange py-20 text-ardoise">
+    <section aria-labelledby="titre-newsletter" className="bg-marque py-20 text-sur-marque">
       <div className="container flex flex-col items-center gap-4 text-center">
         <h2 id="titre-newsletter" className="text-[22px] font-semibold leading-[1.27] md:text-[32px] md:leading-[1.2]">
           {t.titre}
         </h2>
         <p className="max-w-xl text-[15px] leading-[1.7]">{t.texte}</p>
         {etat === 'succes' ? (
-          <p role="status" className="mt-2 rounded-lg bg-white px-6 py-4 font-semibold">
+          <p role="status" className="mt-2 rounded-lg bg-surface px-6 py-4 font-semibold">
             {t.succes}
           </p>
         ) : (
           <form noValidate onSubmit={(e) => envoyer(e)} className="relative mt-2 w-full max-w-xl">
             <PotDeMiel />
-            <div className="flex items-center gap-2 rounded-lg border-2 border-ardoise bg-white p-1.5">
+            <div className="flex items-center gap-2 rounded-lg border-2 border-principal bg-surface p-1.5">
               <label htmlFor="newsletter-email" className="sr-only">
                 {t.champ}
               </label>
@@ -35,9 +35,9 @@ export default function BandeNewsletter() {
                 placeholder={t.champ}
                 aria-invalid={erreurs.email ? true : undefined}
                 aria-describedby={erreurs.email ? 'newsletter-erreur' : undefined}
-                className="h-11 min-w-0 flex-1 rounded px-3 text-[15px] placeholder:text-gris focus:outline-none"
+                className="h-11 min-w-0 flex-1 rounded px-3 text-[15px] placeholder:text-discret focus:outline-none"
               />
-              <button type="submit" disabled={etat === 'envoi'} className="h-11 shrink-0 rounded-md bg-ardoise px-[30px] text-[13px] font-medium text-white hover:bg-ardoise-800 disabled:opacity-60">
+              <button type="submit" disabled={etat === 'envoi'} className="h-11 shrink-0 rounded-md bg-sombre px-[30px] text-[13px] font-medium text-sur-sombre hover:bg-sombre-doux disabled:opacity-60">
                 {t.bouton}
               </button>
             </div>

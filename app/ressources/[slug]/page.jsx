@@ -42,10 +42,10 @@ export default async function PageArticle({ params }) {
 
   return (
     <>
-      <div className="bg-ardoise pb-14 pt-[128px] text-white md:pt-[150px]">
+      <div className="bg-sombre pb-14 pt-[128px] text-sur-sombre md:pt-[150px]">
         <div className="container max-w-3xl">
           <nav aria-label="Fil d'Ariane" className="text-sm text-white/85">
-            <Link href="/ressources" className="hover:text-orange">
+            <Link href="/ressources" className="hover:text-marque-vif">
               Ressources
             </Link>{' '}
             › {rubrique}
@@ -59,9 +59,9 @@ export default async function PageArticle({ params }) {
 
       <article className="container max-w-3xl py-12">
         {/* Contenu Markdown converti en HTML (fichiers rédigés par l'équipe) */}
-        <div className="article font-serif text-ardoise" dangerouslySetInnerHTML={{ __html: article.html }} />
+        <div className="article font-serif text-principal" dangerouslySetInnerHTML={{ __html: article.html }} />
 
-        <aside className="mt-12 flex flex-col gap-4 rounded-lg bg-ardoise p-7 text-white sm:flex-row sm:items-center sm:justify-between">
+        <aside className="mt-12 flex flex-col gap-4 rounded-lg bg-sombre p-7 text-sur-sombre sm:flex-row sm:items-center sm:justify-between">
           <p className="text-xl font-semibold">{cta.titre}</p>
           <Bouton href={lienCta(article.public)}>{cta.bouton}</Bouton>
         </aside>
@@ -72,7 +72,7 @@ export default async function PageArticle({ params }) {
             <ul className="mt-5 grid gap-4 sm:grid-cols-2">
               {autres.map((a) => (
                 <li key={a.slug}>
-                  <Link href={`/ressources/${a.slug}`} className="block rounded-lg border border-bordure p-5 hover:shadow-carte">
+                  <Link href={`/ressources/${a.slug}`} className="block rounded-lg border border-base p-5 hover:shadow-carte">
                     <span className="font-serif text-lg">{a.titre}</span>
                   </Link>
                 </li>

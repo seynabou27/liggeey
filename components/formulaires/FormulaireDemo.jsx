@@ -20,8 +20,8 @@ export default function FormulaireDemo({ service = '' }) {
 
   if (etat === 'succes') {
     return (
-      <div role="status" className="flex flex-col gap-3 rounded-lg bg-orange-clair p-8">
-        <CheckCircle className="h-8 w-8 text-orange-texte" aria-hidden="true" />
+      <div role="status" className="flex flex-col gap-3 rounded-lg bg-marque-doux p-8">
+        <CheckCircle className="h-8 w-8 text-marque" aria-hidden="true" />
         <h2 className="text-2xl font-semibold">{demo.succes.titre}</h2>
         <p className="text-lg">{demo.succes.texte.replace('{delai}', site.delais.demo)}</p>
       </div>
@@ -50,7 +50,7 @@ export default function FormulaireDemo({ service = '' }) {
         <Bouton type="submit" disabled={etat === 'envoi'} className="self-start">
           {etat === 'envoi' ? 'Envoi…' : demo.bouton}
         </Bouton>
-        <p className="text-sm text-gris-fonce">{demo.obligatoire}</p>
+        <p className="text-sm text-secondaire">{demo.obligatoire}</p>
       </div>
     </form>
   );

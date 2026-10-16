@@ -9,14 +9,14 @@ import { VagueDouce } from '@/components/ui/Vague';
 export default function EnTetePage({ surtitre, titre, texte, image, source, children }) {
   const avecPhoto = imageExiste(image);
   return (
-    <section className="relative overflow-hidden bg-ardoise pb-24 pt-[128px] text-white md:pb-32 md:pt-[156px]">
+    <section className="relative overflow-hidden bg-sombre pb-24 pt-[128px] text-sur-sombre md:pb-32 md:pt-[156px]">
       {avecPhoto && <Image src={image} alt="" fill priority sizes="100vw" className="object-cover" />}
-      <div className="absolute inset-0 bg-ardoise/80" aria-hidden="true" />
+      <div className="absolute inset-0 bg-sombre/80" aria-hidden="true" />
       <div className="container relative">
         <div className="max-w-3xl">
           {surtitre && (
-            <p className="flex items-center gap-2.5 text-base font-medium text-orange">
-              <span className="h-0.5 w-9 bg-orange" aria-hidden="true" />
+            <p className="flex items-center gap-2.5 text-base font-medium text-marque-vif">
+              <span className="h-0.5 w-9 bg-marque" aria-hidden="true" />
               {surtitre}
             </p>
           )}

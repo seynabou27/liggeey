@@ -28,10 +28,10 @@ export default function MenuMobile({ ouvert, onFermer }) {
   if (!ouvert) return null;
 
   return (
-    <div id="menu-mobile" role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-white text-ardoise xl:hidden">
-      <div className="container flex h-[72px] shrink-0 items-center justify-between border-b border-bordure">
+    <div id="menu-mobile" role="dialog" aria-modal="true" aria-label="Menu" className="fixed inset-0 z-[60] flex flex-col overflow-y-auto bg-surface text-principal xl:hidden">
+      <div className="container flex h-[72px] shrink-0 items-center justify-between border-b border-base">
         <Image src="/logo/liggeey-ardoise.svg" alt="LIGGEEY" width={113} height={22} />
-        <button ref={boutonFermer} type="button" onClick={onFermer} aria-label="Fermer le menu" className="inline-flex h-11 w-11 items-center justify-center rounded hover:bg-gris-fond">
+        <button ref={boutonFermer} type="button" onClick={onFermer} aria-label="Fermer le menu" className="inline-flex h-11 w-11 items-center justify-center rounded hover:bg-doux">
           <X className="h-6 w-6" aria-hidden="true" />
         </button>
       </div>
@@ -41,8 +41,8 @@ export default function MenuMobile({ ouvert, onFermer }) {
           Accueil
         </Link>
         {commun.groupes.map((groupe) => (
-          <div key={groupe.titre} className="border-t border-bordure py-4">
-            <p className="text-xs font-semibold uppercase tracking-wider text-orange-texte">{groupe.titre}</p>
+          <div key={groupe.titre} className="border-t border-base py-4">
+            <p className="text-xs font-semibold uppercase tracking-wider text-marque">{groupe.titre}</p>
             <ul className="mt-2">
               {groupe.liens.map((lien) => (
                 <li key={lien.href}>
@@ -56,7 +56,7 @@ export default function MenuMobile({ ouvert, onFermer }) {
         ))}
       </nav>
 
-      <div className="container flex flex-col gap-3 border-t border-bordure py-6">
+      <div className="container flex flex-col gap-3 border-t border-base py-6">
         <Bouton href={lienConnexion()} variante="secondaire" pleineLargeur>
           {commun.connexion}
         </Bouton>

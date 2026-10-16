@@ -19,8 +19,8 @@ export default function VideoWolof({ video }) {
   const youtube = video.src ? adresseYouTube(video.src) : null;
 
   return (
-    <article className="flex flex-col gap-3 rounded-lg border border-bordure bg-white p-4">
-      <div className="relative aspect-video overflow-hidden rounded-md bg-ardoise">
+    <article className="flex flex-col gap-3 rounded-lg border border-base bg-surface p-4">
+      <div className="relative aspect-video overflow-hidden rounded-md bg-sombre">
         {lecture && youtube && (
           <iframe src={youtube} title={video.titre} allow="autoplay; encrypted-media" allowFullScreen className="absolute inset-0 h-full w-full" />
         )}
@@ -30,10 +30,10 @@ export default function VideoWolof({ video }) {
             type="button"
             disabled={!video.src}
             onClick={() => setLecture(true)}
-            className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-white disabled:cursor-default"
+            className="absolute inset-0 flex flex-col items-center justify-center gap-2 text-sur-sombre disabled:cursor-default"
             aria-label={video.src ? `Lire la vidéo : ${video.titre}` : `${video.titre} : ${independants.wolof.bientot}`}
           >
-            <span className="grid h-14 w-14 place-items-center rounded-full bg-orange text-ardoise">
+            <span className="grid h-14 w-14 place-items-center rounded-full bg-marque text-sur-marque">
               <Play className="h-6 w-6" aria-hidden="true" />
             </span>
             {!video.src && <span className="text-sm">{independants.wolof.bientot}</span>}
@@ -41,7 +41,7 @@ export default function VideoWolof({ video }) {
         )}
       </div>
       <h3 className="font-semibold">{video.titre}</h3>
-      <p className="text-sm text-gris-fonce">{video.duree}</p>
+      <p className="text-sm text-secondaire">{video.duree}</p>
     </article>
   );
 }

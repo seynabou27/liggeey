@@ -29,7 +29,7 @@ export function filtrerOffres(offres, f) {
 
 function Message({ texte, filtres }) {
   return (
-    <div className="mx-auto flex max-w-xl flex-col items-center gap-5 rounded-lg bg-orange-clair p-8 text-center" role="status">
+    <div className="mx-auto flex max-w-xl flex-col items-center gap-5 rounded-lg bg-marque-doux p-8 text-center" role="status">
       <p className="text-lg">{texte}</p>
       <div className="flex flex-wrap justify-center gap-3">
         <Bouton href={lienInscription('talent')}>Créer mon compte</Bouton>

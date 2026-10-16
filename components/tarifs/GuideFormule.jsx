@@ -11,7 +11,7 @@ function Pastille({ actif, onClick, children }) {
       type="button"
       aria-pressed={actif}
       onClick={onClick}
-      className={`min-h-[44px] rounded-full border-2 px-4 text-sm font-semibold transition-colors ${actif ? 'border-ardoise bg-ardoise text-white' : 'border-bordure bg-white hover:border-ardoise'}`}
+      className={`min-h-[44px] rounded-full border-2 px-4 text-sm font-semibold transition-colors ${actif ? 'border-principal bg-sombre text-sur-sombre' : 'border-base bg-surface hover:border-principal'}`}
     >
       {children}
     </button>
@@ -30,7 +30,7 @@ export default function GuideFormule() {
   const formule = cle === 'postuler' ? 'essentiel' : cle === 'mentor' || cle === 'former' ? 'premium' : undefined;
 
   return (
-    <div className="rounded-lg bg-white p-6 shadow-carte md:p-8">
+    <div className="rounded-lg bg-surface p-6 shadow-carte md:p-8">
       <h2 className="text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">{t.titre}</h2>
 
       <fieldset className="mt-6">
@@ -66,10 +66,10 @@ export default function GuideFormule() {
 
       <div aria-live="polite">
         {resultat && (
-          <div className="mt-6 flex flex-col gap-3 rounded-lg border-2 border-dashed border-ardoise p-5">
-            <p className="text-sm font-semibold text-orange-texte">{t.conseil}</p>
+          <div className="mt-6 flex flex-col gap-3 rounded-lg border-2 border-dashed border-principal p-5">
+            <p className="text-sm font-semibold text-marque">{t.conseil}</p>
             <p className="text-xl font-semibold">{resultat.titre}</p>
-            <p className="text-gris-fonce">{resultat.texte}</p>
+            <p className="text-secondaire">{resultat.texte}</p>
             <div className="flex flex-wrap items-center gap-4">
               {cle === 'entreprise' ? (
                 <Bouton href="/entreprises/demande-de-demo">Demander une démo</Bouton>

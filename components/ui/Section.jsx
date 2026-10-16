@@ -1,8 +1,8 @@
 const FONDS = {
-  blanc: 'bg-white',
-  gris: 'bg-gris-fond',
-  clair: 'bg-orange-clair',
-  sombre: 'bg-ardoise text-white',
+  blanc: 'bg-surface',
+  gris: 'bg-doux',
+  clair: 'bg-marque-doux',
+  sombre: 'bg-sombre text-sur-sombre',
 };
 
 /** Section de page avec conteneur centré et espacements réguliers. */
@@ -18,12 +18,12 @@ export function Section({ id, fond = 'blanc', etroit = false, className = '', ch
 export function TitreSection({ surtitre, titre, texte, centre = false, clair = false, id, className = '' }) {
   return (
     <div className={`mb-10 flex flex-col gap-2 ${centre ? 'items-center text-center' : ''} ${className}`}>
-      {surtitre && <p className={`surtitre ${clair ? '!text-orange' : ''}`}>{surtitre}</p>}
+      {surtitre && <p className={`surtitre ${clair ? '!text-marque-vif' : ''}`}>{surtitre}</p>}
       <h2 id={id} className="max-w-3xl text-balance text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">
         {titre}
       </h2>
       {texte && (
-        <p className={`max-w-2xl text-pretty text-[15px] leading-[1.7] ${clair ? 'text-white/90' : 'text-gris-fonce'}`}>{texte}</p>
+        <p className={`max-w-2xl text-pretty text-[15px] leading-[1.7] ${clair ? 'text-white/90' : 'text-secondaire'}`}>{texte}</p>
       )}
     </div>
   );
@@ -31,5 +31,5 @@ export function TitreSection({ surtitre, titre, texte, centre = false, clair = f
 
 /** Mention de source sous un chiffre. */
 export function Source({ children, clair = false }) {
-  return <p className={`text-sm ${clair ? 'text-white/80' : 'text-gris-fonce'}`}>{children}</p>;
+  return <p className={`text-sm ${clair ? 'text-white/80' : 'text-secondaire'}`}>{children}</p>;
 }

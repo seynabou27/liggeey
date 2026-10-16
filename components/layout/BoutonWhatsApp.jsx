@@ -10,7 +10,7 @@ export default function BoutonWhatsApp() {
       target="_blank"
       rel="noopener noreferrer"
       aria-label={commun.whatsapp.aria}
-      className="fixed bottom-4 right-4 z-40 inline-flex h-14 items-center gap-2 rounded-full bg-whatsapp px-4 font-semibold text-ardoise shadow-carte transition-transform hover:scale-105 md:bottom-6 md:right-6"
+      className="fixed bottom-4 right-4 z-40 inline-flex h-14 items-center gap-2 rounded-full bg-whatsapp px-4 font-semibold text-sur-marque shadow-carte transition-transform hover:scale-105 md:bottom-6 md:right-6"
     >
       <MessageCircle className="h-6 w-6" aria-hidden="true" />
       <span className="hidden md:inline">{commun.whatsapp.libelle}</span>

@@ -32,7 +32,7 @@ export default function PageTalents() {
               {t.constat.chiffres.map((c) => (
                 <div key={c.valeur} className="flex flex-col-reverse gap-2">
                   <dt>{c.texte}</dt>
-                  <dd className="text-5xl font-light text-orange-texte">{c.valeur}</dd>
+                  <dd className="text-5xl font-light text-marque">{c.valeur}</dd>
                 </div>
               ))}
             </dl>
@@ -57,12 +57,12 @@ export default function PageTalents() {
         <TitreSection titre={t.formules.titre} />
         <ul className="grid gap-5 md:grid-cols-2">
           {tarifs.formules.map((f) => (
-            <li key={f.id} className="rounded-lg border border-bordure p-6">
+            <li key={f.id} className="rounded-lg border border-base p-6">
               <h3 className="text-xl font-semibold">{f.nom}</h3>
               <p className="mt-2 text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">
-                {f.prix} <span className="text-base font-normal text-gris-fonce">{f.unite}</span>
+                {f.prix} <span className="text-base font-normal text-secondaire">{f.unite}</span>
               </p>
-              <p className="mt-2 text-gris-fonce">{f.accroche}</p>
+              <p className="mt-2 text-secondaire">{f.accroche}</p>
             </li>
           ))}
         </ul>

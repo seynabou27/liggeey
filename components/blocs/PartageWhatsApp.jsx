@@ -23,7 +23,7 @@ export default function PartageWhatsApp({ evenement, texte, clair = false }) {
       href={lienPartageWhatsApp(message)}
       target="_blank"
       rel="noopener noreferrer"
-      className={`inline-flex min-h-[44px] items-center gap-2 font-semibold underline decoration-orange decoration-2 underline-offset-4 ${clair ? 'text-white hover:text-orange' : 'hover:text-orange-texte'}`}
+      className={`inline-flex min-h-[44px] items-center gap-2 font-semibold underline decoration-primaire-500 decoration-2 underline-offset-4 ${clair ? 'text-sur-sombre hover:text-marque-vif' : 'hover:text-marque'}`}
     >
       <Share2 className="h-4 w-4" aria-hidden="true" />
       Partager sur WhatsApp

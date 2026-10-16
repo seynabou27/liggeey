@@ -16,13 +16,13 @@ export default async function PageDemo({ searchParams }) {
       <EnTetePage surtitre="Entreprises" titre={demo.titre} texte={demo.texte.replace('{delai}', site.delais.demo)} />
       <div className="container grid gap-12 py-16 lg:grid-cols-[1fr_340px]">
         <FormulaireDemo service={service} />
-        <aside className="flex h-fit flex-col gap-4 rounded-lg bg-orange-clair p-6">
+        <aside className="flex h-fit flex-col gap-4 rounded-lg bg-marque-doux p-6">
           <h2 className="text-xl font-semibold">{demo.aside.titre}</h2>
           <Bouton href={lienWhatsApp('Bonjour LIGGEEY, je souhaite une démo : ')} variante="whatsapp" nouvelOnglet>
             <MessageCircle className="h-5 w-5" aria-hidden="true" />
             WhatsApp
           </Bouton>
-          <p className="text-gris-fonce">{demo.aside.rappel}</p>
+          <p className="text-secondaire">{demo.aside.rappel}</p>
         </aside>
       </div>
     </>
