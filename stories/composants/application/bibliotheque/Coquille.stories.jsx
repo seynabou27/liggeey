@@ -1,6 +1,6 @@
 import { fn } from 'storybook/test';
-import { Bell, Briefcase, Calendar, ClipboardList, Crown, GraduationCap, HeartHandshake, Home, LayoutDashboard, UserCircle2, UsersRound } from 'lucide-react';
-import { Coquille, BarreLaterale, BarreHaut, EnTetePage, PiedApp, Carte } from '../../../../components/app';
+import { AlignJustify, Bell, Briefcase, Flame, Grid3x3, Layers, Triangle, Zap, Calendar, ClipboardList, Crown, GraduationCap, HeartHandshake, Home, LayoutDashboard, UserCircle2, UsersRound } from 'lucide-react';
+import { Coquille, BarreIcones, BarreLaterale, BarreHaut, EnTetePage, PiedApp, Carte } from '../../../../components/app';
 import Bouton from '../../../../components/ui/Bouton';
 
 const ELEMENTS = [
@@ -13,6 +13,8 @@ const ELEMENTS = [
   { id: 'profil', label: 'Mon profil', icone: UserCircle2, section: 'Mon compte' },
   { id: 'abonnement', label: 'Abonnement', icone: Crown, section: 'Mon compte' },
 ];
+
+const RAIL = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell].map((icone, i) => ({ icone, actif: i === 0 }));
 
 const Logo = () => <img src="/logo/liggeey-ardoise.svg" alt="LIGGEEY" className="h-6" />;
 const LogoReduit = () => <img src="/logo/monogramme-orange.svg" alt="LIGGEEY" className="h-6" />;
@@ -52,6 +54,7 @@ export const Complete = {
     <Coquille
       {...args}
       elements={ELEMENTS}
+      rail={<BarreIcones elements={RAIL} />}
       logo={<Logo />}
       logoReduit={<LogoReduit />}
       encart={<Encart />}
@@ -74,6 +77,12 @@ export const Mobile = {
   name: 'Coquille · mobile (menu en tiroir)',
   globals: { viewport: { value: 'mobile1' } },
   parameters: { ...Complete.parameters, viewport: { defaultViewport: 'mobile1' } },
+};
+
+export const Rail = {
+  name: 'Barre d’icônes',
+  render: () => <BarreIcones elements={RAIL} />,
+  decorators: [(Story) => <div className="flex h-[420px]"><Story /></div>],
 };
 
 const cadre = (Story) => <div className="flex h-[720px]"><Story /></div>;

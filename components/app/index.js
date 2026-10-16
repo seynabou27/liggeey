@@ -7,5 +7,5 @@ export { BoutonIcone, ChampRecherche, SelecteurPeriode, Onglets, Segments, Pagin
 export { Tableau, CelluleIdentite } from './Tableau';
 export { BarreProgression, ListeClassee, Anneau } from './Progression';
 export { ElementConversation, BulleMessage, ZoneSaisie, SeparateurDate } from './Messagerie';
-export { Coquille, BarreLaterale, BarreHaut, EnTetePage, PiedApp, grouperParSection } from './Coquille';
+export { Coquille, BarreIcones, BarreLaterale, BarreHaut, EnTetePage, PiedApp, grouperParSection } from './Coquille';
 export { default as Bouton } from '../ui/Bouton';

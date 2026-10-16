@@ -848,6 +848,14 @@ const USER_BY_ESPACE = {
    barre latérale claire, barre du haut, en-tête de page avec fil d'Ariane, pied de page.
    Sidebar, Breadcrumb et AppShell gardent leur nom et leurs props d'origine. */
 
+/* Barre d'icônes, en première position avant le menu (bleu ardoise). Son rôle reste à définir :
+   pour l'instant elle reprend les icônes d'origine du prototype et reste décorative. */
+const RAIL_ICONS = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell];
+
+function IconRail() {
+  return <App.BarreIcones elements={RAIL_ICONS.map((icone, i) => ({ icone, actif: i === 0 }))} />;
+}
+
 const toElementsMenu = (navItems) => navItems.map((n) => ({ id: n.id, label: n.label, icone: n.icon, section: n.section }));
 
 const LogoMenu = () => (
@@ -943,6 +951,7 @@ function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, todo
       actif={active}
       onNaviguer={onNavigate}
       compteurs={badges}
+      rail={<IconRail />}
       logo={<LogoMenu />}
       logoReduit={<LogoMenuReduit />}
       encart={<EncartFormule onNavigate={onNavigate} />}
@@ -8256,7 +8265,7 @@ export {
   ProfileRadioCard, PROFILES, EditableTags, Pagination, ServiceForm, OffreEntrepriseForm, EventForm,
   CheckinForm, SignalementForm, PasswordChanger, SERVICES_INITIAL, OFFRES_ENTREPRISE_INITIAL,
   // Navigation
-  AuthShell, AppShell, Sidebar, Breadcrumb, TodoPanel,
+  AuthShell, AppShell, Sidebar, IconRail, Breadcrumb, TodoPanel,
   // Cartes
   OfferCard, FormationCard, MentorCard, CandidatureCard, DemandeCard, ServiceCard, MissionCard,
   OffreEntrepriseCard, CandidatureEntrepriseRow, PrestataireSearchCard, IdentityCell,

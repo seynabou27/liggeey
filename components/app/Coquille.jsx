@@ -128,6 +128,37 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
   );
 }
 
+/* ---------- Barre d'icônes ---------- */
+
+/**
+ * Colonne étroite en bleu ardoise, placée avant la barre latérale (ordinateur seulement).
+ * Rôle à définir : pour l'instant décorative (masquée aux lecteurs d'écran), sauf si les
+ * éléments reçoivent un onClick, auquel cas ils deviennent des boutons avec leur libellé.
+ * - elements : [{ icone, label, actif?, onClick? }]
+ */
+export function BarreIcones({ elements = [] }) {
+  const interactive = elements.some((e) => e.onClick);
+  return (
+    <div className="flex h-full w-14 flex-col items-center gap-3 bg-sombre py-4" aria-hidden={interactive ? undefined : 'true'}>
+      {elements.map((el, i) => {
+        const Icone = el.icone;
+        const classes = `inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
+          el.actif ? 'bg-marque text-sur-marque' : 'text-sur-sombre-discret hover:bg-sombre-doux hover:text-sur-sombre'
+        }`;
+        return el.onClick ? (
+          <button key={el.label || i} type="button" onClick={el.onClick} aria-label={el.label} title={el.label} className={classes}>
+            <Icone size={16} aria-hidden="true" />
+          </button>
+        ) : (
+          <span key={el.label || i} className={classes}>
+            <Icone size={16} />
+          </span>
+        );
+      })}
+    </div>
+  );
+}
+
 /* ---------- Menus déroulants de la barre du haut ---------- */
 
 function MenuNotifications({ notifications }) {
@@ -374,7 +405,7 @@ export function PiedApp({ gauche = `© ${new Date().getFullYear()} LIGGEEY`, dro
 /* ---------- Coquille complète ---------- */
 
 /**
- * Assemble barre latérale, barre du haut, en-tête de page, contenu et pied de page.
+ * Assemble barre d'icônes (rail, facultatif), barre latérale, barre du haut, en-tête de page, contenu et pied de page.
  * Sur ordinateur, le bouton menu replie la barre latérale (choix retenu) ;
  * sur mobile, il ouvre un tiroir qui se ferme après chaque navigation.
  */
@@ -383,6 +414,7 @@ export function Coquille({
   actif,
   onNaviguer,
   compteurs,
+  rail,
   logo,
   logoReduit,
   encart,
@@ -427,7 +459,8 @@ export function Coquille({
 
   return (
     <div className="flex min-h-screen w-full bg-page font-sans text-principal">
-      <div className="sticky top-0 hidden h-screen shrink-0 lg:block">
+      <div className="sticky top-0 hidden h-screen shrink-0 lg:flex">
+        {rail}
         <BarreLaterale {...propsMenu} replie={replie} />
       </div>
 
