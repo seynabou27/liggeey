@@ -41,7 +41,7 @@ export const Avatars = {
   render: () => (
     <div className="flex flex-wrap items-end gap-4">
       {['xs', 'sm', 'md', 'lg', 'xl'].map((t) => <Avatar key={t} nom="Absatou Diallo" taille={t} />)}
-      <Avatar nom="Cheikh Fall" src="https://randomuser.me/api/portraits/men/32.jpg" taille="md" presence="en-ligne" />
+      <Avatar nom="Cheikh Fall" src="/images/plateforme/portraits/cheikh-fall-cadre.jpg" taille="md" presence="en-ligne" />
       <Avatar nom="Awa Diallo" taille="md" ton="plein" presence="absent" />
       <Avatar nom="Senegal Construction" taille="md" ton="neutre" />
     </div>

@@ -7,7 +7,7 @@ export const metadata = {
   robots: { index: false, follow: false },
 };
 
-const PROFILS = ['chercheur', 'prestataire', 'entreprise'];
+const PROFILS = ['chercheur', 'prestataire', 'entreprise', 'jeune', 'mentor'];
 
 /**
  * Adresse venant du site public (voir lib/liens.js) → écran d'ouverture du prototype.

@@ -20,6 +20,7 @@ export const legal = {
         { titre: 'Propriété intellectuelle', texte: ['Les textes, le logo et les visuels du site appartiennent à LIGGEEY ou à leurs auteurs. Toute reproduction sans autorisation est interdite.'] },
         { titre: 'Crédits photos', texte: [
             "Photos d'illustration provisoires, via Unsplash, sous licence Unsplash : Ninthgrid (accueil), Francis Odeyemi (bande des chiffres), Smart Anwana (formations, accueil), Divaris Shirichena (talents), Ali Mkumbwa (indépendants), Christina Morillo / WOCinTech Chat (entreprises), Iwaria Inc. (formations et Job Dating), Daniel Thomas (à propos).",
+            "Photos des profils de démonstration de la plateforme, via Unsplash, sous licence Unsplash : Abraham Eli, Ali Mkumbwa, Angelo Casto, Ayo Ogunseinde, Blessing Olarewaju, Desmond Charles Mushi, Divaris Shirichena, Divine Effiong, Dominic Uzoanya, Emmanuel Ikwuegbu, Etty Fidele, Folakemi Oke, Fortune Vieyra, Fotografía Editorial, Idowu Emmanuel, Its Adonis, Johnnathan Tshibangu, Lanre Tobi, Micheal Ogungbe, Mike Aikins, Muhammad-Taha Ibrahim, Nana Adwuma, Nana Kwame, Nana O., Nathan Wong, Ninthgrid, Olawale Munna, Oluwaferanmi Caleb, Oluwatobi Fasipe, Patrick Amofah, Prince Akachi, Sammyayot254, Shedrack Salami, Sikwe Scarter et Sweder Breet.",
           ],
         },
       ],

@@ -15,7 +15,7 @@
    Sommaire du fichier (dans l'ordre) :
      1. Fondations : couleurs, date de démo, mémoire partagée (useStore)
      2. Composants réutilisables : logo, notifications, images, fichiers
-     3. Connexion et inscription
+     3. Connexion et inscription (date de naissance et règles d'âge)
      4. Coquille de l'application : menu groupé, fil d'Ariane, bloc « À faire »
      5. Espace chercheur : tableau de bord, offres, candidatures, formations, mentors, profil
      6. Espace prestataire : tableau de bord, services, missions, profil, évaluations
@@ -24,6 +24,7 @@
      9. Abonnements Essentiel / Premium et paiement
     10. Profils Essentiel / Premium, mentors (coachings), suivi post-embauche, régularisation
     11. Profils modifiables
+    11 bis. Cap Métier (jeunes sans métier, dès 15 ans) et espace mentor
     12. Version de test : sauvegarde locale, scénarios, commentaires
     13. Composant racine : état global, navigation, routage des écrans
    ===================================================================== */
@@ -100,6 +101,7 @@ import {
   UserCheck,
   TrendingUp,
   FlaskConical,
+  Compass,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip, AreaChart, Area, CartesianGrid } from "recharts";
 // Bibliothèque de l'application (components/app) : coquille, cartes, badges, tableaux… sur les tokens LIGGEEY.
@@ -458,6 +460,8 @@ const ESPACES_DEMO = [
   { id: "chercheur", label: "Chercheur d'emploi" },
   { id: "prestataire", label: "Prestataire" },
   { id: "entreprise", label: "Entreprise" },
+  { id: "jeune", label: "Cap Métier" },
+  { id: "mentor", label: "Mentor" },
   { id: "admin", label: "Admin" },
 ];
 
@@ -550,7 +554,7 @@ function ConnexionScreen({ onNavigate }) {
 
       <fieldset className="mb-6">
         <legend className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-discret">Espace à ouvrir (démo)</legend>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-4">
+        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {ESPACES_DEMO.map((o) => {
             const actif = espace === o.id;
             return (
@@ -639,6 +643,8 @@ const PROFILES = [
   { id: "chercheur", title: "Je cherche un emploi", subtitle: "Jeune diplômé ou en recherche active" },
   { id: "prestataire", title: "Je suis prestataire", subtitle: "Freelance ou travailleur du secteur informel" },
   { id: "entreprise", title: "Je recrute", subtitle: "Entreprise ou particulier employeur" },
+  { id: "jeune", title: "Je cherche ma voie", subtitle: "Dès 15 ans, sans métier : orientation, formation et mentor" },
+  { id: "mentor", title: "Je veux devenir mentor", subtitle: "Professionnel expérimenté qui accompagne des jeunes" },
 ];
 
 function ProfileRadioCard({ profile, selected, onSelect }) {
@@ -701,11 +707,40 @@ const PROFILE_META = {
   chercheur: { badge: "Profil : Je cherche un emploi", tagline: "chercheur" },
   prestataire: { badge: "Profil : Je suis prestataire", tagline: "prestataire" },
   entreprise: { badge: "Profil : Je recrute", tagline: "recruteur" },
+  jeune: { badge: "Parcours : Cap Métier", tagline: "Cap Métier" },
+  mentor: { badge: "Profil : Je veux devenir mentor", tagline: "mentor" },
 };
+
+/* Âges d'accès, d'après le droit sénégalais (à faire valider par un juriste) :
+   - moins de 18 ans = enfant ; majorité civile à 18 ans (Code de la famille) ;
+   - travail et apprentissage dès 15 ans révolus, travaux dangereux interdits avant 18 ans
+     (Code du travail, art. L.145 ; arrêté n° 3748 du 6 juin 2003) ;
+   - un mineur non émancipé ne peut pas être commerçant (Acte uniforme OHADA sur le droit commercial général).
+   Les 15-17 ans passent donc par Cap Métier, avec l'accord d'un parent ou tuteur. */
+const AGE_MAJORITE = 18;
+const AGE_MIN_CAP_METIER = 15;
+const AGE_MIN_PAR_PROFIL = { chercheur: AGE_MAJORITE, prestataire: AGE_MAJORITE, mentor: AGE_MAJORITE, jeune: AGE_MIN_CAP_METIER };
+
+/* Âge révolu à la date de démo, à partir d'une date « AAAA-MM-JJ » (null si la date est vide ou invalide) */
+function ageAu(dateIso, ref = demoNow()) {
+  const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateIso || "");
+  if (!m) return null;
+  const [an, mois, jour] = [Number(m[1]), Number(m[2]), Number(m[3])];
+  let age = ref.getFullYear() - an;
+  if (ref.getMonth() + 1 < mois || (ref.getMonth() + 1 === mois && ref.getDate() < jour)) age -= 1;
+  return age >= 0 && age < 120 ? age : null;
+}
+
+function isoDuJour(d = demoNow()) {
+  return `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, "0")}-${String(d.getDate()).padStart(2, "0")}`;
+}
+
+const CHAMP_NAISSANCE = (help) => ({ name: "naissance", label: "Date de naissance", type: "date", help });
 
 const FIELD_CONFIG = {
   chercheur: [
     { name: "nom", label: "Nom complet", placeholder: "Ex: Moussa Diop", help: "Saisissez votre prénom et votre nom" },
+    CHAMP_NAISSANCE("L'espace emploi est ouvert à partir de 18 ans"),
     { name: "email", label: "Adresse e-mail", type: "email", placeholder: "moussa.diop@exemple.sn", help: "Saisissez une adresse e-mail valide pour la validation" },
     { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Exemple de format valide au Sénégal" },
   ],
@@ -718,16 +753,76 @@ const FIELD_CONFIG = {
   ],
   prestataire: [
     { name: "nom", label: "Nom complet", placeholder: "Ex: Fatou Ndiaye", help: "Saisissez votre prénom et votre nom" },
+    CHAMP_NAISSANCE("L'espace prestataire est réservé aux personnes de 18 ans et plus"),
     { name: "email", label: "Adresse e-mail", type: "email", placeholder: "fatou.ndiaye@exemple.sn", help: "Saisissez une adresse e-mail valide pour la validation" },
     { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Exemple de format valide au Sénégal" },
     { name: "competences", label: "Domaine de compétence", placeholder: "Ex: Restauration, Nettoyage, Maintenance", help: "Saisissez vos compétences clés (séparées par des virgules)" },
     { name: "ville", label: "Ville", placeholder: "Ex: Dakar", help: "Votre ville de résidence principale au Sénégal" },
   ],
+  jeune: [
+    { name: "nom", label: "Nom complet", placeholder: "Ex: Awa Sarr", help: "Saisissez votre prénom et votre nom" },
+    CHAMP_NAISSANCE("Cap Métier est ouvert dès 15 ans. Avant 18 ans, nous demandons l'accord d'un parent ou tuteur"),
+    { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Nous vous écrirons surtout par SMS ou WhatsApp" },
+    { name: "email", label: "Adresse e-mail", type: "email", optional: true, placeholder: "awa.sarr@exemple.sn", help: "Facultatif" },
+    { name: "ville", label: "Ville ou quartier", placeholder: "Ex: Pikine", help: "Pour vous proposer des ateliers près de chez vous" },
+  ],
+  mentor: [
+    { name: "nom", label: "Nom complet", placeholder: "Ex: Mariama Ba", help: "Saisissez votre prénom et votre nom" },
+    CHAMP_NAISSANCE("Les mentors doivent avoir 18 ans ou plus"),
+    { name: "email", label: "Adresse e-mail", type: "email", placeholder: "mariama.ba@exemple.sn", help: "Saisissez une adresse e-mail valide pour la validation" },
+    { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Exemple de format valide au Sénégal" },
+    { name: "metier", label: "Métier ou domaine d'expertise", placeholder: "Ex: Couturière, Responsable RH, Électricien", help: "Le domaine dans lequel vous accompagnerez les jeunes" },
+    { name: "experience", label: "Années d'expérience", type: "number", placeholder: "Ex: 10", help: "Dans ce métier ou ce domaine" },
+  ],
 };
 
+const LIENS_PARENT = ["Mère", "Père", "Tuteur ou tutrice légale"];
+
+/* Message affiché quand l'âge ne permet pas d'ouvrir l'espace choisi */
+function AgeRefus({ profil, age, onCapMetier }) {
+  if (age < AGE_MIN_CAP_METIER) {
+    return (
+      <div role="alert" className="mt-2 rounded-md border border-statut-alerte bg-statut-alerte-doux p-4 text-sm text-principal">
+        <p className="mb-1 font-semibold">LIGGEEY accueille les jeunes à partir de 15 ans.</p>
+        <p className="mb-3 text-secondaire">
+          Avant cet âge, la loi sénégalaise interdit le travail, et l'école reste la priorité. Avec vos parents, vous pouvez nous écrire sur WhatsApp ou passer au bureau de Dakar : nous vous orienterons.
+        </p>
+        <a href={lienWhatsApp("Bonjour LIGGEEY, je voudrais des conseils d'orientation pour mon enfant.")} target="_blank" rel="noopener noreferrer" className={AUTH.lien}>
+          Écrire à LIGGEEY sur WhatsApp
+        </a>
+      </div>
+    );
+  }
+  if (profil === "mentor") {
+    return (
+      <p role="alert" className="mt-2 rounded-md border border-statut-alerte bg-statut-alerte-doux p-4 text-sm text-principal">
+        Pour devenir mentor, il faut avoir 18 ans ou plus. Vous cherchez vous-même votre voie ? Le parcours Cap Métier est fait pour vous.
+      </p>
+    );
+  }
+  return (
+    <div role="alert" className="mt-2 rounded-md border border-statut-alerte bg-statut-alerte-doux p-4 text-sm text-principal">
+      <p className="mb-1 font-semibold">
+        {profil === "prestataire" ? "L'espace prestataire est réservé aux personnes de 18 ans et plus." : "L'espace emploi est réservé aux personnes de 18 ans et plus."}
+      </p>
+      <p className="mb-3 text-secondaire">
+        {profil === "prestataire"
+          ? "Avant 18 ans, la loi ne permet pas d'exercer une activité à son compte. "
+          : "Avant 18 ans, la loi protège les jeunes de certains travaux. "}
+        Le parcours Cap Métier vous aide à choisir un métier, à vous former et à trouver un apprentissage, avec un mentor.
+      </p>
+      <button type="button" onClick={onCapMetier} className="inline-flex min-h-[44px] items-center rounded-md bg-marque px-4 text-sm font-semibold text-sur-marque hover:bg-marque-survol">
+        Continuer avec Cap Métier
+      </button>
+    </div>
+  );
+}
+
 function SignupInfoScreen({ profile, onNavigate }) {
-  const meta = PROFILE_META[profile] || PROFILE_META.chercheur;
-  const fields = FIELD_CONFIG[profile] || FIELD_CONFIG.chercheur;
+  /* Le profil peut basculer vers Cap Métier si l'âge saisi l'exige (les champs déjà remplis sont gardés) */
+  const [profil, setProfil] = useState(profile);
+  const meta = PROFILE_META[profil] || PROFILE_META.chercheur;
+  const fields = FIELD_CONFIG[profil] || FIELD_CONFIG.chercheur;
 
   const [values, setValues] = useState({});
   const [password, setPassword] = useState("");
@@ -736,10 +831,20 @@ function SignupInfoScreen({ profile, onNavigate }) {
   const [touched, setTouched] = useState(false);
 
   const passwordValid = password.length >= 8 && /\d/.test(password);
-  const fieldsValid = fields.every((f) => (values[f.name] || "").trim().length > 0);
+  const fieldsValid = fields.every((f) => f.optional || (values[f.name] || "").trim().length > 0);
   const emailField = fields.find((f) => f.type === "email");
-  const emailValid = emailField ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(values[emailField.name] || "") : true;
-  const formValid = fieldsValid && emailValid && passwordValid && accepted;
+  const emailSaisi = emailField ? (values[emailField.name] || "").trim() : "";
+  const emailValid = emailField && (emailSaisi || !emailField.optional) ? /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(emailSaisi) : true;
+
+  const avecNaissance = fields.some((f) => f.name === "naissance");
+  const age = avecNaissance ? ageAu(values.naissance) : null;
+  const naissanceValide = !avecNaissance || age !== null;
+  const ageMin = AGE_MIN_PAR_PROFIL[profil];
+  const tropJeune = age !== null && ageMin !== undefined && age < ageMin;
+  const mineur = profil === "jeune" && age !== null && age >= AGE_MIN_CAP_METIER && age < AGE_MAJORITE;
+  const parentValide = !mineur || (["parentNom", "parentTelephone"].every((k) => (values[k] || "").trim().length > 0) && values.parentLien && values.parentInforme);
+
+  const formValid = fieldsValid && emailValid && naissanceValide && !tropJeune && parentValide && passwordValid && accepted;
 
   function setField(name, val) {
     setValues((v) => ({ ...v, [name]: val }));
@@ -748,7 +853,12 @@ function SignupInfoScreen({ profile, onNavigate }) {
   function handleSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     setTouched(true);
-    if (formValid) onNavigate("signup-confirm", { profile });
+    if (formValid) onNavigate("signup-confirm", { profile: profil, inscription: { mineur, parentNom: values.parentNom } });
+  }
+
+  function passerCapMetier() {
+    setProfil("jeune");
+    setTouched(false);
   }
 
   const passwordErreur = touched && !passwordValid;
@@ -764,12 +874,15 @@ function SignupInfoScreen({ profile, onNavigate }) {
 
       {fields.map((f) => {
         const val = values[f.name] || "";
-        const invalid = touched && (val.trim().length === 0 || (f.type === "email" && !emailValid));
+        const estNaissance = f.name === "naissance";
+        const vide = !f.optional && val.trim().length === 0;
+        const invalid = touched && (vide || (f.type === "email" && !emailValid) || (estNaissance && !naissanceValide));
+        const message = vide ? "Ce champ est requis." : f.type === "email" ? "Veuillez saisir une adresse e-mail valide." : "Veuillez saisir une date de naissance valide.";
         const id = `inscription-${f.name}`;
         return (
           <div key={f.name} className="mb-4">
             <label htmlFor={id} className={AUTH.libelle}>
-              {f.label} <span className="text-statut-danger" aria-hidden="true">*</span>
+              {f.label} {!f.optional && <span className="text-statut-danger" aria-hidden="true">*</span>}
             </label>
             <input
               id={id}
@@ -777,17 +890,59 @@ function SignupInfoScreen({ profile, onNavigate }) {
               value={val}
               onChange={(e) => setField(f.name, e.target.value)}
               placeholder={f.placeholder}
-              aria-required="true"
-              aria-invalid={invalid || undefined}
+              max={estNaissance ? isoDuJour() : undefined}
+              min={f.type === "number" ? 0 : undefined}
+              aria-required={!f.optional || undefined}
+              aria-invalid={invalid || tropJeune && estNaissance || undefined}
               aria-describedby={`${id}-aide`}
-              className={AUTH.champ(invalid)}
+              className={AUTH.champ(invalid || (estNaissance && tropJeune))}
             />
             <p id={`${id}-aide`} className={AUTH.aide(invalid)}>
-              {invalid ? "Ce champ est requis." : f.help}
+              {invalid ? message : f.help}
             </p>
+            {estNaissance && tropJeune && <AgeRefus profil={profil} age={age} onCapMetier={passerCapMetier} />}
           </div>
         );
       })}
+
+      {mineur && (
+        <fieldset className="mb-4 rounded-lg border border-base bg-doux p-4">
+          <legend className="px-1 text-sm font-semibold text-principal">Votre parent ou tuteur</legend>
+          <p className="mb-4 text-sm text-secondaire">
+            Vous avez {age} ans. Avant 18 ans, la loi demande l'accord d'un parent ou d'un tuteur. Il recevra un SMS pour confirmer, et il sera prévenu de vos séances.
+          </p>
+          {[
+            { name: "parentNom", label: "Nom du parent ou tuteur", placeholder: "Ex: Ndèye Sarr" },
+            { name: "parentTelephone", label: "Téléphone du parent ou tuteur", placeholder: "+221 77 000 00 00" },
+          ].map((f) => {
+            const invalid = touched && !(values[f.name] || "").trim();
+            const id = `inscription-${f.name}`;
+            return (
+              <div key={f.name} className="mb-4">
+                <label htmlFor={id} className={AUTH.libelle}>
+                  {f.label} <span className="text-statut-danger" aria-hidden="true">*</span>
+                </label>
+                <input id={id} type="text" value={values[f.name] || ""} onChange={(e) => setField(f.name, e.target.value)} placeholder={f.placeholder} aria-required="true" aria-invalid={invalid || undefined} className={AUTH.champ(invalid)} />
+                {invalid && <p className={AUTH.aide(true)}>Ce champ est requis.</p>}
+              </div>
+            );
+          })}
+          <div className="mb-4">
+            <label htmlFor="inscription-parentLien" className={AUTH.libelle}>
+              Lien avec vous <span className="text-statut-danger" aria-hidden="true">*</span>
+            </label>
+            <select id="inscription-parentLien" value={values.parentLien || ""} onChange={(e) => setField("parentLien", e.target.value)} aria-required="true" aria-invalid={(touched && !values.parentLien) || undefined} className={AUTH.champ(touched && !values.parentLien)}>
+              <option value="">Choisir</option>
+              {LIENS_PARENT.map((l) => <option key={l}>{l}</option>)}
+            </select>
+          </div>
+          <label className="flex cursor-pointer select-none items-start gap-3">
+            <input type="checkbox" checked={!!values.parentInforme} onChange={(e) => setField("parentInforme", e.target.checked)} className={`${AUTH.case} mt-0.5`} />
+            <span className="text-sm text-principal">Mon parent ou tuteur est au courant de mon inscription à Cap Métier.</span>
+          </label>
+          {touched && !values.parentInforme && <p role="alert" className="mt-2 text-xs text-statut-danger">Parlez-en d'abord à votre parent ou tuteur, puis cochez cette case.</p>}
+        </fieldset>
+      )}
 
       <div className="mb-4">
         <label htmlFor="inscription-mdp" className={AUTH.libelle}>
@@ -832,7 +987,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
           Retour
         </button>
         <button type="submit" className={AUTH.principal}>
-          Créer mon compte
+          {profil === "mentor" ? "Envoyer ma candidature" : "Créer mon compte"}
         </button>
       </div>
 
@@ -843,21 +998,33 @@ function SignupInfoScreen({ profile, onNavigate }) {
 
 /* ---------- Screen 4 : Inscription — Confirmation ---------- */
 
-function ConfirmationScreen({ profile, onNavigate }) {
+function ConfirmationScreen({ profile, inscription, onNavigate }) {
   const meta = PROFILE_META[profile] || PROFILE_META.chercheur;
+  const estMentor = profile === "mentor";
   return (
     <div>
       <Stepper step={3} />
       <div className="grid h-14 w-14 place-items-center rounded-full bg-statut-succes-doux text-statut-succes mb-6">
         <Check size={26} aria-hidden="true" />
       </div>
-      <h2 className={AUTH.titre}>Compte créé avec succès</h2>
-      <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
-        Bienvenue sur LIGGEEY ! Votre compte <strong className="text-principal">{meta.tagline}</strong> est prêt.
-      </p>
+      <h2 className={AUTH.titre}>{estMentor ? "Candidature envoyée" : "Compte créé avec succès"}</h2>
+      {estMentor ? (
+        <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
+          Merci de vouloir accompagner des jeunes ! L'équipe LIGGEEY vérifie votre identité, votre expérience et vos références, puis vous propose de signer la charte du mentor. Vous recevrez un e-mail dès que votre compte sera validé.
+        </p>
+      ) : (
+        <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
+          Bienvenue sur LIGGEEY ! Votre compte <strong className="text-principal">{meta.tagline}</strong> est prêt.
+          {inscription?.mineur && (
+            <>
+              {" "}Nous avons envoyé un SMS à {inscription.parentNom || "votre parent ou tuteur"} pour confirmer son accord. Un mentor vous sera attribué dès sa réponse.
+            </>
+          )}
+        </p>
+      )}
       <div className="flex flex-col gap-3">
         <button type="button" onClick={() => onNavigate("dashboard", { espace: profile })} className={AUTH.principal}>
-          Accéder à mon tableau de bord
+          {estMentor ? "Découvrir l'espace mentor (démo)" : profile === "jeune" ? "Voir mon parcours" : "Accéder à mon tableau de bord"}
         </button>
         <button type="button" onClick={() => onNavigate("login")} className={AUTH.secondaire}>
           Retour à la connexion
@@ -900,6 +1067,19 @@ const NAV_ITEMS_BY_ESPACE = {
     { id: "profil", label: "Profil entreprise", icon: Building2, section: "Mon compte" },
     { id: "abonnement", label: "Abonnement", icon: Crown, section: "Mon compte" },
   ],
+  jeune: [
+    { id: "dashboard", label: "Mon parcours", icon: LayoutDashboard, section: "Cap Métier" },
+    { id: "orientation", label: "Bilan d'orientation", icon: Compass, section: "Cap Métier" },
+    { id: "ateliers", label: "Ateliers découverte", icon: GraduationCap, section: "Cap Métier" },
+    { id: "mentor", label: "Mon mentor", icon: UsersRound, section: "Être accompagné" },
+    { id: "profil", label: "Mon profil", icon: UserCircle2, section: "Mon compte" },
+  ],
+  mentor: [
+    { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, section: "Mon mentorat" },
+    { id: "mentores", label: "Mes mentorés", icon: Users2, section: "Mon mentorat" },
+    { id: "seances", label: "Séances", icon: CalendarDays, section: "Mon mentorat" },
+    { id: "profil", label: "Mon profil mentor", icon: UserCircle2, section: "Mon compte" },
+  ],
   admin: [
     { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, section: "Pilotage" },
     { id: "planning", label: "Planning", icon: CalendarDays, section: "Pilotage" },
@@ -913,6 +1093,7 @@ const NAV_ITEMS_BY_ESPACE = {
     { id: "missions", label: "Missions", icon: ClipboardCheck, section: "Activité" },
     { id: "formations", label: "Formations", icon: GraduationCap, section: "Accompagnement" },
     { id: "mentorat", label: "Mentorat", icon: Heart, section: "Accompagnement" },
+    { id: "cap-metier", label: "Cap Métier", icon: Compass, section: "Accompagnement" },
     { id: "suivi", label: "Suivi post-embauche", icon: HeartHandshake, section: "Accompagnement" },
     { id: "verifications", label: "Vérification des documents", icon: ShieldCheck, section: "Contrôle" },
     { id: "regularisations", label: "Régularisations", icon: Landmark, section: "Contrôle" },
@@ -931,6 +1112,8 @@ const USER_BY_ESPACE = {
   chercheur: { name: "Absatou Diallo", role: "Chercheuse d'emploi", initials: "AD" },
   prestataire: { name: "Mamadou Ndiaye", role: "Électricien · prestataire", initials: "MN" },
   entreprise: { name: "Awa Diallo", role: "Senegal Construction SARL", initials: "AD" },
+  jeune: { name: "Mame Diarra Sène", role: "Cap Métier · 16 ans", initials: "MS" },
+  mentor: { name: "Cheikh Fall", role: "Mentor · Responsable RH", initials: "CF" },
   admin: { name: "Admin LIGGEEY", role: "Super admin", initials: "AL" },
 };
 
@@ -964,7 +1147,7 @@ function EncartFormule({ onNavigate }) {
   const planApi = usePlan();
   const currentPlan = planApi && !planApi.isAdmin ? planApi.plan : null;
   if (!currentPlan) return null;
-  const upgradeTo = currentPlan.prixMensuel === 0 ? planApi.nextPlan() : null;
+  const upgradeTo = planApi.nextPlan();
   return (
     <div className="rounded-lg border border-sur-sombre bg-sombre-doux p-4 text-center">
       <span className="mx-auto mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-marque text-sur-marque" aria-hidden="true">
@@ -1019,10 +1202,11 @@ function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, todo
   }, []);
 
   const estAdmin = user.role === "Super admin";
+  const avecAbonnement = navItems.some((n) => n.id === "abonnement");
   const prenom = user.name.split(" ")[0];
   const menuCompte = [
     !estAdmin && { label: "Mon profil", icone: UserCircle2, onClick: () => onNavigate("profil") },
-    !estAdmin && { label: "Abonnement", icone: Crown, onClick: () => onNavigate("abonnement") },
+    avecAbonnement && { label: "Abonnement", icone: Crown, onClick: () => onNavigate("abonnement") },
     estAdmin && { label: "Paramètres", icone: Settings, onClick: () => onNavigate("parametres") },
     { label: "Changer d'espace", icone: ArrowLeft, onClick: () => onNavigate("login") },
     { label: "Retour au site", icone: Home, href: SITE_URL },
@@ -1135,6 +1319,16 @@ const STATUT_TONS = {
   "En vérification": "alerte",
   "Échoué": "danger",
   "Échec de paiement": "danger",
+  // Cap Métier et mentorat
+  "Accord parental en attente": "alerte",
+  "Accord en attente": "alerte",
+  "Accord confirmé": "succes",
+  "Mentor à attribuer": "info",
+  "Accompagné": "marque",
+  "Projet prêt": "succes",
+  "Demandée": "alerte",
+  "Confirmée": "succes",
+  "Signée": "succes",
 };
 
 function StatusBadge({ status }) {
@@ -1904,7 +2098,7 @@ function FormationsScreen({ initialTab, dataset, userName }) {
 /* ---------- Screen 9 : Mentors ---------- */
 
 const MENTORS = [
-  { id: "cheikh-fall", nom: "Cheikh Fall", role: "Responsable RH", exp: 12, photo: "https://randomuser.me/api/portraits/men/32.jpg", tagline: "Accompagne des jeunes diplômés depuis 8 ans sur la préparation aux entretiens et la construction de parcours.", competences: ["Préparation entretien", "Rédaction CV", "Orientation professionnelle", "Négociation salariale", "Personal branding", "Réseautage", "Gestion du stress", "Prise de parole"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
+  { id: "cheikh-fall", nom: "Cheikh Fall", role: "Responsable RH", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall-cadre.jpg", tagline: "Accompagne des jeunes diplômés depuis 8 ans sur la préparation aux entretiens et la construction de parcours.", competences: ["Préparation entretien", "Rédaction CV", "Orientation professionnelle", "Négociation salariale", "Personal branding", "Réseautage", "Gestion du stress", "Prise de parole"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
       { date: "30 juillet 2026", note: "Simulation d'entretien pour le poste de Chargée de clientèle chez Sonatel. Point à travailler : structurer les réponses avec la méthode STAR." },
       { date: "18 juillet 2026", note: "Relecture du CV : mise en avant des compétences Excel et suppression des expériences non pertinentes." },
       { date: "2 juillet 2026", note: "Premier échange : définition des secteurs ciblés (banque, télécoms) et du rythme de candidatures." },
@@ -1913,17 +2107,17 @@ const MENTORS = [
       { nom: "Template CV professionnel.docx", meta: "DOCX · 2 avril 2026" },
       { nom: "Liste des entreprises qui recrutent.xlsx", meta: "XLSX · 20 juin 2026" },
     ], prochainRdv: "Jeudi 11 août 2026 · 15h00 – 16h00" },
-  { id: "aminata-ndiaye", nom: "Aminata Ndiaye", role: "Directrice Marketing", exp: 15, photo: "https://randomuser.me/api/portraits/women/44.jpg" },
-  { id: "moussa-diop", nom: "Moussa Diop", role: "Ingénieur Logiciel", exp: 10, photo: "https://randomuser.me/api/portraits/men/45.jpg" },
-  { id: "fatou-sarr", nom: "Fatou Sarr", role: "Consultante Finance", exp: 18, photo: "https://randomuser.me/api/portraits/women/68.jpg" },
-  { id: "ousmane-ba", nom: "Ousmane Ba", role: "Chef de Projet", exp: 8, photo: "https://randomuser.me/api/portraits/men/76.jpg" },
-  { id: "mariama-sow", nom: "Mariama Sow", role: "Avocate d'affaires", exp: 14, photo: "https://randomuser.me/api/portraits/women/21.jpg" },
-  { id: "ibrahima-diallo", nom: "Ibrahima Diallo", role: "Architecte", exp: 20, photo: "https://randomuser.me/api/portraits/men/12.jpg" },
-  { id: "aissatou-dia", nom: "Aissatou Dia", role: "Data Scientist", exp: 7, photo: "https://randomuser.me/api/portraits/women/56.jpg" },
-  { id: "papa-seck", nom: "Papa Seck", role: "Entrepreneur", exp: 16, photo: "https://randomuser.me/api/portraits/men/63.jpg" },
-  { id: "khady-toure", nom: "Khady Touré", role: "Journaliste", exp: 11, photo: "https://randomuser.me/api/portraits/women/33.jpg" },
-  { id: "babacar-niang", nom: "Babacar Niang", role: "Médecin", exp: 22, photo: "https://randomuser.me/api/portraits/men/85.jpg" },
-  { id: "ndeye-mbaye", nom: "Ndèye Mbaye", role: "Comptable", exp: 9, photo: "https://randomuser.me/api/portraits/women/12.jpg" },
+  { id: "aminata-ndiaye", nom: "Aminata Ndiaye", role: "Directrice Marketing", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye-cadre.jpg" },
+  { id: "moussa-diop", nom: "Moussa Diop", role: "Ingénieur Logiciel", exp: 10, photo: "/images/plateforme/portraits/moussa-diop-cadre.jpg" },
+  { id: "fatou-sarr", nom: "Fatou Sarr", role: "Consultante Finance", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr-cadre.jpg" },
+  { id: "ousmane-ba", nom: "Ousmane Ba", role: "Chef de Projet", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba-cadre.jpg" },
+  { id: "mariama-sow", nom: "Mariama Sow", role: "Avocate d'affaires", exp: 14, photo: "/images/plateforme/portraits/mariama-sow-cadre.jpg" },
+  { id: "ibrahima-diallo", nom: "Ibrahima Diallo", role: "Architecte", exp: 20, photo: "/images/plateforme/portraits/ibrahima-diallo-cadre.jpg" },
+  { id: "aissatou-dia", nom: "Aissatou Dia", role: "Data Scientist", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia-cadre.jpg" },
+  { id: "papa-seck", nom: "Papa Seck", role: "Entrepreneur", exp: 16, photo: "/images/plateforme/portraits/papa-seck-cadre.jpg" },
+  { id: "khady-toure", nom: "Khady Touré", role: "Journaliste", exp: 11, photo: "/images/plateforme/portraits/khady-toure-cadre.jpg" },
+  { id: "babacar-niang", nom: "Babacar Niang", role: "Médecin", exp: 22, photo: "/images/plateforme/portraits/babacar-niang-cadre.jpg" },
+  { id: "ndeye-mbaye", nom: "Ndèye Mbaye", role: "Comptable", exp: 9, photo: "/images/plateforme/portraits/ndeye-mbaye-cadre.jpg" },
 ];
 
 function initials(name) {
@@ -1958,7 +2152,7 @@ function StatMini({ value, label }) {
 }
 
 const MENTORS_PRESTATAIRE = [
-  { id: "cheikh-fall-artisan", nom: "Cheikh Fall", role: "Maître Électricien", exp: 12, photo: "https://randomuser.me/api/portraits/men/52.jpg", tagline: "Accompagne les électriciens et techniciens depuis 8 ans sur les normes de sécurité, la gestion de chantier et le développement de leur activité.", competences: ["Normes électriques", "Devis & Facturation", "Relation client", "Installation solaire", "Gestion de chantier", "Domotique"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
+  { id: "cheikh-fall-artisan", nom: "Cheikh Fall", role: "Maître Électricien", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall.jpg", tagline: "Accompagne les électriciens et techniciens depuis 8 ans sur les normes de sécurité, la gestion de chantier et le développement de leur activité.", competences: ["Normes électriques", "Devis & Facturation", "Relation client", "Installation solaire", "Gestion de chantier", "Domotique"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
       { date: "30 juillet 2026", note: "Revue des procédures de sécurité électrique : mise en conformité NF C 15-100, check-list d'intervention et documentation des travaux. Point à travailler : devis détaillés avec schémas." },
       { date: "18 juillet 2026", note: "Stratégie de spécialisation : positionnement sur l'installation de panneaux solaires et la domotique, deux marchés en forte croissance au Sénégal." },
       { date: "2 juillet 2026", note: "Premier échange : évaluation des compétences techniques, identification des certifications à obtenir et plan de développement." },
@@ -1967,17 +2161,17 @@ const MENTORS_PRESTATAIRE = [
       { nom: "Modèle de devis professionnel.docx", meta: "DOCX · 2 avril 2026" },
       { nom: "Liste des clients qui recrutent.xlsx", meta: "XLSX · 20 juin 2026" },
     ], prochainRdv: "Jeudi 11 août 2026 · 15h00 – 16h00" },
-  { id: "aminata-ndiaye-couture", nom: "Aminata Ndiaye", role: "Couturière & Styliste", exp: 15, photo: "https://randomuser.me/api/portraits/women/50.jpg" },
-  { id: "moussa-diop-menuisier", nom: "Moussa Diop", role: "Maître Menuisier", exp: 10, photo: "https://randomuser.me/api/portraits/men/22.jpg" },
-  { id: "fatou-sarr-elec", nom: "Fatou Sarr", role: "Électricienne Bâtiment", exp: 18, photo: "https://randomuser.me/api/portraits/women/78.jpg" },
-  { id: "ousmane-ba-macon", nom: "Ousmane Ba", role: "Chef Maçon BTP", exp: 8, photo: "https://randomuser.me/api/portraits/men/41.jpg" },
-  { id: "mariama-sow-plomberie", nom: "Mariama Sow", role: "Plombière Sanitaire", exp: 14, photo: "https://randomuser.me/api/portraits/women/31.jpg" },
-  { id: "ibrahima-diallo-soudeur", nom: "Ibrahima Diallo", role: "Soudeur Industriel", exp: 20, photo: "https://randomuser.me/api/portraits/men/18.jpg" },
-  { id: "aissatou-dia-patisserie", nom: "Aissatou Dia", role: "Pâtissière & Restauratrice", exp: 7, photo: "https://randomuser.me/api/portraits/women/62.jpg" },
-  { id: "papa-seck-btp", nom: "Papa Seck", role: "Entrepreneur BTP", exp: 16, photo: "https://randomuser.me/api/portraits/men/71.jpg" },
-  { id: "khady-toure-teinture", nom: "Khady Touré", role: "Teinturière & Formatrice", exp: 11, photo: "https://randomuser.me/api/portraits/women/39.jpg" },
-  { id: "babacar-niang-carrelage", nom: "Babacar Niang", role: "Carreleur & Décorateur", exp: 22, photo: "https://randomuser.me/api/portraits/men/91.jpg" },
-  { id: "ndeye-mbaye-coiffure", nom: "Ndèye Mbaye", role: "Coiffeuse & Gérante de Salon", exp: 9, photo: "https://randomuser.me/api/portraits/women/17.jpg" },
+  { id: "aminata-ndiaye-couture", nom: "Aminata Ndiaye", role: "Couturière & Styliste", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
+  { id: "moussa-diop-menuisier", nom: "Moussa Diop", role: "Maître Menuisier", exp: 10, photo: "/images/plateforme/portraits/moussa-diop.jpg" },
+  { id: "fatou-sarr-elec", nom: "Fatou Sarr", role: "Électricienne Bâtiment", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
+  { id: "ousmane-ba-macon", nom: "Ousmane Ba", role: "Chef Maçon BTP", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
+  { id: "mariama-sow-plomberie", nom: "Mariama Sow", role: "Plombière Sanitaire", exp: 14, photo: "/images/plateforme/portraits/mariama-sow.jpg" },
+  { id: "ibrahima-diallo-soudeur", nom: "Ibrahima Diallo", role: "Soudeur Industriel", exp: 20, photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
+  { id: "aissatou-dia-patisserie", nom: "Aissatou Dia", role: "Pâtissière & Restauratrice", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia.jpg" },
+  { id: "papa-seck-btp", nom: "Papa Seck", role: "Entrepreneur BTP", exp: 16, photo: "/images/plateforme/portraits/papa-seck.jpg" },
+  { id: "khady-toure-teinture", nom: "Khady Touré", role: "Teinturière & Formatrice", exp: 11, photo: "/images/plateforme/portraits/khady-toure.jpg" },
+  { id: "babacar-niang-carrelage", nom: "Babacar Niang", role: "Carreleur & Décorateur", exp: 22, photo: "/images/plateforme/portraits/babacar-niang.jpg" },
+  { id: "ndeye-mbaye-coiffure", nom: "Ndèye Mbaye", role: "Coiffeuse & Gérante de Salon", exp: 9, photo: "/images/plateforme/portraits/ndeye-mbaye.jpg" },
 ];
 
 function MentorsScreen({ initialMentorId, dataset }) {
@@ -2069,7 +2263,7 @@ function ProfilScreen({ onNavigate }) {
         {/* Colonne fiche */}
         <div className="space-y-6">
           <App.CarteProfil
-            photo="https://randomuser.me/api/portraits/women/65.jpg"
+            photo="/images/plateforme/portraits/absatou-diallo.jpg"
             nom="Absatou Diallo"
             sousTitre={info.profession}
             badges={
@@ -2823,14 +3017,14 @@ function Stars({ note, size = 13 }) {
 }
 
 const PORTFOLIO_REALISATIONS = [
-  { id: "r1", titre: "Installation tableau électrique — Villa Almadies", photo: "https://picsum.photos/seed/liggeey-elec1/480/360", date: "Juillet 2026", lieu: "Almadies, Dakar", description: "Installation complète d'un tableau électrique neuf pour une villa de 5 pièces, avec mise aux normes NF C 15-100." },
-  { id: "r2", titre: "Panneaux solaires — Résidence Ngor", photo: "https://picsum.photos/seed/liggeey-solar2/480/360", date: "Juin 2026", lieu: "Ngor, Dakar", description: "Pose et raccordement d'un kit solaire domestique de 3kW avec onduleur." },
-  { id: "r3", titre: "Câblage réseau — Bureau Plateau", photo: "https://picsum.photos/seed/liggeey-cable3/480/360", date: "Mai 2026", lieu: "Plateau, Dakar", description: "Câblage réseau complet pour un open-space de 12 postes de travail." },
-  { id: "r4", titre: "Mise aux normes — Immeuble Médina", photo: "https://picsum.photos/seed/liggeey-norms4/480/360", date: "Avril 2026", lieu: "Médina, Dakar", description: "Mise en conformité de l'installation électrique d'un immeuble de 4 étages suite à un contrôle d'assurance." },
-  { id: "r5", titre: "Dépannage urgence — Appartement Sacré-Cœur", photo: "https://picsum.photos/seed/liggeey-fix5/480/360", date: "Mars 2026", lieu: "Sacré-Cœur, Dakar", description: "Intervention d'urgence suite à une coupure générale, remplacement du disjoncteur principal." },
-  { id: "r6", titre: "Éclairage extérieur — Villa Ouakam", photo: "https://picsum.photos/seed/liggeey-light6/480/360", date: "Février 2026", lieu: "Ouakam, Dakar", description: "Installation d'un éclairage extérieur basse consommation pour un jardin et une allée." },
-  { id: "r7", titre: "Installation domotique — Résidence Fann", photo: "https://picsum.photos/seed/liggeey-domo7/480/360", date: "Janvier 2026", lieu: "Fann, Dakar", description: "Mise en place d'un système domotique pour la gestion de l'éclairage et des volets roulants." },
-  { id: "r8", titre: "Rénovation électrique complète — Maison Yoff", photo: "https://picsum.photos/seed/liggeey-reno8/480/360", date: "Décembre 2025", lieu: "Yoff, Dakar", description: "Rénovation complète de l'installation électrique d'une maison ancienne, câblage neuf de bout en bout." },
+  { id: "r1", titre: "Installation tableau électrique — Villa Almadies", photo: "/images/plateforme/realisations/realisation-1.jpg", date: "Juillet 2026", lieu: "Almadies, Dakar", description: "Installation complète d'un tableau électrique neuf pour une villa de 5 pièces, avec mise aux normes NF C 15-100." },
+  { id: "r2", titre: "Panneaux solaires — Résidence Ngor", photo: "/images/plateforme/realisations/realisation-2.jpg", date: "Juin 2026", lieu: "Ngor, Dakar", description: "Pose et raccordement d'un kit solaire domestique de 3kW avec onduleur." },
+  { id: "r3", titre: "Câblage réseau — Bureau Plateau", photo: "/images/plateforme/realisations/realisation-3.jpg", date: "Mai 2026", lieu: "Plateau, Dakar", description: "Câblage réseau complet pour un open-space de 12 postes de travail." },
+  { id: "r4", titre: "Mise aux normes — Immeuble Médina", photo: "/images/plateforme/realisations/realisation-4.jpg", date: "Avril 2026", lieu: "Médina, Dakar", description: "Mise en conformité de l'installation électrique d'un immeuble de 4 étages suite à un contrôle d'assurance." },
+  { id: "r5", titre: "Dépannage urgence — Appartement Sacré-Cœur", photo: "/images/plateforme/realisations/realisation-5.jpg", date: "Mars 2026", lieu: "Sacré-Cœur, Dakar", description: "Intervention d'urgence suite à une coupure générale, remplacement du disjoncteur principal." },
+  { id: "r6", titre: "Éclairage extérieur — Villa Ouakam", photo: "/images/plateforme/realisations/realisation-6.jpg", date: "Février 2026", lieu: "Ouakam, Dakar", description: "Installation d'un éclairage extérieur basse consommation pour un jardin et une allée." },
+  { id: "r7", titre: "Installation domotique — Résidence Fann", photo: "/images/plateforme/realisations/realisation-7.jpg", date: "Janvier 2026", lieu: "Fann, Dakar", description: "Mise en place d'un système domotique pour la gestion de l'éclairage et des volets roulants." },
+  { id: "r8", titre: "Rénovation électrique complète — Maison Yoff", photo: "/images/plateforme/realisations/realisation-8.jpg", date: "Décembre 2025", lieu: "Yoff, Dakar", description: "Rénovation complète de l'installation électrique d'une maison ancienne, câblage neuf de bout en bout." },
 ];
 
 function RealisationsScreen({ onBack }) {
@@ -2885,7 +3079,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
 
       <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <div className="flex items-start gap-5 flex-wrap">
-          <SafeImg src="https://randomuser.me/api/portraits/men/67.jpg" alt="Mamadou Ndiaye" className="w-24 h-24 rounded-full object-cover shrink-0" />
+          <SafeImg src="/images/plateforme/portraits/mamadou-ndiaye.jpg" alt="Mamadou Ndiaye" className="w-24 h-24 rounded-full object-cover shrink-0" />
           <div className="flex flex-wrap gap-x-16 gap-y-3 flex-1">
             <div className="w-full flex items-center gap-2">
               <p className="text-lg font-bold" style={{ color: COLORS.slate }}>Mamadou Ndiaye</p>
@@ -3093,26 +3287,26 @@ function EvaluationsScreen({ onNavigate }) {
 
 const OFFRES_ENTREPRISE_INITIAL = [
   { id: "off1", titre: "Chef d'équipe électricité", categorie: "BTP", contrat: "CDI", salaire: "350 000 FCFA/mois", localisation: "Dakar, Plateau", statut: "Active", nbCandidatures: 12, experience: "5-10 ans", dateLimite: "30 nov. 2026", description: "Nous recherchons un Chef d'équipe électricité expérimenté pour superviser nos chantiers résidentiels et tertiaires à Dakar. Vous serez garant de la conformité réglementaire (normes NF C 15-100) et animerez une équipe d'électriciens qualifiés.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe"], candidats: [
-    { nom: "Moussa Diop", metier: "Électricien bâtiment", date: "15/08", statut: "Nouveau", photo: "https://randomuser.me/api/portraits/men/14.jpg" },
-    { nom: "Fatou Sarr", metier: "Plombière", date: "14/08", statut: "En cours", photo: "https://randomuser.me/api/portraits/women/24.jpg" },
-    { nom: "Ibrahima Diallo", metier: "Soudeur", date: "12/08", statut: "Retenu", photo: "https://randomuser.me/api/portraits/men/36.jpg" },
-    { nom: "Aminata Ndiaye", metier: "Couturière", date: "10/08", statut: "Rejeté", photo: "https://randomuser.me/api/portraits/women/29.jpg" },
+    { nom: "Moussa Diop", metier: "Électricien bâtiment", date: "15/08", statut: "Nouveau", photo: "/images/plateforme/portraits/moussa-diop.jpg" },
+    { nom: "Fatou Sarr", metier: "Plombière", date: "14/08", statut: "En cours", photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
+    { nom: "Ibrahima Diallo", metier: "Soudeur", date: "12/08", statut: "Retenu", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
+    { nom: "Aminata Ndiaye", metier: "Couturière", date: "10/08", statut: "Rejeté", photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
   ] },
   { id: "off2", titre: "Technicienne plomberie", categorie: "Plomberie", contrat: "CDD", salaire: "250 000 FCFA/mois", localisation: "Dakar, Médina", statut: "Active", nbCandidatures: 8, experience: "2-5 ans", dateLimite: "15 nov. 2026", description: "Poste de technicienne plomberie pour l'entretien et l'installation de systèmes sanitaires sur nos chantiers.", competences: ["Plomberie sanitaire", "Diagnostic de panne"], candidats: [
-    { nom: "Fatou Mbaye", metier: "Plombière sanitaire", date: "13/08", statut: "Nouveau", photo: "https://randomuser.me/api/portraits/women/41.jpg" },
+    { nom: "Fatou Mbaye", metier: "Plombière sanitaire", date: "13/08", statut: "Nouveau", photo: "/images/plateforme/portraits/fatou-mbaye.jpg" },
   ] },
   { id: "off3", titre: "Soudeur TIG/MIG", categorie: "Industrie", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Thiès", statut: "Active", nbCandidatures: 15, experience: "3-8 ans", dateLimite: "10 déc. 2026", description: "Soudeur qualifié TIG/MIG pour la fabrication et l'assemblage de structures métalliques industrielles.", competences: ["Soudure TIG", "Soudure MIG", "Lecture de plans"], candidats: [
-    { nom: "Ibrahima Diallo", metier: "Soudeur industriel", date: "11/08", statut: "Retenu", photo: "https://randomuser.me/api/portraits/men/36.jpg" },
-    { nom: "Ousmane Diaw", metier: "Soudeur TIG/MIG", date: "09/08", statut: "En cours", photo: "https://randomuser.me/api/portraits/men/48.jpg" },
+    { nom: "Ibrahima Diallo", metier: "Soudeur industriel", date: "11/08", statut: "Retenu", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
+    { nom: "Ousmane Diaw", metier: "Soudeur TIG/MIG", date: "09/08", statut: "En cours", photo: "/images/plateforme/portraits/ousmane-diaw.jpg" },
   ] },
   { id: "off4", titre: "Carreleur expérimenté", categorie: "BTP", contrat: "CDD", salaire: "280 000 FCFA/mois", localisation: "Dakar, Almadies", statut: "En pause", nbCandidatures: 6, experience: "3-6 ans", dateLimite: "5 nov. 2026", description: "Carreleur expérimenté pour la finition de villas haut standing aux Almadies.", competences: ["Pose de carrelage", "Finitions"], candidats: [
-    { nom: "Mariama Tall", metier: "Carreleuse", date: "07/08", statut: "En cours", photo: "https://randomuser.me/api/portraits/women/53.jpg" },
+    { nom: "Mariama Tall", metier: "Carreleuse", date: "07/08", statut: "En cours", photo: "/images/plateforme/portraits/mariama-tall.jpg" },
   ] },
   { id: "off5", titre: "Menuisier ébéniste", categorie: "Artisanat", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Saint-Louis", statut: "Clôturée", nbCandidatures: 5, experience: "5+ ans", dateLimite: "1 août 2026", description: "Menuisier ébéniste pour la fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], candidats: [
-    { nom: "Ousmane Ba", metier: "Menuisier ébéniste", date: "28/07", statut: "Nouveau", photo: "https://randomuser.me/api/portraits/men/59.jpg" },
+    { nom: "Ousmane Ba", metier: "Menuisier ébéniste", date: "28/07", statut: "Nouveau", photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
   ] },
   { id: "off6", titre: "Peintre bâtiment", categorie: "BTP", contrat: "CDD", salaire: "220 000 FCFA/mois", localisation: "Dakar, Parcelles", statut: "Active", nbCandidatures: 9, experience: "1-3 ans", dateLimite: "20 nov. 2026", description: "Peintre bâtiment pour travaux de finition sur nos chantiers résidentiels.", competences: ["Peinture intérieure/extérieure", "Enduits"], candidats: [
-    { nom: "Abdoulaye Sow", metier: "Peintre bâtiment", date: "18/08", statut: "Nouveau", photo: "https://randomuser.me/api/portraits/men/64.jpg" },
+    { nom: "Abdoulaye Sow", metier: "Peintre bâtiment", date: "18/08", statut: "Nouveau", photo: "/images/plateforme/portraits/abdoulaye-sow.jpg" },
   ] },
 ];
 
@@ -4392,14 +4586,14 @@ function AdminDashboardScreen({ onNavigate, todos }) {
 /* ---------- Chercheurs (Admin) ---------- */
 
 const CHERCHEURS_ADMIN_INITIAL = [
-  { id: "ch1", nom: "Moussa Diop", photo: "https://randomuser.me/api/portraits/men/8.jpg", metier: "Électricien bâtiment", ville: "Dakar", date: "12/06/2025", statut: "Actif", email: "moussa.diop@email.sn", telephone: "+221 77 123 45 67", naissance: "15/03/1992", genre: "Homme", experience: "8 ans d'expérience", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe", "Habilitation B2V"], inscritLe: "12/06/2025", derniereConnexion: "25/08/2026", candidatures: [{ title: "Chef d'équipe électricité", sub: "Senegal Construction", badge: "En cours" }, { title: "Technicien maintenance", sub: "Dakar Services", badge: "Retenu" }, { title: "Électricien chantier", sub: "Mbour Construction", badge: "Rejeté" }], formations: [{ title: "Sécurité Électrique", badge: "Certifié" }, { title: "Lecture de plans BTP", badge: "En cours d'apprentissage" }] },
-  { id: "ch2", nom: "Fatou Sarr", photo: "https://randomuser.me/api/portraits/women/8.jpg", metier: "Plombière sanitaire", ville: "Thiès", date: "14/08/2025", statut: "En attente", email: "fatou.sarr@email.sn", telephone: "+221 76 234 56 78", naissance: "02/07/1995", genre: "Femme", experience: "5 ans d'expérience", competences: ["Plomberie sanitaire", "Diagnostic de panne"], inscritLe: "14/08/2025", derniereConnexion: "20/08/2026", candidatures: [{ title: "Plombier qualifié", sub: "Diallo & Fils", badge: "En cours" }], formations: [] },
-  { id: "ch3", nom: "Ibrahima Diallo", photo: "https://randomuser.me/api/portraits/men/19.jpg", metier: "Soudeur industriel", ville: "Saint-Louis", date: "20/09/2025", statut: "Actif", email: "ibrahima.diallo@email.sn", telephone: "+221 78 345 67 89", naissance: "22/11/1990", genre: "Homme", experience: "6 ans d'expérience", competences: ["Soudure TIG", "Soudure MIG"], inscritLe: "20/09/2025", derniereConnexion: "23/08/2026", candidatures: [{ title: "Technicien maintenance", sub: "Dakar Services Pro", badge: "Retenu" }], formations: [{ title: "Soudure TIG-MIG", badge: "Certifié" }] },
-  { id: "ch4", nom: "Aminata Ndiaye", photo: "https://randomuser.me/api/portraits/women/19.jpg", metier: "Couturière", ville: "Dakar", date: "03/11/2025", statut: "Vérifié", email: "aminata.ndiaye@email.sn", telephone: "+221 77 456 78 90", naissance: "10/01/1988", genre: "Femme", experience: "10 ans d'expérience", competences: ["Couture sur mesure", "Gestion d'atelier"], inscritLe: "03/11/2025", derniereConnexion: "22/08/2026", candidatures: [{ title: "Couturière atelier", sub: "Atelier Couture", badge: "Rejeté" }], formations: [] },
-  { id: "ch5", nom: "Ousmane Ba", photo: "https://randomuser.me/api/portraits/men/27.jpg", metier: "Menuisier ébéniste", ville: "Kaolack", date: "18/01/2026", statut: "Suspendu", email: "ousmane.ba@email.sn", telephone: "+221 76 567 89 01", naissance: "05/05/1993", genre: "Homme", experience: "4 ans d'expérience", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "18/01/2026", derniereConnexion: "10/06/2026", candidatures: [{ title: "Menuisier ébéniste", sub: "Ndiaye Menuiserie", badge: "En cours" }], formations: [] },
-  { id: "ch6", nom: "Mariama Tall", photo: "https://randomuser.me/api/portraits/women/27.jpg", metier: "Carreleur", ville: "Rufisque", date: "25/03/2026", statut: "Actif", email: "mariama.tall@email.sn", telephone: "+221 78 678 90 12", naissance: "18/09/1994", genre: "Femme", experience: "4 ans d'expérience", competences: ["Pose de carrelage", "Finitions"], inscritLe: "25/03/2026", derniereConnexion: "21/08/2026", candidatures: [{ title: "Carreleur intérieur", sub: "Senegal Construction", badge: "Nouveau" }], formations: [] },
-  { id: "ch7", nom: "Abdoulaye Sow", photo: "https://randomuser.me/api/portraits/men/38.jpg", metier: "Peintre bâtiment", ville: "Ziguinchor", date: "10/05/2026", statut: "Nouveau", email: "abdoulaye.sow@email.sn", telephone: "+221 77 789 01 23", naissance: "30/12/1996", genre: "Homme", experience: "3 ans d'expérience", competences: ["Peinture intérieure/extérieure", "Enduits"], inscritLe: "10/05/2026", derniereConnexion: "19/08/2026", candidatures: [{ title: "Peintre bâtiment", sub: "Rufisque Bâtiment", badge: "En cours" }], formations: [] },
-  { id: "ch8", nom: "Aissatou Gueye", photo: "https://randomuser.me/api/portraits/women/38.jpg", metier: "Électricienne", ville: "Mbour", date: "02/07/2026", statut: "En attente", email: "aissatou.gueye@email.sn", telephone: "+221 76 890 12 34", naissance: "14/02/1991", genre: "Femme", experience: "7 ans d'expérience", competences: ["Normes NF C 15-100", "Management d'équipe", "Habilitation B2V"], inscritLe: "02/07/2026", derniereConnexion: "24/08/2026", candidatures: [{ title: "Électricien chantier", sub: "Thiès Électrique", badge: "Nouveau" }], formations: [] },
+  { id: "ch1", nom: "Moussa Diop", photo: "/images/plateforme/portraits/moussa-diop.jpg", metier: "Électricien bâtiment", ville: "Dakar", date: "12/06/2025", statut: "Actif", email: "moussa.diop@email.sn", telephone: "+221 77 123 45 67", naissance: "15/03/1992", genre: "Homme", experience: "8 ans d'expérience", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe", "Habilitation B2V"], inscritLe: "12/06/2025", derniereConnexion: "25/08/2026", candidatures: [{ title: "Chef d'équipe électricité", sub: "Senegal Construction", badge: "En cours" }, { title: "Technicien maintenance", sub: "Dakar Services", badge: "Retenu" }, { title: "Électricien chantier", sub: "Mbour Construction", badge: "Rejeté" }], formations: [{ title: "Sécurité Électrique", badge: "Certifié" }, { title: "Lecture de plans BTP", badge: "En cours d'apprentissage" }] },
+  { id: "ch2", nom: "Fatou Sarr", photo: "/images/plateforme/portraits/fatou-sarr.jpg", metier: "Plombière sanitaire", ville: "Thiès", date: "14/08/2025", statut: "En attente", email: "fatou.sarr@email.sn", telephone: "+221 76 234 56 78", naissance: "02/07/1995", genre: "Femme", experience: "5 ans d'expérience", competences: ["Plomberie sanitaire", "Diagnostic de panne"], inscritLe: "14/08/2025", derniereConnexion: "20/08/2026", candidatures: [{ title: "Plombier qualifié", sub: "Diallo & Fils", badge: "En cours" }], formations: [] },
+  { id: "ch3", nom: "Ibrahima Diallo", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg", metier: "Soudeur industriel", ville: "Saint-Louis", date: "20/09/2025", statut: "Actif", email: "ibrahima.diallo@email.sn", telephone: "+221 78 345 67 89", naissance: "22/11/1990", genre: "Homme", experience: "6 ans d'expérience", competences: ["Soudure TIG", "Soudure MIG"], inscritLe: "20/09/2025", derniereConnexion: "23/08/2026", candidatures: [{ title: "Technicien maintenance", sub: "Dakar Services Pro", badge: "Retenu" }], formations: [{ title: "Soudure TIG-MIG", badge: "Certifié" }] },
+  { id: "ch4", nom: "Aminata Ndiaye", photo: "/images/plateforme/portraits/aminata-ndiaye.jpg", metier: "Couturière", ville: "Dakar", date: "03/11/2025", statut: "Vérifié", email: "aminata.ndiaye@email.sn", telephone: "+221 77 456 78 90", naissance: "10/01/1988", genre: "Femme", experience: "10 ans d'expérience", competences: ["Couture sur mesure", "Gestion d'atelier"], inscritLe: "03/11/2025", derniereConnexion: "22/08/2026", candidatures: [{ title: "Couturière atelier", sub: "Atelier Couture", badge: "Rejeté" }], formations: [] },
+  { id: "ch5", nom: "Ousmane Ba", photo: "/images/plateforme/portraits/ousmane-ba.jpg", metier: "Menuisier ébéniste", ville: "Kaolack", date: "18/01/2026", statut: "Suspendu", email: "ousmane.ba@email.sn", telephone: "+221 76 567 89 01", naissance: "05/05/1993", genre: "Homme", experience: "4 ans d'expérience", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "18/01/2026", derniereConnexion: "10/06/2026", candidatures: [{ title: "Menuisier ébéniste", sub: "Ndiaye Menuiserie", badge: "En cours" }], formations: [] },
+  { id: "ch6", nom: "Mariama Tall", photo: "/images/plateforme/portraits/mariama-tall.jpg", metier: "Carreleur", ville: "Rufisque", date: "25/03/2026", statut: "Actif", email: "mariama.tall@email.sn", telephone: "+221 78 678 90 12", naissance: "18/09/1994", genre: "Femme", experience: "4 ans d'expérience", competences: ["Pose de carrelage", "Finitions"], inscritLe: "25/03/2026", derniereConnexion: "21/08/2026", candidatures: [{ title: "Carreleur intérieur", sub: "Senegal Construction", badge: "Nouveau" }], formations: [] },
+  { id: "ch7", nom: "Abdoulaye Sow", photo: "/images/plateforme/portraits/abdoulaye-sow.jpg", metier: "Peintre bâtiment", ville: "Ziguinchor", date: "10/05/2026", statut: "Nouveau", email: "abdoulaye.sow@email.sn", telephone: "+221 77 789 01 23", naissance: "30/12/1996", genre: "Homme", experience: "3 ans d'expérience", competences: ["Peinture intérieure/extérieure", "Enduits"], inscritLe: "10/05/2026", derniereConnexion: "19/08/2026", candidatures: [{ title: "Peintre bâtiment", sub: "Rufisque Bâtiment", badge: "En cours" }], formations: [] },
+  { id: "ch8", nom: "Aissatou Gueye", photo: "/images/plateforme/portraits/aissatou-gueye.jpg", metier: "Électricienne", ville: "Mbour", date: "02/07/2026", statut: "En attente", email: "aissatou.gueye@email.sn", telephone: "+221 76 890 12 34", naissance: "14/02/1991", genre: "Femme", experience: "7 ans d'expérience", competences: ["Normes NF C 15-100", "Management d'équipe", "Habilitation B2V"], inscritLe: "02/07/2026", derniereConnexion: "24/08/2026", candidatures: [{ title: "Électricien chantier", sub: "Thiès Électrique", badge: "Nouveau" }], formations: [] },
 ];
 
 function ChercheursAdminDetail(row, { onBack, update, remove }) {
@@ -4467,14 +4661,14 @@ function ChercheursAdminScreen() {
 /* ---------- Prestataires (Admin) ---------- */
 
 const PRESTATAIRES_ADMIN_INITIAL = [
-  { id: "pa1", nom: "Cheikh Fall", photo: "https://randomuser.me/api/portraits/men/52.jpg", metier: "Électricité générale", ville: "Dakar", missions: 47, note: 4.8, statut: "Vérifié", telephone: "+221 76 543 21 09", email: "cheikh.fall@email.sn", ninea: "12345678", anneesActivite: "12 ans", competences: ["Installation électrique", "Dépannage", "Câblage industriel"], inscritLe: "18/02/2026", derniereConnexion: "24/08/2026", missionsRecentes: [{ title: "Installation de tableau de bord", sub: "Senegal Construction", badge: "Terminée" }, { title: "Dépannage réseau triphasé", sub: "Particulier (Plateau)", badge: "En cours" }, { title: "Rénovation électrique complète", sub: "Thiès Électrique", badge: "Terminée" }], avis: [{ title: "Alassane Diop", sub: "Travail très soigné, ponctuel et respectueux des normes.", value: "★ 5.0" }, { title: "Mariama Ndiaye", sub: "Installation rapide et efficace de nos nouveaux luminaires.", value: "★ 4.5" }] },
-  { id: "pa2", nom: "Awa Diallo", photo: "https://randomuser.me/api/portraits/women/9.jpg", metier: "Plomberie", ville: "Thiès", missions: 32, note: 4.6, statut: "Actif", telephone: "+221 77 123 98 76", email: "awa.diallo@email.sn", ninea: "23456789", anneesActivite: "6 ans", competences: ["Plomberie sanitaire"], inscritLe: "10/03/2026", derniereConnexion: "20/08/2026", missionsRecentes: [{ title: "Installation sanitaire", sub: "Particulier", badge: "Terminée" }], avis: [{ title: "Cheikh Ba", sub: "Très efficace.", value: "★ 5.0" }] },
-  { id: "pa3", nom: "Mamadou Sy", photo: "https://randomuser.me/api/portraits/men/9.jpg", metier: "Maçonnerie", ville: "Dakar", missions: 65, note: 4.9, statut: "Vérifié", telephone: "+221 78 234 56 78", email: "mamadou.sy@email.sn", ninea: "34567890", anneesActivite: "15 ans", competences: ["Maçonnerie générale", "Fondations"], inscritLe: "05/01/2026", derniereConnexion: "25/08/2026", missionsRecentes: [{ title: "Construction villa", sub: "Modou Fall", badge: "En cours" }], avis: [{ title: "Awa Ndiaye", sub: "Excellent maçon.", value: "★ 5.0" }] },
-  { id: "pa4", nom: "Ndèye Fatou Mbaye", photo: "https://randomuser.me/api/portraits/women/15.jpg", metier: "Couture/Textile", ville: "Kaolack", missions: 28, note: 4.7, statut: "Actif", telephone: "+221 76 345 67 89", email: "ndeye.mbaye@email.sn", ninea: "45678901", anneesActivite: "9 ans", competences: ["Couture sur mesure"], inscritLe: "12/02/2026", derniereConnexion: "18/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa5", nom: "Alioune Ndiaye", photo: "https://randomuser.me/api/portraits/men/15.jpg", metier: "Menuiserie", ville: "Saint-Louis", missions: 41, note: 4.5, statut: "En attente", telephone: "+221 77 456 78 90", email: "alioune.ndiaye@email.sn", ninea: "56789012", anneesActivite: "10 ans", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "20/04/2026", derniereConnexion: "15/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa6", nom: "Sokhna Dieng", photo: "https://randomuser.me/api/portraits/women/26.jpg", metier: "Peinture", ville: "Dakar", missions: 19, note: 4.3, statut: "Nouveau", telephone: "+221 78 567 89 01", email: "sokhna.dieng@email.sn", ninea: "67890123", anneesActivite: "3 ans", competences: ["Peinture intérieure"], inscritLe: "01/07/2026", derniereConnexion: "22/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa7", nom: "Babacar Faye", photo: "https://randomuser.me/api/portraits/men/26.jpg", metier: "Carrelage", ville: "Rufisque", missions: 53, note: 4.8, statut: "Vérifié", telephone: "+221 76 678 90 12", email: "babacar.faye@email.sn", ninea: "78901234", anneesActivite: "11 ans", competences: ["Pose de carrelage"], inscritLe: "15/01/2026", derniereConnexion: "23/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa8", nom: "Khady Thiam", photo: "https://randomuser.me/api/portraits/women/34.jpg", metier: "Électricité", ville: "Mbour", missions: 22, note: 4.4, statut: "Suspendu", telephone: "+221 77 789 01 23", email: "khady.thiam@email.sn", ninea: "89012345", anneesActivite: "5 ans", competences: ["Électricité domestique"], inscritLe: "08/03/2026", derniereConnexion: "01/07/2026", missionsRecentes: [], avis: [] },
+  { id: "pa1", nom: "Cheikh Fall", photo: "/images/plateforme/portraits/cheikh-fall.jpg", metier: "Électricité générale", ville: "Dakar", missions: 47, note: 4.8, statut: "Vérifié", telephone: "+221 76 543 21 09", email: "cheikh.fall@email.sn", ninea: "12345678", anneesActivite: "12 ans", competences: ["Installation électrique", "Dépannage", "Câblage industriel"], inscritLe: "18/02/2026", derniereConnexion: "24/08/2026", missionsRecentes: [{ title: "Installation de tableau de bord", sub: "Senegal Construction", badge: "Terminée" }, { title: "Dépannage réseau triphasé", sub: "Particulier (Plateau)", badge: "En cours" }, { title: "Rénovation électrique complète", sub: "Thiès Électrique", badge: "Terminée" }], avis: [{ title: "Alassane Diop", sub: "Travail très soigné, ponctuel et respectueux des normes.", value: "★ 5.0" }, { title: "Mariama Ndiaye", sub: "Installation rapide et efficace de nos nouveaux luminaires.", value: "★ 4.5" }] },
+  { id: "pa2", nom: "Awa Diallo", photo: "/images/plateforme/portraits/awa-diallo.jpg", metier: "Plomberie", ville: "Thiès", missions: 32, note: 4.6, statut: "Actif", telephone: "+221 77 123 98 76", email: "awa.diallo@email.sn", ninea: "23456789", anneesActivite: "6 ans", competences: ["Plomberie sanitaire"], inscritLe: "10/03/2026", derniereConnexion: "20/08/2026", missionsRecentes: [{ title: "Installation sanitaire", sub: "Particulier", badge: "Terminée" }], avis: [{ title: "Cheikh Ba", sub: "Très efficace.", value: "★ 5.0" }] },
+  { id: "pa3", nom: "Mamadou Sy", photo: "/images/plateforme/portraits/mamadou-sy.jpg", metier: "Maçonnerie", ville: "Dakar", missions: 65, note: 4.9, statut: "Vérifié", telephone: "+221 78 234 56 78", email: "mamadou.sy@email.sn", ninea: "34567890", anneesActivite: "15 ans", competences: ["Maçonnerie générale", "Fondations"], inscritLe: "05/01/2026", derniereConnexion: "25/08/2026", missionsRecentes: [{ title: "Construction villa", sub: "Modou Fall", badge: "En cours" }], avis: [{ title: "Awa Ndiaye", sub: "Excellent maçon.", value: "★ 5.0" }] },
+  { id: "pa4", nom: "Ndèye Fatou Mbaye", photo: "/images/plateforme/portraits/ndeye-fatou-mbaye.jpg", metier: "Couture/Textile", ville: "Kaolack", missions: 28, note: 4.7, statut: "Actif", telephone: "+221 76 345 67 89", email: "ndeye.mbaye@email.sn", ninea: "45678901", anneesActivite: "9 ans", competences: ["Couture sur mesure"], inscritLe: "12/02/2026", derniereConnexion: "18/08/2026", missionsRecentes: [], avis: [] },
+  { id: "pa5", nom: "Alioune Ndiaye", photo: "/images/plateforme/portraits/alioune-ndiaye.jpg", metier: "Menuiserie", ville: "Saint-Louis", missions: 41, note: 4.5, statut: "En attente", telephone: "+221 77 456 78 90", email: "alioune.ndiaye@email.sn", ninea: "56789012", anneesActivite: "10 ans", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "20/04/2026", derniereConnexion: "15/08/2026", missionsRecentes: [], avis: [] },
+  { id: "pa6", nom: "Sokhna Dieng", photo: "/images/plateforme/portraits/sokhna-dieng.jpg", metier: "Peinture", ville: "Dakar", missions: 19, note: 4.3, statut: "Nouveau", telephone: "+221 78 567 89 01", email: "sokhna.dieng@email.sn", ninea: "67890123", anneesActivite: "3 ans", competences: ["Peinture intérieure"], inscritLe: "01/07/2026", derniereConnexion: "22/08/2026", missionsRecentes: [], avis: [] },
+  { id: "pa7", nom: "Babacar Faye", photo: "/images/plateforme/portraits/babacar-faye.jpg", metier: "Carrelage", ville: "Rufisque", missions: 53, note: 4.8, statut: "Vérifié", telephone: "+221 76 678 90 12", email: "babacar.faye@email.sn", ninea: "78901234", anneesActivite: "11 ans", competences: ["Pose de carrelage"], inscritLe: "15/01/2026", derniereConnexion: "23/08/2026", missionsRecentes: [], avis: [] },
+  { id: "pa8", nom: "Khady Thiam", photo: "/images/plateforme/portraits/khady-thiam.jpg", metier: "Électricité", ville: "Mbour", missions: 22, note: 4.4, statut: "Suspendu", telephone: "+221 77 789 01 23", email: "khady.thiam@email.sn", ninea: "89012345", anneesActivite: "5 ans", competences: ["Électricité domestique"], inscritLe: "08/03/2026", derniereConnexion: "01/07/2026", missionsRecentes: [], avis: [] },
 ];
 
 function PrestatairesAdminDetail(row, { onBack, update, remove }) {
@@ -4777,14 +4971,14 @@ function FormationsAdminScreen() {
 /* ---------- Mentorat (Admin) ---------- */
 
 const MENTORAT_ADMIN_INITIAL = [
-  { id: "ma1", nom: "Cheikh Fall", photo: "https://randomuser.me/api/portraits/men/52.jpg", metier: "Électricien", mentoresActifs: 3, specialite: "Électricité générale", note: 4.9, statut: "Actif", telephone: "+221 77 654 32 10", email: "cheikh.fall@email.sn", experience: "12 ans d'expérience", ninea: "1234567 2G3", competences: ["Installation électrique", "Dépannage rapide", "Câblage industriel"], certifications: [{ title: "Habilitation électrique B2V", badge: "Validé" }, { title: "Sécurité sur chantier BTP", badge: "Validé" }], totalAccompagnes: 5, membresActuels: [{ title: "Moussa Diop", sub: "Depuis le 01/06/2026", badge: "Mentoré" }, { title: "Abdoulaye Sow", sub: "Depuis le 15/07/2026", badge: "Mentoré" }, { title: "Aissatou Gueye", sub: "Depuis le 01/08/2026", badge: "Mentoré" }] },
-  { id: "ma2", nom: "Mamadou Sy", photo: "https://randomuser.me/api/portraits/men/9.jpg", metier: "Maçon", mentoresActifs: 5, specialite: "Maçonnerie", note: 4.8, statut: "Actif", telephone: "+221 78 765 43 21", email: "mamadou.sy@email.sn", experience: "15 ans d'expérience", ninea: "2345678 3G4", competences: ["Maçonnerie générale"], certifications: [], totalAccompagnes: 8, membresActuels: [] },
-  { id: "ma3", nom: "Awa Diallo", photo: "https://randomuser.me/api/portraits/women/9.jpg", metier: "Plombière", mentoresActifs: 2, specialite: "Plomberie", note: 4.7, statut: "Actif", telephone: "+221 76 876 54 32", email: "awa.diallo@email.sn", experience: "9 ans d'expérience", ninea: "3456789 4G5", competences: ["Plomberie sanitaire"], certifications: [], totalAccompagnes: 4, membresActuels: [] },
-  { id: "ma4", nom: "Babacar Faye", photo: "https://randomuser.me/api/portraits/men/26.jpg", metier: "Carreleur", mentoresActifs: 4, specialite: "Carrelage", note: 4.6, statut: "Actif", telephone: "+221 77 987 65 43", email: "babacar.faye@email.sn", experience: "11 ans d'expérience", ninea: "4567890 5G6", competences: ["Pose de carrelage"], certifications: [], totalAccompagnes: 6, membresActuels: [] },
-  { id: "ma5", nom: "Ndèye Mbaye", photo: "https://randomuser.me/api/portraits/women/15.jpg", metier: "Couturière", mentoresActifs: 1, specialite: "Couture", note: 4.5, statut: "En attente", telephone: "+221 78 098 76 54", email: "ndeye.mbaye@email.sn", experience: "9 ans d'expérience", ninea: "5678901 6G7", competences: ["Couture sur mesure"], certifications: [], totalAccompagnes: 1, membresActuels: [] },
-  { id: "ma6", nom: "Alioune Ndiaye", photo: "https://randomuser.me/api/portraits/men/15.jpg", metier: "Menuisier", mentoresActifs: 3, specialite: "Menuiserie", note: 4.4, statut: "Inactif", telephone: "+221 76 109 87 65", email: "alioune.ndiaye@email.sn", experience: "10 ans d'expérience", ninea: "6789012 7G8", competences: ["Menuiserie"], certifications: [], totalAccompagnes: 5, membresActuels: [] },
-  { id: "ma7", nom: "Sokhna Dieng", photo: "https://randomuser.me/api/portraits/women/26.jpg", metier: "Peintre", mentoresActifs: 2, specialite: "Peinture", note: 4.3, statut: "Actif", telephone: "+221 77 210 98 76", email: "sokhna.dieng@email.sn", experience: "3 ans d'expérience", ninea: "7890123 8G9", competences: ["Peinture intérieure"], certifications: [], totalAccompagnes: 2, membresActuels: [] },
-  { id: "ma8", nom: "Khady Thiam", photo: "https://randomuser.me/api/portraits/women/34.jpg", metier: "Électricienne", mentoresActifs: 0, specialite: "Électricité", note: 0, statut: "En attente", telephone: "+221 78 321 09 87", email: "khady.thiam@email.sn", experience: "5 ans d'expérience", ninea: "8901234 9G0", competences: ["Électricité domestique"], certifications: [], totalAccompagnes: 0, membresActuels: [] },
+  { id: "ma1", nom: "Cheikh Fall", photo: "/images/plateforme/portraits/cheikh-fall.jpg", metier: "Électricien", mentoresActifs: 3, specialite: "Électricité générale", note: 4.9, statut: "Actif", telephone: "+221 77 654 32 10", email: "cheikh.fall@email.sn", experience: "12 ans d'expérience", ninea: "1234567 2G3", competences: ["Installation électrique", "Dépannage rapide", "Câblage industriel"], certifications: [{ title: "Habilitation électrique B2V", badge: "Validé" }, { title: "Sécurité sur chantier BTP", badge: "Validé" }], totalAccompagnes: 5, membresActuels: [{ title: "Moussa Diop", sub: "Depuis le 01/06/2026", badge: "Mentoré" }, { title: "Abdoulaye Sow", sub: "Depuis le 15/07/2026", badge: "Mentoré" }, { title: "Aissatou Gueye", sub: "Depuis le 01/08/2026", badge: "Mentoré" }] },
+  { id: "ma2", nom: "Mamadou Sy", photo: "/images/plateforme/portraits/mamadou-sy.jpg", metier: "Maçon", mentoresActifs: 5, specialite: "Maçonnerie", note: 4.8, statut: "Actif", telephone: "+221 78 765 43 21", email: "mamadou.sy@email.sn", experience: "15 ans d'expérience", ninea: "2345678 3G4", competences: ["Maçonnerie générale"], certifications: [], totalAccompagnes: 8, membresActuels: [] },
+  { id: "ma3", nom: "Awa Diallo", photo: "/images/plateforme/portraits/awa-diallo.jpg", metier: "Plombière", mentoresActifs: 2, specialite: "Plomberie", note: 4.7, statut: "Actif", telephone: "+221 76 876 54 32", email: "awa.diallo@email.sn", experience: "9 ans d'expérience", ninea: "3456789 4G5", competences: ["Plomberie sanitaire"], certifications: [], totalAccompagnes: 4, membresActuels: [] },
+  { id: "ma4", nom: "Babacar Faye", photo: "/images/plateforme/portraits/babacar-faye.jpg", metier: "Carreleur", mentoresActifs: 4, specialite: "Carrelage", note: 4.6, statut: "Actif", telephone: "+221 77 987 65 43", email: "babacar.faye@email.sn", experience: "11 ans d'expérience", ninea: "4567890 5G6", competences: ["Pose de carrelage"], certifications: [], totalAccompagnes: 6, membresActuels: [] },
+  { id: "ma5", nom: "Ndèye Mbaye", photo: "/images/plateforme/portraits/ndeye-mbaye.jpg", metier: "Couturière", mentoresActifs: 1, specialite: "Couture", note: 4.5, statut: "En attente", telephone: "+221 78 098 76 54", email: "ndeye.mbaye@email.sn", experience: "9 ans d'expérience", ninea: "5678901 6G7", competences: ["Couture sur mesure"], certifications: [], totalAccompagnes: 1, membresActuels: [] },
+  { id: "ma6", nom: "Alioune Ndiaye", photo: "/images/plateforme/portraits/alioune-ndiaye.jpg", metier: "Menuisier", mentoresActifs: 3, specialite: "Menuiserie", note: 4.4, statut: "Inactif", telephone: "+221 76 109 87 65", email: "alioune.ndiaye@email.sn", experience: "10 ans d'expérience", ninea: "6789012 7G8", competences: ["Menuiserie"], certifications: [], totalAccompagnes: 5, membresActuels: [] },
+  { id: "ma7", nom: "Sokhna Dieng", photo: "/images/plateforme/portraits/sokhna-dieng.jpg", metier: "Peintre", mentoresActifs: 2, specialite: "Peinture", note: 4.3, statut: "Actif", telephone: "+221 77 210 98 76", email: "sokhna.dieng@email.sn", experience: "3 ans d'expérience", ninea: "7890123 8G9", competences: ["Peinture intérieure"], certifications: [], totalAccompagnes: 2, membresActuels: [] },
+  { id: "ma8", nom: "Khady Thiam", photo: "/images/plateforme/portraits/khady-thiam.jpg", metier: "Électricienne", mentoresActifs: 0, specialite: "Électricité", note: 0, statut: "En attente", telephone: "+221 78 321 09 87", email: "khady.thiam@email.sn", experience: "5 ans d'expérience", ninea: "8901234 9G0", competences: ["Électricité domestique"], certifications: [], totalAccompagnes: 0, membresActuels: [] },
 ];
 
 function MentoratAdminDetail(row, { onBack, update, remove }) {
@@ -5948,7 +6142,7 @@ function ParametresScreen() {
    ABONNEMENTS & OFFRES PREMIUM
    - Offres par type d'utilisateur (chercheur, prestataire, entreprise)
    - Limites mensuelles + fonctionnalités réservées
-   - Paiement mobile money (Wave, Orange Money, Free Money) ou carte
+   - Paiement mobile money (Wave, Orange Money), tarifs alignés sur la page Tarifs du site
    - Pilotage admin : tarifs, quotas, abonnés, transactions
    ===================================================================== */
 
@@ -5971,16 +6165,15 @@ function todayFr(offsetMonths = 0) {
 
 const PLANS_INITIAL = {
   chercheur: [
-    { id: "essentiel", nom: "Essentiel", prixMensuel: 0, description: "Le profil de base pour démarrer votre recherche.", limits: { candidatures: 5 }, features: {}, avantages: ["5 candidatures par mois", "Formations gratuites et certificats", "Suivi de vos candidatures et de votre embauche"] },
-    { id: "premium", nom: "Premium", prixMensuel: 2500, recommande: true, description: "Un profil mis en avant pour être recruté(e) plus vite.", limits: { candidatures: UNLIMITED }, features: { formationsPremium: true, mentorat: true, miseEnAvant: true }, avantages: ["Profil en tête des résultats des recruteurs", "Candidatures illimitées", "Toutes les formations, y compris premium", "Coaching individuel avec un mentor", "Voir qui a consulté votre profil"] },
+    { id: "essentiel", nom: "Essentiel", prixMensuel: 1500, description: "Les fonctionnalités essentielles pour démarrer votre recherche.", limits: { candidatures: 5 }, features: {}, avantages: ["Profil complet et badge « Profil vérifié »", "Offres vérifiées", "5 candidatures par mois", "Suivi des candidatures", "Formations gratuites avec certificat"] },
+    { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { candidatures: UNLIMITED }, features: { formationsPremium: true, mentorat: true, miseEnAvant: true }, avantages: ["Tout le profil Essentiel", "Candidatures illimitées", "Profil mis en avant auprès des recruteurs", "Sessions de mentorat collectives", "Formations premium incluses", "Voir qui a consulté votre profil"] },
   ],
   prestataire: [
-    { id: "essentiel", nom: "Essentiel", prixMensuel: 0, commission: 15, description: "Le profil de base pour proposer vos services.", limits: { services: 10 }, features: {}, avantages: ["Jusqu'à 10 services publiés", "Commission de 15 % par mission", "Guide de régularisation en ligne"] },
-    { id: "premium", nom: "Premium", prixMensuel: 5000, commission: 8, recommande: true, description: "Un profil prioritaire pour développer votre clientèle.", limits: { services: UNLIMITED }, features: { formationsPremium: true, mentorat: true, contreOffre: true, badgePro: true, accompagnementRegularisation: true }, avantages: ["Profil prioritaire et badge Premium", "Services illimités", "Commission réduite à 8 % par mission", "Contre-propositions de tarif aux clients", "Conseiller dédié pour régulariser votre activité", "Formations premium et coaching"] },
+    { id: "essentiel", nom: "Essentiel", prixMensuel: 1500, description: "Les fonctionnalités essentielles pour proposer vos services.", limits: { services: 10 }, features: {}, avantages: ["Profil complet et badge « Profil vérifié »", "Jusqu'à 10 services publiés", "Formations gratuites avec certificat", "Guide de formalisation en ligne"] },
+    { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { services: UNLIMITED }, features: { formationsPremium: true, mentorat: true, contreOffre: true, badgePro: true, accompagnementRegularisation: true }, avantages: ["Tout le profil Essentiel", "Services illimités", "Profil prioritaire et badge Premium", "Contre-propositions de tarif aux clients", "Sessions de mentorat collectives", "Formations premium incluses"] },
   ],
   entreprise: [
-    { id: "essentiel", nom: "Essentiel", prixMensuel: 0, description: "Le profil de base pour un premier recrutement.", limits: { offres: 1 }, features: {}, avantages: ["1 nouvelle offre par mois", "Réception et tri des candidatures", "Suivi post-embauche des recrues"] },
-    { id: "premium", nom: "Premium", prixMensuel: 35000, recommande: true, description: "Un profil Recruteur Premium pour recruter sans limite.", limits: { offres: UNLIMITED }, features: { coordonnees: true, contactPrestataires: true, sponsoring: true }, avantages: ["Badge Recruteur Premium", "Offres illimitées", "Coordonnées et CV des candidats", "Contact direct et missions aux prestataires", "Offres sponsorisées en tête de liste"] },
+    { id: "premium", nom: "Entreprise", prixMensuel: 40000, description: "Publication d'offres, sélection et short-list des profils par LIGGEEY.", limits: { offres: UNLIMITED }, features: { coordonnees: true, contactPrestataires: true, sponsoring: true }, avantages: ["Offres illimitées", "Sélection et short-list des profils par LIGGEEY", "Coordonnées et CV des candidats", "Contact direct et missions aux prestataires", "Offres sponsorisées en tête de liste"] },
   ],
 };
 
@@ -5995,7 +6188,7 @@ const LIMIT_LABELS = {
 const UPGRADE_REASONS = {
   candidatures: { titre: "Vous avez utilisé toutes vos candidatures du mois", texte: "Avec le profil Premium, postulez sans limite aux offres qui vous intéressent.", limit: "candidatures" },
   formationsPremium: { titre: "Cette formation est réservée au profil Premium", texte: "Débloquez toutes les formations et obtenez les certificats associés.", feature: "formationsPremium" },
-  mentorat: { titre: "Le coaching individuel est réservé au profil Premium", texte: "Échangez en tête-à-tête avec un professionnel expérimenté de votre secteur.", feature: "mentorat" },
+  mentorat: { titre: "Le mentorat est réservé au profil Premium", texte: "Profitez des sessions de mentorat collectives avec des professionnels de votre secteur.", feature: "mentorat" },
   services: { titre: "Vous avez atteint le nombre maximum de services", texte: "Publiez autant de services que vous le souhaitez avec le profil Premium.", limit: "services" },
   contreOffre: { titre: "Les contre-propositions sont réservées au profil Premium", texte: "Négociez le tarif d'une mission directement avec le client.", feature: "contreOffre" },
   offres: { titre: "Vous avez publié toutes vos offres du mois", texte: "Publiez davantage d'offres et touchez plus de candidats.", limit: "offres" },
@@ -6008,9 +6201,9 @@ const UPGRADE_REASONS = {
 const PREMIUM_FORMATIONS = new Set(["devweb", "excel", "leadership", "entrepreneuriat", "peinture-moderne", "soudure-tech"]);
 
 const SUBS_INITIAL = {
-  chercheur: { planId: "essentiel", cycle: "mensuel" },
-  prestataire: { planId: "essentiel", cycle: "mensuel" },
-  entreprise: { planId: "essentiel", cycle: "mensuel" },
+  chercheur: { planId: "essentiel", cycle: "mensuel", moyen: "Wave", depuis: "01/09/2026", prochain: "01/11/2026" },
+  prestataire: { planId: "essentiel", cycle: "mensuel", moyen: "Orange Money", depuis: "15/08/2026", prochain: "15/11/2026" },
+  entreprise: { planId: "premium", cycle: "mensuel", moyen: "Wave", depuis: "03/09/2026", prochain: "03/11/2026" },
 };
 
 const USAGE_INITIAL = {
@@ -6022,34 +6215,32 @@ const USAGE_INITIAL = {
 const PAYMENT_METHODS = [
   { id: "wave", nom: "Wave", couleur: "#1DC8F2", type: "mobile" },
   { id: "om", nom: "Orange Money", couleur: "#FF7900", type: "mobile" },
-  { id: "free", nom: "Free Money", couleur: "#CD1E25", type: "mobile" },
-  { id: "carte", nom: "Carte bancaire", couleur: COLORS.slate, type: "carte" },
 ];
 
 const TRANSACTIONS_INITIAL = [
-  { id: "t1", ref: "LIG-26-10-0418", date: "07/10/2026", client: "Sonatel SA", espace: "entreprise", offre: "Premium", cycle: "Mensuel", montant: 35000, moyen: "Orange Money", statut: "Payé" },
-  { id: "t2", ref: "LIG-26-10-0417", date: "06/10/2026", client: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 5000, moyen: "Wave", statut: "Payé" },
-  { id: "t3", ref: "LIG-26-10-0415", date: "05/10/2026", client: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Annuel", montant: 25000, moyen: "Wave", statut: "Payé" },
-  { id: "t4", ref: "LIG-26-10-0411", date: "04/10/2026", client: "Kirène", espace: "entreprise", offre: "Premium", cycle: "Mensuel", montant: 35000, moyen: "Carte bancaire", statut: "Échoué" },
-  { id: "t5", ref: "LIG-26-10-0409", date: "03/10/2026", client: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Annuel", montant: 50000, moyen: "Free Money", statut: "Payé" },
-  { id: "t6", ref: "LIG-26-10-0402", date: "02/10/2026", client: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 2500, moyen: "Orange Money", statut: "Payé" },
-  { id: "t7", ref: "LIG-26-10-0397", date: "01/10/2026", client: "Teranga Capital", espace: "entreprise", offre: "Premium", cycle: "Annuel", montant: 350000, moyen: "Carte bancaire", statut: "Payé" },
-  { id: "t8", ref: "LIG-26-09-0388", date: "29/09/2026", client: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 5000, moyen: "Wave", statut: "Remboursé" },
-  { id: "t9", ref: "LIG-26-09-0381", date: "27/09/2026", client: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 2500, moyen: "Wave", statut: "Échoué" },
-  { id: "t10", ref: "LIG-26-09-0376", date: "25/09/2026", client: "Dakar Bâtiment", espace: "entreprise", offre: "Premium", cycle: "Mensuel", montant: 35000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t1", ref: "LIG-26-10-0418", date: "07/10/2026", client: "Sonatel SA", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t2", ref: "LIG-26-10-0417", date: "06/10/2026", client: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
+  { id: "t3", ref: "LIG-26-10-0415", date: "05/10/2026", client: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
+  { id: "t4", ref: "LIG-26-10-0411", date: "04/10/2026", client: "Kirène", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Échoué" },
+  { id: "t5", ref: "LIG-26-10-0409", date: "03/10/2026", client: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t6", ref: "LIG-26-10-0402", date: "02/10/2026", client: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t7", ref: "LIG-26-10-0397", date: "01/10/2026", client: "Teranga Capital", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
+  { id: "t8", ref: "LIG-26-09-0388", date: "29/09/2026", client: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Remboursé" },
+  { id: "t9", ref: "LIG-26-09-0381", date: "27/09/2026", client: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Échoué" },
+  { id: "t10", ref: "LIG-26-09-0376", date: "25/09/2026", client: "Dakar Bâtiment", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
 ];
 
 const ABONNES_ADMIN_INITIAL = [
-  { id: "ab1", nom: "Sonatel SA", espace: "entreprise", offre: "Premium", cycle: "Mensuel", montant: 35000, depuis: "07/03/2026", prochain: "07/11/2026", statut: "Actif" },
-  { id: "ab2", nom: "Teranga Capital", espace: "entreprise", offre: "Premium", cycle: "Annuel", montant: 350000, depuis: "01/10/2026", prochain: "01/10/2027", statut: "Actif" },
-  { id: "ab3", nom: "Kirène", espace: "entreprise", offre: "Premium", cycle: "Mensuel", montant: 35000, depuis: "04/06/2026", prochain: "04/10/2026", statut: "Échec de paiement" },
-  { id: "ab4", nom: "Dakar Bâtiment", espace: "entreprise", offre: "Premium", cycle: "Mensuel", montant: 35000, depuis: "25/05/2026", prochain: "25/10/2026", statut: "Actif" },
-  { id: "ab5", nom: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 5000, depuis: "06/07/2026", prochain: "06/11/2026", statut: "Actif" },
-  { id: "ab6", nom: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Annuel", montant: 50000, depuis: "03/10/2026", prochain: "03/10/2027", statut: "Actif" },
-  { id: "ab7", nom: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 5000, depuis: "29/08/2026", prochain: "—", statut: "Suspendu" },
-  { id: "ab8", nom: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Annuel", montant: 25000, depuis: "05/10/2026", prochain: "05/10/2027", statut: "Actif" },
-  { id: "ab9", nom: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 2500, depuis: "02/08/2026", prochain: "02/11/2026", statut: "Actif" },
-  { id: "ab10", nom: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 2500, depuis: "27/07/2026", prochain: "27/09/2026", statut: "Échec de paiement" },
+  { id: "ab1", nom: "Sonatel SA", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "07/03/2026", prochain: "07/11/2026", statut: "Actif" },
+  { id: "ab2", nom: "Teranga Capital", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "01/10/2026", prochain: "01/11/2026", statut: "Actif" },
+  { id: "ab3", nom: "Kirène", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "04/06/2026", prochain: "04/10/2026", statut: "Échec de paiement" },
+  { id: "ab4", nom: "Dakar Bâtiment", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "25/05/2026", prochain: "25/10/2026", statut: "Actif" },
+  { id: "ab5", nom: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "06/07/2026", prochain: "06/11/2026", statut: "Actif" },
+  { id: "ab6", nom: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "03/10/2026", prochain: "03/11/2026", statut: "Actif" },
+  { id: "ab7", nom: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "29/08/2026", prochain: "—", statut: "Suspendu" },
+  { id: "ab8", nom: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "05/10/2026", prochain: "05/11/2026", statut: "Actif" },
+  { id: "ab9", nom: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "02/08/2026", prochain: "02/11/2026", statut: "Actif" },
+  { id: "ab10", nom: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "27/07/2026", prochain: "27/09/2026", statut: "Échec de paiement" },
 ];
 
 const REVENUS_MOIS = [
@@ -6096,17 +6287,17 @@ function buildPlanApi({ espace, user, plans, setPlans, subs, setSubs, usage, set
     subscribe: (planId, cycle, moyen) => {
       const target = espacePlans.find((p) => p.id === planId);
       if (!target) return null;
-      const montant = cycle === "annuel" ? target.prixMensuel * 10 : target.prixMensuel;
+      const montant = target.prixMensuel;
       const ref = `LIG-26-10-${String(Math.floor(1000 + Math.random() * 8999))}`;
-      setSubs((s) => ({ ...s, [espace]: { planId, cycle, moyen, depuis: todayFr(), prochain: todayFr(cycle === "annuel" ? 12 : 1) } }));
-      setTransactions((t) => [{ id: `t${Date.now()}`, ref, date: todayFr(), client: user.name, espace, offre: target.nom, cycle: cycle === "annuel" ? "Annuel" : "Mensuel", montant, moyen, statut: "Payé" }, ...t]);
-      return { ref, montant, prochain: todayFr(cycle === "annuel" ? 12 : 1) };
+      setSubs((s) => ({ ...s, [espace]: { planId, cycle, moyen, depuis: todayFr(), prochain: todayFr(1) } }));
+      setTransactions((t) => [{ id: `t${Date.now()}`, ref, date: todayFr(), client: user.name, espace, offre: target.nom, cycle: "Mensuel", montant, moyen, statut: "Payé" }, ...t]);
+      return { ref, montant, prochain: todayFr(1) };
     },
     downgrade: () => {
-      const free = espacePlans.find((p) => p.prixMensuel === 0);
-      if (!free) return;
-      setSubs((s) => ({ ...s, [espace]: { planId: free.id, cycle: "mensuel" } }));
-      notify(`Vous êtes revenu(e) au profil ${free.nom}.`, "info");
+      const base = espacePlans[0];
+      if (!base || base.id === plan?.id) return;
+      setSubs((s) => ({ ...s, [espace]: { ...s[espace], planId: base.id, cycle: "mensuel" } }));
+      notify(`Vous êtes revenu(e) au profil ${base.nom}.`, "info");
     },
   };
   return api;
@@ -6215,10 +6406,9 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
 function PaymentModal({ planId, initialCycle, onClose }) {
   const api = usePlan();
   const target = api.espacePlans.find((p) => p.id === planId);
-  const [cycle, setCycle] = useState(initialCycle || "mensuel");
+  const cycle = "mensuel";
   const [method, setMethod] = useState("wave");
   const [phone, setPhone] = useState("77 123 45 67");
-  const [card, setCard] = useState({ numero: "", expiration: "", cvc: "" });
   const [touched, setTouched] = useState(false);
   const [step, setStep] = useState("form"); // form | pending | done
   const [receipt, setReceipt] = useState(null);
@@ -6228,11 +6418,10 @@ function PaymentModal({ planId, initialCycle, onClose }) {
   if (!target) return null;
 
   const m = PAYMENT_METHODS.find((x) => x.id === method);
-  const montant = cycle === "annuel" ? target.prixMensuel * 10 : target.prixMensuel;
+  const montant = target.prixMensuel;
   const digits = phone.replace(/\D/g, "").replace(/^221/, "");
   const phoneValid = /^7[05678]\d{7}$/.test(digits);
-  const cardValid = card.numero.replace(/\D/g, "").length === 16 && /^\d{2}\/\d{2}$/.test(card.expiration) && /^\d{3}$/.test(card.cvc);
-  const valid = m.type === "mobile" ? phoneValid : cardValid;
+  const valid = phoneValid;
 
   function pay() {
     setTouched(true);
@@ -6260,54 +6449,26 @@ function PaymentModal({ planId, initialCycle, onClose }) {
             <button type="button" onClick={onClose} aria-label="Fermer" className="text-xl leading-none" style={{ color: COLORS.slateLight }}>×</button>
           </div>
 
-          <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Durée</p>
-          <div className="grid grid-cols-2 gap-2 mb-5">
-            {[{ id: "mensuel", label: "Mensuel", sub: `${fcfa(target.prixMensuel)} / mois` }, { id: "annuel", label: "Annuel", sub: `${fcfa(target.prixMensuel * 10)} · 2 mois offerts` }].map((c) => (
-              <button key={c.id} type="button" onClick={() => setCycle(c.id)} aria-pressed={cycle === c.id} className="rounded-md border px-3 py-2.5 text-left" style={{ borderColor: cycle === c.id ? COLORS.orange : COLORS.border, background: cycle === c.id ? COLORS.orangeSoft : COLORS.surface }}>
-                <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{c.label}</p>
-                <p className="text-xs" style={{ color: COLORS.slateLight }}>{c.sub}</p>
-              </button>
-            ))}
-          </div>
-
           <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Moyen de paiement</p>
           <div className="grid grid-cols-2 gap-2 mb-5">
             {PAYMENT_METHODS.map((pm) => (
               <button key={pm.id} type="button" onClick={() => { setMethod(pm.id); setTouched(false); }} aria-pressed={method === pm.id} className="rounded-md border px-3 py-2.5 flex items-center gap-2.5 text-sm font-medium" style={{ borderColor: method === pm.id ? COLORS.orange : COLORS.border, color: COLORS.slate, background: method === pm.id ? COLORS.orangeSoft : COLORS.surface }}>
                 <span className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: pm.couleur }}>
-                  {pm.type === "mobile" ? <Smartphone size={12} color="#fff" /> : <CreditCard size={12} color="#fff" />}
+                  <Smartphone size={12} color="#fff" />
                 </span>
                 {pm.nom}
               </button>
             ))}
           </div>
 
-          {m.type === "mobile" ? (
-            <div className="mb-5">
-              <label htmlFor="pay-phone" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Numéro {m.nom}</label>
-              <div className="flex">
-                <span className="rounded-l-md border border-r-0 px-3 py-2.5 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight, background: COLORS.soft }}>+221</span>
-                <input id="pay-phone" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputCls} rounded-l-none`} style={{ borderColor: touched && !phoneValid ? COLORS.danger : COLORS.border }} />
-              </div>
-              {touched && !phoneValid && <p className="text-xs mt-1" style={{ color: COLORS.danger }}>Saisissez un numéro sénégalais à 9 chiffres, par exemple 77 123 45 67.</p>}
+          <div className="mb-5">
+            <label htmlFor="pay-phone" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Numéro {m.nom}</label>
+            <div className="flex">
+              <span className="rounded-l-md border border-r-0 px-3 py-2.5 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight, background: COLORS.soft }}>+221</span>
+              <input id="pay-phone" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputCls} rounded-l-none`} style={{ borderColor: touched && !phoneValid ? COLORS.danger : COLORS.border }} />
             </div>
-          ) : (
-            <div className="grid grid-cols-2 gap-2 mb-5">
-              <div className="col-span-2">
-                <label htmlFor="card-num" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Numéro de carte</label>
-                <input id="card-num" inputMode="numeric" placeholder="4970 1012 3456 7890" value={card.numero} onChange={(e) => setCard((c) => ({ ...c, numero: e.target.value }))} className={inputCls} style={{ borderColor: COLORS.border }} />
-              </div>
-              <div>
-                <label htmlFor="card-exp" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Expiration</label>
-                <input id="card-exp" placeholder="MM/AA" value={card.expiration} onChange={(e) => setCard((c) => ({ ...c, expiration: e.target.value }))} className={inputCls} style={{ borderColor: COLORS.border }} />
-              </div>
-              <div>
-                <label htmlFor="card-cvc" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Code CVC</label>
-                <input id="card-cvc" inputMode="numeric" placeholder="123" value={card.cvc} onChange={(e) => setCard((c) => ({ ...c, cvc: e.target.value }))} className={inputCls} style={{ borderColor: COLORS.border }} />
-              </div>
-              {touched && !cardValid && <p className="col-span-2 text-xs" style={{ color: COLORS.danger }}>Vérifiez le numéro (16 chiffres), la date (MM/AA) et le code CVC (3 chiffres).</p>}
-            </div>
-          )}
+            {touched && !phoneValid && <p className="text-xs mt-1" style={{ color: COLORS.danger }}>Saisissez un numéro sénégalais à 9 chiffres, par exemple 77 123 45 67.</p>}
+          </div>
 
           <div className="rounded-md px-4 py-3 mb-5 flex items-center justify-between" style={{ background: COLORS.soft }}>
             <span className="text-sm" style={{ color: COLORS.slateLight }}>Total à payer</span>
@@ -6327,10 +6488,10 @@ function PaymentModal({ planId, initialCycle, onClose }) {
         <div className="p-8 text-center" aria-live="polite">
           <Loader2 size={32} color={COLORS.orange} className="mx-auto mb-4 animate-spin" />
           <h3 id="pay-title" className="text-lg font-bold mb-1" style={{ color: COLORS.slate }}>
-            {m.type === "mobile" ? `Confirmez sur votre téléphone` : "Vérification de la carte"}
+            Confirmez sur votre téléphone
           </h3>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>
-            {m.type === "mobile" ? `Une demande de paiement ${m.nom} de ${fcfa(montant)} a été envoyée au +221 ${phone}. Saisissez votre code secret pour valider.` : "Votre banque valide le paiement, cela prend quelques secondes."}
+            {`Une demande de paiement ${m.nom} de ${fcfa(montant)} a été envoyée au +221 ${phone}. Saisissez votre code secret pour valider.`}
           </p>
         </div>
       )}
@@ -6361,10 +6522,10 @@ function PaymentModal({ planId, initialCycle, onClose }) {
 function AbonnementScreen() {
   const api = usePlan();
   const { plan, sub, espacePlans } = api;
-  const [cycle, setCycle] = useState(sub?.cycle || "mensuel");
   const [confirmDowngrade, setConfirmDowngrade] = useState(false);
   const history = api.transactions.filter((t) => t.espace === api.espace && t.client === api.user.name);
-  const isPaid = plan.prixMensuel > 0;
+  const base = espacePlans[0];
+  const canDowngrade = espacePlans.length > 1 && plan.id !== base.id;
   const limitKeys = Object.keys(plan.limits);
 
   return (
@@ -6375,13 +6536,12 @@ function AbonnementScreen() {
         <div>
           <p className="text-sm mb-1" style={{ color: COLORS.onDarkMuted }}>Profil actuel</p>
           <p className="text-2xl font-bold text-sur-sombre flex items-center gap-2">
-            {plan.nom} {isPaid && <Crown size={20} color={COLORS.orange} />}
+            {plan.nom} {plan.id !== "essentiel" && <Crown size={20} color={COLORS.orange} />}
           </p>
           <p className="text-sm mt-1" style={{ color: COLORS.orange }}>
-            {isPaid ? `${fcfa(sub.cycle === "annuel" ? plan.prixMensuel * 10 : plan.prixMensuel)} / ${sub.cycle === "annuel" ? "an" : "mois"} · renouvellement le ${sub.prochain}` : "Sans engagement, sans frais"}
+            {`${fcfa(plan.prixMensuel)} / mois${sub.prochain ? ` · renouvellement le ${sub.prochain}` : ""}`}
           </p>
-          {plan.commission !== undefined && <p className="text-sm mt-3" style={{ color: COLORS.onDarkMuted }}>Commission sur vos missions : <span className="text-sur-sombre font-semibold">{plan.commission} %</span></p>}
-          {isPaid && (
+          {canDowngrade && (
             <button type="button" onClick={() => setConfirmDowngrade(true)} className="text-xs font-semibold mt-4 underline" style={{ color: COLORS.onDarkMuted }}>
               Résilier l'abonnement
             </button>
@@ -6396,26 +6556,17 @@ function AbonnementScreen() {
 
       <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
         <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Choisir votre profil</h2>
-        <div className="inline-flex rounded-md border p-0.5" style={{ borderColor: COLORS.border, background: COLORS.surface }} role="group" aria-label="Durée de facturation">
-          {[{ id: "mensuel", label: "Mensuel" }, { id: "annuel", label: "Annuel · 2 mois offerts" }].map((c) => (
-            <button key={c.id} type="button" onClick={() => setCycle(c.id)} aria-pressed={cycle === c.id} className="rounded px-3 py-1.5 text-sm font-semibold" style={{ background: cycle === c.id ? COLORS.dark : "transparent", color: cycle === c.id ? COLORS.onDark : COLORS.slateLight }}>
-              {c.label}
-            </button>
-          ))}
-        </div>
+        <p className="text-sm" style={{ color: COLORS.slateLight }}>Paiement mensuel par Wave ou Orange Money</p>
       </div>
 
       <div className={`grid grid-cols-1 ${espacePlans.length === 3 ? "lg:grid-cols-3" : "md:grid-cols-2"} gap-4 mb-10`}>
         {espacePlans.map((p) => {
           const isCurrent = p.id === plan.id;
-          const free = p.prixMensuel === 0;
-          const price = cycle === "annuel" ? p.prixMensuel * 10 : p.prixMensuel;
-          const sameCycle = free || sub.cycle === cycle;
+          const isBase = p.id === base.id;
           let cta;
-          if (isCurrent && sameCycle) cta = { label: "Profil actuel", disabled: true };
-          else if (free) cta = { label: `Revenir à ${p.nom}`, onClick: () => setConfirmDowngrade(true), secondary: true };
-          else if (isCurrent) cta = { label: cycle === "annuel" ? "Passer en annuel" : "Passer en mensuel", onClick: () => api.startPayment(p.id, cycle) };
-          else cta = { label: p.prixMensuel > plan.prixMensuel ? `Passer à ${p.nom}` : `Choisir ${p.nom}`, onClick: () => api.startPayment(p.id, cycle) };
+          if (isCurrent) cta = { label: "Profil actuel", disabled: true };
+          else if (isBase) cta = { label: `Revenir à ${p.nom}`, onClick: () => setConfirmDowngrade(true), secondary: true };
+          else cta = { label: p.prixMensuel > plan.prixMensuel ? `Passer à ${p.nom}` : `Choisir ${p.nom}`, onClick: () => api.startPayment(p.id, "mensuel") };
           return (
             <div key={p.id} className="rounded-lg bg-surface p-6 flex flex-col relative" style={{ border: `${isCurrent ? 2 : 1}px solid ${isCurrent ? COLORS.orange : COLORS.border}` }}>
               <div className="flex items-center justify-between mb-1 min-h-[24px]">
@@ -6425,13 +6576,13 @@ function AbonnementScreen() {
               </div>
               <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>{p.description}</p>
               <p className="mb-5">
-                <span className="text-3xl font-bold" style={{ color: COLORS.slate }}>{free ? "0" : fcfa(price).replace(" FCFA", "")}</span>
-                <span className="text-sm ml-1" style={{ color: COLORS.slateLight }}>FCFA / {cycle === "annuel" ? "an" : "mois"}</span>
+                <span className="text-3xl font-bold" style={{ color: COLORS.slate }}>{fcfa(p.prixMensuel).replace(" FCFA", "")}</span>
+                <span className="text-sm ml-1" style={{ color: COLORS.slateLight }}>FCFA / mois</span>
               </p>
               <ul className="flex flex-col gap-2.5 mb-6 flex-1">
                 {p.avantages.map((a) => (
                   <li key={a} className="flex items-start gap-2 text-sm" style={{ color: COLORS.slate }}>
-                    <Check size={15} color={free ? COLORS.slateLight : "#16A34A"} className="mt-0.5 shrink-0" /> {a}
+                    <Check size={15} color={isBase ? COLORS.slateLight : "#16A34A"} className="mt-0.5 shrink-0" /> {a}
                   </li>
                 ))}
               </ul>
@@ -6485,7 +6636,7 @@ function AbonnementScreen() {
         <ModalFrame onClose={() => setConfirmDowngrade(false)} labelledBy="downgrade-title">
           <div className="p-6">
             <h3 id="downgrade-title" className="text-lg font-bold mb-2" style={{ color: COLORS.slate }}>Résilier le profil {plan.nom} ?</h3>
-            <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Vous reviendrez au profil Essentiel et perdrez l'accès à :</p>
+            <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Vous reviendrez au profil {base.nom} et perdrez l'accès à :</p>
             <ul className="flex flex-col gap-1.5 mb-6">
               {plan.avantages.slice(0, 3).map((a) => (
                 <li key={a} className="flex items-start gap-2 text-sm" style={{ color: COLORS.slate }}><X size={14} color={COLORS.danger} className="mt-0.5 shrink-0" /> {a}</li>
@@ -6663,7 +6814,7 @@ function AbonnementsAdminScreen() {
                       <div key={p.id} className="rounded-md p-4" style={{ background: COLORS.soft }}>
                         <p className="font-semibold mb-3" style={{ color: COLORS.slate }}>{p.nom}</p>
                         <label className="block text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }} htmlFor={`prix-${esp}-${p.id}`}>Prix mensuel (FCFA)</label>
-                        <input id={`prix-${esp}-${p.id}`} type="number" min={0} step={500} disabled={p.prixMensuel === 0 && p.id === draft[esp][0].id} value={p.prixMensuel} onChange={(e) => setPlanField(esp, p.id, "prix", Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-md border px-3 py-2 text-sm mb-3 bg-surface outline-none focus:border-primaire-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
+                        <input id={`prix-${esp}-${p.id}`} type="number" min={0} step={500} value={p.prixMensuel} onChange={(e) => setPlanField(esp, p.id, "prix", Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-md border px-3 py-2 text-sm mb-3 bg-surface outline-none focus:border-primaire-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
                         <label className="block text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }} htmlFor={`lim-${esp}-${p.id}`}>{LIMIT_LABELS[limitKey]}</label>
                         <div className="flex items-center gap-2">
                           <input id={`lim-${esp}-${p.id}`} type="number" min={1} disabled={lim === UNLIMITED} value={lim === UNLIMITED ? "" : lim} placeholder="Illimité" onChange={(e) => setPlanField(esp, p.id, limitKey, Math.max(1, Number(e.target.value) || 1))} className="flex-1 min-w-0 rounded-md border px-3 py-2 text-sm bg-surface outline-none focus:border-primaire-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
@@ -6698,12 +6849,11 @@ const PROFILE_TIER_PERKS = {
     ["Badge sur le profil", "—", "Badge Premium"],
     ["Candidatures", "5 par mois", "Illimitées"],
     ["Qui a consulté votre profil", "—", "Visible"],
-    ["Mentorat individuel", "—", "Inclus"],
+    ["Mentorat collectif", "—", "Inclus"],
   ],
   prestataire: [
     ["Position dans les recherches", "Standard", "Prioritaire"],
     ["Badge sur le profil", "—", "Badge Premium"],
-    ["Commission par mission", "15 %", "8 %"],
     ["Services publiés", "10", "Illimités"],
     ["Aide à la régularisation", "Guide en ligne", "Conseiller dédié"],
   ],
@@ -6723,7 +6873,7 @@ const PROFILE_VIEWERS = [
 ];
 
 function isPremiumPlan(plan) {
-  return !!plan && plan.prixMensuel > 0;
+  return !!plan && plan.id !== "essentiel";
 }
 
 function TierBadge({ premium, size = "md" }) {
@@ -6749,15 +6899,15 @@ function ProfileTierCard() {
   const api = usePlan();
   if (!api || api.isAdmin) return null;
   const premium = isPremiumPlan(api.plan);
-  const premiumPlan = api.espacePlans.find((p) => p.prixMensuel > 0);
-  const rows = PROFILE_TIER_PERKS[api.espace] || [];
+  const premiumPlan = api.espacePlans.find((p) => isPremiumPlan(p));
+  const rows = api.espacePlans.length > 1 ? PROFILE_TIER_PERKS[api.espace] || [] : [];
 
   return (
     <div className="rounded-lg bg-surface mb-4 overflow-hidden" style={{ border: `1px solid ${premium ? COLORS.orange : COLORS.border}` }}>
       <div className="px-6 py-4 flex items-center justify-between flex-wrap gap-3" style={{ background: premium ? COLORS.dark : COLORS.soft }}>
         <div>
           <p className="font-semibold" style={{ color: premium ? COLORS.onDark : COLORS.slate }}>
-            {premium ? "Votre profil est Premium" : "Votre profil est Essentiel"}
+            {`Votre profil est ${api.plan.nom}`}
           </p>
           <p className="text-sm" style={{ color: premium ? COLORS.onDarkMuted : COLORS.slateLight }}>
             {premium ? `Actif jusqu'au ${api.sub.prochain || "prochain renouvellement"}.` : "Passez au profil Premium pour être vu en priorité."}
@@ -6795,6 +6945,7 @@ function ProfileTierCard() {
         </div>
       )}
 
+      {rows.length > 0 && (
       <div className="overflow-x-auto">
         <table className="w-full text-sm min-w-[480px]">
           <thead>
@@ -6815,6 +6966,7 @@ function ProfileTierCard() {
           </tbody>
         </table>
       </div>
+      )}
     </div>
   );
 }
@@ -7963,13 +8115,1077 @@ function InfoField({ label, value }) {
 }
 
 /* =====================================================================
+   CAP MÉTIER ET ESPACE MENTOR
+   - Cap Métier : suivi et coaching des jeunes sans métier, dès 15 ans
+     (accord d'un parent ou tuteur avant 18 ans : voir AGE_MIN_PAR_PROFIL).
+   - Espace mentor : mentorés attribués (Cap Métier et chercheurs d'emploi),
+     séances, comptes rendus.
+   - Admin : attribution des mentors aux jeunes, accords parentaux.
+   Protection des mineurs, appliquée dans la démo :
+   - un mentor n'est attribué qu'après l'accord du parent ou tuteur ;
+   - les séances avec un mineur ont lieu en groupe ou au bureau de Dakar ;
+   - le mentor ne voit ni le téléphone ni l'adresse d'un mineur ;
+   - pas de photo pour les jeunes (initiales seulement).
+   Mémoire partagée (useStore) : cap-jeunes, mentorat-seances, mentorat-notes,
+   cap-ateliers, cap-orientation, mentor-disponible.
+   ===================================================================== */
+
+const MENTOR_CONNECTE = MENTORS[0]; // Cheikh Fall : le mentor de l'espace mentor de démo
+const JEUNE_CONNECTE_ID = "mame-diarra-sene"; // la jeune de l'espace Cap Métier de démo
+
+const ETAPES_CAP = [
+  { id: "bilan", label: "Bilan d'orientation", texte: "Ce que vous aimez, vos forces, vos contraintes." },
+  { id: "piste", label: "Choix d'une piste métier", texte: "Un ou deux métiers à explorer." },
+  { id: "decouverte", label: "Découverte et formation", texte: "Ateliers, rencontres avec des professionnels, bases du métier." },
+  { id: "apprentissage", label: "Apprentissage ou stage", texte: "Apprendre auprès d'un professionnel, possible dès 15 ans." },
+  { id: "projet", label: "Projet prêt", texte: "Vers l'emploi ou une activité à son compte, à partir de 18 ans." },
+];
+
+const FORMATS_SEANCE = ["Visio", "Téléphone", "Au bureau de Dakar", "En groupe, au bureau de Dakar"];
+const FORMATS_SEANCE_MINEUR = ["Au bureau de Dakar", "En groupe, au bureau de Dakar"];
+const HEURES_SEANCE = ["10h00", "14h00", "16h00", "18h00"];
+
+const JEUNES_CAP_INITIAL = [
+  { id: "mame-diarra-sene", nom: "Mame Diarra Sène", naissance: "2010-03-12", ville: "Pikine", telephone: "+221 77 000 11 22", parent: { nom: "Ndèye Sène", lien: "Mère", telephone: "+221 77 000 12 34", accord: "Confirmé" }, etape: 2, piste: "Couture et stylisme", mentorId: "cheikh-fall", souhait: "", inscription: "2 septembre 2026", objectifs: ["Choisir entre la couture et la coiffure", "Trouver un atelier d'apprentissage à Pikine"] },
+  { id: "serigne-mbaye", nom: "Serigne Mbaye", naissance: "2004-01-15", ville: "Dakar, Médina", telephone: "+221 78 000 22 33", parent: null, etape: 3, piste: "Électricité bâtiment", mentorId: "cheikh-fall", souhait: "", inscription: "10 juin 2026", objectifs: ["Terminer l'apprentissage chez un électricien de la Médina", "Préparer un CV pour les entreprises du BTP"] },
+  { id: "ousmane-diatta", nom: "Ousmane Diatta", naissance: "2007-06-02", ville: "Ziguinchor", telephone: "+221 76 000 33 44", parent: null, etape: 1, piste: "Mécanique auto et moto", mentorId: null, souhait: "Un professionnel de la mécanique ou du froid", inscription: "28 septembre 2026", objectifs: [] },
+  { id: "fatoumata-kane", nom: "Fatoumata Kane", naissance: "2009-11-20", ville: "Thiès", telephone: "+221 77 000 44 55", parent: { nom: "Abdou Kane", lien: "Père", telephone: "+221 77 000 45 67", accord: "En attente" }, etape: 0, piste: "", mentorId: null, souhait: "Quelqu'un qui travaille dans la santé", inscription: "12 octobre 2026", objectifs: [] },
+  { id: "lamine-badji", nom: "Lamine Badji", naissance: "2008-02-28", ville: "Kaolack", telephone: "+221 70 000 55 66", parent: null, etape: 0, piste: "", mentorId: null, souhait: "Quelqu'un qui connaît l'agriculture", inscription: "8 octobre 2026", objectifs: [] },
+  { id: "aicha-faye", nom: "Aïcha Faye", naissance: "2006-09-05", ville: "Rufisque", telephone: "+221 76 000 66 77", parent: null, etape: 4, piste: "Cuisine et pâtisserie", mentorId: "aminata-ndiaye", souhait: "", inscription: "3 mars 2026", objectifs: ["Ouvrir l'espace chercheur d'emploi", "Postuler dans les pâtisseries de Rufisque et de Dakar"] },
+];
+
+/* Chercheurs d'emploi suivis par le mentor connecté (en plus des jeunes Cap Métier) */
+const MENTORES_CHERCHEURS = [
+  { id: "absatou-diallo", nom: "Absatou Diallo", parcours: "Chercheuse d'emploi", ville: "Dakar", objectif: "Décrocher un poste de chargée de clientèle", depuis: "2 juillet 2026", candidatures: CANDIDATURES },
+  { id: "pape-ndiaye", nom: "Pape Ndiaye", parcours: "Jeune diplômé en comptabilité", ville: "Dakar, Grand Yoff", objectif: "Trouver un premier poste d'assistant comptable", depuis: "15 septembre 2026", candidatures: [{ poste: "Assistant comptable", entreprise: "Cabinet Diop & Associés", date: "5 octobre 2026", statut: "Vue par le recruteur" }] },
+];
+
+const NOTES_MENTORAT_INITIAL = {
+  "absatou-diallo": MENTORS[0].historique,
+  "mame-diarra-sene": [
+    { date: "3 octobre 2026", note: "Atelier découverte couture, en groupe : très motivée, à l'aise avec la machine. Prochaine étape : rencontrer une couturière de Pikine qui prend des apprentis." },
+    { date: "19 septembre 2026", note: "Bilan d'orientation au bureau, avec sa mère : intérêt pour la couture et la coiffure. Elle veut continuer les cours du soir." },
+  ],
+  "serigne-mbaye": [{ date: "6 octobre 2026", note: "Point d'étape : l'apprentissage se passe bien. Il note chaque chantier pour préparer son CV." }],
+};
+
+const SEANCES_INITIAL = [
+  { id: "se1", mentoreId: "absatou-diallo", date: "2026-10-15", heure: "15h00", format: "Visio", statut: "Confirmée" },
+  { id: "se2", mentoreId: "mame-diarra-sene", date: "2026-10-17", heure: "10h00", format: "En groupe, au bureau de Dakar", statut: "Confirmée" },
+  { id: "se3", mentoreId: "serigne-mbaye", date: "2026-10-20", heure: "18h00", format: "Visio", statut: "Demandée", message: "Je voudrais qu'on travaille mon CV ensemble." },
+  { id: "se4", mentoreId: "pape-ndiaye", date: "2026-10-22", heure: "16h00", format: "Téléphone", statut: "Demandée", message: "Préparer mon entretien au cabinet Diop & Associés." },
+];
+
+const ATELIERS_CAP = [
+  { id: "at-couture", titre: "Découvrir la couture", lieu: "Bureau LIGGEEY, Dakar", date: "2026-10-24", heure: "10h00 – 12h00", places: 12, texte: "Prendre en main une machine à coudre et réaliser une première pièce simple." },
+  { id: "at-numerique", titre: "Les métiers du numérique", lieu: "En ligne", date: "2026-10-28", heure: "16h00 – 17h00", places: 30, texte: "Graphisme, réseaux sociaux, maintenance informatique : qui fait quoi, et comment s'y former ?" },
+  { id: "at-cuisine", titre: "Cuisine et pâtisserie", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-07", heure: "10h00 – 12h00", places: 10, texte: "Rencontrer une pâtissière et découvrir le travail en cuisine." },
+  { id: "at-electricite", titre: "Électricité : le métier et la sécurité", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-14", heure: "10h00 – 12h00", places: 12, texte: "Comprendre le métier, ses risques et les règles de sécurité.", noteMineur: "Avant 18 ans : démonstration seulement, sans manipulation." },
+];
+
+const GOUTS_ORIENTATION = [
+  { id: "mains", label: "Travailler avec mes mains" },
+  { id: "creer", label: "Créer, dessiner, décorer" },
+  { id: "aider", label: "Aider et prendre soin des autres" },
+  { id: "cuisine", label: "Cuisiner" },
+  { id: "reparer", label: "Réparer, comprendre comment ça marche" },
+  { id: "numerique", label: "Le téléphone, l'ordinateur, internet" },
+  { id: "dehors", label: "Être dehors, la nature" },
+  { id: "vendre", label: "Parler aux gens, vendre" },
+];
+
+/* dangereux : apprentissage possible dès 15 ans, mais certaines tâches sont interdites avant 18 ans */
+const PISTES_METIER = [
+  { id: "couture", nom: "Couture et stylisme", gouts: ["mains", "creer"] },
+  { id: "coiffure", nom: "Coiffure et esthétique", gouts: ["creer", "aider", "vendre"] },
+  { id: "patisserie", nom: "Cuisine et pâtisserie", gouts: ["cuisine", "mains"] },
+  { id: "mecanique", nom: "Mécanique auto et moto", gouts: ["reparer", "mains"], dangereux: true },
+  { id: "electricite", nom: "Électricité bâtiment", gouts: ["reparer", "mains"], dangereux: true },
+  { id: "froid", nom: "Froid et climatisation", gouts: ["reparer"], dangereux: true },
+  { id: "maintenance", nom: "Maintenance informatique et téléphones", gouts: ["numerique", "reparer"] },
+  { id: "graphisme", nom: "Graphisme et réseaux sociaux", gouts: ["numerique", "creer", "vendre"] },
+  { id: "agriculture", nom: "Agriculture et maraîchage", gouts: ["dehors", "mains"] },
+  { id: "aide-personne", nom: "Aide à la personne", gouts: ["aider"] },
+  { id: "commerce", nom: "Vente et commerce", gouts: ["vendre"] },
+];
+
+const CHARTE_MENTOR = [
+  "J'échange avec les jeunes uniquement par LIGGEEY : messagerie et séances prévues.",
+  "Avec un jeune de moins de 18 ans, je le rencontre seulement en groupe ou au bureau de Dakar.",
+  "Je ne demande jamais d'argent, de service ni de photo.",
+  "Je garde pour moi ce que le jeune me confie, sauf s'il est en danger.",
+  "Je signale à l'équipe LIGGEEY toute situation préoccupante.",
+];
+
+function estMineur(j) {
+  const age = ageAu(j.naissance);
+  return age !== null && age < AGE_MAJORITE;
+}
+
+function statutCap(j) {
+  if (j.parent && j.parent.accord !== "Confirmé") return "Accord parental en attente";
+  if (!j.mentorId) return "Mentor à attribuer";
+  if (j.etape >= ETAPES_CAP.length - 1) return "Projet prêt";
+  return "Accompagné";
+}
+
+function dateLongue(iso) {
+  const d = new Date(`${iso}T12:00:00`);
+  const t = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  return t.charAt(0).toUpperCase() + t.slice(1);
+}
+
+function dateDuJourLongue() {
+  return demoNow().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
+function dateMajorite(naissance) {
+  const [a, m, j] = naissance.split("-").map(Number);
+  return new Date(a + AGE_MAJORITE, m - 1, j).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+}
+
+const parDate = (a, b) => (a.date + a.heure).localeCompare(b.date + b.heure);
+
+/* Mentorés d'un mentor : jeunes Cap Métier attribués, et chercheurs d'emploi pour le mentor de démo */
+function mentoresDe(mentorId, jeunes) {
+  return [
+    ...jeunes.filter((j) => j.mentorId === mentorId).map((j) => ({ id: j.id, nom: j.nom, type: "Cap Métier", sous: j.piste ? `Cap Métier · ${j.piste}` : "Cap Métier", mineur: estMineur(j), age: ageAu(j.naissance), jeune: j })),
+    ...(mentorId === MENTOR_CONNECTE.id ? MENTORES_CHERCHEURS : []).map((c) => ({ id: c.id, nom: c.nom, type: "Chercheur", sous: c.parcours, mineur: false, chercheur: c })),
+  ];
+}
+
+function nomMentore(id, jeunes) {
+  return (jeunes.find((j) => j.id === id) || MENTORES_CHERCHEURS.find((c) => c.id === id))?.nom || "Mentoré";
+}
+
+function BadgeMineur({ age }) {
+  return <App.Badge ton="info" taille="moyen">Mineur · {age} ans</App.Badge>;
+}
+
+/* Étapes du parcours Cap Métier (liste verticale) */
+function EtapesCap({ etape }) {
+  return (
+    <ol className="space-y-1">
+      {ETAPES_CAP.map((e, i) => {
+        const fait = i < etape;
+        const enCours = i === etape;
+        return (
+          <li key={e.id} aria-current={enCours ? "step" : undefined} className={`flex items-start gap-3 rounded-md p-3 ${enCours ? "bg-marque-doux" : ""}`}>
+            <span className={`mt-0.5 grid h-7 w-7 shrink-0 place-items-center rounded-full text-xs font-semibold ${fait ? "bg-statut-succes-doux text-statut-succes" : enCours ? "bg-marque text-sur-marque" : "bg-doux-fort text-secondaire"}`}>
+              {fait ? <Check size={14} aria-hidden="true" /> : i + 1}
+            </span>
+            <span className="min-w-0">
+              <span className="block text-sm font-semibold text-principal">
+                {e.label}
+                {fait && <span className="sr-only"> (terminée)</span>}
+                {enCours && <span className="ml-2 text-xs font-medium text-marque">En cours</span>}
+              </span>
+              <span className="block text-sm text-secondaire">{e.texte}</span>
+            </span>
+          </li>
+        );
+      })}
+    </ol>
+  );
+}
+
+/* Rappel des règles pour les moins de 18 ans */
+function NoteMineur({ children }) {
+  return (
+    <div className="flex items-start gap-3 rounded-md bg-statut-info-doux p-4 text-sm text-principal">
+      <ShieldCheck size={18} className="mt-0.5 shrink-0 text-statut-info" aria-hidden="true" />
+      <p>{children}</p>
+    </div>
+  );
+}
+
+function useJeuneConnecte() {
+  const [jeunes, setJeunes] = useStore("cap-jeunes", JEUNES_CAP_INITIAL);
+  const moi = jeunes.find((j) => j.id === JEUNE_CONNECTE_ID) || jeunes[0];
+  const majMoi = (patch) => setJeunes((l) => l.map((j) => (j.id === moi.id ? { ...j, ...(typeof patch === "function" ? patch(j) : patch) } : j)));
+  return { moi, majMoi, jeunes };
+}
+
+/* ---------- Cap Métier (jeune) : mon parcours ---------- */
+
+function CapParcoursScreen({ onNavigate, todos }) {
+  const { moi } = useJeuneConnecte();
+  const [seances] = useStore("mentorat-seances", SEANCES_INITIAL);
+  const mentor = MENTORS.find((m) => m.id === moi.mentorId);
+  const prochaine = seances.filter((s) => s.mentoreId === moi.id && s.statut === "Confirmée").sort(parDate)[0];
+  const mineur = estMineur(moi);
+  const progression = Math.round((moi.etape / (ETAPES_CAP.length - 1)) * 100);
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Votre parcours pour trouver un métier qui vous ressemble, étape par étape.</p>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte titre="Mes étapes" sousTitre={`Étape ${moi.etape + 1} sur ${ETAPES_CAP.length}`} className="xl:col-span-2">
+          <App.BarreProgression valeur={progression} label={`Parcours avancé à ${progression} %`} />
+          <div className="mt-4">
+            <EtapesCap etape={moi.etape} />
+          </div>
+        </App.Carte>
+
+        <div className="space-y-4">
+          <App.Carte titre="Mon mentor">
+            {mentor ? (
+              <div className="flex flex-col items-center text-center">
+                <SafeImg src={mentor.photo} alt={mentor.nom} className="mb-3 h-20 w-20 rounded-full object-cover" />
+                <p className="font-semibold text-principal">{mentor.nom}</p>
+                <p className="mb-4 text-sm text-discret">{mentor.role}</p>
+                <p className="mb-4 w-full rounded-md bg-doux p-3 text-sm">
+                  <span className="block text-xs text-discret">Prochaine séance</span>
+                  <span className="block font-semibold text-principal">{prochaine ? `${dateLongue(prochaine.date)} · ${prochaine.heure}` : "Aucune séance prévue"}</span>
+                  {prochaine && <span className="block text-xs text-secondaire">{prochaine.format}</span>}
+                </p>
+                <App.Bouton pleineLargeur variante="neutre" onClick={() => onNavigate("mentor")}>Voir mon mentor</App.Bouton>
+              </div>
+            ) : (
+              <App.EtatVide icone={UsersRound} titre="Mentor en cours d'attribution" texte="L'équipe LIGGEEY choisit le mentor qui vous correspond." />
+            )}
+          </App.Carte>
+
+          <App.Carte titre="Mes objectifs">
+            {moi.objectifs.length ? (
+              <ul className="space-y-2">
+                {moi.objectifs.map((o) => (
+                  <li key={o} className="flex items-start gap-2 text-sm text-principal">
+                    <Flag size={15} className="mt-0.5 shrink-0 text-marque" aria-hidden="true" />
+                    {o}
+                  </li>
+                ))}
+              </ul>
+            ) : (
+              <p className="text-sm text-secondaire">Vous fixerez vos objectifs avec votre mentor, lors de votre première séance.</p>
+            )}
+          </App.Carte>
+        </div>
+      </div>
+
+      {mineur && moi.parent && (
+        <NoteMineur>
+          {moi.parent.accord === "Confirmé"
+            ? `${moi.parent.nom} (${moi.parent.lien.toLowerCase()}) a donné son accord et reçoit un SMS avant chaque séance. `
+            : `Nous attendons l'accord de ${moi.parent.nom}. `}
+          Avant 18 ans, vos séances ont lieu en groupe ou au bureau de Dakar. À partir du {dateMajorite(moi.naissance)}, vous pourrez aussi ouvrir l'espace emploi ou l'espace prestataire.
+        </NoteMineur>
+      )}
+
+      <TodoPanel items={todos} onNavigate={onNavigate} />
+    </div>
+  );
+}
+
+/* ---------- Cap Métier (jeune) : bilan d'orientation ---------- */
+
+function CapOrientationScreen({ onNavigate }) {
+  const { moi, majMoi } = useJeuneConnecte();
+  const [gouts, setGouts] = useStore("cap-orientation", ["mains", "creer"]);
+  const mineur = estMineur(moi);
+  const pistes = PISTES_METIER.map((p) => ({ ...p, score: p.gouts.filter((g) => gouts.includes(g)).length }))
+    .filter((p) => p.score > 0)
+    .sort((a, b) => b.score - a.score)
+    .slice(0, 4);
+
+  function basculer(id) {
+    setGouts((l) => (l.includes(id) ? l.filter((g) => g !== id) : [...l, id]));
+  }
+  function choisir(p) {
+    majMoi((j) => ({ piste: p.nom, etape: Math.max(j.etape, 2) }));
+    notify(`Piste « ${p.nom} » enregistrée. Vous en parlerez avec votre mentor.`);
+  }
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Il n'y a pas de bonne ou de mauvaise réponse. Choisissez ce qui vous plaît vraiment : nous vous proposons des pistes métier.</p>
+
+      <App.Carte titre="Ce que vous aimez" sousTitre="Plusieurs choix possibles">
+        <div className="flex flex-wrap gap-2">
+          {GOUTS_ORIENTATION.map((g) => {
+            const actif = gouts.includes(g.id);
+            return (
+              <button
+                key={g.id}
+                type="button"
+                aria-pressed={actif}
+                onClick={() => basculer(g.id)}
+                className={`inline-flex min-h-[44px] items-center gap-2 rounded-full border px-4 text-sm font-medium transition-colors ${actif ? "border-marque bg-marque-doux text-marque-fort" : "border-base bg-surface text-secondaire hover:bg-doux hover:text-principal"}`}
+              >
+                {actif && <Check size={14} aria-hidden="true" />}
+                {g.label}
+              </button>
+            );
+          })}
+        </div>
+      </App.Carte>
+
+      <App.Carte titre="Des pistes métier pour vous">
+        {pistes.length === 0 ? (
+          <App.EtatVide icone={Compass} titre="Choisissez au moins une réponse" texte="Vos pistes métier apparaîtront ici." />
+        ) : (
+          <ul className="grid grid-cols-1 gap-3 md:grid-cols-2">
+            {pistes.map((p) => {
+              const choisie = moi.piste === p.nom;
+              return (
+                <li key={p.id} className={`flex flex-col gap-3 rounded-lg border p-4 ${choisie ? "border-marque bg-marque-doux" : "border-base"}`}>
+                  <div className="flex items-start justify-between gap-2">
+                    <p className="font-semibold text-principal">{p.nom}</p>
+                    {choisie && <App.Badge ton="succes" taille="moyen">Ma piste</App.Badge>}
+                  </div>
+                  {p.dangereux && mineur && (
+                    <p className="text-xs text-secondaire">Apprentissage possible dès 15 ans. Certaines tâches sont interdites avant 18 ans : votre maître d'apprentissage doit les respecter.</p>
+                  )}
+                  {!choisie && (
+                    <App.Bouton petit variante="doux" onClick={() => choisir(p)}>Choisir cette piste</App.Bouton>
+                  )}
+                </li>
+              );
+            })}
+          </ul>
+        )}
+      </App.Carte>
+
+      <div className="flex flex-wrap gap-3">
+        <App.Bouton variante="neutre" onClick={() => onNavigate("ateliers")}>Voir les ateliers découverte</App.Bouton>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Cap Métier (jeune) : ateliers découverte ---------- */
+
+function CapAteliersScreen() {
+  const { moi } = useJeuneConnecte();
+  const [inscrits, setInscrits] = useStore("cap-ateliers", ["at-couture"]);
+  const mineur = estMineur(moi);
+
+  function basculer(a) {
+    if (inscrits.includes(a.id)) {
+      setInscrits((l) => l.filter((x) => x !== a.id));
+      notify("Inscription annulée.");
+    } else {
+      setInscrits((l) => [...l, a.id]);
+      notify(mineur ? "Inscription enregistrée. Votre parent ou tuteur est prévenu par SMS." : "Inscription enregistrée.");
+    }
+  }
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Des ateliers courts pour découvrir un métier avant de vous lancer, avec des professionnels.</p>
+      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
+        {ATELIERS_CAP.map((a) => {
+          const inscrit = inscrits.includes(a.id);
+          return (
+            <li key={a.id}>
+              <App.Carte titre={a.titre} actions={inscrit && <App.Badge ton="succes" taille="moyen">Inscrit</App.Badge>} className="h-full">
+                <p className="mb-3 text-sm text-secondaire">{a.texte}</p>
+                <App.LigneInfo icone={Calendar} libelle="Date">{dateLongue(a.date)} · {a.heure}</App.LigneInfo>
+                <App.LigneInfo icone={MapPin} libelle="Lieu">{a.lieu}</App.LigneInfo>
+                <App.LigneInfo icone={Users2} libelle="Places">{a.places}</App.LigneInfo>
+                {mineur && a.noteMineur && <p className="mt-2 text-xs font-medium text-statut-info">{a.noteMineur}</p>}
+                <div className="mt-4">
+                  <App.Bouton petit variante={inscrit ? "neutre" : "principal"} onClick={() => basculer(a)}>
+                    {inscrit ? "Annuler mon inscription" : "M'inscrire"}
+                  </App.Bouton>
+                </div>
+              </App.Carte>
+            </li>
+          );
+        })}
+      </ul>
+    </div>
+  );
+}
+
+/* ---------- Cap Métier (jeune) : mon mentor ---------- */
+
+function DemandeSeanceForm({ mineur, onEnvoyer, libelle = "Envoyer ma demande", avecMessage = true }) {
+  const [date, setDate] = useState("");
+  const [heure, setHeure] = useState(HEURES_SEANCE[0]);
+  const formats = mineur ? FORMATS_SEANCE_MINEUR : FORMATS_SEANCE;
+  const [format, setFormat] = useState(formats[0]);
+  const [message, setMessage] = useState("");
+  const [essai, setEssai] = useState(false);
+  const champ = "h-11 w-full rounded-md border border-base bg-surface px-3 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40";
+
+  function envoyer(e) {
+    e.preventDefault();
+    setEssai(true);
+    if (!date) return;
+    onEnvoyer({ date, heure, format, message: message.trim() });
+    setDate("");
+    setMessage("");
+    setEssai(false);
+  }
+
+  return (
+    <form onSubmit={envoyer} noValidate className="space-y-3">
+      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
+        <label className="text-sm font-medium text-principal">
+          Date
+          <input type="date" value={date} min={isoDuJour()} onChange={(e) => setDate(e.target.value)} aria-invalid={(essai && !date) || undefined} className={`${champ} mt-1 ${essai && !date ? "border-statut-danger" : ""}`} />
+        </label>
+        <label className="text-sm font-medium text-principal">
+          Heure
+          <select value={heure} onChange={(e) => setHeure(e.target.value)} className={`${champ} mt-1`}>
+            {HEURES_SEANCE.map((h) => <option key={h}>{h}</option>)}
+          </select>
+        </label>
+        <label className="text-sm font-medium text-principal">
+          Format
+          <select value={format} onChange={(e) => setFormat(e.target.value)} className={`${champ} mt-1`}>
+            {formats.map((f) => <option key={f}>{f}</option>)}
+          </select>
+        </label>
+      </div>
+      {essai && !date && <p role="alert" className="text-xs text-statut-danger">Choisissez une date.</p>}
+      {avecMessage && (
+        <label className="block text-sm font-medium text-principal">
+          Message (facultatif)
+          <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} className="mt-1 w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
+        </label>
+      )}
+      {mineur && <p className="text-xs text-secondaire">Avant 18 ans, les séances ont lieu au bureau de Dakar ou en groupe.</p>}
+      <App.Bouton type="submit" petit>{libelle}</App.Bouton>
+    </form>
+  );
+}
+
+function ListeSeances({ seances, jeunes, avecNom = false, actions }) {
+  if (seances.length === 0) return <p className="text-sm text-secondaire">Aucune séance pour le moment.</p>;
+  return (
+    <ul className="divide-y divide-base">
+      {seances.map((s) => (
+        <li key={s.id} className="flex flex-wrap items-center justify-between gap-3 py-3">
+          <div className="min-w-0">
+            {avecNom && <p className="text-sm font-semibold text-principal">{nomMentore(s.mentoreId, jeunes)}</p>}
+            <p className={`text-sm ${avecNom ? "text-secondaire" : "font-semibold text-principal"}`}>{dateLongue(s.date)} · {s.heure}</p>
+            <p className="text-xs text-discret">{s.format}</p>
+            {s.message && <p className="mt-1 text-sm italic text-secondaire">« {s.message} »</p>}
+          </div>
+          <div className="flex flex-wrap items-center gap-2">
+            <StatusBadge status={s.statut} />
+            {actions && actions(s)}
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function CapMentorScreen() {
+  const { moi, majMoi } = useJeuneConnecte();
+  const [seances, setSeances] = useStore("mentorat-seances", SEANCES_INITIAL);
+  const [notes] = useStore("mentorat-notes", NOTES_MENTORAT_INITIAL);
+  const [souhait, setSouhait] = useState(moi.souhait || "");
+  const mentor = MENTORS.find((m) => m.id === moi.mentorId);
+  const mineur = estMineur(moi);
+  const mesSeances = seances.filter((s) => s.mentoreId === moi.id && ["Confirmée", "Demandée"].includes(s.statut)).sort(parDate);
+  const mesNotes = notes[moi.id] || [];
+
+  if (!mentor) {
+    return (
+      <div className="space-y-6">
+        <App.Carte titre="Demander un mentor">
+          <p className="mb-4 text-sm text-secondaire">Dites-nous quel professionnel vous aimeriez rencontrer. L'équipe LIGGEEY choisit votre mentor et vous prévient.</p>
+          <label className="block text-sm font-medium text-principal">
+            Le mentor que vous souhaitez
+            <textarea value={souhait} onChange={(e) => setSouhait(e.target.value)} rows={3} placeholder="Ex : une couturière qui a son propre atelier" className="mt-1 w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
+          </label>
+          <div className="mt-4">
+            <App.Bouton onClick={() => { majMoi({ souhait: souhait.trim() }); notify("Demande envoyée. L'équipe LIGGEEY vous propose un mentor dès que possible."); }}>Envoyer ma demande</App.Bouton>
+          </div>
+        </App.Carte>
+        {mineur && moi.parent?.accord !== "Confirmé" && <NoteMineur>Votre mentor sera attribué dès que votre parent ou tuteur aura confirmé son accord.</NoteMineur>}
+      </div>
+    );
+  }
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.CarteProfil
+          photo={mentor.photo}
+          nom={mentor.nom}
+          sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
+          badges={<App.Badge ton="succes" taille="moyen">Mentor vérifié par LIGGEEY</App.Badge>}
+        >
+          {mentor.tagline && <p className="mt-4 text-sm text-secondaire">{mentor.tagline}</p>}
+        </App.CarteProfil>
+
+        <div className="space-y-4 xl:col-span-2">
+          <App.Carte titre="Mes séances">
+            <ListeSeances seances={mesSeances} jeunes={[moi]} />
+          </App.Carte>
+          <App.Carte titre="Demander une séance">
+            <DemandeSeanceForm
+              mineur={mineur}
+              onEnvoyer={(s) => {
+                setSeances((l) => [...l, { id: `se${Date.now()}`, mentoreId: moi.id, statut: "Demandée", ...s }]);
+                notify(mineur ? `Demande envoyée à ${mentor.nom}. Votre parent ou tuteur est prévenu par SMS.` : `Demande envoyée à ${mentor.nom}.`);
+              }}
+            />
+          </App.Carte>
+        </div>
+      </div>
+
+      <App.Carte titre="Comptes rendus de mon mentor">
+        {mesNotes.length === 0 ? (
+          <p className="text-sm text-secondaire">Après chaque séance, votre mentor écrit ici ce que vous avez vu ensemble.</p>
+        ) : (
+          <ul className="space-y-4">
+            {mesNotes.map((n) => (
+              <li key={n.date + n.note} className="border-l-2 border-marque pl-4">
+                <p className="text-xs font-semibold text-discret">{n.date}</p>
+                <p className="text-sm text-principal">{n.note}</p>
+              </li>
+            ))}
+          </ul>
+        )}
+      </App.Carte>
+
+      {mineur && <NoteMineur>Un souci avec une séance ou avec votre mentor ? Parlez-en à votre parent ou écrivez à l'équipe LIGGEEY sur WhatsApp : nous sommes là pour vous protéger.</NoteMineur>}
+    </div>
+  );
+}
+
+/* ---------- Cap Métier (jeune) : mon profil ---------- */
+
+function CapProfilScreen() {
+  const { moi } = useJeuneConnecte();
+  const age = ageAu(moi.naissance);
+  const naissance = new Date(`${moi.naissance}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return (
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <App.CarteProfil
+        nom={moi.nom}
+        sousTitre={moi.piste ? `Cap Métier · ${moi.piste}` : "Cap Métier"}
+        badges={age < AGE_MAJORITE ? <BadgeMineur age={age} /> : null}
+        infos={[
+          { icone: Calendar, libelle: "Date de naissance", valeur: `${naissance} (${age} ans)` },
+          { icone: MapPin, libelle: "Ville", valeur: moi.ville },
+          { icone: Phone, libelle: "Téléphone", valeur: moi.telephone },
+          { icone: CalendarCheck, libelle: "Inscription", valeur: moi.inscription },
+        ]}
+      />
+      <div className="space-y-4">
+        {moi.parent && (
+          <App.Carte titre="Mon parent ou tuteur" actions={<StatusBadge status={moi.parent.accord === "Confirmé" ? "Accord confirmé" : "Accord en attente"} />}>
+            <App.LigneInfo icone={UserCircle2} libelle="Nom">{moi.parent.nom}</App.LigneInfo>
+            <App.LigneInfo icone={HeartHandshake} libelle="Lien">{moi.parent.lien}</App.LigneInfo>
+            <App.LigneInfo icone={Phone} libelle="Téléphone">{moi.parent.telephone}</App.LigneInfo>
+          </App.Carte>
+        )}
+        <App.Carte titre="À 18 ans">
+          <p className="text-sm text-secondaire">
+            {age < AGE_MAJORITE
+              ? `À partir du ${dateMajorite(moi.naissance)}, vous pourrez ouvrir l'espace emploi pour postuler aux offres, ou l'espace prestataire pour travailler à votre compte. Votre parcours Cap Métier vous suivra.`
+              : "Vous pouvez ouvrir l'espace emploi ou l'espace prestataire. Votre mentor vous aide à choisir."}
+          </p>
+        </App.Carte>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Espace mentor : tableau de bord ---------- */
+
+function MentorDashboardScreen({ onNavigate, todos }) {
+  const [jeunes] = useStore("cap-jeunes", JEUNES_CAP_INITIAL);
+  const [seances] = useStore("mentorat-seances", SEANCES_INITIAL);
+  const mentores = mentoresDe(MENTOR_CONNECTE.id, jeunes);
+  const ids = new Set(mentores.map((m) => m.id));
+  const miennes = seances.filter((s) => ids.has(s.mentoreId));
+  const aVenir = miennes.filter((s) => s.statut === "Confirmée").sort(parDate);
+  const demandes = miennes.filter((s) => s.statut === "Demandée");
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Voici les jeunes que vous accompagnez et vos prochaines séances.</p>
+
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard icon={Users2} value={mentores.length} label="Mentorés" detail={`Dont ${mentores.filter((m) => m.type === "Cap Métier").length} en Cap Métier`} onClick={() => onNavigate("mentores")} />
+        <StatCard icon={CalendarCheck} value={aVenir.length} label="Séances à venir" detail="Confirmées" tone="succes" onClick={() => onNavigate("seances")} />
+        <StatCard icon={Bell} value={demandes.length} label="Demandes de séance" detail={demandes.length ? "À accepter ou refuser" : "Aucune en attente"} tone="alerte" onClick={() => onNavigate("seances")} />
+        <StatCard icon={Clock} value={MENTOR_CONNECTE.stats.heures} label="Heures de mentorat" detail="Depuis votre arrivée" tone="info" />
+      </div>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte titre="Prochaines séances" className="xl:col-span-2" actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("seances")}>Tout voir</App.Bouton>}>
+          <App.Tableau
+            legende="Prochaines séances de mentorat"
+            lignes={aVenir}
+            vide="Aucune séance confirmée."
+            onLigne={(s) => onNavigate("mentores", { mentoreId: s.mentoreId })}
+            colonnes={[
+              { cle: "mentoreId", titre: "Mentoré", rendu: (s) => <App.CelluleIdentite visuel={<App.Avatar nom={nomMentore(s.mentoreId, jeunes)} taille="sm" />} titre={nomMentore(s.mentoreId, jeunes)} sousTitre={s.format} /> },
+              { cle: "date", titre: "Date", rendu: (s) => <span className="text-principal">{dateLongue(s.date)} · {s.heure}</span> },
+              { cle: "statut", titre: "Statut", rendu: (s) => <StatusBadge status={s.statut} /> },
+            ]}
+          />
+        </App.Carte>
+
+        <App.Carte titre="Mes mentorés" flush>
+          <ul className="px-3 pb-3">
+            {mentores.map((m) => (
+              <li key={m.id}>
+                <button type="button" onClick={() => onNavigate("mentores", { mentoreId: m.id })} className="flex min-h-[52px] w-full items-center justify-between gap-3 rounded-md px-3 py-2 text-left hover:bg-doux">
+                  <span className="flex min-w-0 items-center gap-3">
+                    <App.Avatar nom={m.nom} taille="sm" />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-semibold text-principal">{m.nom}</span>
+                      <span className="block truncate text-xs text-discret">{m.sous}</span>
+                    </span>
+                  </span>
+                  {m.mineur ? <BadgeMineur age={m.age} /> : <ChevronRight size={16} className="shrink-0 text-discret" aria-hidden="true" />}
+                </button>
+              </li>
+            ))}
+          </ul>
+        </App.Carte>
+      </div>
+
+      <TodoPanel items={todos} onNavigate={onNavigate} />
+    </div>
+  );
+}
+
+/* ---------- Espace mentor : mes mentorés ---------- */
+
+function MentoreDetail({ mentore, onBack }) {
+  const [jeunes, setJeunes] = useStore("cap-jeunes", JEUNES_CAP_INITIAL);
+  const [seances] = useStore("mentorat-seances", SEANCES_INITIAL);
+  const [notes, setNotes] = useStore("mentorat-notes", NOTES_MENTORAT_INITIAL);
+  const [brouillon, setBrouillon] = useState("");
+  const [objectif, setObjectif] = useState("");
+  const jeune = mentore.jeune ? jeunes.find((j) => j.id === mentore.id) : null;
+  const prenom = mentore.nom.split(" ")[0];
+  const sesNotes = notes[mentore.id] || [];
+  const sesSeances = seances.filter((s) => s.mentoreId === mentore.id).sort(parDate);
+  const majJeune = (patch) => setJeunes((l) => l.map((j) => (j.id === mentore.id ? { ...j, ...patch } : j)));
+
+  function ajouterNote() {
+    if (!brouillon.trim()) return;
+    setNotes((n) => ({ ...n, [mentore.id]: [{ date: dateDuJourLongue(), note: brouillon.trim() }, ...(n[mentore.id] || [])] }));
+    setBrouillon("");
+    notify(`Compte rendu enregistré. ${prenom} peut le lire dans son espace.`);
+  }
+
+  return (
+    <div className="space-y-6">
+      <button type="button" onClick={onBack} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium text-marque">
+        <ArrowLeft size={14} aria-hidden="true" /> Retour aux mentorés
+      </button>
+
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <div className="space-y-4">
+          <App.CarteProfil
+            nom={mentore.nom}
+            sousTitre={mentore.sous}
+            badges={<>{mentore.mineur && <BadgeMineur age={mentore.age} />}<App.Badge ton="marque" taille="moyen">{mentore.type}</App.Badge></>}
+            infos={[
+              { icone: MapPin, libelle: "Ville", valeur: mentore.mineur ? "Masquée" : (jeune || mentore.chercheur).ville },
+              { icone: Phone, libelle: "Téléphone", valeur: mentore.mineur ? "Masqué" : jeune ? jeune.telephone : "Par la messagerie LIGGEEY" },
+              { icone: CalendarCheck, libelle: "Suivi depuis", valeur: jeune ? jeune.inscription : mentore.chercheur.depuis },
+            ]}
+          />
+          {mentore.mineur && (
+            <NoteMineur>{prenom} a moins de 18 ans. Vos échanges passent par LIGGEEY, et les séances ont lieu en groupe ou au bureau de Dakar. Son parent ou tuteur est prévenu de chaque séance.</NoteMineur>
+          )}
+          <App.Bouton variante="neutre" pleineLargeur onClick={() => notify("Signalement transmis à l'équipe LIGGEEY. Elle vous recontacte rapidement.")}>
+            <AlertCircle size={16} aria-hidden="true" /> Signaler une situation préoccupante
+          </App.Bouton>
+        </div>
+
+        <div className="space-y-4 xl:col-span-2">
+          {jeune && (
+            <App.Carte
+              titre="Parcours Cap Métier"
+              sousTitre={jeune.piste ? `Piste : ${jeune.piste}` : "Piste métier à choisir"}
+              actions={jeune.etape < ETAPES_CAP.length - 1 && (
+                <App.Bouton petit variante="doux" onClick={() => { majJeune({ etape: jeune.etape + 1 }); notify(`Étape « ${ETAPES_CAP[jeune.etape].label} » validée.`); }}>
+                  Valider l'étape en cours
+                </App.Bouton>
+              )}
+            >
+              <EtapesCap etape={jeune.etape} />
+              <p className="mb-2 mt-4 text-sm font-semibold text-principal">Objectifs</p>
+              <ul className="mb-3 space-y-1.5">
+                {jeune.objectifs.map((o) => (
+                  <li key={o} className="flex items-start gap-2 text-sm text-principal">
+                    <Flag size={14} className="mt-0.5 shrink-0 text-marque" aria-hidden="true" />{o}
+                  </li>
+                ))}
+                {jeune.objectifs.length === 0 && <li className="text-sm text-secondaire">Aucun objectif pour le moment.</li>}
+              </ul>
+              <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (!objectif.trim()) return; majJeune({ objectifs: [...jeune.objectifs, objectif.trim()] }); setObjectif(""); }}>
+                <label htmlFor="nouvel-objectif" className="sr-only">Nouvel objectif</label>
+                <input id="nouvel-objectif" value={objectif} onChange={(e) => setObjectif(e.target.value)} placeholder="Ajouter un objectif" className="h-11 min-w-0 flex-1 rounded-md border border-base bg-surface px-3 text-sm outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
+                <App.Bouton type="submit" petit variante="doux">Ajouter</App.Bouton>
+              </form>
+            </App.Carte>
+          )}
+
+          {mentore.chercheur && (
+            <App.Carte titre="Candidatures" sousTitre={`Objectif : ${mentore.chercheur.objectif}`}>
+              <App.Tableau
+                legende={`Candidatures de ${mentore.nom}`}
+                cleLigne="poste"
+                lignes={mentore.chercheur.candidatures}
+                colonnes={[
+                  { cle: "poste", titre: "Poste", rendu: (c) => <App.CelluleIdentite titre={c.poste} sousTitre={c.entreprise} /> },
+                  { cle: "date", titre: "Envoyée le", masqueMobile: true },
+                  { cle: "statut", titre: "Statut", rendu: (c) => <StatusBadge status={c.statut} /> },
+                ]}
+              />
+            </App.Carte>
+          )}
+
+          <App.Carte titre="Séances">
+            <ListeSeances seances={sesSeances} jeunes={jeunes} />
+          </App.Carte>
+
+          <App.Carte titre="Comptes rendus" sousTitre={`${prenom} les voit dans son espace`}>
+            <label htmlFor="nouveau-compte-rendu" className="mb-1 block text-sm font-medium text-principal">Nouveau compte rendu</label>
+            <textarea id="nouveau-compte-rendu" value={brouillon} onChange={(e) => setBrouillon(e.target.value)} rows={3} placeholder="Ce que vous avez vu ensemble, et la prochaine étape" className="w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
+            <div className="mb-5 mt-2">
+              <App.Bouton petit onClick={ajouterNote} disabled={!brouillon.trim()}>Enregistrer</App.Bouton>
+            </div>
+            <ul className="space-y-4">
+              {sesNotes.map((n) => (
+                <li key={n.date + n.note} className="border-l-2 border-marque pl-4">
+                  <p className="text-xs font-semibold text-discret">{n.date}</p>
+                  <p className="text-sm text-principal">{n.note}</p>
+                </li>
+              ))}
+            </ul>
+          </App.Carte>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function MentoresScreen({ initialId }) {
+  const [jeunes] = useStore("cap-jeunes", JEUNES_CAP_INITIAL);
+  const mentores = mentoresDe(MENTOR_CONNECTE.id, jeunes);
+  const [selectedId, setSelectedId] = useState(initialId || null);
+  const [filtre, setFiltre] = useState("tous");
+  const [recherche, setRecherche] = useState("");
+  const selected = mentores.find((m) => m.id === selectedId);
+
+  if (selected) return <MentoreDetail mentore={selected} onBack={() => setSelectedId(null)} />;
+
+  const liste = mentores
+    .filter((m) => filtre === "tous" || (filtre === "cap" ? m.type === "Cap Métier" : m.type === "Chercheur"))
+    .filter((m) => (m.nom + m.sous).toLowerCase().includes(recherche.toLowerCase()));
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Les jeunes que l'équipe LIGGEEY vous a confiés.</p>
+      <div className="flex flex-wrap items-center gap-3">
+        <App.ChampRecherche valeur={recherche} onChange={setRecherche} placeholder="Rechercher un mentoré" />
+        <App.Segments
+          label="Type de parcours"
+          actif={filtre}
+          onChange={setFiltre}
+          options={[{ id: "tous", label: "Tous" }, { id: "cap", label: "Cap Métier" }, { id: "chercheur", label: "Chercheurs d'emploi" }]}
+        />
+      </div>
+      {liste.length === 0 ? (
+        <App.EtatVide icone={Users2} titre="Aucun mentoré" texte="Aucun mentoré ne correspond à votre recherche." />
+      ) : (
+        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
+          {liste.map((m) => (
+            <li key={m.id}>
+              <button type="button" onClick={() => setSelectedId(m.id)} className="flex h-full w-full flex-col gap-3 rounded-lg border border-base bg-surface p-5 text-left transition-colors hover:border-marque">
+                <span className="flex items-center gap-3">
+                  <App.Avatar nom={m.nom} taille="md" />
+                  <span className="min-w-0">
+                    <span className="block font-semibold text-principal">{m.nom}</span>
+                    <span className="block text-sm text-discret">{m.sous}</span>
+                  </span>
+                </span>
+                <span className="flex flex-wrap gap-2">
+                  {m.mineur && <BadgeMineur age={m.age} />}
+                  {m.jeune && <App.Badge ton="neutre" taille="moyen">Étape {m.jeune.etape + 1} / {ETAPES_CAP.length}</App.Badge>}
+                  {m.chercheur && <App.Badge ton="neutre" taille="moyen">{m.chercheur.candidatures.length} candidatures</App.Badge>}
+                </span>
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+    </div>
+  );
+}
+
+/* ---------- Espace mentor : séances ---------- */
+
+function SeancesMentorScreen() {
+  const [jeunes] = useStore("cap-jeunes", JEUNES_CAP_INITIAL);
+  const [seances, setSeances] = useStore("mentorat-seances", SEANCES_INITIAL);
+  const mentores = mentoresDe(MENTOR_CONNECTE.id, jeunes);
+  const ids = new Set(mentores.map((m) => m.id));
+  const miennes = seances.filter((s) => ids.has(s.mentoreId)).sort(parDate);
+  const demandes = miennes.filter((s) => s.statut === "Demandée");
+  const aVenir = miennes.filter((s) => s.statut === "Confirmée");
+  const [onglet, setOnglet] = useState(demandes.length ? "demandes" : "avenir");
+  const [pourId, setPourId] = useState(mentores[0]?.id || "");
+  const pour = mentores.find((m) => m.id === pourId);
+  const statut = (id, s) => setSeances((l) => l.map((x) => (x.id === id ? { ...x, statut: s } : x)));
+
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.Carte flush className="xl:col-span-2">
+          <div className="px-5 pt-2">
+            <App.Onglets
+              label="Séances"
+              actif={onglet}
+              onChange={setOnglet}
+              onglets={[{ id: "demandes", label: "Demandes", compte: demandes.length }, { id: "avenir", label: "À venir", compte: aVenir.length }]}
+            />
+          </div>
+          <div className="px-5 pb-4">
+            {onglet === "demandes" ? (
+              <ListeSeances
+                seances={demandes}
+                jeunes={jeunes}
+                avecNom
+                actions={(s) => (
+                  <>
+                    <App.Bouton petit onClick={() => { statut(s.id, "Confirmée"); notify("Séance confirmée. Le mentoré est prévenu."); }}>Accepter</App.Bouton>
+                    <App.Bouton petit variante="neutre" onClick={() => { statut(s.id, "Refusée"); notify("Demande refusée. Proposez un autre créneau au mentoré."); }}>Refuser</App.Bouton>
+                  </>
+                )}
+              />
+            ) : (
+              <ListeSeances
+                seances={aVenir}
+                jeunes={jeunes}
+                avecNom
+                actions={(s) => <App.Bouton petit variante="neutre" onClick={() => { statut(s.id, "Annulée"); notify("Séance annulée. Le mentoré est prévenu."); }}>Annuler</App.Bouton>}
+              />
+            )}
+          </div>
+        </App.Carte>
+
+        <App.Carte titre="Proposer une séance">
+          <label className="mb-3 block text-sm font-medium text-principal">
+            Mentoré
+            <select value={pourId} onChange={(e) => setPourId(e.target.value)} className="mt-1 h-11 w-full rounded-md border border-base bg-surface px-3 text-sm text-principal outline-none focus:border-marque">
+              {mentores.map((m) => <option key={m.id} value={m.id}>{m.nom}{m.mineur ? " (mineur)" : ""}</option>)}
+            </select>
+          </label>
+          {pour && (
+            <DemandeSeanceForm
+              key={pour.id}
+              mineur={pour.mineur}
+              avecMessage={false}
+              libelle="Programmer la séance"
+              onEnvoyer={(s) => {
+                setSeances((l) => [...l, { id: `se${Date.now()}`, mentoreId: pour.id, statut: "Confirmée", ...s }]);
+                notify(pour.mineur ? `Séance programmée. ${pour.nom.split(" ")[0]} et son parent ou tuteur sont prévenus.` : `Séance programmée. ${pour.nom.split(" ")[0]} est prévenu.`);
+              }}
+            />
+          )}
+        </App.Carte>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Espace mentor : mon profil ---------- */
+
+function MentorProfilScreen() {
+  const [disponible, setDisponible] = useStore("mentor-disponible", true);
+  const m = mentorProfile(MENTOR_CONNECTE);
+  return (
+    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
+      <App.CarteProfil
+        photo={MENTOR_CONNECTE.photo}
+        nom={MENTOR_CONNECTE.nom}
+        sousTitre={`${MENTOR_CONNECTE.role} · ${MENTOR_CONNECTE.exp} ans d'expérience`}
+        badges={<App.Badge ton="succes" taille="moyen">Profil vérifié par LIGGEEY</App.Badge>}
+        infos={[
+          { icone: Users2, libelle: "Mentorés accompagnés", valeur: m.stats.mentores },
+          { icone: Star, libelle: "Note des mentorés", valeur: m.stats.note },
+          { icone: Clock, libelle: "Mentor depuis", valeur: m.stats.anciennete },
+        ]}
+      >
+        <p className="mb-2 mt-5 text-sm font-semibold text-principal">Compétences</p>
+        <div className="flex flex-wrap gap-1.5">
+          {(MENTOR_CONNECTE.competences || []).map((c) => <App.Badge key={c} ton="marque" taille="moyen">{c}</App.Badge>)}
+        </div>
+      </App.CarteProfil>
+
+      <div className="space-y-4">
+        <App.Carte titre="Disponibilité">
+          <App.Interrupteur
+            actif={disponible}
+            onChange={setDisponible}
+            label="Accepter de nouveaux mentorés"
+            description="L'équipe LIGGEEY vous attribue des jeunes seulement si cette option est active."
+          />
+        </App.Carte>
+        <App.Carte titre="Charte du mentor" actions={<StatusBadge status="Signée" />}>
+          <ul className="space-y-2">
+            {CHARTE_MENTOR.map((r) => (
+              <li key={r} className="flex items-start gap-2 text-sm text-principal">
+                <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-statut-succes" aria-hidden="true" />{r}
+              </li>
+            ))}
+          </ul>
+        </App.Carte>
+      </div>
+    </div>
+  );
+}
+
+/* ---------- Admin : Cap Métier (attribution des mentors, accords parentaux) ---------- */
+
+function CapMetierAdminDetail({ jeune, onBack, maj }) {
+  const [mentorId, setMentorId] = useState(jeune.mentorId || "");
+  const age = ageAu(jeune.naissance);
+  const mineur = age < AGE_MAJORITE;
+  const accordManquant = jeune.parent && jeune.parent.accord !== "Confirmé";
+  const mentor = MENTORS.find((m) => m.id === jeune.mentorId);
+
+  function attribuer() {
+    const m = MENTORS.find((x) => x.id === mentorId);
+    if (!m || accordManquant) return;
+    maj({ mentorId: m.id });
+    notify(`${m.nom} est maintenant le mentor de ${jeune.nom}.${mineur ? " Le parent ou tuteur est prévenu par SMS." : ""}`);
+  }
+
+  return (
+    <div className="space-y-6">
+      <button type="button" onClick={onBack} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium text-marque">
+        <ArrowLeft size={14} aria-hidden="true" /> Retour à Cap Métier
+      </button>
+      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
+        <App.CarteProfil
+          nom={jeune.nom}
+          sousTitre={jeune.piste ? `Piste : ${jeune.piste}` : "Piste métier à choisir"}
+          badges={<>{mineur && <BadgeMineur age={age} />}<StatusBadge status={statutCap(jeune)} /></>}
+          infos={[
+            { icone: Calendar, libelle: "Âge", valeur: `${age} ans` },
+            { icone: MapPin, libelle: "Ville", valeur: jeune.ville },
+            { icone: Phone, libelle: "Téléphone", valeur: jeune.telephone },
+            { icone: CalendarCheck, libelle: "Inscription", valeur: jeune.inscription },
+          ]}
+        >
+          {jeune.souhait && <p className="mt-4 rounded-md bg-doux p-3 text-sm text-principal"><span className="block text-xs font-semibold text-discret">Mentor souhaité</span>{jeune.souhait}</p>}
+        </App.CarteProfil>
+
+        <div className="space-y-4 xl:col-span-2">
+          {jeune.parent && (
+            <App.Carte titre="Parent ou tuteur" actions={<StatusBadge status={jeune.parent.accord === "Confirmé" ? "Accord confirmé" : "Accord en attente"} />}>
+              <App.LigneInfo icone={UserCircle2} libelle="Nom">{jeune.parent.nom} ({jeune.parent.lien.toLowerCase()})</App.LigneInfo>
+              <App.LigneInfo icone={Phone} libelle="Téléphone">{jeune.parent.telephone}</App.LigneInfo>
+              {accordManquant && (
+                <div className="mt-4 flex flex-wrap gap-2">
+                  <App.Bouton petit variante="doux" onClick={() => notify(`SMS de relance envoyé à ${jeune.parent.nom}.`)}>Relancer par SMS</App.Bouton>
+                  <App.Bouton petit variante="neutre" onClick={() => { maj({ parent: { ...jeune.parent, accord: "Confirmé" } }); notify("Accord parental enregistré."); }}>Enregistrer l'accord reçu</App.Bouton>
+                </div>
+              )}
+            </App.Carte>
+          )}
+
+          <App.Carte titre="Mentor" sousTitre={mentor ? `Actuellement : ${mentor.nom}` : "Aucun mentor attribué"}>
+            {accordManquant ? (
+              <NoteMineur>Le mentor pourra être attribué après l'accord du parent ou tuteur.</NoteMineur>
+            ) : (
+              <div className="flex flex-wrap items-end gap-3">
+                <label className="min-w-[220px] flex-1 text-sm font-medium text-principal">
+                  Choisir un mentor
+                  <select value={mentorId} onChange={(e) => setMentorId(e.target.value)} className="mt-1 h-11 w-full rounded-md border border-base bg-surface px-3 text-sm text-principal outline-none focus:border-marque">
+                    <option value="">Choisir</option>
+                    {MENTORS.map((m) => <option key={m.id} value={m.id}>{m.nom} · {m.role}</option>)}
+                  </select>
+                </label>
+                <App.Bouton onClick={attribuer} disabled={!mentorId || mentorId === jeune.mentorId}>{mentor ? "Changer de mentor" : "Attribuer"}</App.Bouton>
+              </div>
+            )}
+          </App.Carte>
+
+          <App.Carte titre="Parcours">
+            <EtapesCap etape={jeune.etape} />
+          </App.Carte>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function CapMetierAdminScreen() {
+  const [jeunes, setJeunes] = useStore("cap-jeunes", JEUNES_CAP_INITIAL);
+  const [filtre, setFiltre] = useState("tous");
+  const [selectedId, setSelectedId] = useState(null);
+  const selected = jeunes.find((j) => j.id === selectedId);
+
+  if (selected) {
+    return <CapMetierAdminDetail key={selected.id} jeune={selected} onBack={() => setSelectedId(null)} maj={(patch) => setJeunes((l) => l.map((j) => (j.id === selected.id ? { ...j, ...patch } : j)))} />;
+  }
+
+  const FILTRES = {
+    tous: () => true,
+    attribuer: (j) => statutCap(j) === "Mentor à attribuer",
+    accord: (j) => statutCap(j) === "Accord parental en attente",
+    mineurs: estMineur,
+  };
+  const liste = jeunes.filter(FILTRES[filtre]);
+  const compte = (k) => jeunes.filter(FILTRES[k]).length;
+
+  return (
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Les jeunes sans métier accompagnés par LIGGEEY, dès 15 ans. Attribuez un mentor à chacun, après l'accord du parent ou tuteur pour les mineurs.</p>
+      <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+        <StatCard icon={Compass} value={jeunes.length} label="Jeunes suivis" detail="Parcours Cap Métier" onClick={() => setFiltre("tous")} />
+        <StatCard icon={ShieldCheck} value={compte("mineurs")} label="Mineurs" detail="15 à 17 ans" tone="info" onClick={() => setFiltre("mineurs")} />
+        <StatCard icon={UsersRound} value={compte("attribuer")} label="Mentor à attribuer" detail="Demandes en attente" tone="alerte" onClick={() => setFiltre("attribuer")} />
+        <StatCard icon={Phone} value={compte("accord")} label="Accords parentaux" detail="En attente de réponse" tone="danger" onClick={() => setFiltre("accord")} />
+      </div>
+      <App.Carte flush>
+        <div className="p-4">
+          <App.Segments
+            label="Filtrer les jeunes"
+            actif={filtre}
+            onChange={setFiltre}
+            options={[{ id: "tous", label: "Tous" }, { id: "attribuer", label: "Mentor à attribuer" }, { id: "accord", label: "Accord en attente" }, { id: "mineurs", label: "Mineurs" }]}
+          />
+        </div>
+        <div className="px-4 pb-4">
+          <App.Tableau
+            legende="Jeunes du parcours Cap Métier"
+            lignes={liste}
+            onLigne={(j) => setSelectedId(j.id)}
+            vide="Aucun jeune dans cette catégorie."
+            colonnes={[
+              { cle: "nom", titre: "Jeune", rendu: (j) => <App.CelluleIdentite visuel={<App.Avatar nom={j.nom} taille="sm" />} titre={j.nom} sousTitre={j.ville} /> },
+              { cle: "naissance", titre: "Âge", rendu: (j) => (estMineur(j) ? <BadgeMineur age={ageAu(j.naissance)} /> : <span className="text-principal">{ageAu(j.naissance)} ans</span>) },
+              { cle: "piste", titre: "Piste métier", masqueMobile: true, rendu: (j) => <span className="text-principal">{j.piste || "À choisir"}</span> },
+              { cle: "mentorId", titre: "Mentor", masqueMobile: true, rendu: (j) => <span className="text-principal">{MENTORS.find((m) => m.id === j.mentorId)?.nom || "—"}</span> },
+              { cle: "statut", titre: "Statut", rendu: (j) => <StatusBadge status={statutCap(j)} /> },
+            ]}
+          />
+        </div>
+      </App.Carte>
+    </div>
+  );
+}
+
+/* =====================================================================
    VERSION DE TEST
    - Sauvegarde automatique dans le navigateur du testeur (localStorage)
    - Barre « Mode test » : scénarios à dérouler, commentaire sur l'écran,
      réinitialisation de la démo
    ===================================================================== */
 
-const TEST_STORAGE_KEY = "liggeey-test-v1";
+const TEST_STORAGE_KEY = "liggeey-test-v2";
 const TEST_SCENARIOS_KEY = "liggeey-test-scenarios-v1";
 
 function encodeState(value) {
@@ -8145,7 +9361,9 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   const [screen, setScreen] = useState(ecranInitial || saved?.screen || "login");
   const [espace, setEspace] = useState(espaceInitial || saved?.espace || "chercheur");
   const [signupProfile, setSignupProfile] = useState(profilInitial);
+  const [signupInscription, setSignupInscription] = useState(null);
   const [presetMentorId, setPresetMentorId] = useState(null);
+  const [presetMentoreId, setPresetMentoreId] = useState(null);
   const [presetFormationsTab, setPresetFormationsTab] = useState("toutes");
   const [offresEntreprise, setOffresEntreprise] = useState(saved?.offresEntreprise || OFFRES_ENTREPRISE_INITIAL);
   const [plans, setPlans] = useState(saved?.plans || PLANS_INITIAL);
@@ -8180,8 +9398,10 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
 
   function navigate(next, data) {
     if (data?.profile) setSignupProfile(data.profile);
+    if (next === "signup-confirm") setSignupInscription(data?.inscription || null);
     if (data?.espace) setEspace(data.espace);
     if (next === "mentors") setPresetMentorId(data?.mentorId || null);
+    if (next === "mentores") setPresetMentoreId(data?.mentoreId || null);
     if (next === "formations") setPresetFormationsTab(data?.tab || "toutes");
     if (next === "login") setEspace("chercheur");
     setScreen(next);
@@ -8217,6 +9437,19 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   const paiementsEchoues = transactions.filter((t) => t.statut === "Échoué").length;
   const pl = (n, one, many) => `${n} ${n > 1 ? many : one}`;
 
+  /* Cap Métier et mentorat */
+  const jeunesCap = readStore(storeData, "cap-jeunes", JEUNES_CAP_INITIAL);
+  const seancesMentorat = readStore(storeData, "mentorat-seances", SEANCES_INITIAL);
+  const jeuneConnecte = jeunesCap.find((j) => j.id === JEUNE_CONNECTE_ID);
+  const mentorJeune = MENTORS.find((m) => m.id === jeuneConnecte?.mentorId);
+  const seanceJeune = seancesMentorat.filter((s) => s.mentoreId === JEUNE_CONNECTE_ID && s.statut === "Confirmée").sort(parDate)[0];
+  const idsMentores = new Set(mentoresDe(MENTOR_CONNECTE.id, jeunesCap).map((m) => m.id));
+  const seancesMentor = seancesMentorat.filter((s) => idsMentores.has(s.mentoreId));
+  const demandesSeance = seancesMentor.filter((s) => s.statut === "Demandée").length;
+  const seanceMentor = seancesMentor.filter((s) => s.statut === "Confirmée").sort(parDate)[0];
+  const capAAttribuer = jeunesCap.filter((j) => statutCap(j) === "Mentor à attribuer").length;
+  const capAccords = jeunesCap.filter((j) => statutCap(j) === "Accord parental en attente").length;
+
   const TODOS = {
     chercheur: [
       ...pointsSuivi.map((j) => ({ label: `Répondre au point de suivi « ${j.label} »`, to: "suivi", icon: HeartHandshake })),
@@ -8232,7 +9465,17 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
       evaluationsAFaire > 0 && { label: `Évaluer vos recrues (${pl(evaluationsAFaire, "point de suivi", "points de suivi")})`, to: "suivi", icon: HeartHandshake },
       nouvellesCandidatures > 0 && { label: `Traiter ${pl(nouvellesCandidatures, "nouvelle candidature", "nouvelles candidatures")}`, to: "candidatures", icon: ClipboardList },
     ],
+    jeune: [
+      jeuneConnecte && !jeuneConnecte.piste && { label: "Faire votre bilan d'orientation", to: "orientation", icon: Compass },
+      seanceJeune && mentorJeune && { label: `Séance avec ${mentorJeune.nom} : ${dateLongue(seanceJeune.date)} à ${seanceJeune.heure}`, to: "mentor", icon: Calendar },
+    ],
+    mentor: [
+      demandesSeance > 0 && { label: `Répondre à ${pl(demandesSeance, "demande de séance", "demandes de séance")}`, to: "seances", icon: CalendarDays },
+      seanceMentor && { label: `Séance avec ${nomMentore(seanceMentor.mentoreId, jeunesCap)} : ${dateLongue(seanceMentor.date)} à ${seanceMentor.heure}`, to: "mentores", data: { mentoreId: seanceMentor.mentoreId }, icon: Calendar },
+    ],
     admin: [
+      capAccords > 0 && { label: `Relancer ${pl(capAccords, "parent", "parents")} pour l'accord parental (Cap Métier)`, to: "cap-metier", icon: Phone },
+      capAAttribuer > 0 && { label: `Attribuer un mentor à ${pl(capAAttribuer, "jeune", "jeunes")} (Cap Métier)`, to: "cap-metier", icon: Compass },
       signalementsOuverts > 0 && { label: `Traiter ${pl(signalementsOuverts, "signalement post-embauche", "signalements post-embauche")}`, to: "suivi", icon: Flag, urgent: true },
       regulAVerifier > 0 && { label: `Vérifier ${pl(regulAVerifier, "justificatif de régularisation", "justificatifs de régularisation")}`, to: "regularisations", icon: Landmark },
       paiementsEchoues > 0 && { label: `Relancer ${pl(paiementsEchoues, "paiement échoué", "paiements échoués")}`, to: "abonnements", icon: CreditCard },
@@ -8243,7 +9486,9 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     chercheur: { suivi: pointsSuivi.length },
     prestataire: { regularisation: regulRefusees.length + regulACompleter.length, missions: missionsEnAttente },
     entreprise: { candidatures: nouvellesCandidatures, suivi: evaluationsAFaire + recruesARisque },
-    admin: { suivi: signalementsOuverts, regularisations: regulAVerifier, abonnements: paiementsEchoues },
+    jeune: {},
+    mentor: { seances: demandesSeance },
+    admin: { suivi: signalementsOuverts, regularisations: regulAVerifier, abonnements: paiementsEchoues, "cap-metier": capAAttribuer + capAccords },
   };
 
   /* Les offres actives publiées par l'entreprise apparaissent aussi côté chercheur */
@@ -8257,6 +9502,20 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     if (screen === "dashboard" && espace === "prestataire") return <PrestataireDashboardScreen user={currentUser} onNavigate={navigate} todos={todos} />;
     if (screen === "dashboard" && espace === "entreprise") return <EntrepriseDashboardScreen user={currentUser} offres={offresEntreprise} onNavigate={navigate} todos={todos} />;
     if (screen === "dashboard" && espace === "admin") return <AdminDashboardScreen onNavigate={navigate} todos={todos} />;
+    if (espace === "jeune") {
+      if (screen === "dashboard") return <CapParcoursScreen onNavigate={navigate} todos={todos} />;
+      if (screen === "orientation") return <CapOrientationScreen onNavigate={navigate} />;
+      if (screen === "ateliers") return <CapAteliersScreen />;
+      if (screen === "mentor") return <CapMentorScreen />;
+      if (screen === "profil") return <CapProfilScreen />;
+    }
+    if (espace === "mentor") {
+      if (screen === "dashboard") return <MentorDashboardScreen onNavigate={navigate} todos={todos} />;
+      if (screen === "mentores") return <MentoresScreen key={presetMentoreId || "liste"} initialId={presetMentoreId} />;
+      if (screen === "seances") return <SeancesMentorScreen />;
+      if (screen === "profil") return <MentorProfilScreen />;
+    }
+    if (screen === "cap-metier" && espace === "admin") return <CapMetierAdminScreen />;
     if (screen === "chercheurs" && espace === "admin") return <ChercheursAdminScreen />;
     if (screen === "prestataires" && espace === "admin") return <PrestatairesAdminScreen />;
     if (screen === "entreprises" && espace === "admin") return <EntreprisesAdminScreen />;
@@ -8328,7 +9587,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
       {screen === "login" && <ConnexionScreen onNavigate={navigate} />}
       {screen === "signup-choice" && <SignupChoiceScreen onNavigate={navigate} />}
       {screen === "signup-info" && <SignupInfoScreen profile={signupProfile} onNavigate={navigate} />}
-      {screen === "signup-confirm" && <ConfirmationScreen profile={signupProfile} onNavigate={navigate} />}
+      {screen === "signup-confirm" && <ConfirmationScreen profile={signupProfile} inscription={signupInscription} onNavigate={navigate} />}
       <Toaster />
     </AuthShell>
   );

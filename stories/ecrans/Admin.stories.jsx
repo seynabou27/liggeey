@@ -30,6 +30,8 @@ export const Formations = { name: "Formations", render: () => <Ecran ecran="form
 
 export const Mentorat = { name: "Mentorat", render: () => <Ecran ecran="mentorat" espace="admin" /> };
 
+export const CapMetier = { name: "Cap Métier", render: () => <Ecran ecran="cap-metier" espace="admin" /> };
+
 export const Suivi = { name: "Suivi post-embauche", render: () => <Ecran ecran="suivi" espace="admin" /> };
 
 export const Verifications = { name: "Vérification des documents", render: () => <Ecran ecran="verifications" espace="admin" /> };

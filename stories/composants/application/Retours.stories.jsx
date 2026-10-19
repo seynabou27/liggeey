@@ -69,13 +69,12 @@ export const Paiement = {
   name: 'PaymentModal',
   render: (a) => (
     <AvecPlateforme espace={a.espace}>
-      <PaymentModal planId="premium" initialCycle={a.initialCycle} onClose={a.onClose} />
+      <PaymentModal planId="premium" onClose={a.onClose} />
     </AvecPlateforme>
   ),
-  args: { espace: 'chercheur', initialCycle: 'mensuel', onClose: fn() },
+  args: { espace: 'chercheur', onClose: fn() },
   argTypes: {
     espace: { control: 'inline-radio', options: ['chercheur', 'prestataire', 'entreprise'] },
-    initialCycle: { control: 'inline-radio', options: ['mensuel', 'annuel'] },
   },
   parameters: { docs: { story: { inline: false, height: '820px' } } },
 };

@@ -15,4 +15,8 @@ export const InscriptionPrestataire = { name: 'Inscription · 2. informations (p
 
 export const InscriptionEntreprise = { name: 'Inscription · 2. informations (entreprise)', render: () => <Ecran ecran="signup-info" profil="entreprise" /> };
 
+export const InscriptionCapMetier = { name: 'Inscription · 2. informations (Cap Métier)', render: () => <Ecran ecran="signup-info" profil="jeune" /> };
+
+export const InscriptionMentor = { name: 'Inscription · 2. informations (mentor)', render: () => <Ecran ecran="signup-info" profil="mentor" /> };
+
 export const InscriptionConfirmation = { name: 'Inscription · 3. confirmation', render: () => <Ecran ecran="signup-confirm" profil="chercheur" /> };

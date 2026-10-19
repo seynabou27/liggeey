@@ -42,6 +42,7 @@ export const tarifs = {
       { nom: 'Suivi post-embauche', prix: '25 000 FCFA', unite: '/ recrue', texte: 'L’intégration de votre recrue suivie pendant 90 jours.' },
       { nom: 'Job Dating', prix: '5 000 FCFA', unite: '/ participant', texte: 'Une rencontre directe entre candidats et entreprises.' },
       { nom: 'Accompagnement à la formalisation', prix: '5 000 FCFA', unite: '/ dossier', texte: 'Les démarches pour déclarer votre activité, expliquées et suivies.' },
+      { nom: 'Publicité pour les marques affiliées', prix: '25 000 FCFA', unite: '/ campagne', texte: 'Faites connaître votre marque auprès des utilisateurs de la plateforme.' },
     ],
   },
   paiement: { titre: 'Payer simplement', texte: 'Wave et Orange Money, directement depuis votre téléphone.' },

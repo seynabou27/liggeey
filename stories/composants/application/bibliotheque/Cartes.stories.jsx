@@ -64,7 +64,7 @@ export const Profil = {
   render: () => (
     <div className="max-w-md">
       <CarteProfil
-        photo="https://randomuser.me/api/portraits/women/65.jpg"
+        photo="/images/plateforme/portraits/absatou-diallo.jpg"
         nom="Absatou Diallo"
         sousTitre="Commerciale"
         badges={<><Badge ton="neutre" taille="moyen">Essentiel</Badge><Badge ton="alerte" taille="moyen">Vérification en cours</Badge></>}

@@ -16,9 +16,11 @@ import Compteur from '@/components/ui/Compteur';
 export function BandeParcours() {
   const { parcours } = accueil;
   return (
-    <section aria-label="Parcours" className="bg-surface py-[50px]">
+    <section aria-labelledby="titre-parcours" className="bg-surface py-[50px]">
       <div className="container flex flex-col items-center gap-6 text-center">
-        <p className="max-w-md text-xl font-medium leading-[2]">{parcours.intro}</p>
+        <h2 id="titre-parcours" className="max-w-3xl text-balance text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">
+          {parcours.intro}
+        </h2>
         <ul className="grid w-full max-w-5xl gap-2 lg:grid-cols-3">
           {parcours.items.map((item) => (
             <li key={item.href}>

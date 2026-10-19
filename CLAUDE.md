@@ -39,7 +39,8 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
     - formations et ateliers : 40 000 FCFA ;
     - suivi post-embauche : 25 000 FCFA ;
     - Job Dating : 5 000 FCFA ;
-    - accompagnement à la formalisation : 5 000 FCFA.
+    - accompagnement à la formalisation : 5 000 FCFA ;
+    - publicité pour les marques affiliées, sur la plateforme : 25 000 FCFA.
   - Paiement : Wave et Orange Money.
 - **Textes** : en français, avec le vouvoiement, des phrases courtes et un ton chaleureux et professionnel.
   - Ils vivent dans `content/fr/`, pas dans les composants.
@@ -49,6 +50,12 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
   - l'orange (`bg-marque`, #F0891D) sert de fond, toujours avec du texte ardoise (`text-sur-marque`), ou de couleur de grand titre ;
   - le texte orange sur fond blanc utilise `text-marque` (primaire-700, #A85A0F) ;
   - zones cliquables de 44 px minimum, focus visible, `alt` sur les images, un seul `h1` par page.
+- **Âges d'accès (droit sénégalais, à faire valider par un juriste)** : date de naissance demandée à l'inscription (`AGE_MIN_PAR_PROFIL` dans le prototype).
+  - chercheur d'emploi, prestataire et mentor : 18 ans minimum (majorité civile ; un mineur non émancipé ne peut pas être commerçant, droit OHADA) ;
+  - Cap Métier (jeunes sans métier) : dès 15 ans (âge minimum du travail et de l'apprentissage : Code du travail, art. L.145, arrêté n° 3748 du 6 juin 2003), avec l'accord d'un parent ou tuteur avant 18 ans ;
+  - avant 15 ans : pas de compte, orientation vers le bureau ou WhatsApp ;
+  - protection des mineurs : mentor attribué par l'admin seulement après l'accord parental, séances en groupe ou au bureau de Dakar, coordonnées masquées pour le mentor, pas de photo.
+- **Photos** : elles montrent en grande majorité des personnes africaines, ou des scènes en Afrique (le Sénégal en priorité). Pas de service d'avatars aléatoires (randomuser.me, picsum…) : les photos sont hébergées dans `public/images/` et créditées (`content/fr/legal.js`).
 - **Performance** :
   - pas de bibliothèque lourde sur les pages du site ;
   - images avec `next/image`, compressées (moins de 300 Ko pour les grands bandeaux).
@@ -118,9 +125,10 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
 
 - **Fichier** : `components/plateforme/LiggeeyPrototype.jsx`. C'est le prototype repris tel quel, en un seul fichier d'environ 8 300 lignes, avec un sommaire en tête.
 - **Montage** : côté navigateur seulement (`components/plateforme/Plateforme.jsx`, avec `dynamic(..., { ssr: false })`), sur `app/plateforme/[[...ecran]]/page.jsx`.
+- **Espaces** : chercheur, prestataire, entreprise, Cap Métier (`jeune` : orientation, ateliers découverte, mentor attribué), mentor (`mentor` : mentorés, séances, comptes rendus, charte) et admin (dont l'écran « Cap Métier » : accords parentaux et attribution des mentors). Cap Métier et mentor n'ont pas d'abonnement : leur tarif reste à décider.
 - **Écrans ouverts depuis le site** : uniquement la connexion et l'inscription.
   - `/plateforme/connexion` ;
-  - `/plateforme/inscription`, avec `?profil=chercheur`, `prestataire` ou `entreprise`.
+  - `/plateforme/inscription`, avec `?profil=chercheur`, `prestataire`, `entreprise`, `jeune` ou `mentor`.
 - **Règle d'accès** : le site ne renvoie jamais directement vers une page interne de la plateforme (offres, tableau de bord…). Toute autre adresse sous `/plateforme/…` redirige vers `/plateforme/connexion`. Les offres se consultent sur le site, dans la vitrine de l'accueil et sa fenêtre de détail (`/?offre=…`, `/?secteur=…`), qui invite à se connecter.
 - **Données** : de démonstration, gardées dans le navigateur (localStorage). Il n'y a pas de serveur ni de vrais comptes, et les paiements sont simulés.
 - **Affichage** : plein écran, sans l'en-tête ni le pied de page du site (`components/layout/Cadre.jsx`). La plateforme n'est pas indexée par Google.
@@ -129,12 +137,13 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
   - la barre « Mode test » n'est plus affichée (les deux `<TestModeBar … />` du composant racine sont retirés ; la sauvegarde locale reste) ;
   - les liens de retour vers le site (constante `SITE_URL`) : logo cliquable, « Retour au site » sur la connexion et l'inscription, et en bas du menu de l'application ;
   - le bouton « Découvrir les offres d'emploi » de la connexion mène aux offres du site (`/#offres`), plus aux offres internes ;
-  - un bloc `export { … }` en fin de fichier, qui expose les composants et données de démo à Storybook (sans changer le comportement).
+  - un bloc `export { … }` en fin de fichier, qui expose les composants et données de démo à Storybook (sans changer le comportement) ;
+  - la date de naissance et les règles d'âge à l'inscription, les profils « Je cherche ma voie » (Cap Métier) et « Je veux devenir mentor », et la section « 11 bis. Cap Métier et espace mentor ».
 - **Dépendances** : `recharts` et `lucide-react`. Si la compilation échoue sur une icône, vérifier son nom dans la version installée de `lucide-react`.
 
 ## Chantiers ouverts (ordre de priorité suggéré)
 
-1. **Aligner les formules du prototype** (`PLANS_INITIAL`) sur les tarifs ci-dessus. Le prototype affiche encore Essentiel gratuit et Premium à 2 500, 5 000 ou 35 000 FCFA. Il propose aussi Free Money et la carte, en plus de Wave et Orange Money.
+1. ~~Aligner les formules du prototype (`PLANS_INITIAL`) sur les tarifs ci-dessus.~~ Fait : Essentiel 1 500 et Premium 3 000 FCFA (chercheur et prestataire), formule unique Entreprise à 40 000 FCFA, paiement mensuel par Wave ou Orange Money. Reste à trancher : la commission des prestataires (retirée, absente du site) et l'accompagnement à la formalisation, inclus dans Premium sur la plateforme mais vendu 5 000 FCFA sur le site.
 2. **Remplacer les vraies entreprises** citées dans les données de démo du prototype (Sonatel, Banque Atlantique, Teranga Capital…) par des noms fictifs.
 3. **Lire le paramètre `formule`** dans le prototype. Il est envoyé par les boutons d'inscription de la page Tarifs.
 4. **Découper le prototype en modules**, un dossier par espace (chercheur, prestataire, entreprise, admin), sans changer son comportement.
@@ -151,7 +160,7 @@ La liste complète est dans `README.md`, section « Valeurs provisoires ». À r
 - les informations du Job Dating du 12 décembre 2026 ;
 - les mentions légales, à faire valider par un juriste ;
 - les logos Wave et Orange Money ;
-- les photos Unsplash provisoires (`public/images/README.md`).
+- les photos Unsplash provisoires (`public/images/README.md`) et celles des profils de démonstration de la plateforme (`public/images/plateforme/README.md`).
 
 ## Maquettes de référence
 
