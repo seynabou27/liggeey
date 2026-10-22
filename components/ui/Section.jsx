@@ -8,7 +8,7 @@ const FONDS = {
 /** Section de page avec conteneur centré et espacements réguliers. */
 export function Section({ id, fond = 'blanc', etroit = false, className = '', children, ...props }) {
   return (
-    <section id={id} className={`py-20 ${FONDS[fond]} ${className}`} {...props}>
+    <section id={id} className={`py-12 md:py-20 ${FONDS[fond]} ${className}`} {...props}>
       <div className={`container ${etroit ? 'max-w-4xl' : ''}`}>{children}</div>
     </section>
   );
@@ -17,7 +17,7 @@ export function Section({ id, fond = 'blanc', etroit = false, className = '', ch
 /** Titre de section : surtitre, h2 et phrase d'introduction. */
 export function TitreSection({ surtitre, titre, texte, centre = false, clair = false, id, className = '' }) {
   return (
-    <div className={`mb-10 flex flex-col gap-2 ${centre ? 'items-center text-center' : ''} ${className}`}>
+    <div className={`mb-8 flex flex-col gap-2 md:mb-10 ${centre ? 'items-center text-center' : ''} ${className}`}>
       {surtitre && <p className={`surtitre ${clair ? '!text-marque-vif' : ''}`}>{surtitre}</p>}
       <h2 id={id} className="max-w-3xl text-balance text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">
         {titre}

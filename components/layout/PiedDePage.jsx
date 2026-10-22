@@ -16,8 +16,9 @@ export default function PiedDePage() {
 
   return (
     <footer className="bg-sombre text-sur-sombre">
-      <div className="container grid gap-10 py-16 sm:grid-cols-2 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.3fr]">
-        <div className="flex flex-col gap-4">
+      {/* Mobile : liens sur deux colonnes ; présentation et aide sur toute la largeur */}
+      <div className="container grid grid-cols-2 gap-x-6 gap-y-8 py-12 md:gap-10 md:py-16 lg:grid-cols-[1.5fr_1fr_1fr_1fr_1.3fr]">
+        <div className="col-span-2 flex flex-col gap-4 md:col-span-1">
           <Image src="/logo/liggeey-blanc.svg" alt="LIGGEEY" width={123} height={24} />
           <p className="max-w-xs text-[13px] font-medium leading-[1.8] text-white/85">{site.slogan}</p>
           <p className="flex items-start gap-2 text-[13px] font-medium leading-[1.8] text-white/85">
@@ -40,7 +41,7 @@ export default function PiedDePage() {
         {commun.groupes.map((groupe) => (
           <nav key={groupe.titre} aria-label={groupe.titre}>
             <h2 className="text-[15px] font-semibold">{groupe.titre}</h2>
-            <ul className="mt-5 flex flex-col">
+            <ul className="mt-3 flex flex-col md:mt-5">
               {groupe.liens.map((lien) => (
                 <li key={lien.href}>
                   <Link href={lien.href} className="inline-flex min-h-[36px] items-center text-[13px] font-medium text-white/85 hover:text-marque-vif">
@@ -52,9 +53,9 @@ export default function PiedDePage() {
           </nav>
         ))}
 
-        <div>
+        <div className="col-span-2 md:col-span-1">
           <h2 className="text-[15px] font-semibold">{commun.aide.titre}</h2>
-          <div className="mt-5 flex flex-col gap-3">
+          <div className="mt-3 grid gap-3 sm:grid-cols-2 md:mt-5 md:flex md:flex-col">
             <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="flex items-center gap-3 rounded-lg border-2 border-white/25 px-4 py-2.5 hover:border-marque">
               <MessageCircle className="h-6 w-6 text-marque-vif" aria-hidden="true" />
               <span className="flex flex-col leading-tight">

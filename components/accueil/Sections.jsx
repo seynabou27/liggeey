@@ -16,7 +16,7 @@ import Compteur from '@/components/ui/Compteur';
 export function BandeParcours() {
   const { parcours } = accueil;
   return (
-    <section aria-labelledby="titre-parcours" className="bg-surface py-[50px]">
+    <section aria-labelledby="titre-parcours" className="bg-surface py-10 md:py-[50px]">
       <div className="container flex flex-col items-center gap-6 text-center">
         <h2 id="titre-parcours" className="max-w-3xl text-balance text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">
           {parcours.intro}
@@ -45,15 +45,15 @@ export function GrilleSecteurs() {
   return (
     <Section fond="gris" aria-labelledby="titre-secteurs">
       <TitreSection id="titre-secteurs" centre titre={t.titre} texte={t.texte} />
-      <ul className="grid grid-cols-2 gap-4 lg:grid-cols-4">
+      <ul className="grid grid-cols-2 gap-3 md:gap-4 lg:grid-cols-4">
         {secteurs.map((s) => (
           <li key={s.id}>
-            <Link href={lienOffresSite({ secteur: s.id })} scroll={false} className="flex h-full flex-col items-center gap-3 rounded-lg bg-surface p-6 text-center shadow-[0_0_0_1px_rgb(var(--bordure-base))] transition-shadow hover:shadow-carte">
-              <span className="grid h-12 w-12 place-items-center rounded-lg bg-marque-doux text-marque">
+            <Link href={lienOffresSite({ secteur: s.id })} scroll={false} className="flex h-full min-h-[44px] flex-col items-center gap-2 rounded-lg bg-surface p-4 text-center md:gap-3 md:p-6 shadow-[0_0_0_1px_rgb(var(--bordure-base))] transition-shadow hover:shadow-carte">
+              <span className="grid h-10 w-10 place-items-center rounded-lg bg-marque-doux text-marque md:h-12 md:w-12">
                 <Icone nom={s.icone} />
               </span>
-              <span className="text-lg font-medium">{s.nom}</span>
-              <span className="rounded-full bg-doux px-4 py-0.5 text-xs font-medium">{t.lien}</span>
+              <span className="text-[15px] font-medium leading-snug md:text-lg">{s.nom}</span>
+              <span className="hidden rounded-full bg-doux px-4 py-0.5 text-xs font-medium md:inline">{t.lien}</span>
             </Link>
           </li>
         ))}
@@ -89,11 +89,11 @@ export function BandeConstat() {
         </div>
 
         <div className="flex flex-col gap-4">
-          <dl className="grid grid-cols-1 gap-4 sm:grid-cols-2">
+          <dl className="grid grid-cols-2 gap-3 md:gap-4">
             {t.chiffres.map((c) => (
-              <div key={c.texte} className="flex flex-col-reverse gap-3 rounded-lg bg-surface p-6 shadow-[0_0_0_1px_rgb(var(--bordure-base))] transition-shadow hover:shadow-carte">
-                <dt className="text-[15px] leading-[1.6] text-secondaire">{c.texte}</dt>
-                <dd className="text-[40px] font-light leading-none text-marque-titre md:text-5xl">
+              <div key={c.texte} className="flex flex-col-reverse gap-2 rounded-lg bg-surface p-4 shadow-[0_0_0_1px_rgb(var(--bordure-base))] transition-shadow hover:shadow-carte md:gap-3 md:p-6">
+                <dt className="text-[13px] leading-[1.5] text-secondaire md:text-[15px] md:leading-[1.6]">{c.texte}</dt>
+                <dd className="text-[32px] font-light leading-none text-marque-titre md:text-5xl">
                   <Compteur valeur={c.valeur} />
                   <span className="ml-1">{c.unite}</span>
                 </dd>
@@ -113,14 +113,14 @@ export function Engagements() {
   return (
     <Section aria-labelledby="titre-engagements">
       <TitreSection id="titre-engagements" centre titre={t.titre} texte={t.texte} />
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-6">
+      <ul className="grid gap-3 sm:grid-cols-2 md:gap-5 lg:grid-cols-6">
         {t.items.map((item, i) => (
-          <li key={item.titre} className={`flex flex-col gap-3 rounded-lg bg-surface p-6 shadow-[0_0_0_1px_rgb(var(--bordure-base))] lg:col-span-2 ${i === 3 ? 'lg:col-start-2' : ''}`}>
-            <span className="grid h-12 w-12 place-items-center rounded-full bg-marque-doux text-marque">
+          <li key={item.titre} className={`grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 rounded-lg bg-surface p-5 shadow-[0_0_0_1px_rgb(var(--bordure-base))] md:flex md:flex-col md:gap-3 md:p-6 lg:col-span-2 ${i === 3 ? 'lg:col-start-2' : ''}`}>
+            <span className="row-span-2 grid h-10 w-10 place-items-center rounded-full bg-marque-doux text-marque md:h-12 md:w-12">
               <Icone nom={item.icone} />
             </span>
-            <h3 className="text-base font-semibold">{item.titre}</h3>
-            <p className="leading-[1.7] text-secondaire">{item.texte}</p>
+            <h3 className="self-center text-base font-semibold md:self-auto">{item.titre}</h3>
+            <p className="leading-[1.6] text-secondaire md:leading-[1.7]">{item.texte}</p>
           </li>
         ))}
       </ul>
@@ -140,7 +140,7 @@ export function AVenir({ evenement }) {
   const pastille = evenement ? datePastille(evenement.date) : null;
 
   return (
-    <section aria-label="À venir" className="bg-surface pb-20">
+    <section aria-label="À venir" className="bg-surface pb-12 md:pb-20">
       <div className="container grid gap-5 md:grid-cols-2">
         <article className="flex flex-col gap-4 rounded-lg border border-base p-6 sm:flex-row sm:items-center">
           {pastille ? (

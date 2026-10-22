@@ -64,13 +64,15 @@ export function GrilleOffres({ offres, offreInitiale = null }) {
 
   return (
     <>
-      <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+      {/* Mobile : carrousel horizontal (une carte et demie visible) ; à partir de 768 px : grille */}
+      <ul className="-mx-3 flex snap-x snap-mandatory scroll-px-3 gap-4 overflow-x-auto px-3 pb-2 [scrollbar-width:none] md:mx-0 md:grid md:grid-cols-2 md:gap-5 md:overflow-visible md:px-0 md:pb-0 lg:grid-cols-4 [&::-webkit-scrollbar]:hidden">
         {offres.map((offre) => (
-          <li key={offre.id}>
+          <li key={offre.id} className="w-[78%] max-w-[320px] shrink-0 snap-start md:w-auto md:max-w-none">
             <CarteOffre offre={offre} onVoir={setOuverte} />
           </li>
         ))}
       </ul>
+      {offres.length > 1 && <p className="mt-3 text-center text-[13px] text-secondaire md:hidden">{accueil.offres.glisser}</p>}
       <DetailOffre offre={ouverte} onFermer={() => setOuverte(null)} />
     </>
   );

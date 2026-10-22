@@ -81,7 +81,8 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
   - texte courant : 15 px, interligne 1,5 ; titres en demi-gras (`font-semibold`), jamais en gras ;
   - grand titre de l'accueil : 25 px sur mobile, 40 px, puis 57 px sur ordinateur ; texte du bandeau : 20 px, interligne 1,8 ;
   - titres de section (h2) : 22 px sur mobile, 35 px sur ordinateur ; phrase d'intro : 15 px, interligne 1,7 ;
-  - sections : 80 px d'espace en haut et en bas (`py-20`) ; conteneur de 1 320 px maximum, marges de 12 px ;
+  - sections : 48 px d'espace en haut et en bas sur mobile, 80 px à partir de 768 px (`py-12 md:py-20`) ; conteneur de 1 320 px maximum, marges de 12 px ;
+  - sous 768 px, les blocs longs sont compactés sans changer le style (le public est surtout sur téléphone) : offres en carrousel horizontal, cartes d'atouts et d'engagements avec l'icône à gauche du titre, maquette du téléphone masquée dans « Comment ça marche », chiffres et secteurs sur deux colonnes, pied de page sur deux colonnes. Au-dessus de 768 px, rien ne change ;
   - menu : 14 px, moyen ; étiquettes de formulaire : 12 px ; champs de 56 px de haut ; pied de page : titres 15 px, liens 13 px.
 - **Icônes** : `lucide-react`.
 - **Formes** : boutons à coins de 4 px, cartes à coins de 8 px, ombre `shadow-carte`.

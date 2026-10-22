@@ -9,15 +9,19 @@ import Icone from '@/components/ui/Icone';
 export function GrilleAtouts({ items, colonnes = 3 }) {
   const cols = { 2: 'sm:grid-cols-2', 3: 'sm:grid-cols-2 lg:grid-cols-3', 4: 'sm:grid-cols-2 lg:grid-cols-4' }[colonnes];
   return (
-    <ul className={`grid gap-5 ${cols}`}>
+    <ul className={`grid gap-3 md:gap-5 ${cols}`}>
       {items.map((item) => (
-        <li key={item.titre} className="flex flex-col gap-3 rounded-lg border border-base bg-surface p-6">
+        <li
+          key={item.titre}
+          className={`gap-3 rounded-lg border border-base bg-surface p-5 md:flex md:flex-col md:gap-3 md:p-6 ${item.icone ? 'grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1' : 'flex flex-col'}`}
+        >
+          {/* Mobile : icône à gauche du titre, pour des cartes plus courtes */}
           {item.icone && (
-            <span className="grid h-12 w-12 place-items-center rounded-lg bg-marque-doux text-marque">
+            <span className="row-span-2 grid h-10 w-10 place-items-center rounded-lg bg-marque-doux text-marque md:h-12 md:w-12">
               <Icone nom={item.icone} />
             </span>
           )}
-          <h3 className="text-lg font-semibold">{item.titre}</h3>
+          <h3 className="self-center text-lg font-semibold md:self-auto">{item.titre}</h3>
           <p className="text-secondaire">{item.texte}</p>
         </li>
       ))}
@@ -28,7 +32,7 @@ export function GrilleAtouts({ items, colonnes = 3 }) {
 /** Étapes numérotées (1, 2, 3, 4). */
 export function Etapes({ items }) {
   return (
-    <ol className="grid gap-6 sm:grid-cols-2 lg:grid-cols-4">
+    <ol className="grid gap-5 sm:grid-cols-2 md:gap-6 lg:grid-cols-4">
       {items.map((etape, i) => (
         <li key={etape.titre} className="flex gap-4 lg:flex-col">
           <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-sombre font-semibold text-sur-sombre" aria-hidden="true">
@@ -64,7 +68,7 @@ export function Questions({ items }) {
 /** Bande finale sombre avec un titre et des boutons. */
 export function AppelFinal({ titre, children }) {
   return (
-    <section className="bg-sombre py-16 text-sur-sombre md:py-20">
+    <section className="bg-sombre py-12 text-sur-sombre md:py-20">
       <div className="container flex flex-col items-center gap-8 text-center">
         <h2 className="max-w-2xl text-balance text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">{titre}</h2>
         <div className="flex flex-wrap justify-center gap-3">{children}</div>
@@ -76,7 +80,7 @@ export function AppelFinal({ titre, children }) {
 /** Accompagnement humain : bureau de Dakar et WhatsApp. */
 export function BlocAide({ titre, texte }) {
   return (
-    <section className="bg-marque-doux py-20">
+    <section className="bg-marque-doux py-12 md:py-20">
       <div className="container grid gap-8 md:grid-cols-[1.3fr_1fr] md:items-center">
         <div>
           <h2 className="text-[22px] font-semibold leading-[1.27] md:text-[35px] md:leading-[1.2]">{titre}</h2>

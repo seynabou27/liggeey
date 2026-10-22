@@ -10,9 +10,9 @@ import Icone from '@/components/ui/Icone';
 
 function Colonne({ id, groupe, visible }) {
   return (
-    <div id={`etapes-${id}`} className={`${visible ? 'flex' : 'hidden'} flex-col gap-8 lg:flex`}>
+    <div id={`etapes-${id}`} className={`${visible ? 'flex' : 'hidden'} flex-col gap-6 md:gap-8 lg:flex`}>
       <p className="surtitre">{groupe.titre}</p>
-      <ol className="flex flex-col gap-8">
+      <ol className="flex flex-col gap-6 md:gap-8">
         {groupe.items.map((etape) => (
           <li key={etape.titre} className="flex gap-4">
             <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-marque-doux text-marque">
@@ -39,7 +39,7 @@ export default function CommentCaMarche({ avecCapture }) {
   const [onglet, setOnglet] = useState('talents');
 
   return (
-    <section aria-labelledby="titre-etapes" className="bg-surface py-20">
+    <section aria-labelledby="titre-etapes" className="bg-surface py-12 md:py-20">
       <div className="container">
         <TitreSection id="titre-etapes" centre titre={t.titre} texte={t.texte} />
 
@@ -60,7 +60,8 @@ export default function CommentCaMarche({ avecCapture }) {
 
         <div className="grid items-center gap-10 lg:grid-cols-[1fr_280px_1fr] lg:gap-14">
           <Colonne id="talents" groupe={t.talents} visible={onglet === 'talents'} />
-          <div className="order-first mx-auto w-[220px] lg:order-none lg:w-[260px]">
+          {/* La maquette du téléphone est masquée sur mobile : les étapes suffisent */}
+          <div className="order-first mx-auto hidden w-[220px] md:block lg:order-none lg:w-[260px]">
             <div className="relative aspect-[9/18] overflow-hidden rounded-[36px] border-[10px] border-principal bg-marque-doux shadow-carte">
               {avecCapture ? (
                 <Image src={t.capture} alt="Écran de l'application LIGGEEY" fill sizes="260px" className="object-cover" />
@@ -74,7 +75,7 @@ export default function CommentCaMarche({ avecCapture }) {
           <Colonne id="entreprises" groupe={t.entreprises} visible={onglet === 'entreprises'} />
         </div>
 
-        <div className="mt-12 flex flex-wrap justify-center gap-3">
+        <div className="mt-10 flex flex-wrap justify-center gap-3 md:mt-12">
           <Bouton href={lienInscription()}>Créer mon compte</Bouton>
           <Bouton href="/entreprises/demande-de-demo" variante="secondaire">
             Demander une démo

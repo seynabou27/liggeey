@@ -48,6 +48,7 @@ export const accueil = {
     sansResultat: "Pas d'offre en vitrine pour cette recherche. Créez votre compte pour voir toutes les offres.",
     aucune: 'Les premières offres vérifiées arrivent. Créez votre compte pour être prévenu.',
     effacer: 'Effacer la recherche',
+    glisser: 'Faites glisser pour voir les autres offres.',
     detail: {
       fermer: 'Fermer',
       lieu: 'Lieu',

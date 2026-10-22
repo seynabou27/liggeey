@@ -10,7 +10,7 @@ export default function BandeNewsletter() {
   const { etat, erreurs, envoyer } = useEnvoi('newsletter', ['email']);
 
   return (
-    <section aria-labelledby="titre-newsletter" className="bg-marque py-20 text-sur-marque">
+    <section aria-labelledby="titre-newsletter" className="bg-marque py-12 text-sur-marque md:py-20">
       <div className="container flex flex-col items-center gap-4 text-center">
         <h2 id="titre-newsletter" className="text-[22px] font-semibold leading-[1.27] md:text-[32px] md:leading-[1.2]">
           {t.titre}
