@@ -8,7 +8,9 @@
      (/plateforme/{espace}/{écran}, voir lib/routesPlateforme.js) ;
    - la barre « Mode test » n'est plus affichée (la sauvegarde locale de la démo est conservée) ;
    - liens de retour vers le site public (constante SITE_URL) : logo, « Retour au site » sur la
-     connexion et l'inscription, et en bas du menu de l'application.
+     connexion et l'inscription, et en bas du menu de l'application ;
+   - comptes réels (props compte / comptesDemo, ServeurContext) : connexion, inscription et déconnexion
+     par l'API app/api/auth/… (components/plateforme/apiComptes.js). Sans ces props (Storybook), tout reste simulé.
    Monté par components/plateforme/Plateforme.jsx sur /plateforme. */
 
 /* =====================================================================
@@ -107,6 +109,7 @@ import {
   TrendingUp,
   FlaskConical,
   Compass,
+  LogOut,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip, AreaChart, Area, CartesianGrid } from "recharts";
 // Bibliothèque de l'application (components/app) : coquille, cartes, badges, tableaux… sur les tokens LIGGEEY.
@@ -114,6 +117,10 @@ import * as App from "../app";
 import { site } from "@/lib/site";
 import { lienPartageWhatsApp, lienWhatsApp } from "@/lib/liens";
 import { adressePlateforme, lireAdressePlateforme, lireAdresseNavigateur, ECRANS_AUTH } from "@/lib/routesPlateforme";
+// Comptes réels (API app/api/auth/…) : règles partagées avec le serveur, appels réseau, comptes de démonstration.
+import { AGE_MAJORITE, AGE_MIN_CAP_METIER, AGE_MIN_PAR_PROFIL, LIENS_PARENT, normaliserTelephone } from "@/lib/comptes.mjs";
+import { COMPTES_DEMO, MOT_DE_PASSE_DEMO } from "@/lib/comptesDemo.mjs";
+import { apiConnexion, apiInscription, apiDeconnexion } from "./apiComptes";
 
 // Couleurs : tokens LIGGEEY (lib/tokens/couleurs.mjs), lus via les variables CSS du site.
 // Les noms d'origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
@@ -165,6 +172,11 @@ function demoNow() {
 }
 
 const StoreContext = React.createContext(null);
+
+/* Comptes réels : fourni par le composant racine quand la plateforme tourne avec le serveur (/plateforme).
+   null dans Storybook : la connexion et l'inscription restent simulées, comme dans le prototype d'origine.
+   { compte, comptesDemo, onConnecte(compte), onDeconnexion() } */
+const ServeurContext = React.createContext(null);
 
 function useStore(key, initial) {
   const store = React.useContext(StoreContext);
@@ -569,30 +581,58 @@ const ESPACES_DEMO = [
   { id: "admin", label: "Admin" },
 ];
 
+/* Compte de démonstration d'un espace (lib/comptesDemo.mjs, créés par npm run db:amorcer). */
+const compteDemo = (espace) => COMPTES_DEMO.find((c) => c.profil === espace);
+
 function ConnexionScreen({ onNavigate }) {
+  /* Avec le serveur : vrai compte (e-mail ou téléphone), vérifié par l'API. Le choix d'espace ne sert qu'à
+     préremplir un compte de démonstration (NEXT_PUBLIC_COMPTES_DEMO). Sans serveur (Storybook) : simulation. */
+  const serveur = React.useContext(ServeurContext);
+  const avecDemo = !serveur || serveur.comptesDemo;
   const [mode, setMode] = useState("login"); // login | forgot | sent
-  const [email, setEmail] = useState("demo@liggeey.sn");
-  const [password, setPassword] = useState("demo1234");
+  const [email, setEmail] = useState(!serveur ? "demo@liggeey.sn" : avecDemo ? compteDemo("chercheur").email : "");
+  const [password, setPassword] = useState(avecDemo ? MOT_DE_PASSE_DEMO : "");
   const [espace, setEspace] = useState("chercheur");
   const [showPassword, setShowPassword] = useState(false);
   const [remember, setRemember] = useState(false);
   const [touched, setTouched] = useState(false);
   const [status, setStatus] = useState(null);
+  const [erreurServeur, setErreurServeur] = useState("");
+  const [envoi, setEnvoi] = useState(false);
   const [resetEmail, setResetEmail] = useState("");
   const [resetTouched, setResetTouched] = useState(false);
 
-  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+  const emailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email.trim()) || (!!serveur && !!normaliserTelephone(email));
   const passwordValid = password.length >= 8;
   const resetEmailValid = /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(resetEmail);
 
-  function handleSubmit(e) {
+  function choisirEspace(id) {
+    setEspace(id);
+    if (serveur) {
+      setEmail(compteDemo(id).email);
+      setPassword(MOT_DE_PASSE_DEMO);
+      setErreurServeur("");
+    }
+  }
+
+  async function handleSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     setTouched(true);
-    if (emailValid && passwordValid) {
-      onNavigate("dashboard", { espace });
-    } else {
+    setErreurServeur("");
+    if (!emailValid || !passwordValid) {
       setStatus("error");
+      return;
     }
+    setStatus(null);
+    if (!serveur) {
+      onNavigate("dashboard", { espace });
+      return;
+    }
+    setEnvoi(true);
+    const r = await apiConnexion({ identifiant: email.trim(), motDePasse: password, souvenir: remember });
+    setEnvoi(false);
+    if (r.ok) serveur.onConnecte(r.compte);
+    else setErreurServeur(r.erreur || "Connexion impossible pour le moment.");
   }
 
   function handleResetSubmit(e) {
@@ -656,8 +696,9 @@ function ConnexionScreen({ onNavigate }) {
         </button>
       </p>
 
+      {avecDemo && (
       <fieldset className="mb-6">
-        <legend className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-discret">Espace à ouvrir (démo)</legend>
+        <legend className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-discret">{serveur ? "Compte de démonstration" : "Espace à ouvrir (démo)"}</legend>
         <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
           {ESPACES_DEMO.map((o) => {
             const actif = espace === o.id;
@@ -666,7 +707,7 @@ function ConnexionScreen({ onNavigate }) {
                 key={o.id}
                 type="button"
                 aria-pressed={actif}
-                onClick={() => setEspace(o.id)}
+                onClick={() => choisirEspace(o.id)}
                 className={`min-h-[44px] rounded-md border px-2 text-xs font-semibold leading-tight transition-colors ${
                   actif ? "border-marque bg-marque-doux text-marque-fort" : "border-base bg-surface text-secondaire hover:bg-doux hover:text-principal"
                 }`}
@@ -677,22 +718,27 @@ function ConnexionScreen({ onNavigate }) {
           })}
         </div>
       </fieldset>
+      )}
 
       <div className="mb-4">
-        <label htmlFor="connexion-email" className={AUTH.libelle}>Adresse e-mail</label>
+        <label htmlFor="connexion-email" className={AUTH.libelle}>{serveur ? "E-mail ou téléphone" : "Adresse e-mail"}</label>
         <input
           id="connexion-email"
-          type="email"
-          autoComplete="email"
+          type={serveur ? "text" : "email"}
+          inputMode={serveur ? "email" : undefined}
+          autoComplete={serveur ? "username" : "email"}
+          autoCapitalize="none"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
-          placeholder="exemple@liggeey.sn"
+          placeholder={serveur ? "exemple@liggeey.sn ou 77 000 00 00" : "exemple@liggeey.sn"}
           aria-invalid={emailErreur || undefined}
           aria-describedby="connexion-email-aide"
           className={AUTH.champ(emailErreur)}
         />
         <p id="connexion-email-aide" className={AUTH.aide(emailErreur)}>
-          {emailErreur ? "Veuillez saisir une adresse e-mail valide." : "Saisissez l'adresse e-mail utilisée lors de votre inscription"}
+          {serveur
+            ? emailErreur ? "Saisissez une adresse e-mail ou un numéro sénégalais valide." : "L'adresse e-mail ou le numéro utilisé lors de votre inscription"
+            : emailErreur ? "Veuillez saisir une adresse e-mail valide." : "Saisissez l'adresse e-mail utilisée lors de votre inscription"}
         </p>
       </div>
 
@@ -727,12 +773,15 @@ function ConnexionScreen({ onNavigate }) {
         <span className="text-sm text-principal">Se souvenir de moi</span>
       </label>
 
-      <button type="submit" className={AUTH.principal}>Se connecter</button>
+      <button type="submit" disabled={envoi} aria-busy={envoi || undefined} className={`${AUTH.principal} gap-2 disabled:opacity-70`}>
+        {envoi && <Loader2 size={18} className="animate-spin" aria-hidden="true" />}
+        {envoi ? "Connexion…" : "Se connecter"}
+      </button>
 
-      {status === "error" && (
+      {(status === "error" || erreurServeur) && (
         <div role="alert" className="mt-5 flex items-start gap-3 rounded-md bg-statut-danger-doux px-4 py-3 text-sm text-statut-danger">
           <AlertCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
-          Merci de corriger les champs en rouge avant de continuer.
+          {erreurServeur || "Merci de corriger les champs en rouge avant de continuer."}
         </div>
       )}
 
@@ -820,10 +869,9 @@ const PROFILE_META = {
    - travail et apprentissage dès 15 ans révolus, travaux dangereux interdits avant 18 ans
      (Code du travail, art. L.145 ; arrêté n° 3748 du 6 juin 2003) ;
    - un mineur non émancipé ne peut pas être commerçant (Acte uniforme OHADA sur le droit commercial général).
-   Les 15-17 ans passent donc par Cap Métier, avec l'accord d'un parent ou tuteur. */
-const AGE_MAJORITE = 18;
-const AGE_MIN_CAP_METIER = 15;
-const AGE_MIN_PAR_PROFIL = { chercheur: AGE_MAJORITE, prestataire: AGE_MAJORITE, mentor: AGE_MAJORITE, jeune: AGE_MIN_CAP_METIER };
+   Les 15-17 ans passent donc par Cap Métier, avec l'accord d'un parent ou tuteur.
+   AGE_MAJORITE, AGE_MIN_CAP_METIER, AGE_MIN_PAR_PROFIL et LIENS_PARENT viennent de lib/comptes.mjs,
+   partagé avec l'API, qui revérifie ces règles à l'inscription. */
 
 /* Âge révolu à la date de démo, à partir d'une date « AAAA-MM-JJ » (null si la date est vide ou invalide) */
 function ageAu(dateIso, ref = demoNow()) {
@@ -880,8 +928,6 @@ const FIELD_CONFIG = {
   ],
 };
 
-const LIENS_PARENT = ["Mère", "Père", "Tuteur ou tutrice légale"];
-
 /* Message affiché quand l'âge ne permet pas d'ouvrir l'espace choisi */
 function AgeRefus({ profil, age, onCapMetier }) {
   if (age < AGE_MIN_CAP_METIER) {
@@ -923,7 +969,12 @@ function AgeRefus({ profil, age, onCapMetier }) {
 }
 
 function SignupInfoScreen({ profile, onNavigate }) {
-  /* Le profil peut basculer vers Cap Métier si l'âge saisi l'exige (les champs déjà remplis sont gardés) */
+  /* Le profil peut basculer vers Cap Métier si l'âge saisi l'exige (les champs déjà remplis sont gardés).
+     Avec le serveur, le compte est créé par l'API, qui revérifie tout (âge, doublons…) et renvoie ses erreurs par champ. */
+  const serveur = React.useContext(ServeurContext);
+  const [envoi, setEnvoi] = useState(false);
+  const [erreursServeur, setErreursServeur] = useState({});
+  const [erreurServeur, setErreurServeur] = useState("");
   const [profil, setProfil] = useState(profile);
   const meta = PROFILE_META[profil] || PROFILE_META.chercheur;
   const fields = FIELD_CONFIG[profil] || FIELD_CONFIG.chercheur;
@@ -952,12 +1003,29 @@ function SignupInfoScreen({ profile, onNavigate }) {
 
   function setField(name, val) {
     setValues((v) => ({ ...v, [name]: val }));
+    if (erreursServeur[name]) setErreursServeur(({ [name]: _retire, ...reste }) => reste);
   }
 
-  function handleSubmit(e) {
+  async function handleSubmit(e) {
     if (e && e.preventDefault) e.preventDefault();
     setTouched(true);
-    if (formValid) onNavigate("signup-confirm", { profile: profil, inscription: { mineur, parentNom: values.parentNom } });
+    setErreurServeur("");
+    if (!formValid || envoi) return;
+    const suite = { profile: profil, inscription: { mineur, parentNom: values.parentNom } };
+    if (!serveur) {
+      onNavigate("signup-confirm", suite);
+      return;
+    }
+    setEnvoi(true);
+    const r = await apiInscription({ ...values, profil, motDePasse: password, cgu: accepted });
+    setEnvoi(false);
+    if (r.ok) {
+      serveur.retenirCompte(r.compte);
+      onNavigate("signup-confirm", suite);
+      return;
+    }
+    setErreursServeur(r.erreurs || {});
+    setErreurServeur(r.erreur || "L'inscription est impossible pour le moment.");
   }
 
   function passerCapMetier() {
@@ -980,8 +1048,9 @@ function SignupInfoScreen({ profile, onNavigate }) {
         const val = values[f.name] || "";
         const estNaissance = f.name === "naissance";
         const vide = !f.optional && val.trim().length === 0;
-        const invalid = touched && (vide || (f.type === "email" && !emailValid) || (estNaissance && !naissanceValide));
-        const message = vide ? "Ce champ est requis." : f.type === "email" ? "Veuillez saisir une adresse e-mail valide." : "Veuillez saisir une date de naissance valide.";
+        const erreurApi = erreursServeur[f.name];
+        const invalid = (touched && (vide || (f.type === "email" && !emailValid) || (estNaissance && !naissanceValide))) || !!erreurApi;
+        const message = erreurApi || (vide ? "Ce champ est requis." : f.type === "email" ? "Veuillez saisir une adresse e-mail valide." : "Veuillez saisir une date de naissance valide.");
         const id = `inscription-${f.name}`;
         return (
           <div key={f.name} className="mb-4">
@@ -1086,12 +1155,26 @@ function SignupInfoScreen({ profile, onNavigate }) {
         <p role="alert" className="text-xs mb-4 -mt-4 text-statut-danger">Merci d'accepter les conditions pour continuer.</p>
       )}
 
+      {erreurServeur && (
+        <div role="alert" className="mb-4 flex items-start gap-3 rounded-md bg-statut-danger-doux px-4 py-3 text-sm text-statut-danger">
+          <AlertCircle size={18} className="mt-0.5 shrink-0" aria-hidden="true" />
+          <span>
+            {erreurServeur}
+            {/* Erreurs sur des champs sans message propre (parent, mot de passe, conditions) */}
+            {Object.entries(erreursServeur)
+              .filter(([champ]) => !fields.some((f) => f.name === champ))
+              .map(([champ, msg]) => <span key={champ} className="mt-1 block">{msg}</span>)}
+          </span>
+        </div>
+      )}
+
       <div className="flex gap-3">
         <button type="button" onClick={() => onNavigate("signup-choice")} className={AUTH.secondaire}>
           Retour
         </button>
-        <button type="submit" className={AUTH.principal}>
-          {profil === "mentor" ? "Envoyer ma candidature" : "Créer mon compte"}
+        <button type="submit" disabled={envoi} aria-busy={envoi || undefined} className={`${AUTH.principal} gap-2 disabled:opacity-70`}>
+          {envoi && <Loader2 size={18} className="animate-spin" aria-hidden="true" />}
+          {envoi ? "Envoi…" : profil === "mentor" ? "Envoyer ma candidature" : "Créer mon compte"}
         </button>
       </div>
 
@@ -1105,6 +1188,8 @@ function SignupInfoScreen({ profile, onNavigate }) {
 function ConfirmationScreen({ profile, inscription, onNavigate }) {
   const meta = PROFILE_META[profile] || PROFILE_META.chercheur;
   const estMentor = profile === "mentor";
+  // Avec le serveur, aucun SMS ni e-mail n'est encore envoyé automatiquement : l'équipe prend contact.
+  const serveur = React.useContext(ServeurContext);
   return (
     <div>
       <Stepper step={3} />
@@ -1114,14 +1199,14 @@ function ConfirmationScreen({ profile, inscription, onNavigate }) {
       <h2 className={AUTH.titre}>{estMentor ? "Candidature envoyée" : "Compte créé avec succès"}</h2>
       {estMentor ? (
         <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
-          Merci de vouloir accompagner des jeunes ! L'équipe LIGGEEY vérifie votre identité, votre expérience et vos références, puis vous propose de signer la charte du mentor. Vous recevrez un e-mail dès que votre compte sera validé.
+          Merci de vouloir accompagner des jeunes ! L'équipe LIGGEEY vérifie votre identité, votre expérience et vos références, puis vous propose de signer la charte du mentor. {serveur ? "Nous vous contacterons dès que votre compte sera validé." : "Vous recevrez un e-mail dès que votre compte sera validé."}
         </p>
       ) : (
         <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
           Bienvenue sur LIGGEEY ! Votre compte <strong className="text-principal">{meta.tagline}</strong> est prêt.
           {inscription?.mineur && (
             <>
-              {" "}Nous avons envoyé un SMS à {inscription.parentNom || "votre parent ou tuteur"} pour confirmer son accord. Un mentor vous sera attribué dès sa réponse.
+              {" "}{serveur ? "Nous allons contacter" : "Nous avons envoyé un SMS à"} {inscription.parentNom || "votre parent ou tuteur"} pour confirmer son accord. Un mentor vous sera attribué dès sa réponse.
             </>
           )}
         </p>
@@ -1384,14 +1469,17 @@ function AppShell({ espace, navItems, active, onNavigate, user, breadcrumb, badg
     return () => obs.disconnect();
   }, []);
 
-  const estAdmin = user.role === "Super admin";
+  const serveur = React.useContext(ServeurContext);
+  const estAdmin = espace === "admin";
   const avecAbonnement = navItems.some((n) => n.id === "abonnement");
   const prenom = user.name.split(" ")[0];
   const menuCompte = [
     !estAdmin && { label: "Mon profil", icone: UserCircle2, onClick: () => onNavigate("profil") },
     avecAbonnement && { label: "Abonnement", icone: Crown, onClick: () => onNavigate("abonnement") },
     estAdmin && { label: "Paramètres", icone: Settings, onClick: () => onNavigate("parametres") },
-    { label: "Changer d'espace", icone: ArrowLeft, onClick: () => onNavigate("login") },
+    serveur
+      ? { label: "Se déconnecter", icone: LogOut, onClick: serveur.onDeconnexion }
+      : { label: "Changer d'espace", icone: ArrowLeft, onClick: () => onNavigate("login") },
     { label: "Retour au site", icone: Home, href: SITE_URL },
   ].filter(Boolean);
   const notifications = todos.map((t, i) => ({
@@ -11810,12 +11898,21 @@ function sessionOuverte(saved, espace) {
 }
 
 /* Écran d'ouverture :
+   0. avec le serveur (compte fourni, même null) : la page /plateforme a déjà vérifié la session et redirigé
+      si besoin. Un écran interne s'ouvre donc dans l'espace du compte connecté ;
    1. ecranInitial / espaceInitial (Storybook) ;
    2. l'adresse (/plateforme/connexion, /plateforme/admin/offres…) : un écran interne ne s'ouvre
       que si une session est ouverte pour cet espace. Session ouverte dans un autre espace : son
       tableau de bord ; aucune session : la connexion ;
    3. /plateforme seul : la dernière session de test, sinon la connexion. */
-function ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminInitial, profilAdresse, saved }) {
+function ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminInitial, profilAdresse, saved, compte }) {
+  if (compte !== undefined) {
+    const demande = cheminInitial?.length ? lireAdressePlateforme(cheminInitial, profilAdresse) : null;
+    if (demande?.type === "auth") return { screen: demande.screen, espace: compte?.profil || "chercheur", profil: demande.profil || null };
+    if (!compte) return { screen: "login", espace: "chercheur", profil: null };
+    const ecran = demande?.type === "app" && demande.espace === compte.profil && demande.screen && ecranValide(compte.profil, demande.screen) ? demande.screen : "dashboard";
+    return { screen: ecran, espace: compte.profil, profil: null };
+  }
   const espaceSession = saved?.espace || "chercheur";
   if (ecranInitial) return { screen: ecranInitial, espace: espaceInitial || espaceSession, profil: profilInitial };
   const demande = cheminInitial?.length ? lireAdressePlateforme(cheminInitial, profilAdresse) : null;
@@ -11829,9 +11926,15 @@ function ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminIniti
   return { screen: saved?.screen || "login", espace: espaceSession, profil: profilInitial };
 }
 
-export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = null, profilInitial = null, cheminInitial = null, profilAdresse = null, synchroniserAdresse = false } = {}) {
+/* compte : compte connecté, lu par le serveur (null si personne). undefined (Storybook) : connexion simulée, sans serveur.
+   comptesDemo : l'écran de connexion propose les comptes de démonstration. */
+export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = null, profilInitial = null, cheminInitial = null, profilAdresse = null, synchroniserAdresse = false, compte = undefined, comptesDemo = false } = {}) {
+  const modeServeur = compte !== undefined;
+  const [compteCourant, setCompteCourant] = useState(compte ?? null);
+  const compteRef = useRef(compteCourant);
+  compteRef.current = compteCourant;
   const [saved] = useState(loadSnapshot);
-  const [depart] = useState(() => ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminInitial, profilAdresse, saved }));
+  const [depart] = useState(() => ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminInitial, profilAdresse, saved, compte }));
   const [screen, setScreen] = useState(depart.screen);
   const [espace, setEspace] = useState(depart.espace);
   const [signupProfile, setSignupProfile] = useState(depart.profil);
@@ -11863,12 +11966,16 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
         setScreen(demande.screen);
         return;
       }
+      // Avec le serveur, un écran interne n'est ouvert qu'au compte connecté de cet espace.
+      const compteActuel = compteRef.current;
+      if (modeServeur && !compteActuel) { setScreen("login"); return; }
+      if (modeServeur && demande.espace !== compteActuel.profil) { setEspace(compteActuel.profil); setScreen("dashboard"); return; }
       setEspace(demande.espace);
       setScreen(demande.screen && ecranValide(demande.espace, demande.screen) ? demande.screen : "dashboard");
     };
     window.addEventListener("popstate", surHistorique);
     return () => window.removeEventListener("popstate", surHistorique);
-  }, [synchroniserAdresse]);
+  }, [synchroniserAdresse, modeServeur]);
   const [signupInscription, setSignupInscription] = useState(null);
   const [presetMentorId, setPresetMentorId] = useState(null);
   const [presetMentoreId, setPresetMentoreId] = useState(null);
@@ -11919,7 +12026,24 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     setScreen(next);
   }
 
-  const currentUser = USER_BY_ESPACE[espace];
+  /* Comptes réels : connexion, inscription et déconnexion passent par l'API (components/plateforme/apiComptes.js). */
+  const serveurApi = React.useMemo(() => (modeServeur ? {
+    compte: compteCourant,
+    comptesDemo,
+    retenirCompte: setCompteCourant,
+    onConnecte: (c) => { setCompteCourant(c); navigate("dashboard", { espace: c.profil }); },
+    onDeconnexion: async () => {
+      const r = await apiDeconnexion();
+      if (!r.ok) { notify(r.erreur || "Déconnexion impossible pour le moment.", "info"); return; }
+      setCompteCourant(null);
+      navigate("login");
+    },
+  } : null), [modeServeur, compteCourant, comptesDemo]); // eslint-disable-line react-hooks/exhaustive-deps
+
+  /* Le nom, le rôle et les initiales affichés viennent du compte connecté ; les données des écrans restent celles de la démo. */
+  const currentUser = compteCourant && compteCourant.profil === espace
+    ? { ...USER_BY_ESPACE[espace], name: compteCourant.nom, role: compteCourant.role, initials: compteCourant.initiales }
+    : USER_BY_ESPACE[espace];
   const navItems = NAV_ITEMS_BY_ESPACE[espace];
   const planApi = buildPlanApi({ espace, user: currentUser, plans, setPlans, subs, setSubs, usage, setUsage, transactions, setTransactions, setUpgrade, setPayment });
   planApi.regulSteps = espace === "prestataire" ? regulSteps : null;
@@ -12092,6 +12216,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
 
   if (APP_SCREENS.includes(screen)) {
     return (
+      <ServeurContext.Provider value={serveurApi}>
       <StoreContext.Provider value={storeApi}>
       <PlanContext.Provider value={planApi}>
         <AppShell
@@ -12111,10 +12236,12 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
         </AppShell>
       </PlanContext.Provider>
       </StoreContext.Provider>
+      </ServeurContext.Provider>
     );
   }
 
   return (
+    <ServeurContext.Provider value={serveurApi}>
     <AuthShell mode={screen === "login" ? "connexion" : "inscription"}>
       {screen === "login" && <ConnexionScreen onNavigate={navigate} />}
       {screen === "signup-choice" && <SignupChoiceScreen onNavigate={navigate} />}
@@ -12122,6 +12249,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
       {screen === "signup-confirm" && <ConfirmationScreen profile={signupProfile} inscription={signupInscription} onNavigate={navigate} />}
       <Toaster />
     </AuthShell>
+    </ServeurContext.Provider>
   );
 }
 

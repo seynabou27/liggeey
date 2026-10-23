@@ -13,10 +13,13 @@ les contenus validés à l'étape 3.
 ```bash
 npm install
 cp .env.example .env.local   # puis remplir les valeurs
+npm run db:amorcer           # comptes de démonstration (mot de passe : demo1234)
 npm run dev                  # http://localhost:3000
 ```
 
-Pour la mise en production, lancez `npm run build` puis `npm start`. Vous pouvez aussi importer le dépôt dans Vercel : Next.js est détecté automatiquement.
+En développement, la base de données est créée toute seule dans `.donnees/pglite` (PGlite, un PostgreSQL intégré) : rien à installer.
+
+Pour la mise en production, renseignez `DATABASE_URL` (PostgreSQL), lancez `npm run db:migrer`, `npm run build`, puis `npm start`. Vous pouvez aussi importer le dépôt dans Vercel : Next.js est détecté automatiquement.
 
 ## Où modifier quoi
 
@@ -51,8 +54,35 @@ Le prototype de l'application est intégré au site, sur `/plateforme`. Les bout
   - `/plateforme/inscription` : choix du profil, ou directement le formulaire avec `?profil=chercheur`, `prestataire` ou `entreprise` ;
   - `/plateforme/offres` : offres d'emploi (espace chercheur de démonstration).
 - Plein écran, sans l'en-tête ni le pied de page du site (`components/layout/Cadre.jsx`). Non indexée par Google.
-- Données de démonstration, gardées dans le navigateur (localStorage) : pas encore de serveur, de vrais comptes ni de vrais paiements.
+- **Comptes réels** : l'inscription, la connexion (e-mail ou téléphone) et la déconnexion passent par l'API (`app/api/auth/`), avec une base PostgreSQL. Les écrans internes sont réservés, côté serveur, au compte connecté de l'espace. Voir « Back-end » ci-dessous.
+- Le reste des données (offres, candidatures, messages, paiements…) est encore de démonstration, gardé dans le navigateur (localStorage). Les paiements sont simulés.
 - Quand l'application sera déployée à part, mettez son adresse dans `NEXT_PUBLIC_APP_URL` : les liens du site la suivront.
+
+## Back-end (comptes)
+
+- **Base** : PostgreSQL avec Drizzle ORM. Schéma : `lib/serveur/schema.mjs` ; migrations SQL : `drizzle/`.
+  - `DATABASE_URL` vide : PGlite dans `.donnees/pglite`, en développement seulement. PGlite n'accepte qu'un seul programme à la fois : **arrêtez `npm run dev` avant de lancer une commande `db:…`**.
+  - `DATABASE_URL` renseignée : n'importe quel PostgreSQL (Neon, Supabase, serveur dédié…).
+- **API** :
+  - `POST /api/auth/inscription` : crée le compte et ouvre la session. Toutes les règles du formulaire sont revérifiées, dont les âges et l'accord parental (Cap Métier) ;
+  - `POST /api/auth/connexion` : e-mail ou téléphone, avec mot de passe. 5 échecs en 15 minutes bloquent l'identifiant ;
+  - `POST /api/auth/deconnexion` ;
+  - `GET /api/auth/session` : le compte connecté.
+- **Sécurité** :
+  - mots de passe chiffrés en scrypt ;
+  - session dans un cookie httpOnly (30 jours avec « Se souvenir de moi ») ;
+  - requêtes venues d'un autre site refusées.
+- **Commandes** :
+
+  | Commande | Rôle |
+  | --- | --- |
+  | `npm run db:generer` | Créer une migration après une modification du schéma |
+  | `npm run db:migrer` | Appliquer les migrations (à chaque mise en ligne) |
+  | `npm run db:amorcer` | Créer les comptes de démonstration, un par espace (refusé en production) |
+  | `npm run db:admin` | Créer un compte admin (variables `ADMIN_NOM`, `ADMIN_EMAIL`, `ADMIN_TELEPHONE`, `ADMIN_MOT_DE_PASSE`) |
+  | `npm run db:studio` | Explorer la base dans le navigateur |
+
+- **Comptes de démonstration** : `demo-chercheur@liggeey.sn`, `demo-prestataire@`, `demo-entreprise@`, `demo-capmetier@`, `demo-mentor@` et `demo-admin@liggeey.sn`, avec le mot de passe `demo1234`. Avec `NEXT_PUBLIC_COMPTES_DEMO=true`, l'écran de connexion les propose. **Passez cette variable à `false` avant la mise en ligne.**
 
 ## ⚠️ Valeurs provisoires à remplacer avant la mise en ligne
 

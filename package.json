@@ -2,24 +2,33 @@
   "name": "site-liggeey",
   "version": "0.1.0",
   "private": true,
-  "description": "Site public de LIGGEEY, plateforme sénégalaise d'insertion professionnelle",
+  "description": "Site public et plateforme de LIGGEEY, plateforme sénégalaise d’insertion professionnelle",
   "scripts": {
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
     "storybook": "storybook dev -p 6006",
-    "build-storybook": "storybook build -o storybook-static"
+    "build-storybook": "storybook build -o storybook-static",
+    "db:generer": "drizzle-kit generate",
+    "db:migrer": "node --env-file-if-exists=.env.local scripts/db-migrer.mjs",
+    "db:amorcer": "node --env-file-if-exists=.env.local scripts/db-amorcer.mjs",
+    "db:admin": "node --env-file-if-exists=.env.local scripts/creer-admin.mjs",
+    "db:studio": "node --env-file-if-exists=.env.local node_modules/.bin/drizzle-kit studio"
   },
   "dependencies": {
+    "@electric-sql/pglite": "^0.5.11",
+    "drizzle-orm": "^0.45.4",
     "jspdf": "^4.2.1",
     "jspdf-autotable": "^5.0.9",
     "lucide-react": "^0.460.0",
     "marked": "^14.1.0",
     "next": "^16.4.2",
+    "pg": "^8.23.1",
     "react": "^19.0.0",
     "react-dom": "^19.0.0",
     "react-is": "^19.0.0",
-    "recharts": "^2.15.0"
+    "recharts": "^2.15.0",
+    "server-only": "^0.0.1"
   },
   "overrides": {
     "react-is": "^19.0.0"
@@ -29,6 +38,7 @@
     "@storybook/addon-docs": "10.6.2",
     "@storybook/nextjs-vite": "10.6.2",
     "autoprefixer": "^10.4.20",
+    "drizzle-kit": "^0.31.11",
     "postcss": "^8.4.47",
     "storybook": "10.6.2",
     "tailwindcss": "^3.4.19",

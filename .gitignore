@@ -6,3 +6,6 @@ out
 .DS_Store
 storybook-static
 *storybook.log
+
+# Base de données locale (PGlite)
+.donnees

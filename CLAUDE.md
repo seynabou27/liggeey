@@ -23,9 +23,10 @@ Un seul projet Next.js 16 (App Router, JavaScript, Tailwind CSS 3), qui contient
    - `components/` : les composants ;
    - `content/fr/` : tous les textes ;
    - `lib/` : la configuration et les liens ;
-2. **la plateforme** : le prototype React, servi sur `/plateforme` (`components/plateforme/`).
+2. **la plateforme** : le prototype React, servi sur `/plateforme` (`components/plateforme/`) ;
+3. **le back-end** : l'API (`app/api/`) et le code serveur (`lib/serveur/`), avec une base PostgreSQL. Voir la section « Back-end ».
 
-Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build`, `npm run storybook` (http://localhost:6006, fondations et composants). Copier `.env.example` en `.env.local`.
+Commandes : `npm install`, `npm run db:amorcer` (comptes de démonstration), `npm run dev` (http://localhost:3000), `npm run build`, `npm run storybook` (http://localhost:6006, fondations et composants). Copier `.env.example` en `.env.local`.
 
 ## Règles à respecter
 
@@ -135,8 +136,16 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
   - `/plateforme/connexion` ;
   - `/plateforme/inscription`, avec `?profil=chercheur`, `prestataire`, `entreprise`, `jeune` ou `mentor`.
 - **Adresses** (`lib/routesPlateforme.js`) : chaque écran a la sienne, `/plateforme/{espace}/{écran}` (espaces : `chercheur`, `prestataire`, `entreprise`, `cap-metier`, `mentor`, `admin` ; écrans : identifiants du menu, `dashboard` devient `tableau-de-bord`), par exemple `/plateforme/admin/offres`. L'adresse suit la navigation ; Précédent, Suivant et le rechargement fonctionnent.
-- **Règle d'accès** : le site ne renvoie jamais directement vers une page interne de la plateforme (offres, tableau de bord…). Un écran interne ne s'ouvre par son adresse que si une session de test est ouverte pour cet espace dans le navigateur ; ouverte dans un autre espace, on arrive sur son tableau de bord ; sans session, sur `/plateforme/connexion`. Une adresse inconnue renvoie aussi vers la connexion. La vraie application devra refaire ce contrôle côté serveur. Les offres se consultent sur le site, dans la vitrine de l'accueil et sa fenêtre de détail (`/?offre=…`, `/?secteur=…`), qui invite à se connecter.
-- **Données** : de démonstration, gardées dans le navigateur (localStorage). Il n'y a pas de serveur ni de vrais comptes, et les paiements sont simulés.
+- **Règle d'accès**, contrôlée côté serveur par `app/plateforme/[[...ecran]]/page.jsx`, avec la session :
+  - le site ne renvoie jamais directement vers une page interne de la plateforme (offres, tableau de bord…) ;
+  - un écran interne n'est ouvert qu'au compte connecté de cet espace. Un compte d'un autre espace arrive sur son propre tableau de bord ; sans session, on arrive sur `/plateforme/connexion` ;
+  - déjà connecté, la connexion et l'inscription renvoient vers le tableau de bord ;
+  - une adresse inconnue renvoie vers le tableau de bord, ou vers la connexion sans session.
+
+  Le prototype refait le même contrôle quand on utilise Précédent et Suivant. Les offres se consultent sur le site, dans la vitrine de l'accueil et sa fenêtre de détail (`/?offre=…`, `/?secteur=…`), qui invite à se connecter.
+- **Données** :
+  - les comptes sont réels (base PostgreSQL, API `app/api/auth/`). Le nom, le rôle et les initiales affichés dans la coquille viennent du compte connecté ;
+  - le reste est encore de démonstration, gardé dans le navigateur (localStorage) : offres, candidatures, messages, abonnements… Les paiements sont simulés. Ces données passeront au serveur domaine par domaine (voir « Chantiers ouverts »).
 - **Affichage** : plein écran, sans l'en-tête ni le pied de page du site (`components/layout/Cadre.jsx`). La plateforme n'est pas indexée par Google.
 - **Changements faits au fichier d'origine** (à refaire si une nouvelle version du prototype remplace ce fichier) :
   - la directive `'use client'` et les props `ecranInitial`, `espaceInitial` et `profilInitial` du composant racine ;
@@ -145,11 +154,43 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
   - le bouton « Découvrir les offres d'emploi » de la connexion mène aux offres du site (`/#offres`), plus aux offres internes ;
   - un bloc `export { … }` en fin de fichier, qui expose les composants et données de démo à Storybook (sans changer le comportement) ;
   - la date de naissance et les règles d'âge à l'inscription, les profils « Je cherche ma voie » (Cap Métier) et « Je veux devenir mentor », et la section « 11 bis. Cap Métier et espace mentor » ;
+  - les comptes réels : props `compte` et `comptesDemo` du composant racine. Elles alimentent `ServeurContext`, qui vaut `null` dans Storybook, où la connexion reste simulée. Ce mode touche :
+    - `ConnexionScreen` : e-mail ou téléphone, appel à l'API, choix d'un compte de démonstration ;
+    - `SignupInfoScreen` : envoi à l'API, erreurs affichées par champ ;
+    - `ConfirmationScreen` : textes sans SMS ni e-mail automatiques ;
+    - le menu du compte : « Se déconnecter » ;
+    - les règles d'âge, importées de `lib/comptes.mjs` ;
   - les formulaires des espaces, refaits au style des écrans de connexion (`AUTH`) avec des briques communes placées juste après : `FORM` (classes des champs de 48 px, grilles, pastilles de choix, barre d'actions), `Champ` (libellé relié, aide ou erreur), `ListeChamp` (liste déroulante avec flèche), `useFormulaire` (valeurs, erreurs affichées après un premier envoi, attributs `aria-*`), `AlerteFormulaire` et `BoutonDanger`. Tout nouveau formulaire les utilise, avec `App.Carte` et `App.Bouton`.
 - **Messagerie** : chaque profil (chercheur, prestataire, entreprise, Cap Métier, mentor) a un écran « Messages » pour écrire à l'équipe LIGGEEY. L'admin répond depuis Communication › Messagerie : c'est la même conversation (mémoire partagée « conversations », `CONVERSATIONS_INITIAL`). Pas de messagerie entre utilisateurs pour l'instant. Les non-lus alimentent les compteurs du menu et les tâches « À faire ».
 - **Régularisation des prestataires** : facultative. Le prestataire travaille et est payé sans régulariser ; l'écran pose d'abord une question (« Souhaitez-vous qu'on vous accompagne… ? », mémoire `regul-choix`) : Oui → les étapes à suivre ; Non → seulement les informations à savoir (comment ça marche, avec ou sans, questions) et « J'ai changé d'avis ». En cours de route, « Arrêter la régularisation » (avec confirmation) : plus de rappels, étapes validées gardées, documents envoyés toujours vérifiés, et « Reprendre ma régularisation » repart au même point (écran et carte du profil). Les rappels (tâches, compteur du menu, badge « en cours ») ne concernent que ceux qui ont commencé, et la régularisation ne compte plus dans la complétion du profil.
 - **Vérification des offres** : une offre créée par l'entreprise (ou refusée puis corrigée) part « En vérification » et n'est visible des candidats qu'une fois validée par l'admin (écran « Offres », bloc « Offres à vérifier » : points à contrôler, puis « Valider et publier » ou « Refuser » avec un motif, que l'entreprise voit sur son offre).
 - **Dépendances** : `recharts` et `lucide-react` (plus `jspdf` et `jspdf-autotable` pour l'export PDF de l'admin). Si la compilation échoue sur une icône, vérifier son nom dans la version installée de `lucide-react`.
+
+## Back-end
+
+- **Pile** : routes Next (`app/api/…`) et code serveur dans `lib/serveur/` (jamais importé par un composant client), base PostgreSQL avec Drizzle ORM.
+- **Base** :
+  - `DATABASE_URL` vide : PGlite (PostgreSQL intégré) dans `.donnees/pglite`, en développement seulement. Les migrations s'y appliquent toutes seules. Un seul processus à la fois : arrêter `npm run dev` avant un script `db:…`, sinon la base locale peut s'abîmer ;
+  - en production : `DATABASE_URL` obligatoire, et `npm run db:migrer` à chaque mise en ligne.
+- **Fichiers** :
+  - `lib/serveur/schema.mjs` : les tables `utilisateurs`, `tuteurs` (parent d'un jeune de 15 à 17 ans), `sessions` et `tentatives_connexion` ;
+  - `lib/serveur/db.mjs` : la connexion ;
+  - `lib/serveur/comptes.mjs` : la validation de l'inscription, la création de compte et `comptePublic` (ce que le navigateur voit) ;
+  - `lib/serveur/session.js` : `ouvrirSession`, `compteConnecte`, `utilisateurConnecte`, `fermerSession` ;
+  - `lib/serveur/http.js` : réponses JSON, refus des autres origines, limite d'essais de connexion ;
+  - `lib/serveur/motDePasse.mjs` : scrypt.
+- **Règles partagées** entre le navigateur et le serveur : `lib/comptes.mjs` (profils, âges, téléphone sénégalais au format +221…, mot de passe) et `lib/comptesDemo.mjs` (comptes de démonstration).
+- **Fichiers `.mjs`** : ceux qui sont aussi lus par les scripts Node (`scripts/`). Ils s'importent entre eux par chemin relatif, avec l'extension.
+- **Modifier le schéma** : changer `schema.mjs`, puis lancer `npm run db:generer`. Committer la migration créée dans `drizzle/`.
+- **Nouvelle route protégée** :
+  - appeler `utilisateurConnecte()` et vérifier `profil` et `statut` ;
+  - pour un POST, commencer par `refuserSiAutreOrigine(requete)` ;
+  - ne jamais renvoyer `motDePasseHash`.
+- **Pas encore fait** :
+  - mot de passe oublié (l'écran reste simulé) ;
+  - SMS au parent ou tuteur, et e-mails ;
+  - validation des mentors par l'admin (statut `a_valider`, accès laissé ouvert pour la démo) ;
+  - suspension de compte depuis l'admin.
 
 ## Chantiers ouverts (ordre de priorité suggéré)
 
@@ -159,7 +200,16 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
 4. **Découper le prototype en modules**, un dossier par espace (chercheur, prestataire, entreprise, admin), sans changer son comportement.
 5. **Optimiser le référencement et l'accessibilité** : audit Lighthouse sur mobile, contrastes, navigation au clavier, données schema.org.
 6. **Préparer la checklist** de mise en ligne et de tests.
-7. **Plus tard** : construire la vraie application (comptes, API, paiements Wave et Orange Money), puis faire pointer `NEXT_PUBLIC_APP_URL` vers son adresse.
+7. **Back-end, par étapes** :
+   - ~~socle : comptes, sessions, contrôle d'accès côté serveur~~ (fait) ;
+   - mot de passe oublié par SMS ou e-mail ;
+   - offres (création par l'entreprise, vérification par l'admin, vitrine `APP_API_URL`) ;
+   - candidatures ;
+   - messagerie avec l'équipe ;
+   - profils et documents (stockage de fichiers) ;
+   - Cap Métier (accord parental, attribution des mentors) ;
+   - paiements Wave et Orange Money ;
+   - écrans de l'admin.
 
 ## Valeurs provisoires
 
