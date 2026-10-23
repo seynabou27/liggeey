@@ -16,3 +16,5 @@ export const Ateliers = { name: 'Ateliers découverte', render: () => <Ecran ecr
 export const Mentor = { name: 'Mon mentor', render: () => <Ecran ecran="mentor" espace="jeune" /> };
 
 export const Profil = { name: 'Mon profil', render: () => <Ecran ecran="profil" espace="jeune" /> };
+
+export const Messages = { name: "Messages", render: () => <Ecran ecran="messages" espace="jeune" /> };

@@ -69,8 +69,26 @@ export const faq = {
 
 export const contact = {
   meta: { titre: 'Contact', description: 'WhatsApp, bureau d’accueil à Dakar ou formulaire : contactez l’équipe LIGGEEY.' },
-  hero: { surtitre: 'Contact', titre: 'Parlons-en.', texte: 'Une question, besoin d’aide pour vous inscrire, envie de devenir partenaire ? Choisissez le moyen qui vous convient.' },
-  moyens: { whatsapp: 'WhatsApp', bureau: 'Bureau d’accueil', email: 'E-mail', ecrire: 'Écrire sur WhatsApp', itineraire: 'Itinéraire' },
+  hero: {
+    surtitre: 'Contact',
+    titre: 'Parlons-en.',
+    texte: 'Une question, besoin d’aide pour vous inscrire, envie de devenir partenaire ? Choisissez le moyen qui vous convient.',
+    image: '/images/contact-hero.jpg',
+    message: 'Envoyer un message',
+  },
+  moyens: {
+    whatsapp: 'WhatsApp',
+    bureau: 'Bureau d’accueil',
+    email: 'E-mail',
+    ecrire: 'Écrire sur WhatsApp',
+    itineraire: 'Itinéraire',
+    envoyerEmail: 'Envoyer un e-mail',
+    textes: {
+      whatsapp: 'Écrivez-nous depuis votre téléphone : notre équipe vous répond.',
+      bureau: 'Venez nous voir à Dakar, aux horaires d’ouverture.',
+      email: 'Pour les partenariats et les demandes détaillées.',
+    },
+  },
   formulaire: {
     titre: 'Écrivez-nous',
     champs: { nom: 'Nom et prénom', telephone: 'Téléphone (WhatsApp)', email: 'E-mail', profil: 'Vous êtes', motif: 'Motif', message: 'Message', consentement: 'J’accepte la politique de confidentialité.' },

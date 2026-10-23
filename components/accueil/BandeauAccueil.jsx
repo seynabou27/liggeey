@@ -18,32 +18,37 @@ export default function BandeauAccueil() {
     <section aria-labelledby="titre-accueil" className="relative overflow-hidden bg-sombre text-sur-sombre">
       {avecPhoto && <Image src={hero.image} alt="" fill priority sizes="100vw" className="object-cover" />}
       {/* Voile sombre sous le texte (contraste), plus léger à droite pour laisser vivre la photo */}
-      <div className="absolute inset-0 bg-sombre/75 lg:bg-transparent lg:bg-gradient-to-r lg:from-sombre/90 lg:via-sombre/60 lg:to-sombre/10" aria-hidden="true" />
+      <div className="absolute inset-0 bg-sombre/75 xl:bg-transparent xl:bg-gradient-to-r xl:from-sombre/90 xl:via-sombre/60 xl:to-sombre/10" aria-hidden="true" />
       <VagueAccueil />
 
-      <div className="container relative grid gap-10 pb-12 pt-[124px] lg:min-h-[740px] lg:grid-cols-[minmax(0,1fr)_480px] lg:gap-14 lg:pb-32 lg:pt-[104px]">
-        <div className="flex flex-col lg:pt-[78px]">
-          <p className="flex items-center gap-2.5 text-base font-medium text-marque-vif">
-            <span className="h-0.5 w-9 bg-marque" aria-hidden="true" />
+      {/* Deux colonnes seulement à partir de 1280 px : en dessous, le titre manque de place à côté de la carte */}
+      <div className="container relative grid gap-8 pb-12 pt-[104px] sm:gap-10 sm:pt-[124px] xl:min-h-[740px] xl:grid-cols-[minmax(0,1fr)_480px] xl:gap-14 xl:pb-32 xl:pt-[104px]">
+        <div className="flex flex-col xl:pt-[78px]">
+          <p className="flex items-center gap-2.5 text-sm font-medium text-marque-vif sm:text-base">
+            <span className="h-0.5 w-6 shrink-0 bg-marque sm:w-9" aria-hidden="true" />
             {hero.surtitre}
           </p>
-          <h1 id="titre-accueil" className="mt-4 max-w-[640px] text-balance text-[25px] font-semibold leading-[1.3] sm:text-[40px] lg:text-[57px]">
+          <h1 id="titre-accueil" className="mt-3 max-w-[640px] text-balance text-[30px] font-semibold leading-[1.2] sm:mt-4 sm:text-[44px] xl:text-[57px]">
             {hero.titre}
           </h1>
-          <p className="mt-6 max-w-[600px] text-pretty text-xl leading-[1.8] text-white/90">{hero.texte}</p>
-          <dl className="mt-8 flex flex-wrap gap-x-12 gap-y-5">
+          <p className="mt-4 max-w-[600px] text-pretty text-base leading-[1.7] text-white/90 sm:mt-6 sm:text-xl sm:leading-[1.8]">{hero.texte}</p>
+          {/* Les trois repères toujours sur une ligne : grille jusqu'à 768 px, puis espacés librement */}
+          <dl className="mt-6 grid grid-cols-3 gap-3 sm:mt-8 sm:gap-6 md:flex md:flex-wrap md:gap-x-12 md:gap-y-5 xl:gap-x-8">
             {hero.reperes.map((r) => (
-              <div key={r.libelle} className="flex flex-col-reverse gap-2">
-                <dt className="text-sm text-white/90 sm:text-base">{r.libelle}</dt>
-                <dd className="text-[32px] font-light leading-none sm:text-5xl">
+              <div key={r.libelle} className="flex flex-col-reverse justify-end gap-1.5 sm:gap-2">
+                <dt className="text-xs leading-snug text-white/90 sm:text-sm md:text-base">{r.libelle}</dt>
+                <dd className="text-[28px] font-light leading-none sm:text-4xl md:text-5xl">
                   <Compteur valeur={r.valeur} />
-                  <span className={`ml-1.5 text-marque-vif ${r.petit ? 'text-2xl sm:text-3xl' : ''}`}>{r.unite}</span>
+                  <span className={`ml-1 text-marque-vif sm:ml-1.5 ${r.petit ? 'text-2xl sm:text-3xl' : ''}`}>{r.unite}</span>
                 </dd>
               </div>
             ))}
           </dl>
         </div>
-        <CarteRecherche />
+        {/* Carte empilée sous le texte jusqu'à 1280 px, sans s'étirer sur toute la largeur */}
+        <div className="w-full max-w-2xl xl:max-w-none">
+          <CarteRecherche />
+        </div>
       </div>
     </section>
   );

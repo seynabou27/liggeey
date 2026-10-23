@@ -2,7 +2,7 @@ import { ChevronDown } from 'lucide-react';
 
 const BASE =
   'w-full rounded border bg-surface px-3.5 text-[15px] text-principal placeholder:text-discret focus:border-marque focus:outline-none focus:ring-2 focus:ring-focus/40';
-const bord = (erreur) => (erreur ? 'border-primaire-700' : 'border-base');
+const bord = (erreur) => (erreur ? 'border-statut-danger' : 'border-base');
 
 function Libelle({ pour, children, requis }) {
   return (
@@ -16,7 +16,7 @@ function Libelle({ pour, children, requis }) {
 function Erreur({ id, children }) {
   if (!children) return null;
   return (
-    <p id={id} className="text-sm font-medium text-marque">
+    <p id={id} className="text-sm font-medium text-statut-danger">
       {children}
     </p>
   );
@@ -139,7 +139,7 @@ export function PotDeMiel() {
 /** Message d'échec d'envoi, avec repli WhatsApp. */
 export function MessageErreur({ lienWhatsApp }) {
   return (
-    <p role="alert" className="rounded-lg bg-marque-doux p-4">
+    <p role="alert" className="rounded-lg bg-statut-danger-doux p-4">
       L'envoi n'a pas abouti. Réessayez dans un instant, ou{' '}
       <a href={lienWhatsApp} target="_blank" rel="noopener noreferrer" className="lien">
         écrivez-nous sur WhatsApp

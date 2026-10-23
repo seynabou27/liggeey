@@ -72,7 +72,10 @@ Commandes : `npm install`, `npm run dev` (http://localhost:3000), `npm run build
     - bordures : `border-base`, `border-forte`, `border-principal`, `border-marque` ;
     - focus : `ring-focus`, `outline-focus`.
   - Dans le prototype (styles en ligne), l'objet `COLORS` pointe vers les mêmes variables CSS.
-  - **Thème sombre** : prêt mais inactif. Il s'active avec `data-theme="sombre"` sur `<html>`.
+  - **Thème sombre** : actif dans la plateforme seulement (le site public reste en clair). Il s'active avec `data-theme="sombre"` sur `<html>`.
+    - choix : bouton lune/soleil dans la barre du haut et sur la connexion et l'inscription, plus « Apparence » dans les paramètres de l'admin (clair, sombre, comme l'appareil). Clair par défaut (`THEME_PAR_DEFAUT`) ;
+    - code : `components/app/Theme.jsx` (`useTheme`, `useThemeApplique` appelé dans `Plateforme.jsx`, `BoutonTheme`, `ChoixTheme`) et `lib/theme.js` (clé du navigateur, script posé dans la page `/plateforme` pour éviter un flash clair) ;
+    - règle : pas de couleur fixe dans le prototype. Statuts via `COLORS.success`, `danger`, `info`… (tokens `statut`), texte sur un statut plein en `text-sur-statut`. Un bloc qui doit rester clair (fac-similé de document) porte `data-theme="clair"`.
   - Ajouter ou modifier une couleur : changer `lib/tokens/couleurs.mjs`, puis vérifier les contrastes dans Storybook.
 - **Polices** :
   - Plus Jakarta Sans pour l'interface (`font-sans`, chargée par `next/font`), comme le modèle JobStock ;
@@ -103,9 +106,10 @@ Tout nouveau composant reçoit sa story, avec ses états. Simulations (`.storybo
 
 Structure de la plateforme inspirée du modèle Mifty (https://mannatthemes.com/mifty/default/index.html), refaite avec les tokens, les couleurs et la police de LIGGEEY. Aucun code ni visuel de Mifty n'est copié.
 
-- `Coquille.jsx` : barre latérale claire (groupes en petites capitales, élément actif teinté avec barre orange, encart de formule en bas, repliable et retenu dans le navigateur ; tiroir sur mobile), barre du haut (salutation, recherche de page, notifications alimentées par les tâches « À faire », menu du compte), en-tête de page (titre et fil d'Ariane), pied de page.
+- `Coquille.jsx` : barre d'icônes bleu foncé avant le menu (`BarreIcones`, ordinateur seulement), avec les icônes et la mise en page d'origine. Chaque icône est un raccourci, avec info-bulle et compteur du menu ; son rôle est fixe et adapté à chaque espace (`RACCOURCIS_PAR_ESPACE` dans le prototype) : Flame = priorités, Grid3x3 = explorer, Zap = action rapide (`creer: true` ouvre le formulaire de création d'offre ou de service), Triangle = à surveiller, AlignJustify = mes suivis, Layers = progresser, Bell = messages. Barre latérale claire (groupes en petites capitales, élément actif teinté avec barre orange, encart de formule en bas, repliable et retenu dans le navigateur ; tiroir sur mobile), barre du haut (salutation, recherche de page, notifications alimentées par les tâches « À faire », menu du compte), en-tête de page (titre et fil d'Ariane), pied de page.
 - `Carte.jsx` : `Carte`, `CarteStat`, `CarteProfil`, `PastilleIcone`, `LigneInfo`, `EtatVide`.
 - `Badge.jsx`, `Avatar.jsx`, `Controles.jsx` (boutons ronds, recherche, sélecteur, onglets, segments, pagination, interrupteur), `Tableau.jsx`, `Progression.jsx`, `Messagerie.jsx`.
+- `Export.jsx` : `MenuExport`, bouton « Exporter » des listes de l'admin (PDF, Excel .xlsx, CSV), sur toutes les lignes filtrées. Logique dans `lib/export.js` : le .xlsx et le CSV sont écrits sans bibliothèque ; le PDF utilise `jspdf` et `jspdf-autotable`, chargés seulement au clic.
 - Tout s'importe depuis `components/app` (`import * as App from "../app"` dans le prototype). Le `Bouton` du site a deux variantes de plus pour l'application : `doux` et `neutre`.
 - Le titre de chaque écran est affiché par la coquille (libellé du menu) : un écran ne remet pas de `h1`. Ses sous-titres sont des `h2` en demi-gras.
 - Couleurs de statut : tokens `statut` (`bg-statut-succes-doux`, `text-statut-danger`…). Les tons de `StatusBadge` sont dans `STATUT_TONS`.
@@ -130,7 +134,8 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
 - **Écrans ouverts depuis le site** : uniquement la connexion et l'inscription.
   - `/plateforme/connexion` ;
   - `/plateforme/inscription`, avec `?profil=chercheur`, `prestataire`, `entreprise`, `jeune` ou `mentor`.
-- **Règle d'accès** : le site ne renvoie jamais directement vers une page interne de la plateforme (offres, tableau de bord…). Toute autre adresse sous `/plateforme/…` redirige vers `/plateforme/connexion`. Les offres se consultent sur le site, dans la vitrine de l'accueil et sa fenêtre de détail (`/?offre=…`, `/?secteur=…`), qui invite à se connecter.
+- **Adresses** (`lib/routesPlateforme.js`) : chaque écran a la sienne, `/plateforme/{espace}/{écran}` (espaces : `chercheur`, `prestataire`, `entreprise`, `cap-metier`, `mentor`, `admin` ; écrans : identifiants du menu, `dashboard` devient `tableau-de-bord`), par exemple `/plateforme/admin/offres`. L'adresse suit la navigation ; Précédent, Suivant et le rechargement fonctionnent.
+- **Règle d'accès** : le site ne renvoie jamais directement vers une page interne de la plateforme (offres, tableau de bord…). Un écran interne ne s'ouvre par son adresse que si une session de test est ouverte pour cet espace dans le navigateur ; ouverte dans un autre espace, on arrive sur son tableau de bord ; sans session, sur `/plateforme/connexion`. Une adresse inconnue renvoie aussi vers la connexion. La vraie application devra refaire ce contrôle côté serveur. Les offres se consultent sur le site, dans la vitrine de l'accueil et sa fenêtre de détail (`/?offre=…`, `/?secteur=…`), qui invite à se connecter.
 - **Données** : de démonstration, gardées dans le navigateur (localStorage). Il n'y a pas de serveur ni de vrais comptes, et les paiements sont simulés.
 - **Affichage** : plein écran, sans l'en-tête ni le pied de page du site (`components/layout/Cadre.jsx`). La plateforme n'est pas indexée par Google.
 - **Changements faits au fichier d'origine** (à refaire si une nouvelle version du prototype remplace ce fichier) :
@@ -139,8 +144,12 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
   - les liens de retour vers le site (constante `SITE_URL`) : logo cliquable, « Retour au site » sur la connexion et l'inscription, et en bas du menu de l'application ;
   - le bouton « Découvrir les offres d'emploi » de la connexion mène aux offres du site (`/#offres`), plus aux offres internes ;
   - un bloc `export { … }` en fin de fichier, qui expose les composants et données de démo à Storybook (sans changer le comportement) ;
-  - la date de naissance et les règles d'âge à l'inscription, les profils « Je cherche ma voie » (Cap Métier) et « Je veux devenir mentor », et la section « 11 bis. Cap Métier et espace mentor ».
-- **Dépendances** : `recharts` et `lucide-react`. Si la compilation échoue sur une icône, vérifier son nom dans la version installée de `lucide-react`.
+  - la date de naissance et les règles d'âge à l'inscription, les profils « Je cherche ma voie » (Cap Métier) et « Je veux devenir mentor », et la section « 11 bis. Cap Métier et espace mentor » ;
+  - les formulaires des espaces, refaits au style des écrans de connexion (`AUTH`) avec des briques communes placées juste après : `FORM` (classes des champs de 48 px, grilles, pastilles de choix, barre d'actions), `Champ` (libellé relié, aide ou erreur), `ListeChamp` (liste déroulante avec flèche), `useFormulaire` (valeurs, erreurs affichées après un premier envoi, attributs `aria-*`), `AlerteFormulaire` et `BoutonDanger`. Tout nouveau formulaire les utilise, avec `App.Carte` et `App.Bouton`.
+- **Messagerie** : chaque profil (chercheur, prestataire, entreprise, Cap Métier, mentor) a un écran « Messages » pour écrire à l'équipe LIGGEEY. L'admin répond depuis Communication › Messagerie : c'est la même conversation (mémoire partagée « conversations », `CONVERSATIONS_INITIAL`). Pas de messagerie entre utilisateurs pour l'instant. Les non-lus alimentent les compteurs du menu et les tâches « À faire ».
+- **Régularisation des prestataires** : facultative. Le prestataire travaille et est payé sans régulariser ; l'écran pose d'abord une question (« Souhaitez-vous qu'on vous accompagne… ? », mémoire `regul-choix`) : Oui → les étapes à suivre ; Non → seulement les informations à savoir (comment ça marche, avec ou sans, questions) et « J'ai changé d'avis ». En cours de route, « Arrêter la régularisation » (avec confirmation) : plus de rappels, étapes validées gardées, documents envoyés toujours vérifiés, et « Reprendre ma régularisation » repart au même point (écran et carte du profil). Les rappels (tâches, compteur du menu, badge « en cours ») ne concernent que ceux qui ont commencé, et la régularisation ne compte plus dans la complétion du profil.
+- **Vérification des offres** : une offre créée par l'entreprise (ou refusée puis corrigée) part « En vérification » et n'est visible des candidats qu'une fois validée par l'admin (écran « Offres », bloc « Offres à vérifier » : points à contrôler, puis « Valider et publier » ou « Refuser » avec un motif, que l'entreprise voit sur son offre).
+- **Dépendances** : `recharts` et `lucide-react` (plus `jspdf` et `jspdf-autotable` pour l'export PDF de l'admin). Si la compilation échoue sur une icône, vérifier son nom dans la version installée de `lucide-react`.
 
 ## Chantiers ouverts (ordre de priorité suggéré)
 

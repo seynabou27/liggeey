@@ -3,8 +3,9 @@
 /* Intégration Next.js : prototype de la plateforme repris tel quel (fichier d'origine : liggeey-app (3).jsx).
    Changements faits à l'original :
    - la directive 'use client' ci-dessus ;
-   - les props ecranInitial / espaceInitial / profilInitial du composant racine (en bas du fichier),
-     qui permettent au site d'ouvrir directement la connexion ou l'inscription ;
+   - les props ecranInitial / espaceInitial / profilInitial (Storybook) et cheminInitial / profilAdresse /
+     synchroniserAdresse du composant racine (en bas du fichier) : chaque écran a son adresse
+     (/plateforme/{espace}/{écran}, voir lib/routesPlateforme.js) ;
    - la barre « Mode test » n'est plus affichée (la sauvegarde locale de la démo est conservée) ;
    - liens de retour vers le site public (constante SITE_URL) : logo, « Retour au site » sur la
      connexion et l'inscription, et en bas du menu de l'application.
@@ -50,8 +51,12 @@ import {
   PanelLeftClose,
   PanelLeft,
   ArrowLeft,
+  Bookmark,
+  BookmarkCheck,
+  Share2,
   Home,
   ChevronRight,
+  ChevronDown,
   FileText,
   CalendarCheck,
   Clock,
@@ -107,7 +112,8 @@ import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, 
 // Bibliothèque de l'application (components/app) : coquille, cartes, badges, tableaux… sur les tokens LIGGEEY.
 import * as App from "../app";
 import { site } from "@/lib/site";
-import { lienWhatsApp } from "@/lib/liens";
+import { lienPartageWhatsApp, lienWhatsApp } from "@/lib/liens";
+import { adressePlateforme, lireAdressePlateforme, lireAdresseNavigateur, ECRANS_AUTH } from "@/lib/routesPlateforme";
 
 // Couleurs : tokens LIGGEEY (lib/tokens/couleurs.mjs), lus via les variables CSS du site.
 // Les noms d'origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
@@ -131,7 +137,17 @@ const COLORS = {
   onDarkMuted: "rgb(var(--texte-sur-sombre-secondaire))",
   onDarkSubtle: "rgb(var(--texte-sur-sombre-discret))",
   brandPale: "rgb(var(--texte-marque-pale))",
-  danger: "#DC2626",
+  // Statuts : suivent le thème clair ou sombre (lib/tokens/couleurs.mjs, groupe statut).
+  success: "rgb(var(--statut-succes))",
+  successSoft: "rgb(var(--statut-succes-doux))",
+  successBright: "rgb(var(--statut-succes-vif))", // sur fond sombre (toasts, jauges)
+  warning: "rgb(var(--statut-alerte))",
+  danger: "rgb(var(--statut-danger))",
+  dangerSoft: "rgb(var(--statut-danger-doux))",
+  dangerBright: "rgb(var(--statut-danger-vif))",
+  info: "rgb(var(--statut-info))",
+  infoSoft: "rgb(var(--statut-info-doux))",
+  onStatus: "rgb(var(--texte-sur-statut))", // texte sur un fond de statut plein
 };
 
 /* =====================================================================
@@ -294,15 +310,19 @@ function AuthShell({ children, mode = "connexion" }) {
     <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] font-sans">
       <AuthPanneau mode={mode} />
 
-      <div className="flex flex-col bg-surface">
+      <div className="relative flex flex-col bg-surface">
+        <App.BoutonTheme className="absolute right-6 top-6 hidden md:inline-flex" />
         {/* Mobile : bandeau ardoise compact à la place du panneau */}
         <div className="md:hidden flex items-center justify-between gap-4 px-6 py-4 text-sur-sombre" style={{ background: "linear-gradient(120deg, rgb(var(--neutre-750)), rgb(var(--neutre-900)))" }}>
           <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex">
             <Logo color="rgb(var(--texte-sur-sombre))" iconColor={COLORS.orange} height={22} />
           </a>
-          <a href={SITE_URL} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold">
-            <ArrowLeft size={15} aria-hidden="true" /> Retour au site
-          </a>
+          <div className="flex items-center gap-1">
+            <App.BoutonTheme variante="sur-sombre" />
+            <a href={SITE_URL} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold">
+              <ArrowLeft size={15} aria-hidden="true" /> Retour au site
+            </a>
+          </div>
         </div>
 
         <div className="flex flex-1 items-center justify-center px-6 py-10 md:py-16">
@@ -390,7 +410,7 @@ function Toaster() {
     <div className="fixed bottom-4 right-4 left-4 sm:left-auto z-50 flex flex-col gap-2 items-stretch sm:items-end pointer-events-none" role="status" aria-live="polite">
       {items.map((t) => (
         <div key={t.id} className="pointer-events-auto rounded-md px-4 py-3 text-sm font-medium shadow-lg flex items-center gap-2 sm:max-w-sm" style={{ background: COLORS.dark, color: COLORS.onDark }}>
-          {t.tone === "info" ? <AlertCircle size={15} color={COLORS.orange} /> : <CheckCircle2 size={15} color="#4ADE80" />}
+          {t.tone === "info" ? <AlertCircle size={15} color={COLORS.orange} /> : <CheckCircle2 size={15} color={COLORS.successBright} />}
           {t.message}
         </div>
       ))}
@@ -453,6 +473,90 @@ const AUTH = {
   case: "h-5 w-5 shrink-0 rounded accent-primaire-500",
   oeil: "absolute right-1.5 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-md text-discret hover:bg-doux hover:text-secondaire",
 };
+
+/* ---------- Champs de formulaire de l'application ----------
+   Mêmes styles que AUTH, pour tous les formulaires des espaces (services, offres,
+   profils, événements…). Champ : libellé relié, contrôle, aide ou erreur. */
+
+const FORM = {
+  champ: AUTH.champ,
+  zone: (erreur) => `${AUTH.champ(erreur).replace("h-12 ", "")} py-3`,
+  liste: (erreur) => `${AUTH.champ(erreur)} appearance-none pr-10`,
+  section: "mb-4 text-sm font-semibold text-principal",
+  grille: "grid grid-cols-1 gap-5 sm:grid-cols-2",
+  actions: "mt-6 flex flex-col-reverse gap-3 border-t border-base pt-5 sm:flex-row sm:justify-end",
+  // Bouton de choix en pastille (suggestions, motifs, réponses courtes).
+  pastille: (actif) =>
+    `inline-flex min-h-[44px] items-center gap-1.5 rounded-full border px-4 text-sm font-medium transition-colors ${
+      actif ? "border-marque bg-marque-doux text-principal" : "border-base bg-surface text-secondaire hover:border-forte hover:text-principal"
+    }`,
+  encart: "rounded-lg border border-base bg-surface p-5",
+  fichier: "inline-flex min-h-[44px] items-center justify-center gap-2 rounded border border-forte bg-surface px-4 text-sm font-semibold text-principal transition-colors hover:bg-doux",
+};
+
+function Champ({ id, label, requis, aide, erreur, children, large }) {
+  return (
+    <div className={large ? "sm:col-span-2" : ""}>
+      <label htmlFor={id} className={AUTH.libelle}>
+        {label}{requis && <span aria-hidden="true" className="text-marque"> *</span>}
+      </label>
+      {children}
+      {(erreur || aide) && <p id={`${id}-aide`} className={AUTH.aide(erreur)}>{erreur || aide}</p>}
+    </div>
+  );
+}
+
+/**
+ * État d'un formulaire : valeurs, erreurs (affichées après un premier essai d'envoi)
+ * et attributs des champs. `verifier(v)` renvoie { clé: message | false }.
+ */
+function useFormulaire(initial, verifier = () => ({})) {
+  const [v, setV] = useState(initial);
+  const [essai, setEssai] = useState(false);
+  const erreurs = verifier(v);
+  const invalide = Object.values(erreurs).some(Boolean);
+  const err = (k) => (essai && erreurs[k]) || null;
+  const set = (k, val) => setV((s) => ({ ...s, [k]: val }));
+  const attrs = (id, k, { requis, aide } = {}) => ({
+    id,
+    value: v[k] ?? "",
+    onChange: (e) => set(k, e.target.value),
+    "aria-required": requis || undefined,
+    "aria-invalid": err(k) ? true : undefined,
+    "aria-describedby": err(k) || aide ? `${id}-aide` : undefined,
+  });
+  const soumettre = (action) => (e) => {
+    e.preventDefault();
+    setEssai(true);
+    if (!invalide) action(v);
+  };
+  return { v, setV, set, err, attrs, soumettre, essai, invalide, setEssai };
+}
+
+/** Rappel global sous un formulaire incomplet. */
+function AlerteFormulaire({ visible, children = "Complétez les champs signalés." }) {
+  if (!visible) return null;
+  return <p role="alert" className="mt-5 text-sm text-statut-danger">{children}</p>;
+}
+
+/** Action destructrice (refuser, archiver…), au gabarit des boutons de l'application. */
+function BoutonDanger({ className = "", children, ...props }) {
+  return (
+    <button type="button" className={`inline-flex min-h-[48px] items-center justify-center gap-2 rounded bg-statut-danger px-6 text-[15px] font-semibold text-sur-statut transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 ${className}`} {...props}>
+      {children}
+    </button>
+  );
+}
+
+/** Liste déroulante avec flèche, au style des champs. */
+function ListeChamp({ erreur, className = "", children, ...props }) {
+  return (
+    <div className="relative">
+      <select className={`${FORM.liste(erreur)} ${className}`} {...props}>{children}</select>
+      <ChevronDown size={16} className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-discret" aria-hidden="true" />
+    </div>
+  );
+}
 
 /* ---------- Screen 1 : Connexion ---------- */
 
@@ -1045,6 +1149,7 @@ const NAV_ITEMS_BY_ESPACE = {
     { id: "formations", label: "Formations", icon: GraduationCap, section: "Progresser" },
     { id: "mentors", label: "Mentors", icon: UsersRound, section: "Progresser" },
     { id: "suivi", label: "Suivi post-embauche", icon: HeartHandshake, section: "Mon emploi" },
+    { id: "messages", label: "Messages", icon: MessageCircle, section: "Mon compte" },
     { id: "profil", label: "Mon profil", icon: UserCircle2, section: "Mon compte" },
     { id: "abonnement", label: "Abonnement", icon: Crown, section: "Mon compte" },
   ],
@@ -1055,6 +1160,7 @@ const NAV_ITEMS_BY_ESPACE = {
     { id: "formations", label: "Formations", icon: GraduationCap, section: "Progresser" },
     { id: "mentors", label: "Mentors", icon: UsersRound, section: "Progresser" },
     { id: "regularisation", label: "Régularisation", icon: Landmark, section: "Mon compte" },
+    { id: "messages", label: "Messages", icon: MessageCircle, section: "Mon compte" },
     { id: "profil", label: "Mon profil", icon: UserCircle2, section: "Mon compte" },
     { id: "abonnement", label: "Abonnement", icon: Crown, section: "Mon compte" },
   ],
@@ -1064,6 +1170,7 @@ const NAV_ITEMS_BY_ESPACE = {
     { id: "candidatures", label: "Candidatures", icon: ClipboardList, section: "Recrutement" },
     { id: "suivi", label: "Suivi des recrues", icon: HeartHandshake, section: "Recrutement" },
     { id: "prestataires", label: "Trouver un prestataire", icon: Users2, section: "Prestataires" },
+    { id: "messages", label: "Messages", icon: MessageCircle, section: "Mon compte" },
     { id: "profil", label: "Profil entreprise", icon: Building2, section: "Mon compte" },
     { id: "abonnement", label: "Abonnement", icon: Crown, section: "Mon compte" },
   ],
@@ -1072,12 +1179,14 @@ const NAV_ITEMS_BY_ESPACE = {
     { id: "orientation", label: "Bilan d'orientation", icon: Compass, section: "Cap Métier" },
     { id: "ateliers", label: "Ateliers découverte", icon: GraduationCap, section: "Cap Métier" },
     { id: "mentor", label: "Mon mentor", icon: UsersRound, section: "Être accompagné" },
+    { id: "messages", label: "Messages", icon: MessageCircle, section: "Mon compte" },
     { id: "profil", label: "Mon profil", icon: UserCircle2, section: "Mon compte" },
   ],
   mentor: [
     { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, section: "Mon mentorat" },
     { id: "mentores", label: "Mes mentorés", icon: Users2, section: "Mon mentorat" },
     { id: "seances", label: "Séances", icon: CalendarDays, section: "Mon mentorat" },
+    { id: "messages", label: "Messages", icon: MessageCircle, section: "Mon compte" },
     { id: "profil", label: "Mon profil mentor", icon: UserCircle2, section: "Mon compte" },
   ],
   admin: [
@@ -1121,12 +1230,86 @@ const USER_BY_ESPACE = {
    barre latérale claire, barre du haut, en-tête de page avec fil d'Ariane, pied de page.
    Sidebar, Breadcrumb et AppShell gardent leur nom et leurs props d'origine. */
 
-/* Barre d'icônes, en première position avant le menu (bleu le plus foncé, neutre-900). Son rôle reste à définir :
-   pour l'instant elle reprend les icônes d'origine du prototype et reste décorative. */
+/* Barre d'icônes, en première position avant le menu (bleu le plus foncé, neutre-900).
+   Elle garde les icônes d'origine du prototype, dans le même ordre ; chacune a un rôle fixe, adapté à chaque espace :
+   Flame = priorités (tableau de bord et « À faire »), Grid3x3 = explorer, Zap = action rapide,
+   Triangle = à surveiller, AlignJustify = mes suivis, Layers = progresser, Bell = messages.
+   Une icône sans équivalent dans l'espace n'est pas affichée. « creer » ouvre directement le formulaire de création ;
+   le compteur reprend celui du menu. */
 const RAIL_ICONS = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell];
 
-function IconRail() {
-  return <App.BarreIcones elements={RAIL_ICONS.map((icone, i) => ({ icone, actif: i === 0 }))} />;
+const RACCOURCIS_PAR_ESPACE = {
+  chercheur: [
+    { to: "dashboard", label: "Mes priorités" },
+    { to: "offres", label: "Parcourir les offres" },
+    { to: "abonnement", label: "Booster mon profil" },
+    { to: "suivi", label: "Points de suivi à compléter" },
+    { to: "candidatures", label: "Mes candidatures" },
+    { to: "formations", label: "Me former" },
+    { to: "messages", label: "Messages" },
+  ],
+  prestataire: [
+    { to: "dashboard", label: "Mes priorités" },
+    { to: "services", label: "Mes services" },
+    { to: "services", label: "Ajouter un service", creer: true },
+    { to: "regularisation", label: "Régularisation" },
+    { to: "missions", label: "Mes missions" },
+    { to: "formations", label: "Me former" },
+    { to: "messages", label: "Messages" },
+  ],
+  entreprise: [
+    { to: "dashboard", label: "Mes priorités" },
+    { to: "prestataires", label: "Trouver un prestataire" },
+    { to: "offres", label: "Publier une offre", creer: true },
+    { to: "suivi", label: "Recrues à accompagner" },
+    { to: "candidatures", label: "Candidatures" },
+    { to: "offres", label: "Mes offres" },
+    { to: "messages", label: "Messages" },
+  ],
+  jeune: [
+    { to: "dashboard", label: "Mon parcours" },
+    { to: "ateliers", label: "Ateliers découverte" },
+    { to: "orientation", label: "Faire mon bilan d'orientation" },
+    null,
+    { to: "mentor", label: "Mon mentor" },
+    null,
+    { to: "messages", label: "Messages" },
+  ],
+  mentor: [
+    { to: "dashboard", label: "Mes priorités" },
+    null,
+    null,
+    { to: "seances", label: "Demandes de séance" },
+    { to: "mentores", label: "Mes mentorés" },
+    null,
+    { to: "messages", label: "Messages" },
+  ],
+  admin: [
+    { to: "dashboard", label: "Priorités du jour" },
+    { to: "chercheurs", label: "Utilisateurs" },
+    { to: "offres", label: "Vérifier les offres" },
+    { to: "suivi", label: "Signalements ouverts" },
+    { to: "candidatures", label: "Candidatures" },
+    { to: "formations", label: "Formations" },
+    { to: "communication", label: "Messagerie", data: { onglet: "Messagerie" } },
+  ],
+};
+
+function IconRail({ espace, active, onNavigate = () => {}, badges = {}, taches = 0 }) {
+  const raccourcis = RAIL_ICONS.map((icone, i) => {
+    const r = (RACCOURCIS_PAR_ESPACE[espace] || [])[i];
+    if (!r) return null;
+    const compteur = r.creer ? 0 : r.to === "dashboard" ? taches : badges[r.to] || 0;
+    return {
+      icone,
+      label: r.label,
+      // Une seule icône active par écran : celle de la vue (pas l'action « créer »).
+      actif: !r.creer && r.to === active && !(RACCOURCIS_PAR_ESPACE[espace] || []).slice(0, i).some((p) => p && !p.creer && p.to === active),
+      compteur,
+      onClick: () => onNavigate(r.to, r.creer ? { creer: true } : r.data),
+    };
+  }).filter(Boolean);
+  return <App.BarreIcones elements={raccourcis} />;
 }
 
 const toElementsMenu = (navItems) => navItems.map((n) => ({ id: n.id, label: n.label, icone: n.icon, section: n.section }));
@@ -1183,7 +1366,7 @@ function Breadcrumb({ items, onNavigate, title }) {
   return <App.EnTetePage titre={title || items[items.length - 1]?.label} filAriane={items} onNaviguer={onNavigate} />;
 }
 
-function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, todos = [], children }) {
+function AppShell({ espace, navItems, active, onNavigate, user, breadcrumb, badges, todos = [], children }) {
   const mainRef = useRef(null);
   // Remonte en haut de page dès que l'écran (ou une vue détail) change.
   useEffect(() => {
@@ -1225,7 +1408,7 @@ function AppShell({ navItems, active, onNavigate, user, breadcrumb, badges, todo
       actif={active}
       onNaviguer={onNavigate}
       compteurs={badges}
-      rail={<IconRail />}
+      rail={<IconRail espace={espace} active={active} onNavigate={onNavigate} badges={badges} taches={todos.length} />}
       logo={<LogoMenu />}
       logoReduit={<LogoMenuReduit />}
       encart={<EncartFormule onNavigate={onNavigate} />}
@@ -1343,7 +1526,7 @@ function DashboardScreen({ user, onNavigate, todos }) {
   const prochainCoaching = (coachings[mentor.id] || defaultCoachings(mentor)).upcoming[0];
   const enAttente = candidatures.filter((c) => c.statut === "Candidature reçue" || c.statut === "Vue par le recruteur").length;
   const entretiens = candidatures.filter((c) => c.statut === "Entretien programmé").length;
-  const COMPLETION = 70;
+  const COMPLETION = useCompletionChercheur().valeur;
 
   /* Où en sont les candidatures : part de chaque statut */
   const parStatut = Object.entries(candidatures.reduce((acc, c) => ({ ...acc, [c.statut]: (acc[c.statut] || 0) + 1 }), {}))
@@ -1433,8 +1616,16 @@ const OFFRES_DATA = [
     entreprise: "Sonatel",
     secteur: "Télécommunications",
     localisation: "Dakar, Plateau",
+    experience: "2-5 ans",
+    publieeLe: "2026-10-13",
+    dateLimite: "15 novembre 2026",
     description:
       "Vous serez en charge du développement des applications web de l'entreprise, en utilisant des technologies modernes telles que React, Node.js et MongoDB. Vous travaillerez en équipe pour concevoir des interfaces utilisateur fluides et des backends robustes.",
+    missions: [
+      "Développer de nouvelles fonctionnalités, de l'interface jusqu'à l'API.",
+      "Relire le code de l'équipe et écrire des tests.",
+      "Participer aux choix techniques avec le responsable produit.",
+    ],
     competences: ["React", "Node.js", "MongoDB"],
   },
   {
@@ -1443,8 +1634,16 @@ const OFFRES_DATA = [
     entreprise: "Banque Atlantique",
     secteur: "Finance & Banque",
     localisation: "Dakar",
+    experience: "1-2 ans",
+    publieeLe: "2026-10-12",
+    dateLimite: "31 octobre 2026",
     description:
       "Vous accueillez, conseillez et fidélisez un portefeuille de clients particuliers, en veillant à la qualité de service et à l'atteinte des objectifs commerciaux de l'agence.",
+    missions: [
+      "Accueillir et conseiller les clients de l'agence.",
+      "Présenter les produits adaptés à chaque besoin.",
+      "Suivre votre portefeuille et vos objectifs commerciaux.",
+    ],
     competences: ["Relation client", "Vente", "Sens du service"],
   },
   {
@@ -1453,8 +1652,16 @@ const OFFRES_DATA = [
     entreprise: "Teranga Capital",
     secteur: "Investissement",
     localisation: "Dakar",
+    experience: "1-2 ans",
+    publieeLe: "2026-10-09",
+    dateLimite: "10 novembre 2026",
     description:
       "Vous assurez la saisie comptable, le suivi des factures fournisseurs/clients et participez à la préparation des clôtures mensuelles sous la supervision du responsable financier.",
+    missions: [
+      "Saisir les écritures comptables courantes.",
+      "Suivre les factures des clients et des fournisseurs.",
+      "Préparer les clôtures mensuelles avec le responsable financier.",
+    ],
     competences: ["Comptabilité", "Excel", "Rigueur"],
   },
   {
@@ -1463,8 +1670,16 @@ const OFFRES_DATA = [
     entreprise: "Wave Mobile",
     secteur: "Fintech",
     localisation: "Dakar",
+    experience: "5-10 ans",
+    publieeLe: "2026-10-07",
+    dateLimite: "7 novembre 2026",
     description:
       "Vous définissez et pilotez la stratégie d'acquisition digitale (SEO, SEA, réseaux sociaux) et analysez la performance des campagnes pour optimiser le coût d'acquisition.",
+    missions: [
+      "Construire le plan d'acquisition digitale.",
+      "Piloter les campagnes et le budget associé.",
+      "Mesurer les résultats et proposer des améliorations.",
+    ],
     competences: ["SEO/SEA", "Réseaux sociaux", "Analytics"],
   },
   {
@@ -1473,8 +1688,16 @@ const OFFRES_DATA = [
     entreprise: "Expresso Sénégal",
     secteur: "Télécommunications",
     localisation: "Dakar",
+    experience: "Débutant",
+    publieeLe: "2026-10-05",
+    dateLimite: "30 octobre 2026",
     description:
       "Vous participez à la supervision et à l'optimisation de l'infrastructure réseau, sous l'encadrement de l'équipe technique.",
+    missions: [
+      "Surveiller l'état du réseau et signaler les incidents.",
+      "Participer aux interventions de maintenance.",
+      "Documenter les procédures avec l'équipe technique.",
+    ],
     competences: ["Réseaux", "Supervision", "Dépannage"],
   },
   {
@@ -1483,8 +1706,16 @@ const OFFRES_DATA = [
     entreprise: "Atos Sénégal",
     secteur: "Consulting IT",
     localisation: "Dakar",
+    experience: "5-10 ans",
+    publieeLe: "2026-10-01",
+    dateLimite: "1er novembre 2026",
     description:
       "Vous pilotez des projets d'intégration IT pour des clients grands comptes, de la phase de cadrage jusqu'à la mise en production.",
+    missions: [
+      "Cadrer les besoins avec le client.",
+      "Planifier le projet et coordonner l'équipe.",
+      "Suivre les délais, le budget et la mise en production.",
+    ],
     competences: ["Gestion de projet", "Agile", "Relation client"],
   },
   {
@@ -1493,119 +1724,487 @@ const OFFRES_DATA = [
     entreprise: "Jumia Sénégal",
     secteur: "E-commerce",
     localisation: "Dakar",
+    experience: "1-2 ans",
+    publieeLe: "2026-09-28",
+    dateLimite: "28 octobre 2026",
     description:
       "Vous animez les réseaux sociaux de la marque, créez du contenu engageant et suivez les indicateurs de performance des publications.",
+    missions: [
+      "Publier et animer les réseaux sociaux de la marque.",
+      "Créer les visuels et les textes des publications.",
+      "Suivre les résultats et répondre à la communauté.",
+    ],
     competences: ["Réseaux sociaux", "Création de contenu", "Reporting"],
   },
 ];
 
-function OfferCard({ offre, onOpen, applied }) {
+/* Offres d'emploi (modèle JobStock) : liste en cartes horizontales, filtres, offres sauvegardées,
+   et fiche détail en page (en-tête, description, aperçu de l'offre, candidature, offres similaires). */
+
+const sansAccents = (t) => String(t ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
+const cleOffre = (o) => `${o.titre}|${o.entreprise}`;
+const initialesEntreprise = (nom) => nom.split(/\s+/).map((m) => m[0]).join("").slice(0, 2).toUpperCase();
+
+function publieeIlYa(iso) {
+  if (!iso) return null;
+  const j = joursDepuis(iso);
+  if (j === 0) return "Publiée aujourd'hui";
+  if (j === 1) return "Publiée hier";
+  return `Publiée il y a ${j} jours`;
+}
+
+function LogoEntreprise({ nom, taille = "md" }) {
+  const dims = taille === "lg" ? "h-16 w-16 text-xl" : "h-12 w-12 text-base";
+  return (
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-sombre font-semibold text-sur-sombre ${dims}`} aria-hidden="true">
+      {initialesEntreprise(nom)}
+    </span>
+  );
+}
+
+/* Méta-informations sur une ligne : icône discrète + texte. */
+function MetaOffre({ icone: Icone, children }) {
+  return (
+    <span className="inline-flex items-center gap-1.5 text-[13px] text-secondaire">
+      <Icone size={14} className="shrink-0 text-discret" aria-hidden="true" />
+      {children}
+    </span>
+  );
+}
+
+function BoutonSauvegarde({ saved, onToggle, titre }) {
+  const Icone = saved ? BookmarkCheck : Bookmark;
   return (
     <button
       type="button"
-      onClick={() => onOpen(offre)}
-      className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md"
-      style={{ borderColor: COLORS.border }}
+      onClick={(e) => { e.stopPropagation(); onToggle?.(); }}
+      aria-pressed={!!saved}
+      aria-label={saved ? `Retirer « ${titre} » des offres sauvegardées` : `Sauvegarder « ${titre} »`}
+      title={saved ? "Retirer des offres sauvegardées" : "Sauvegarder"}
+      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors ${saved ? "border-marque bg-marque-doux text-marque" : "border-base text-secondaire hover:border-forte hover:text-principal"}`}
     >
-      <div className="flex items-start justify-between gap-2 mb-0.5">
-        <p className="font-semibold" style={{ color: COLORS.slate }}>{offre.titre}</p>
-        {offre.sponsorisee && <PremiumChip label="Sponsorisée" />}
-      </div>
-      <p className="text-xs mb-4" style={{ color: applied ? "#16A34A" : COLORS.slateLight }}>{offre.contrat}{applied ? " · Déjà postulé" : ""}</p>
-      <div className="flex items-center gap-2.5 pt-3" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-        <div className="w-8 h-8 rounded-full shrink-0" style={{ background: COLORS.orangeSoft }} />
-        <div className="min-w-0">
-          <p className="text-sm font-semibold truncate" style={{ color: COLORS.slate }}>{offre.entreprise}</p>
-          <p className="text-xs truncate" style={{ color: COLORS.slateLight }}>{offre.secteur}</p>
-        </div>
-      </div>
+      <Icone size={18} strokeWidth={1.75} aria-hidden="true" />
     </button>
   );
 }
 
-function OfferModal({ offre, onClose }) {
-  const [applied, setApplied] = useState(false);
+/* Pièces communes des listes et des fiches (offres, formations, mentors), sur le modèle JobStock :
+   barre de filtres, compteur de résultats, en-tête de fiche, colonne « Aperçu », listes à coches et étiquettes. */
+
+function BoutonRetour({ onClick, children }) {
+  return (
+    <button type="button" onClick={onClick} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium text-secondaire hover:text-principal">
+      <ArrowLeft size={15} aria-hidden="true" /> {children}
+    </button>
+  );
+}
+
+function BarreFiltres({ label, children }) {
+  return (
+    <section className="rounded-lg border border-base bg-surface p-4" aria-label={label}>
+      <div className="flex flex-col gap-3 lg:flex-row lg:items-center">{children}</div>
+    </section>
+  );
+}
+
+function CompteResultats({ n, nom, feminin = false }) {
+  const pluriel = n > 1 ? "s" : "";
+  return (
+    <p className="text-sm text-secondaire" aria-live="polite">
+      <span className="font-semibold text-principal">{n}</span> {nom}{pluriel} trouvé{feminin ? "e" : ""}{pluriel}
+    </p>
+  );
+}
+
+function EnTeteFiche({ visuel, badges, titre, sousTitre, meta, actions }) {
+  return (
+    <section className="overflow-hidden rounded-lg border border-base bg-surface">
+      <div className="h-2 bg-marque" aria-hidden="true" />
+      <div className="flex flex-col gap-5 p-6 lg:flex-row lg:items-center">
+        <div className="flex min-w-0 flex-1 items-start gap-4">
+          {visuel}
+          <div className="min-w-0">
+            {badges && <div className="mb-2 flex flex-wrap items-center gap-2">{badges}</div>}
+            <h2 className="text-xl font-semibold leading-snug text-principal sm:text-2xl">{titre}</h2>
+            {sousTitre && <p className="mt-0.5 text-secondaire">{sousTitre}</p>}
+            {meta && <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">{meta}</div>}
+          </div>
+        </div>
+        {actions && <div className="flex flex-wrap items-center gap-2">{actions}</div>}
+      </div>
+    </section>
+  );
+}
+
+/* Fiche en deux colonnes : contenu principal, colonne latérale (aperçu, actions). */
+function MiseEnPageFiche({ principal, cote }) {
+  return (
+    <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+      <div className="min-w-0 space-y-6">{principal}</div>
+      <aside className="space-y-6">{cote}</aside>
+    </div>
+  );
+}
+
+/* Carte « Aperçu » : icône sur pastille, intitulé, valeur. items : [{ icone, libelle, valeur }] */
+function ApercuFiche({ titre, items }) {
+  return (
+    <App.Carte titre={titre}>
+      <dl className="space-y-4">
+        {items.filter((i) => i.valeur !== undefined && i.valeur !== null && i.valeur !== "").map(({ icone, libelle, valeur }) => (
+          <div key={libelle} className="flex items-start gap-3">
+            <App.PastilleIcone icone={icone} ton="marque" forme="carre" />
+            <div className="min-w-0">
+              <dt className="text-xs font-medium text-discret">{libelle}</dt>
+              <dd className="text-sm font-semibold text-principal">{valeur}</dd>
+            </div>
+          </div>
+        ))}
+      </dl>
+    </App.Carte>
+  );
+}
+
+function ListeCoches({ items }) {
+  return (
+    <ul className="space-y-3">
+      {items.map((m) => (
+        <li key={m} className="flex items-start gap-3 text-[15px] leading-[1.6] text-secondaire">
+          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-marque-doux text-marque" aria-hidden="true">
+            <Check size={12} strokeWidth={2.5} />
+          </span>
+          {m}
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+function Etiquettes({ items, max }) {
+  const visibles = max ? items.slice(0, max) : items;
+  const reste = items.length - visibles.length;
+  return (
+    <ul className="flex flex-wrap gap-2">
+      {visibles.map((c) => (
+        <li key={c} className="rounded-full bg-doux px-3 py-1.5 text-[13px] font-medium text-principal">{c}</li>
+      ))}
+      {reste > 0 && <li className="rounded-full px-2 py-1.5 text-[13px] font-medium text-discret">+{reste}</li>}
+    </ul>
+  );
+}
+
+const ELEMENTS_PAR_PAGE = 5;
+
+/* Pagination des listes : 5 éléments par page ; la page revient dans les bornes quand les filtres réduisent la liste. */
+function usePaginationListe(items, parPage = ELEMENTS_PAR_PAGE) {
+  const [page, setPage] = useState(1);
+  const pages = Math.max(1, Math.ceil(items.length / parPage));
+  const courante = Math.min(page, pages);
+  return { page: courante, setPage, parPage, total: items.length, paged: items.slice((courante - 1) * parPage, courante * parPage) };
+}
+
+function PiedListe({ pagination: p }) {
+  if (p.total <= p.parPage) return null;
+  return <Pagination page={p.page} pageSize={p.parPage} totalItems={p.total} onPageChange={p.setPage} />;
+}
+
+function ListeVide({ icone = Search, titre, texte, action }) {
+  return (
+    <div className="rounded-lg border border-base bg-surface">
+      <App.EtatVide icone={icone} titre={titre} texte={texte} action={action} />
+    </div>
+  );
+}
+
+/* Carte horizontale des listes : visuel, titre et badges, sous-titre, informations, contenu libre, actions à droite.
+   Toute la carte ouvre la fiche (onOpen) ; les actions de droite ne la déclenchent pas. */
+function CarteListe({ visuel, titre, badges, sousTitre, meta, children, aside, actions, onOpen, accent = false }) {
+  return (
+    <article
+      onClick={onOpen}
+      className={`group flex flex-col gap-4 rounded-lg border bg-surface p-5 transition-shadow hover:shadow-carte sm:flex-row sm:items-center ${onOpen ? "cursor-pointer" : ""} ${accent ? "border-marque" : "border-base"}`}
+    >
+      <div className="flex min-w-0 flex-1 items-start gap-4">
+        {visuel}
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className={`text-base font-semibold text-principal ${onOpen ? "group-hover:text-marque" : ""}`}>{titre}</h3>
+            {badges}
+          </div>
+          {sousTitre && <p className="mt-0.5 text-sm text-secondaire">{sousTitre}</p>}
+          {meta && <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">{meta}</div>}
+          {children}
+        </div>
+      </div>
+      {(aside || actions) && (
+        <div className="flex flex-wrap items-center justify-end gap-2 border-t border-base pt-4 sm:border-0 sm:pt-0" onClick={(e) => e.stopPropagation()}>
+          {aside}
+          {actions}
+        </div>
+      )}
+    </article>
+  );
+}
+
+function VisuelIcone({ icone: Icone, taille = "md" }) {
+  const dims = taille === "lg" ? "h-16 w-16" : "h-12 w-12";
+  return (
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque ${dims}`} aria-hidden="true">
+      <Icone size={taille === "lg" ? 28 : 22} strokeWidth={1.75} />
+    </span>
+  );
+}
+
+function AvatarListe({ nom, photo, taille = "md" }) {
+  const dims = taille === "lg" ? "h-16 w-16" : "h-12 w-12";
+  return <SafeImg src={photo} alt={nom} className={`${dims} shrink-0 rounded-full object-cover`} />;
+}
+
+/* Pavé de date (jour + mois), pour les ateliers et les séances. */
+function VisuelDate({ iso, taille = "md" }) {
+  const d = new Date(`${iso}T00:00:00`);
+  const dims = taille === "lg" ? "h-16 w-16" : "h-12 w-12";
+  return (
+    <span className={`flex shrink-0 flex-col items-center justify-center rounded-lg bg-marque-doux text-marque ${dims}`} aria-hidden="true">
+      <span className={`font-semibold leading-none ${taille === "lg" ? "text-2xl" : "text-lg"}`}>{d.getDate()}</span>
+      <span className="mt-0.5 text-[11px] font-semibold uppercase">{d.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")}</span>
+    </span>
+  );
+}
+
+/* Avis clients : auteur, note, date, commentaire. avis : [{ auteur, note, date?, commentaire }] */
+function ListeAvis({ avis, vide = "Aucun avis pour le moment." }) {
+  if (!avis.length) return <p className="text-sm text-secondaire">{vide}</p>;
+  return (
+    <ul className="divide-y divide-base">
+      {avis.map((a, i) => (
+        <li key={i} className="flex gap-3 py-4 first:pt-0 last:pb-0">
+          <SafeImg alt={a.auteur} className="h-10 w-10 shrink-0 rounded-full" />
+          <div className="min-w-0 flex-1">
+            <div className="flex flex-wrap items-center justify-between gap-2">
+              <p className="text-sm font-semibold text-principal">{a.auteur}</p>
+              {a.date && <span className="text-xs text-discret">{a.date}</span>}
+            </div>
+            <Stars note={a.note} size={12} />
+            <p className="mt-1 text-sm text-secondaire">{a.commentaire}</p>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+/* Parcours professionnel en frise. etapes : [{ poste, structure, periode, description }] */
+function FriseParcours({ etapes }) {
+  return (
+    <ol>
+      {etapes.map((p, i) => (
+        <li key={i} className="flex gap-3 pb-5 last:pb-0">
+          <div className="flex flex-col items-center">
+            <div className={`mt-1.5 h-2.5 w-2.5 rounded-full ${i === 0 ? "bg-marque" : "bg-doux-fort"}`} />
+            {i < etapes.length - 1 && <div className="mt-1 w-px flex-1 bg-doux-fort" />}
+          </div>
+          <div>
+            <p className="text-sm font-semibold text-principal">{p.poste}{p.structure ? ` · ${p.structure}` : ""}</p>
+            <p className="mb-1 text-xs text-discret">{p.periode}</p>
+            <p className="text-sm text-secondaire">{p.description}</p>
+          </div>
+        </li>
+      ))}
+    </ol>
+  );
+}
+
+function OfferCard({ offre, onOpen, applied, saved, onToggleSave }) {
+  const publiee = publieeIlYa(offre.publieeLe);
+  return (
+    <article
+      onClick={() => onOpen(offre)}
+      className="group flex cursor-pointer flex-col gap-4 rounded-lg border border-base bg-surface p-5 transition-shadow hover:shadow-carte sm:flex-row sm:items-center"
+    >
+      <div className="flex min-w-0 flex-1 items-start gap-4">
+        <LogoEntreprise nom={offre.entreprise} />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-base font-semibold text-principal group-hover:text-marque">{offre.titre}</h3>
+            {offre.sponsorisee && <PremiumChip label="Sponsorisée" />}
+          </div>
+          <p className="mt-0.5 text-sm text-secondaire">{offre.entreprise} · {offre.secteur}</p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <App.Badge ton="info" taille="moyen">{offre.contrat}</App.Badge>
+            <MetaOffre icone={MapPin}>{offre.localisation}</MetaOffre>
+            {offre.experience && <MetaOffre icone={Briefcase}>{offre.experience}</MetaOffre>}
+            {publiee && <MetaOffre icone={Clock}>{publiee}</MetaOffre>}
+          </div>
+        </div>
+      </div>
+      <div className="flex items-center gap-2 border-t border-base pt-4 sm:border-0 sm:pt-0">
+        {applied && <App.Badge ton="succes" point taille="moyen" className="mr-auto sm:mr-1">Déjà postulé</App.Badge>}
+        {onToggleSave && <BoutonSauvegarde saved={saved} onToggle={onToggleSave} titre={offre.titre} />}
+        <App.Bouton
+          petit
+          variante={applied ? "neutre" : "principal"}
+          onClick={(e) => { e.stopPropagation(); onOpen(offre); }}
+          aria-label={`Voir l'offre : ${offre.titre}`}
+          className={applied ? "" : "ml-auto sm:ml-0"}
+        >
+          Voir l'offre
+        </App.Bouton>
+      </div>
+    </article>
+  );
+}
+
+/* Candidature à une offre : quota du profil, enregistrement dans « Mes candidatures ». */
+function usePostuler(offre) {
   const planApi = usePlan();
   const [candidatures, setCandidatures] = useStore("candidatures-chercheur", CANDIDATURES);
-  useEffect(() => {
-    const onKey = (e) => { if (e.key === "Escape") onClose(); };
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-  if (!offre) return null;
-  const existing = candidatures.find((c) => c.poste === offre.titre && c.entreprise === offre.entreprise);
+  const existing = offre ? candidatures.find((c) => c.poste === offre.titre && c.entreprise === offre.entreprise) : null;
   const restantes = planApi ? planApi.remaining("candidatures") : UNLIMITED;
   function postuler() {
+    if (!offre || existing) return;
     if (planApi && restantes <= 0) { planApi.requestUpgrade("candidatures"); return; }
     if (planApi) planApi.consume("candidatures");
     setCandidatures((l) => [{ id: `cand-${Date.now()}`, poste: offre.titre, entreprise: offre.entreprise, ville: offre.localisation.split(",")[0], date: frLongDate(demoNow()), statut: "Candidature reçue", step: 1 }, ...l]);
-    setApplied(true);
+    notify("Candidature envoyée. Retrouvez-la dans « Mes candidatures ».");
   }
+  return { existing, restantes, planApi, postuler };
+}
+
+function messagePartageOffre(o) {
+  return `Offre vérifiée sur LIGGEEY : ${o.titre} chez ${o.entreprise} (${o.localisation}). Créez votre compte pour postuler.`;
+}
+
+function OffreDetail({ offre, similaires = [], onOpen, onBack, onNavigate, saved, onToggleSave }) {
+  const { existing, restantes, planApi, postuler } = usePostuler(offre);
+  const [candidatures] = useStore("candidatures-chercheur", CANDIDATURES);
+  const publiee = publieeIlYa(offre.publieeLe);
+  const apercu = [
+    { icone: CalendarDays, libelle: "Date de publication", valeur: offre.publieeLe && frLongDate(new Date(`${offre.publieeLe}T00:00:00`)) },
+    { icone: MapPin, libelle: "Lieu", valeur: offre.localisation },
+    { icone: FileText, libelle: "Type de contrat", valeur: offre.contrat },
+    { icone: Layers, libelle: "Secteur", valeur: offre.secteur },
+    { icone: TrendingUp, libelle: "Expérience", valeur: offre.experience },
+    { icone: Wallet, libelle: "Salaire", valeur: offre.salaire },
+    { icone: Clock, libelle: "Date limite", valeur: offre.dateLimite },
+  ].filter((i) => i.valeur);
+
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(15,11,8,0.55)" }} onClick={onClose}>
-      <div
-        className="w-full max-w-lg rounded-lg bg-surface p-6"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <div className="flex items-start justify-between mb-4">
-          <h3 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{offre.titre}</h3>
-          <button type="button" onClick={onClose} className="text-discret hover:text-secondaire text-xl leading-none">×</button>
-        </div>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour aux offres</BoutonRetour>
 
-        <div className="flex flex-col gap-3 mb-5">
-          <Row label="Entreprise" value={`${offre.entreprise} · ${offre.secteur}`} />
-          <Row label="Type de contrat" value={offre.contrat} />
-          <Row label="Localisation" value={offre.localisation} />
-          <Row label="Description" value={offre.description} />
-          <div>
-            <p className="text-xs font-semibold mb-1.5" style={{ color: COLORS.slateLight }}>Compétences requises</p>
-            <div className="flex flex-wrap gap-1.5">
-              {offre.competences.map((c) => (
-                <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-                  {c}
-                </span>
-              ))}
-            </div>
-          </div>
-        </div>
-
-        {applied ? (
-          <div className="rounded-md px-4 py-3 text-sm mb-2" style={{ background: "#ECFDF5", color: "#047857" }}>
-            Candidature envoyée. Vous la retrouverez dans « Mes candidatures ».
-          </div>
-        ) : existing ? (
-          <div className="rounded-md px-4 py-3 text-sm mb-2 flex items-center justify-between gap-3" style={{ background: COLORS.soft, color: COLORS.slate }}>
-            <span>Vous avez déjà postulé le {existing.date}.</span>
+      <EnTeteFiche
+        visuel={<LogoEntreprise nom={offre.entreprise} taille="lg" />}
+        badges={<>
+          <App.Badge ton="succes" taille="moyen"><BadgeCheck size={13} aria-hidden="true" /> Offre vérifiée</App.Badge>
+          {offre.sponsorisee && <PremiumChip label="Sponsorisée" />}
+        </>}
+        titre={offre.titre}
+        sousTitre={`${offre.entreprise} · ${offre.secteur}`}
+        meta={<>
+          <App.Badge ton="info" taille="moyen">{offre.contrat}</App.Badge>
+          <MetaOffre icone={MapPin}>{offre.localisation}</MetaOffre>
+          {offre.experience && <MetaOffre icone={Briefcase}>{offre.experience}</MetaOffre>}
+          {publiee && <MetaOffre icone={Clock}>{publiee}</MetaOffre>}
+        </>}
+        actions={<>
+          {existing ? (
             <StatusBadge status={existing.statut} />
-          </div>
-        ) : (
-          <>
-          {restantes !== UNLIMITED && (
-            <p className="text-xs mb-3" style={{ color: restantes > 0 ? COLORS.slateLight : COLORS.danger }}>
-              {restantes > 0 ? `Il vous reste ${restantes} candidature${restantes > 1 ? "s" : ""} ce mois-ci avec le profil ${planApi.plan.nom}.` : `Vous avez utilisé toutes vos candidatures du mois avec le profil ${planApi.plan.nom}.`}
-            </p>
+          ) : (
+            <App.Bouton onClick={postuler}>
+              <Send size={16} aria-hidden="true" /> Postuler
+            </App.Bouton>
           )}
-          <div className="flex justify-end gap-3">
-            <button
-              type="button"
-              onClick={onClose}
-              className="rounded-md px-5 py-2.5 text-sm font-semibold border transition-colors hover:bg-doux"
-              style={{ borderColor: COLORS.border, color: COLORS.slate }}
-            >
-              Fermer
-            </button>
-            <button
-              type="button"
-              onClick={postuler}
-              className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque transition-opacity hover:opacity-90"
-              style={{ background: COLORS.orange }}
-            >
-              Postuler
-            </button>
-          </div>
-          </>
-        )}
+          <BoutonSauvegarde saved={saved} onToggle={onToggleSave} titre={offre.titre} />
+          <a
+            href={lienPartageWhatsApp(messagePartageOffre(offre))}
+            target="_blank"
+            rel="noopener noreferrer"
+            aria-label={`Partager « ${offre.titre} » sur WhatsApp`}
+            title="Partager sur WhatsApp"
+            className="inline-flex h-11 w-11 items-center justify-center rounded-full border border-base text-secondaire transition-colors hover:border-forte hover:text-principal"
+          >
+            <Share2 size={18} strokeWidth={1.75} aria-hidden="true" />
+          </a>
+        </>}
+      />
+
+      <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
+        {/* Contenu de l'offre */}
+        <div className="space-y-6">
+          <App.Carte titre="Description du poste">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{offre.description}</p>
+          </App.Carte>
+
+          {offre.missions?.length > 0 && (
+            <App.Carte titre="Vos missions">
+              <ListeCoches items={offre.missions} />
+            </App.Carte>
+          )}
+
+          {offre.competences?.length > 0 && (
+            <App.Carte titre="Compétences recherchées">
+              <Etiquettes items={offre.competences} />
+            </App.Carte>
+          )}
+        </div>
+
+        {/* Colonne latérale */}
+        <aside className="space-y-6">
+          <ApercuFiche titre="Aperçu de l'offre" items={apercu} />
+
+          <App.Carte titre="Votre candidature">
+            {existing ? (
+              <div className="space-y-4">
+                <p className="text-sm text-secondaire">Vous avez postulé le {existing.date}. Nous vous informons à chaque étape.</p>
+                <StatusBadge status={existing.statut} />
+                {onNavigate && (
+                  <App.Bouton pleineLargeur variante="neutre" onClick={() => onNavigate("candidatures")}>Suivre ma candidature</App.Bouton>
+                )}
+              </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-secondaire">Votre profil LIGGEEY est transmis au recruteur. Vous suivez chaque étape dans « Mes candidatures ».</p>
+                {restantes !== UNLIMITED && (
+                  <p className={`text-sm ${restantes > 0 ? "text-discret" : "text-statut-danger"}`}>
+                    {restantes > 0
+                      ? `Il vous reste ${restantes} candidature${restantes > 1 ? "s" : ""} ce mois-ci avec le profil ${planApi.plan.nom}.`
+                      : `Vous avez utilisé toutes vos candidatures du mois avec le profil ${planApi.plan.nom}.`}
+                  </p>
+                )}
+                <App.Bouton pleineLargeur onClick={postuler}>
+                  <Send size={16} aria-hidden="true" /> Postuler à cette offre
+                </App.Bouton>
+              </div>
+            )}
+          </App.Carte>
+
+          <App.Carte titre="L'entreprise">
+            <div className="flex items-center gap-3">
+              <LogoEntreprise nom={offre.entreprise} />
+              <div className="min-w-0">
+                <p className="font-semibold text-principal">{offre.entreprise}</p>
+                <p className="text-sm text-discret">{offre.secteur}</p>
+              </div>
+            </div>
+            <p className="mt-4 flex items-start gap-2 rounded-md bg-marque-doux px-3 py-2.5 text-sm text-principal">
+              <ShieldCheck size={16} className="mt-0.5 shrink-0 text-marque" aria-hidden="true" />
+              Entreprise et offre vérifiées par l'équipe LIGGEEY.
+            </p>
+          </App.Carte>
+        </aside>
       </div>
+
+      {similaires.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-lg font-semibold text-principal">Offres similaires</h2>
+          <div className="space-y-4">
+            {similaires.map((o) => (
+              <OfferCard key={cleOffre(o)} offre={o} onOpen={onOpen} applied={candidatures.some((c) => c.poste === o.titre && c.entreprise === o.entreprise)} />
+            ))}
+          </div>
+        </section>
+      )}
     </div>
   );
 }
@@ -1620,46 +2219,134 @@ function Row({ label, value }) {
 }
 
 const PAGE_SIZE = 6;
+const OFFRES_PAR_PAGE = 5;
 
-function OffresScreen({ extraOffres = [] }) {
+function OffresScreen({ extraOffres = [], onNavigate }) {
   const [candidatures] = useStore("candidatures-chercheur", CANDIDATURES);
-  const ALL_OFFRES = [...extraOffres, ...OFFRES_DATA].sort((a, b) => (b.sponsorisee ? 1 : 0) - (a.sponsorisee ? 1 : 0));
+  const [sauvegardees, setSauvegardees] = useStore("offres-sauvegardees", []);
+  const ALL_OFFRES = [...extraOffres, ...OFFRES_DATA];
   const [query, setQuery] = useState("");
-  const [selected, setSelected] = useState(null);
+  const [secteur, setSecteur] = useState("tous");
+  const [contrat, setContrat] = useState("tous");
+  const [vue, setVue] = useState("toutes");
+  const [selectedKey, setSelectedKey] = useState(null);
   const [page, setPage] = useState(1);
 
-  const filtered = ALL_OFFRES.filter((o) =>
-    (o.titre + o.entreprise + o.secteur).toLowerCase().includes(query.toLowerCase())
-  );
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const secteurs = Array.from(new Set(ALL_OFFRES.map((o) => o.secteur))).sort();
+  const contrats = Array.from(new Set(ALL_OFFRES.map((o) => o.contrat)));
+  const aPostule = (o) => candidatures.some((c) => c.poste === o.titre && c.entreprise === o.entreprise);
+  const estSauvegardee = (o) => sauvegardees.includes(cleOffre(o));
+  const basculer = (o) => {
+    const k = cleOffre(o);
+    const deja = sauvegardees.includes(k);
+    setSauvegardees(deja ? sauvegardees.filter((x) => x !== k) : [...sauvegardees, k]);
+    notify(deja ? "Offre retirée de vos offres sauvegardées." : "Offre sauvegardée.", deja ? "info" : "success");
+  };
+
+  const q = sansAccents(query.trim());
+  const filtered = ALL_OFFRES
+    .filter((o) =>
+      (!q || sansAccents([o.titre, o.entreprise, o.secteur, o.localisation, ...(o.competences || [])].join(" ")).includes(q)) &&
+      (secteur === "tous" || o.secteur === secteur) &&
+      (contrat === "tous" || o.contrat === contrat) &&
+      (vue === "toutes" || estSauvegardee(o)))
+    // Sponsorisées en tête, puis les plus récentes (les offres publiées par l'entreprise n'ont pas de date : en tête)
+    .sort((a, b) => (b.sponsorisee ? 1 : 0) - (a.sponsorisee ? 1 : 0) || (b.publieeLe || "9999").localeCompare(a.publieeLe || "9999"));
+  const pages = Math.max(1, Math.ceil(filtered.length / OFFRES_PAR_PAGE));
+  const pageCourante = Math.min(page, pages);
+  const paged = filtered.slice((pageCourante - 1) * OFFRES_PAR_PAGE, pageCourante * OFFRES_PAR_PAGE);
+  const filtresActifs = q || secteur !== "tous" || contrat !== "tous" || vue !== "toutes";
+  const reinitialiser = () => { setQuery(""); setSecteur("tous"); setContrat("tous"); setVue("toutes"); setPage(1); };
+
+  const selected = ALL_OFFRES.find((o) => cleOffre(o) === selectedKey);
+  const ouvrir = (o) => { setSelectedKey(cleOffre(o)); window.scrollTo(0, 0); };
+
+  if (selected) {
+    const similaires = ALL_OFFRES
+      .filter((o) => cleOffre(o) !== selectedKey && (o.secteur === selected.secteur || o.contrat === selected.contrat))
+      .slice(0, 3);
+    return (
+      <OffreDetail
+        key={selectedKey}
+        offre={selected}
+        similaires={similaires}
+        onOpen={ouvrir}
+        onBack={() => setSelectedKey(null)}
+        onNavigate={onNavigate}
+        saved={estSauvegardee(selected)}
+        onToggleSave={() => basculer(selected)}
+      />
+    );
+  }
 
   return (
-    <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
-        Un statut réel pour chaque candidature, mis à jour à chaque étape – jamais de silence indéfini.
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">
+        Toutes les offres sont vérifiées par l'équipe LIGGEEY. Chaque candidature reçoit un statut réel, mis à jour à chaque étape.
       </p>
 
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-        placeholder="Rechercher ici"
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
-        style={{ borderColor: COLORS.border }}
-      />
+      {/* Barre de recherche et filtres */}
+      <BarreFiltres label="Rechercher et filtrer les offres">
+          <App.ChampRecherche
+            variante="carre"
+            valeur={query}
+            onChange={(v) => { setQuery(v); setPage(1); }}
+            placeholder="Poste, entreprise, compétence ou ville…"
+            label="Rechercher une offre d'emploi"
+            className="w-full lg:flex-1"
+          />
+          <div className="flex flex-wrap items-center gap-2">
+            <App.SelecteurPeriode
+              icone={Layers}
+              label="Secteur"
+              valeur={secteur}
+              onChange={(v) => { setSecteur(v); setPage(1); }}
+              options={[{ id: "tous", label: "Tous les secteurs" }, ...secteurs]}
+            />
+            <App.SelecteurPeriode
+              icone={FileText}
+              label="Type de contrat"
+              valeur={contrat}
+              onChange={(v) => { setContrat(v); setPage(1); }}
+              options={[{ id: "tous", label: "Tous les contrats" }, ...contrats]}
+            />
+          </div>
+      </BarreFiltres>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paged.map((o) => (
-          <OfferCard key={o.titre + o.entreprise} offre={o} onOpen={setSelected} applied={candidatures.some((c) => c.poste === o.titre && c.entreprise === o.entreprise)} />
-        ))}
-        {paged.length === 0 && (
-          <p className="text-sm col-span-full" style={{ color: COLORS.slateLight }}>Aucune offre ne correspond à votre recherche.</p>
-        )}
+      {/* Résultats */}
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Afficher"
+          actif={vue}
+          onChange={(v) => { setVue(v); setPage(1); }}
+          options={[
+            { id: "toutes", label: `Toutes (${ALL_OFFRES.length})` },
+            { id: "sauvegardees", label: `Sauvegardées (${sauvegardees.filter((k) => ALL_OFFRES.some((o) => cleOffre(o) === k)).length})` },
+          ]}
+        />
+        <CompteResultats n={filtered.length} nom="offre" feminin />
       </div>
 
-      <Pagination page={page} pageSize={PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+      {paged.length > 0 ? (
+        <div className="space-y-4">
+          {paged.map((o) => (
+            <OfferCard key={cleOffre(o)} offre={o} onOpen={ouvrir} applied={aPostule(o)} saved={estSauvegardee(o)} onToggleSave={() => basculer(o)} />
+          ))}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-base bg-surface">
+          <App.EtatVide
+            icone={vue === "sauvegardees" && !q ? Bookmark : Search}
+            titre={vue === "sauvegardees" && !q ? "Aucune offre sauvegardée" : "Aucune offre ne correspond à votre recherche"}
+            texte={vue === "sauvegardees" && !q ? "Touchez l'icône de signet sur une offre pour la retrouver ici." : "Essayez d'autres mots-clés ou retirez un filtre."}
+            action={filtresActifs && <App.Bouton petit variante="neutre" onClick={reinitialiser}>Effacer les filtres</App.Bouton>}
+          />
+        </div>
+      )}
 
-      <OfferModal key={selected ? selected.titre + selected.entreprise : "none"} offre={selected} onClose={() => setSelected(null)} />
+      {filtered.length > OFFRES_PAR_PAGE && (
+        <Pagination page={pageCourante} pageSize={OFFRES_PAR_PAGE} totalItems={filtered.length} onPageChange={setPage} />
+      )}
     </div>
   );
 }
@@ -1716,47 +2403,110 @@ function CandidatureStepper({ step, negative }) {
   );
 }
 
+const GROUPES_CANDIDATURE = [
+  { id: "toutes", label: "Toutes", test: () => true },
+  { id: "cours", label: "En cours", test: (c) => ["Candidature reçue", "Vue par le recruteur", "Entretien programmé"].includes(c.statut) },
+  { id: "retenues", label: "Retenues", test: (c) => c.statut === "Candidature Retenue" },
+  { id: "refusees", label: "Réponses négatives", test: (c) => !!c.negative || c.statut === "Réponse négative" },
+];
+
 function CandidatureCard({ c, onNavigate }) {
   return (
-    <div className="rounded-lg border bg-surface p-5 mb-4" style={{ borderColor: c.embauche ? "#86EFAC" : COLORS.border }}>
-      <div className="flex items-start justify-between gap-3 mb-1">
-        <p className="font-semibold" style={{ color: COLORS.slate }}>{c.poste}</p>
-        <StatusBadge status={c.statut} />
+    <CarteListe
+      accent={!!c.embauche}
+      visuel={<LogoEntreprise nom={c.entreprise} />}
+      titre={c.poste}
+      badges={<StatusBadge status={c.statut} />}
+      sousTitre={c.entreprise}
+      meta={<>
+        <MetaOffre icone={MapPin}>{c.ville}</MetaOffre>
+        <MetaOffre icone={CalendarDays}>Postulé le {c.date}</MetaOffre>
+      </>}
+    >
+      <div className="max-w-md">
+        <CandidatureStepper step={c.step} negative={c.negative} />
       </div>
-      <p className="text-xs" style={{ color: COLORS.slateLight }}>
-        {c.entreprise} · {c.ville} · Postulé le {c.date}
-      </p>
-      <CandidatureStepper step={c.step} negative={c.negative} />
       {c.negative && (
-        <div className="mt-4 rounded-md px-4 py-3 text-sm" style={{ background: "#FEF2F2", color: "#B91C1C" }}>
-          <strong>Motif communiqué par le recruteur : </strong>{c.motif}
-        </div>
+        <p className="mt-4 rounded-md bg-statut-danger-doux px-4 py-3 text-sm text-statut-danger">
+          <span className="font-semibold">Motif communiqué par le recruteur : </span>{c.motif}
+        </p>
       )}
       {c.embauche && (
-        <div className="mt-4 rounded-md px-4 py-3 text-sm flex items-center justify-between gap-3 flex-wrap" style={{ background: "#ECFDF5", color: "#047857" }}>
+        <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
           <span>Vous avez été recrutée. LIGGEEY vous accompagne pendant vos six premiers mois.</span>
-          <button type="button" onClick={() => onNavigate("suivi")} className="font-semibold underline">Voir mon suivi post-embauche</button>
+          {onNavigate && (
+            <button type="button" onClick={(e) => { e.stopPropagation(); onNavigate("suivi"); }} className="inline-flex min-h-[44px] items-center font-semibold underline">
+              Voir mon suivi post-embauche
+            </button>
+          )}
         </div>
       )}
-    </div>
+    </CarteListe>
   );
 }
 
 function CandidaturesScreen({ onNavigate }) {
   const [candidatures] = useStore("candidatures-chercheur", CANDIDATURES);
+  const [query, setQuery] = useState("");
+  const [groupe, setGroupe] = useState("toutes");
+  const q = sansAccents(query.trim());
+  const test = GROUPES_CANDIDATURE.find((g) => g.id === groupe).test;
+  const filtered = candidatures.filter((c) => (!q || sansAccents([c.poste, c.entreprise, c.ville].join(" ")).includes(q)) && test(c));
+  const pagination = usePaginationListe(filtered);
+  const filtresActifs = q || groupe !== "toutes";
+
   return (
-    <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
-        Suivez en temps réel l'avancement de vos dossiers de candidature auprès des entreprises sénégalaises.
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">
+        Suivez en temps réel l'avancement de vos candidatures. Chaque étape est mise à jour : jamais de silence indéfini.
       </p>
-      {candidatures.length === 0 && (
-        <div className="rounded-lg border bg-surface p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>
-          Vous n'avez pas encore postulé. <button type="button" onClick={() => onNavigate("offres")} className="font-semibold" style={{ color: COLORS.orange }}>Parcourir les offres</button>
+
+      <BarreFiltres label="Rechercher dans mes candidatures">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); pagination.setPage(1); }}
+          placeholder="Poste, entreprise ou ville…"
+          label="Rechercher une candidature"
+          className="w-full lg:flex-1"
+        />
+        {onNavigate && (
+          <App.Bouton petit variante="doux" onClick={() => onNavigate("offres")}>
+            <Briefcase size={15} aria-hidden="true" /> Voir les offres
+          </App.Bouton>
+        )}
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Afficher"
+          actif={groupe}
+          onChange={(v) => { setGroupe(v); pagination.setPage(1); }}
+          options={GROUPES_CANDIDATURE.map((g) => ({ id: g.id, label: `${g.label} (${candidatures.filter(g.test).length})` }))}
+        />
+        <CompteResultats n={filtered.length} nom="candidature" feminin />
+      </div>
+
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((c) => <CandidatureCard key={c.id || c.poste} c={c} onNavigate={onNavigate} />)}
         </div>
+      ) : candidatures.length === 0 ? (
+        <ListeVide
+          icone={ClipboardList}
+          titre="Vous n'avez pas encore postulé"
+          texte="Parcourez les offres vérifiées et envoyez votre première candidature."
+          action={onNavigate && <App.Bouton petit onClick={() => onNavigate("offres")}>Parcourir les offres</App.Bouton>}
+        />
+      ) : (
+        <ListeVide
+          titre="Aucune candidature ne correspond"
+          texte="Essayez d'autres mots-clés ou un autre filtre."
+          action={filtresActifs && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setGroupe("toutes"); }}>Effacer les filtres</App.Bouton>}
+        />
       )}
-      {candidatures.map((c) => (
-        <CandidatureCard key={c.id || c.poste} c={c} onNavigate={onNavigate} />
-      ))}
+
+      <PiedListe pagination={pagination} />
     </div>
   );
 }
@@ -1793,7 +2543,7 @@ function moduleStatus(index, enrolled, progressCount) {
 }
 
 const MODULE_BADGE_STYLE = {
-  "Complété": { bg: "#DCFCE7", color: "#16A34A" },
+  "Complété": { bg: COLORS.successSoft, color: COLORS.success },
   "En cours": { bg: COLORS.orangeSoft, color: COLORS.orange },
   "Verrouillé": { bg: COLORS.softStrong, color: COLORS.slateLight },
 };
@@ -1811,117 +2561,192 @@ const FORMATIONS_ALL = [
   { id: "entrepreneuriat", nom: "Entrepreneuriat", modules: 20, heures: 50, enrolled: false, coach: "awa.diagne@email.com", tagline: "Structurer et lancer votre projet entrepreneurial.", description: "De l'idée au business plan : structurez votre projet entrepreneurial étape par étape." },
 ];
 
-function FormationCard({ f, onOpen, premium, locked }) {
+/* Nom lisible à partir de l'adresse du formateur (aissatou.fall@… → Aissatou Fall). */
+function nomDepuisEmail(email) {
+  return email.split("@")[0].split(/[.-]/).map((m) => m.charAt(0).toUpperCase() + m.slice(1)).join(" ");
+}
+
+function progressionFormation(f, inscrit, fait) {
+  if (!inscrit) return 0;
+  return Math.min(100, Math.round((Math.min(fait, f.modules) / f.modules) * 100));
+}
+
+function VisuelFormation({ taille = "md" }) {
+  const dims = taille === "lg" ? "h-16 w-16" : "h-12 w-12";
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(f)}
-      className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md"
-      style={{ borderColor: COLORS.border }}
-    >
-      <div className="flex items-start justify-between mb-3">
-        <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: COLORS.orangeSoft }}>
-          <GraduationCap size={16} color={COLORS.orange} />
-        </div>
-        {premium && <PremiumChip locked={locked} />}
-      </div>
-      <p className="font-semibold text-sm mb-0.5" style={{ color: COLORS.slate }}>{f.nom}</p>
-      <p className="text-xs" style={{ color: COLORS.slateLight }}>{f.modules} Modules · {f.heures}h</p>
-    </button>
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque ${dims}`} aria-hidden="true">
+      <GraduationCap size={taille === "lg" ? 28 : 22} strokeWidth={1.75} />
+    </span>
   );
 }
 
-function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, onAdvanceModule, onViewCertificate, onBack }) {
+function FormationCard({ f, onOpen, premium, locked, inscrit = false, progression = 0 }) {
+  const terminee = inscrit && progression >= 100;
+  return (
+    <article
+      onClick={() => onOpen(f)}
+      className="group flex cursor-pointer flex-col gap-4 rounded-lg border border-base bg-surface p-5 transition-shadow hover:shadow-carte sm:flex-row sm:items-center"
+    >
+      <div className="flex min-w-0 flex-1 items-start gap-4">
+        <VisuelFormation />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-base font-semibold text-principal group-hover:text-marque">{f.nom}</h3>
+            {premium && <PremiumChip locked={locked} />}
+          </div>
+          {f.tagline && <p className="mt-0.5 text-sm text-secondaire">{f.tagline}</p>}
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <MetaOffre icone={Layers}>{f.modules} modules</MetaOffre>
+            <MetaOffre icone={Clock}>{f.heures} h</MetaOffre>
+            <MetaOffre icone={CalendarDays}>{dureeFromHeures(f.heures)}</MetaOffre>
+          </div>
+          {inscrit && (
+            <div className="mt-3 flex max-w-sm items-center gap-3">
+              <App.BarreProgression valeur={progression} ton={terminee ? "succes" : "marque"} label={`Progression : ${progression} %`} />
+              <span className="shrink-0 text-xs font-semibold text-secondaire">{progression} %</span>
+            </div>
+          )}
+        </div>
+      </div>
+      <div className="flex items-center gap-2 border-t border-base pt-4 sm:border-0 sm:pt-0">
+        {inscrit && <App.Badge ton={terminee ? "succes" : "marque"} point taille="moyen" className="mr-auto sm:mr-1">{terminee ? "Terminée" : "Inscrit"}</App.Badge>}
+        <App.Bouton
+          petit
+          variante={inscrit ? "neutre" : "principal"}
+          onClick={(e) => { e.stopPropagation(); onOpen(f); }}
+          aria-label={`${inscrit ? "Continuer" : "Voir"} la formation : ${f.nom}`}
+          className={inscrit ? "" : "ml-auto sm:ml-0"}
+        >
+          {inscrit ? (terminee ? "Voir" : "Continuer") : "Voir la formation"}
+        </App.Bouton>
+      </div>
+    </article>
+  );
+}
+
+function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, onAdvanceModule, onViewCertificate, onBack, premium = false, locked = false, similaires = [], onOpen, carteProps = () => ({}) }) {
   const total = formation.modules;
   const modulesList = buildModules(formation);
   const isComplete = enrolled && progressCount >= total;
-  const globalProgress = enrolled ? Math.min(100, Math.round(((progressCount + (progressCount < total ? 0.5 : 0)) / total) * 100)) : 0;
+  const progression = progressionFormation(formation, enrolled, progressCount);
+  const statut = isComplete ? "Terminée" : enrolled ? "En cours" : "Non inscrit";
+  const TON_MODULE = { "Complété": "succes", "En cours": "marque", "Verrouillé": "neutre" };
 
   return (
-    <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
-        <ArrowLeft size={14} /> Retour aux formations
-      </button>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour aux formations</BoutonRetour>
 
-      <div className="flex items-start justify-between flex-wrap gap-3 mb-1">
-        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{formation.nom}</h2>
-        {!enrolled && (
-          <button type="button" onClick={onToggleEnroll} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-            S'inscrire à cette formation
-          </button>
-        )}
-        {isComplete && (
-          <button type="button" onClick={onViewCertificate} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-            Voir mon certificat
-          </button>
-        )}
-      </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>{formation.tagline}</p>
+      <EnTeteFiche
+        visuel={<VisuelFormation taille="lg" />}
+        badges={<>
+          <App.Badge ton={isComplete ? "succes" : enrolled ? "marque" : "neutre"} point taille="moyen">{statut}</App.Badge>
+          {premium && <PremiumChip locked={locked} />}
+        </>}
+        titre={formation.nom}
+        sousTitre={formation.tagline}
+        meta={<>
+          <MetaOffre icone={Layers}>{total} modules</MetaOffre>
+          <MetaOffre icone={Clock}>{formation.heures} h d'apprentissage</MetaOffre>
+          <MetaOffre icone={CalendarDays}>{dureeFromHeures(formation.heures)}</MetaOffre>
+        </>}
+        actions={
+          !enrolled ? (
+            <App.Bouton onClick={onToggleEnroll}>
+              {locked ? <Lock size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />} S'inscrire à cette formation
+            </App.Bouton>
+          ) : isComplete ? (
+            <App.Bouton onClick={onViewCertificate}>
+              <ShieldCheck size={16} aria-hidden="true" /> Voir mon certificat
+            </App.Bouton>
+          ) : null
+        }
+      />
 
-      <div className="rounded-lg border bg-surface divide-y mb-6" style={{ borderColor: COLORS.border }}>
-        <Row label="Libellé" value={formation.nom} />
-        <div className="px-5 py-3"><Row label="Description" value={formation.description} /></div>
-        <div className="px-5 py-3"><Row label="Coach" value={formation.coach} /></div>
-        <div className="px-5 py-3"><Row label="Modules" value={`${formation.modules} Modules · ${formation.heures}h d'apprentissage`} /></div>
-        <div className="px-5 py-3"><Row label="Durée" value={dureeFromHeures(formation.heures)} /></div>
-        <div className="px-5 py-3 flex items-center justify-between">
-          <p className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>Statut</p>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: enrolled ? "#DCFCE7" : COLORS.softStrong, color: enrolled ? "#16A34A" : COLORS.slateLight }}>
-            {isComplete ? "Terminée" : enrolled ? "Actif" : "Non inscrit"}
-          </span>
-        </div>
-      </div>
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="À propos de la formation">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{formation.description}</p>
+          </App.Carte>
 
-      <div className="rounded-lg border bg-surface p-5 mb-6" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold" style={{ color: COLORS.slate }}>Modules</h3>
-          {enrolled && <p className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>{Math.min(progressCount, total)} / {total} modules validés</p>}
-        </div>
-        {enrolled && (
-          <div className="mb-4">
-            <div className="flex items-center justify-between mb-1.5">
-              <p className="text-xs" style={{ color: COLORS.slateLight }}>Progression globale</p>
-              <p className="text-xs font-semibold" style={{ color: COLORS.orange }}>{globalProgress}%</p>
-            </div>
-            <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.softStrong }}>
-              <div className="h-1.5 rounded-full" style={{ width: `${globalProgress}%`, background: "#16A34A" }} />
-            </div>
-          </div>
-        )}
-        <div className="flex flex-col divide-y" style={{ borderColor: COLORS.border }}>
-          {modulesList.map((m, i) => {
-            const status = moduleStatus(i, enrolled, progressCount);
-            const style = MODULE_BADGE_STYLE[status];
-            return (
-              <div key={m.n} className="flex items-center justify-between py-3">
-                <div>
-                  <p className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>MODULE {m.n}</p>
-                  <p className="text-sm font-semibold" style={{ color: status === "Verrouillé" ? COLORS.slateLight : COLORS.slate }}>{m.titre}</p>
-                  <p className="text-xs" style={{ color: COLORS.slateLight }}>Durée : {m.duree}</p>
+          <App.Carte titre="Programme" sousTitre={enrolled ? `${Math.min(progressCount, total)} / ${total} modules validés` : `${total} modules`} flush>
+            <ol className="divide-y divide-base border-t border-base">
+              {modulesList.map((m, i) => {
+                const status = moduleStatus(i, enrolled, progressCount);
+                return (
+                  <li key={m.n} className="flex flex-col gap-3 px-6 py-4 sm:flex-row sm:items-center">
+                    <div className="flex min-w-0 flex-1 items-start gap-3">
+                      <span className={`inline-flex h-8 w-8 shrink-0 items-center justify-center rounded-full text-xs font-semibold ${status === "Complété" ? "bg-statut-succes-doux text-statut-succes" : status === "En cours" ? "bg-marque text-sur-marque" : "bg-doux text-discret"}`} aria-hidden="true">
+                        {status === "Complété" ? <Check size={14} strokeWidth={2.5} /> : m.n}
+                      </span>
+                      <div className="min-w-0">
+                        <p className={`text-sm font-semibold ${status === "Verrouillé" ? "text-secondaire" : "text-principal"}`}>{m.titre}</p>
+                        <p className="text-xs text-discret">Module {m.n} · {m.duree}</p>
+                      </div>
+                    </div>
+                    <div className="flex items-center gap-2 pl-11 sm:pl-0">
+                      {status === "En cours" && <App.Bouton petit onClick={onAdvanceModule}>Marquer comme terminé</App.Bouton>}
+                      <App.Badge ton={TON_MODULE[status]} taille="moyen">{status === "Verrouillé" && <Lock size={11} aria-hidden="true" />}{status}</App.Badge>
+                    </div>
+                  </li>
+                );
+              })}
+            </ol>
+          </App.Carte>
+
+          {formation.linkedCandidature && (
+            <App.Carte titre="Candidature liée" actions={<StatusBadge status={formation.linkedCandidature.statut} />}>
+              <p className="text-sm font-semibold text-principal">{formation.linkedCandidature.poste}</p>
+              <p className="text-xs text-discret">{formation.linkedCandidature.ville} · {formation.linkedCandidature.date}</p>
+              <CandidatureStepper step={formation.linkedCandidature.step} />
+            </App.Carte>
+          )}
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Aperçu de la formation"
+            items={[
+              { icone: Layers, libelle: "Modules", valeur: `${total} modules` },
+              { icone: Clock, libelle: "Volume horaire", valeur: `${formation.heures} h` },
+              { icone: CalendarDays, libelle: "Durée", valeur: dureeFromHeures(formation.heures) },
+              { icone: UserCircle2, libelle: "Formateur", valeur: nomDepuisEmail(formation.coach) },
+              { icone: Crown, libelle: "Accès", valeur: premium ? "Profil Premium" : "Inclus dans votre profil" },
+            ]}
+          />
+
+          <App.Carte titre="Votre progression">
+            {enrolled ? (
+              <div className="space-y-3">
+                <div className="flex items-end justify-between">
+                  <p className="text-[28px] font-semibold leading-none text-principal">{progression} %</p>
+                  <p className="text-sm text-discret">{Math.min(progressCount, total)} / {total} modules</p>
                 </div>
-                <div className="flex items-center gap-3 shrink-0">
-                  {status === "En cours" && (
-                    <button type="button" onClick={onAdvanceModule} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-                      Marquer comme terminé
-                    </button>
-                  )}
-                  <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: style.bg, color: style.color }}>{status}</span>
-                </div>
+                <App.BarreProgression valeur={progression} ton={isComplete ? "succes" : "marque"} hauteur="epaisse" label="Progression de la formation" />
+                <p className="text-sm text-secondaire">
+                  {isComplete ? "Bravo, vous avez terminé tous les modules. Votre certificat est prêt." : "Validez chaque module pour débloquer le suivant et obtenir votre certificat."}
+                </p>
+                {isComplete && <App.Bouton pleineLargeur variante="neutre" onClick={onViewCertificate}>Voir mon certificat</App.Bouton>}
               </div>
-            );
-          })}
-        </div>
-      </div>
+            ) : (
+              <div className="space-y-4">
+                <p className="text-sm text-secondaire">
+                  {locked ? "Cette formation fait partie du profil Premium." : "Inscrivez-vous pour suivre les modules à votre rythme et obtenir un certificat LIGGEEY."}
+                </p>
+                <App.Bouton pleineLargeur onClick={onToggleEnroll}>
+                  {locked ? <Lock size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />} S'inscrire
+                </App.Bouton>
+              </div>
+            )}
+          </App.Carte>
+        </>}
+      />
 
-      {formation.linkedCandidature && (
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-start justify-between mb-1">
-            <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>{formation.linkedCandidature.poste}</p>
-            <StatusBadge status={formation.linkedCandidature.statut} />
+      {similaires.length > 0 && (
+        <section>
+          <h2 className="mb-4 text-lg font-semibold text-principal">Autres formations</h2>
+          <div className="space-y-4">
+            {similaires.map((f) => <FormationCard key={f.id} f={f} onOpen={onOpen} {...carteProps(f)} />)}
           </div>
-          <p className="text-xs" style={{ color: COLORS.slateLight }}>{formation.linkedCandidature.ville} · {formation.linkedCandidature.date}</p>
-          <CandidatureStepper step={formation.linkedCandidature.step} />
-        </div>
+        </section>
       )}
     </div>
   );
@@ -1937,7 +2762,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
         <ArrowLeft size={14} /> Retour à la formation
       </button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Certificat de formation</h2>
-      <p className="text-sm mb-6" style={{ color: "#16A34A" }}>Félicitations ! Vous avez complété la formation avec succès.</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.success }}>Félicitations ! Vous avez complété la formation avec succès.</p>
 
       <div className="rounded-lg border-2 p-8 mb-6 text-center" style={{ borderColor: COLORS.orange }}>
         <div className="w-16 h-16 rounded-full flex items-center justify-center mx-auto mb-4" style={{ background: COLORS.orangeSoft }}>
@@ -1952,7 +2777,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4" style={{ borderTop: `1px solid ${COLORS.border}` }}>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>DATE D'OBTENTION</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>30 octobre 2026</p></div>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>VOLUME HORAIRE</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{formation.modules} Modules · {formation.heures}h</p></div>
-          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>MENTION</p><p className="text-sm font-semibold" style={{ color: "#16A34A" }}>Très bien (87/100)</p></div>
+          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>MENTION</p><p className="text-sm font-semibold" style={{ color: COLORS.success }}>Très bien (87/100)</p></div>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>ID UNIQUE</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>CERT-{formation.id.slice(0, 2).toUpperCase()}-2026-0042</p></div>
         </div>
       </div>
@@ -1960,7 +2785,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
       <div className="flex gap-3 mb-8">
         <button type="button" onClick={() => setFeedback("téléchargé")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Télécharger (PDF)</button>
         <button type="button" onClick={() => setFeedback("partagé")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Partager</button>
-        {feedback && <span className="self-center text-sm" style={{ color: "#047857" }}>Certificat {feedback} (démo).</span>}
+        {feedback && <span className="self-center text-sm" style={{ color: COLORS.success }}>Certificat {feedback} (démo).</span>}
       </div>
 
       <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Formations recommandées pour vous</h3>
@@ -1978,7 +2803,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
 }
 
 const FORMATIONS_PRESTATAIRE_ALL = [
-  { id: "securite-elec", nom: "Sécurité Électrique", modules: 8, heures: 24, enrolled: true, progressCount: 4, coach: "cheikh.fall@cneap.sn", tagline: "Maîtriser les normes de sécurité sur chantier électrique.", description: "Formation qualifiante couvrant l'ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d'urgence sur chantier.", moduleNames: [
+  { id: "securite-elec", domaines: ["electricite"], nom: "Sécurité Électrique", modules: 8, heures: 24, enrolled: true, progressCount: 4, coach: "cheikh.fall@cneap.sn", tagline: "Maîtriser les normes de sécurité sur chantier électrique.", description: "Formation qualifiante couvrant l'ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d'urgence sur chantier.", moduleNames: [
     { titre: "Introduction aux normes NF C 15-100", duree: "2h30" },
     { titre: "Protection des personnes et des biens", duree: "3h00" },
     { titre: "Dimensionnement des circuits", duree: "4h00" },
@@ -1988,26 +2813,34 @@ const FORMATIONS_PRESTATAIRE_ALL = [
     { titre: "Mise en pratique — TP sur site", duree: "3h00" },
     { titre: "Évaluation finale", duree: "3h00" },
   ] },
-  { id: "peinture-moderne", nom: "Peinture Moderne", modules: 8, heures: 24, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques modernes de peinture décorative et finitions.", description: "Apprenez les techniques actuelles de peinture décorative, enduits et finitions haut de gamme recherchées par les clients particuliers." },
-  { id: "gestion-micro", nom: "Gestion Micro-Entreprise", modules: 12, heures: 32, enrolled: true, progressCount: 5, coach: "fatou.ba@cneap.sn", tagline: "Gérer et développer sa petite activité indépendante.", description: "Comptabilité de base, fixation des tarifs, gestion des devis et développement de la clientèle pour les travailleurs indépendants." },
-  { id: "soudure-tech", nom: "Techniques de Soudure", modules: 14, heures: 48, enrolled: false, coach: "moussa.diagne@cneap.sn", tagline: "Perfectionner ses techniques de soudure TIG et MIG.", description: "Formation avancée en soudure industrielle pour les professionnels souhaitant élargir leur champ de compétences." },
-  { id: "maconnerie-fond", nom: "Maçonnerie & Fondations", modules: 16, heures: 44, enrolled: false, coach: "ibrahima.sy@institutbtp.sn", tagline: "Construire des fondations solides et durables.", description: "Techniques de fondations, dosage du béton et lecture de plans pour les maçons professionnels." },
-  { id: "normes-btp", nom: "Normes BTP & Sécurité", modules: 10, heures: 28, enrolled: true, progressCount: 6, coach: "khadija.ndoye@institutbtp.sn", tagline: "Connaître et appliquer les normes de sécurité BTP.", description: "Les règles de sécurité incontournables sur un chantier de construction, port des équipements et prévention des accidents." },
-  { id: "coiffure-esthetique", nom: "Coiffure & Esthétique", modules: 10, heures: 26, enrolled: false, coach: "aissatou.fall@centreartisanat.sn", tagline: "Techniques de coiffure et de soins esthétiques.", description: "Tresses, soins capillaires et techniques esthétiques recherchées par une clientèle exigeante." },
-  { id: "relation-client", nom: "Relation Client", modules: 6, heures: 16, enrolled: true, progressCount: 6, coach: "omar.gueye@cneap.sn", tagline: "Fidéliser sa clientèle et gérer les réclamations.", description: "Communiquer efficacement avec ses clients, gérer les insatisfactions et construire une réputation solide." },
-  { id: "mecanique-auto", nom: "Mécanique Auto", modules: 18, heures: 50, enrolled: false, coach: "papa.diouf@institutbtp.sn", tagline: "Diagnostiquer et réparer les pannes mécaniques courantes.", description: "Bases de la mécanique automobile : diagnostic de panne, entretien courant et réparations essentielles." },
-  { id: "couture-confection", nom: "Couture & Confection", modules: 12, heures: 30, enrolled: false, coach: "ndeye.diop@centreartisanat.sn", tagline: "Perfectionner ses techniques de couture sur mesure.", description: "Techniques avancées de couture, patronage et confection sur mesure pour les professionnels du textile." },
-  { id: "installation-sanitaire", nom: "Installation Sanitaire", modules: 12, heures: 34, enrolled: false, coach: "modou.diagne@institutbtp.sn", tagline: "Installer et entretenir des systèmes sanitaires complets.", description: "Installation de sanitaires, raccordements et mise aux normes des systèmes de plomberie résidentiels." },
-  { id: "peinture-batiment", nom: "Peinture Bâtiment", modules: 8, heures: 20, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques de peinture pour le bâtiment.", description: "Préparation des surfaces, application et finitions pour des chantiers de peinture en bâtiment." },
+  { id: "peinture-moderne", domaines: ["btp"], nom: "Peinture Moderne", modules: 8, heures: 24, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques modernes de peinture décorative et finitions.", description: "Apprenez les techniques actuelles de peinture décorative, enduits et finitions haut de gamme recherchées par les clients particuliers." },
+  { id: "gestion-micro", domaines: ["tous"], nom: "Gestion Micro-Entreprise", modules: 12, heures: 32, enrolled: true, progressCount: 5, coach: "fatou.ba@cneap.sn", tagline: "Gérer et développer sa petite activité indépendante.", description: "Comptabilité de base, fixation des tarifs, gestion des devis et développement de la clientèle pour les travailleurs indépendants." },
+  { id: "soudure-tech", domaines: ["metallerie"], nom: "Techniques de Soudure", modules: 14, heures: 48, enrolled: false, coach: "moussa.diagne@cneap.sn", tagline: "Perfectionner ses techniques de soudure TIG et MIG.", description: "Formation avancée en soudure industrielle pour les professionnels souhaitant élargir leur champ de compétences." },
+  { id: "maconnerie-fond", domaines: ["btp"], nom: "Maçonnerie & Fondations", modules: 16, heures: 44, enrolled: false, coach: "ibrahima.sy@institutbtp.sn", tagline: "Construire des fondations solides et durables.", description: "Techniques de fondations, dosage du béton et lecture de plans pour les maçons professionnels." },
+  { id: "normes-btp", domaines: ["btp", "electricite", "plomberie", "menuiserie", "metallerie"], nom: "Normes BTP & Sécurité", modules: 10, heures: 28, enrolled: true, progressCount: 6, coach: "khadija.ndoye@institutbtp.sn", tagline: "Connaître et appliquer les normes de sécurité BTP.", description: "Les règles de sécurité incontournables sur un chantier de construction, port des équipements et prévention des accidents." },
+  { id: "coiffure-esthetique", domaines: ["coiffure"], nom: "Coiffure & Esthétique", modules: 10, heures: 26, enrolled: false, coach: "aissatou.fall@centreartisanat.sn", tagline: "Techniques de coiffure et de soins esthétiques.", description: "Tresses, soins capillaires et techniques esthétiques recherchées par une clientèle exigeante." },
+  { id: "relation-client", domaines: ["tous"], nom: "Relation Client", modules: 6, heures: 16, enrolled: true, progressCount: 6, coach: "omar.gueye@cneap.sn", tagline: "Fidéliser sa clientèle et gérer les réclamations.", description: "Communiquer efficacement avec ses clients, gérer les insatisfactions et construire une réputation solide." },
+  { id: "mecanique-auto", domaines: ["mecanique"], nom: "Mécanique Auto", modules: 18, heures: 50, enrolled: false, coach: "papa.diouf@institutbtp.sn", tagline: "Diagnostiquer et réparer les pannes mécaniques courantes.", description: "Bases de la mécanique automobile : diagnostic de panne, entretien courant et réparations essentielles." },
+  { id: "couture-confection", domaines: ["couture"], nom: "Couture & Confection", modules: 12, heures: 30, enrolled: false, coach: "ndeye.diop@centreartisanat.sn", tagline: "Perfectionner ses techniques de couture sur mesure.", description: "Techniques avancées de couture, patronage et confection sur mesure pour les professionnels du textile." },
+  { id: "installation-sanitaire", domaines: ["plomberie"], nom: "Installation Sanitaire", modules: 12, heures: 34, enrolled: false, coach: "modou.diagne@institutbtp.sn", tagline: "Installer et entretenir des systèmes sanitaires complets.", description: "Installation de sanitaires, raccordements et mise aux normes des systèmes de plomberie résidentiels." },
+  { id: "peinture-batiment", domaines: ["btp"], nom: "Peinture Bâtiment", modules: 8, heures: 20, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques de peinture pour le bâtiment.", description: "Préparation des surfaces, application et finitions pour des chantiers de peinture en bâtiment." },
+  { id: "solaire-pv", domaines: ["electricite"], nom: "Installation Solaire Photovoltaïque", modules: 10, heures: 30, enrolled: false, coach: "ousmane.diop@cneap.sn", tagline: "Dimensionner et poser une installation solaire domestique.", description: "Calcul des besoins, choix des panneaux et des batteries, pose et raccordement d'un kit solaire en toute sécurité." },
+  { id: "domotique-maison", domaines: ["electricite"], nom: "Domotique & Maison Connectée", modules: 8, heures: 20, enrolled: false, coach: "aminata.fall@cneap.sn", tagline: "Installer des équipements pilotés à distance.", description: "Éclairage, volets et climatisation pilotés depuis un téléphone : installation, paramétrage et dépannage." },
 ];
 
+const FORMATIONS_PAR_PAGE = 5;
+
 function FormationsScreen({ initialTab, dataset, userName }) {
-  const ALL = dataset || FORMATIONS_ALL;
+  const BASE = dataset || FORMATIONS_ALL;
+  const estPrestataire = BASE === FORMATIONS_PRESTATAIRE_ALL;
+  const { metier, domaine } = useDomainePrestataire();
+  const ALL = estPrestataire ? BASE.filter((f) => dansDomaine(f, domaine)) : BASE;
   const [tab, setTab] = useState(initialTab || "toutes");
   const [query, setQuery] = useState("");
-  const storeKey = ALL === FORMATIONS_PRESTATAIRE_ALL ? "p" : "c";
-  const [enrolledIds, setEnrolledIds] = useStore(`formations-inscrites-${storeKey}`, () => ALL.filter((f) => f.enrolled).map((f) => f.id));
-  const [progressCounts, setProgressCounts] = useStore(`formations-progression-${storeKey}`, () => Object.fromEntries(ALL.map((f) => [f.id, f.progressCount || 0])));
+  const [acces, setAcces] = useState("tous");
+  const storeKey = estPrestataire ? "p" : "c";
+  const [enrolledIds, setEnrolledIds] = useStore(`formations-inscrites-${storeKey}`, () => BASE.filter((f) => f.enrolled).map((f) => f.id));
+  const [progressCounts, setProgressCounts] = useStore(`formations-progression-${storeKey}`, () => Object.fromEntries(BASE.map((f) => [f.id, f.progressCount || 0])));
   const [selectedId, setSelectedId] = useState(null);
   const [view, setView] = useState("list"); // list | detail | certificate
   const [page, setPage] = useState(1);
@@ -2018,14 +2851,27 @@ function FormationsScreen({ initialTab, dataset, userName }) {
     if (isLocked(ALL.find((f) => f.id === id))) { planApi.requestUpgrade("formationsPremium"); return; }
     setEnrolledIds((ids) => (ids.includes(id) ? ids : [...ids, id]));
     setProgressCounts((p) => ({ ...p, [id]: p[id] || 0 }));
+    notify("Inscription confirmée. Bonne formation !");
   }
   function advanceModule(id, total) {
     setProgressCounts((p) => ({ ...p, [id]: Math.min(total, (p[id] || 0) + 1) }));
   }
+  const carteProps = (f) => {
+    const inscrit = enrolledIds.includes(f.id);
+    return { premium: PREMIUM_FORMATIONS.has(f.id), locked: isLocked(f), inscrit, progression: progressionFormation(f, inscrit, progressCounts[f.id] || 0) };
+  };
+  const ouvrir = (f) => { setSelectedId(f.id); setView("detail"); window.scrollTo(0, 0); };
 
-  const source = tab === "mes" ? ALL.filter((f) => enrolledIds.includes(f.id)) : ALL;
-  const filtered = source.filter((f) => f.nom.toLowerCase().includes(query.toLowerCase()));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const mes = ALL.filter((f) => enrolledIds.includes(f.id));
+  const source = tab === "mes" ? mes : ALL;
+  const q = sansAccents(query.trim());
+  const filtered = source.filter((f) =>
+    (!q || sansAccents([f.nom, f.tagline, f.description].join(" ")).includes(q)) &&
+    (acces === "tous" || (acces === "premium") === PREMIUM_FORMATIONS.has(f.id)));
+  const pages = Math.max(1, Math.ceil(filtered.length / FORMATIONS_PAR_PAGE));
+  const pageCourante = Math.min(page, pages);
+  const paged = filtered.slice((pageCourante - 1) * FORMATIONS_PAR_PAGE, pageCourante * FORMATIONS_PAR_PAGE);
+  const filtresActifs = q || acces !== "tous";
   const selected = ALL.find((f) => f.id === selectedId);
 
   if (selected && view === "certificate") {
@@ -2041,56 +2887,83 @@ function FormationsScreen({ initialTab, dataset, userName }) {
   if (selected) {
     return (
       <FormationDetail
+        key={selected.id}
         formation={selected}
         enrolled={enrolledIds.includes(selected.id)}
         progressCount={progressCounts[selected.id] || 0}
+        premium={PREMIUM_FORMATIONS.has(selected.id)}
+        locked={isLocked(selected)}
         onToggleEnroll={() => toggleEnroll(selected.id)}
         onAdvanceModule={() => advanceModule(selected.id, selected.modules)}
         onViewCertificate={() => setView("certificate")}
         onBack={() => { setSelectedId(null); setView("list"); }}
+        similaires={ALL.filter((f) => f.id !== selected.id && !enrolledIds.includes(f.id)).slice(0, 3)}
+        onOpen={ouvrir}
+        carteProps={carteProps}
       />
     );
   }
 
   return (
-    <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
-        Développez vos compétences avec des formations pensées pour le marché sénégalais.
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">
+        Développez vos compétences avec des formations pensées pour le marché sénégalais. Chaque formation terminée vous donne un certificat LIGGEEY.
       </p>
+      {estPrestataire && <NoteDomaine metier={metier} domaine={domaine} texte="Formations choisies" />}
 
-      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
-        {[{ id: "toutes", label: "Toutes les formations" }, { id: "mes", label: "Mes formations" }].map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => { setTab(t.id); setPage(1); }}
-            className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`}
-            
-          >
-            {t.label}
-          </button>
-        ))}
+      <BarreFiltres label="Rechercher et filtrer les formations">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); setPage(1); }}
+          placeholder="Nom ou thème de la formation…"
+          label="Rechercher une formation"
+          className="w-full lg:flex-1"
+        />
+        <App.SelecteurPeriode
+          icone={Crown}
+          label="Accès"
+          valeur={acces}
+          onChange={(v) => { setAcces(v); setPage(1); }}
+          options={[{ id: "tous", label: "Tous les accès" }, { id: "inclus", label: "Incluses dans mon profil" }, { id: "premium", label: "Premium" }]}
+        />
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Afficher"
+          actif={tab}
+          onChange={(v) => { setTab(v); setPage(1); }}
+          options={[
+            { id: "toutes", label: `Toutes (${ALL.length})` },
+            { id: "mes", label: `Mes formations (${mes.length})` },
+          ]}
+        />
+        <CompteResultats n={filtered.length} nom="formation" feminin />
       </div>
 
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-        placeholder={tab === "mes" ? "Rechercher parmi mes formations..." : "Rechercher une formation..."}
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
-        style={{ borderColor: COLORS.border }}
-      />
+      {paged.length > 0 ? (
+        <div className="space-y-4">
+          {paged.map((f) => <FormationCard key={f.id} f={f} onOpen={ouvrir} {...carteProps(f)} />)}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-base bg-surface">
+          <App.EtatVide
+            icone={tab === "mes" && !filtresActifs ? GraduationCap : Search}
+            titre={tab === "mes" && !filtresActifs ? "Vous ne suivez aucune formation" : "Aucune formation ne correspond à votre recherche"}
+            texte={tab === "mes" && !filtresActifs ? "Parcourez le catalogue et inscrivez-vous à une première formation." : "Essayez d'autres mots-clés ou retirez un filtre."}
+            action={
+              tab === "mes" && !filtresActifs
+                ? <App.Bouton petit onClick={() => setTab("toutes")}>Voir toutes les formations</App.Bouton>
+                : filtresActifs && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setAcces("tous"); setPage(1); }}>Effacer les filtres</App.Bouton>
+            }
+          />
+        </div>
+      )}
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paged.map((f) => (
-          <FormationCard key={f.id} f={f} premium={PREMIUM_FORMATIONS.has(f.id)} locked={isLocked(f)} onOpen={(ff) => { setSelectedId(ff.id); setView("detail"); }} />
-        ))}
-        {paged.length === 0 && (
-          <p className="text-sm col-span-full" style={{ color: COLORS.slateLight }}>Aucune formation à afficher.</p>
-        )}
-      </div>
-
-      <Pagination page={page} pageSize={PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+      {filtered.length > FORMATIONS_PAR_PAGE && (
+        <Pagination page={pageCourante} pageSize={FORMATIONS_PAR_PAGE} totalItems={filtered.length} onPageChange={setPage} />
+      )}
     </div>
   );
 }
@@ -2125,20 +2998,42 @@ function initials(name) {
 }
 
 function MentorCard({ m, onOpen }) {
+  const profil = mentorProfile(m);
+  const themes = m.competences || profil.themes;
   return (
-    <button
-      type="button"
+    <article
       onClick={() => onOpen(m)}
-      className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md"
-      style={{ borderColor: COLORS.border }}
+      className="group flex cursor-pointer flex-col gap-4 rounded-lg border border-base bg-surface p-5 transition-shadow hover:shadow-carte sm:flex-row sm:items-center"
     >
-      <div className="flex items-start justify-between mb-3">
-        <SafeImg src={m.photo} alt={m.nom} className="w-11 h-11 rounded-full object-cover" />
-        {m.historique && <span className="text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>Votre mentor</span>}
+      <div className="flex min-w-0 flex-1 items-start gap-4">
+        <SafeImg src={m.photo} alt={m.nom} className="h-14 w-14 shrink-0 rounded-full object-cover" />
+        <div className="min-w-0 flex-1">
+          <div className="flex flex-wrap items-center gap-2">
+            <h3 className="text-base font-semibold text-principal group-hover:text-marque">{m.nom}</h3>
+            {m.historique && <App.Badge ton="succes" point taille="moyen">Votre mentor</App.Badge>}
+          </div>
+          <p className="mt-0.5 text-sm text-secondaire">{m.role} · {m.exp} ans d'expérience</p>
+          <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
+            <MetaOffre icone={Star}>{profil.stats.note}</MetaOffre>
+            <MetaOffre icone={UsersRound}>{profil.stats.mentores} mentorés</MetaOffre>
+            <MetaOffre icone={MessageCircle}>{profil.langues.join(", ")}</MetaOffre>
+          </div>
+          <div className="mt-3">
+            <Etiquettes items={themes} max={3} />
+          </div>
+        </div>
       </div>
-      <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>{m.nom}</p>
-      <p className="text-xs" style={{ color: COLORS.slateLight }}>{m.role} · {m.exp} ans d'expérience</p>
-    </button>
+      <div className="flex items-center justify-end gap-2 border-t border-base pt-4 sm:border-0 sm:pt-0">
+        <App.Bouton
+          petit
+          variante={m.historique ? "neutre" : "principal"}
+          onClick={(e) => { e.stopPropagation(); onOpen(m); }}
+          aria-label={`Voir le profil de ${m.nom}`}
+        >
+          Voir le profil
+        </App.Bouton>
+      </div>
+    </article>
   );
 }
 
@@ -2152,7 +3047,7 @@ function StatMini({ value, label }) {
 }
 
 const MENTORS_PRESTATAIRE = [
-  { id: "cheikh-fall-artisan", nom: "Cheikh Fall", role: "Maître Électricien", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall.jpg", tagline: "Accompagne les électriciens et techniciens depuis 8 ans sur les normes de sécurité, la gestion de chantier et le développement de leur activité.", competences: ["Normes électriques", "Devis & Facturation", "Relation client", "Installation solaire", "Gestion de chantier", "Domotique"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
+  { id: "cheikh-fall-artisan", domaines: ["electricite"], nom: "Cheikh Fall", role: "Maître Électricien", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall.jpg", tagline: "Accompagne les électriciens et techniciens depuis 8 ans sur les normes de sécurité, la gestion de chantier et le développement de leur activité.", competences: ["Normes électriques", "Devis & Facturation", "Relation client", "Installation solaire", "Gestion de chantier", "Domotique"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
       { date: "30 juillet 2026", note: "Revue des procédures de sécurité électrique : mise en conformité NF C 15-100, check-list d'intervention et documentation des travaux. Point à travailler : devis détaillés avec schémas." },
       { date: "18 juillet 2026", note: "Stratégie de spécialisation : positionnement sur l'installation de panneaux solaires et la domotique, deux marchés en forte croissance au Sénégal." },
       { date: "2 juillet 2026", note: "Premier échange : évaluation des compétences techniques, identification des certifications à obtenir et plan de développement." },
@@ -2161,30 +3056,78 @@ const MENTORS_PRESTATAIRE = [
       { nom: "Modèle de devis professionnel.docx", meta: "DOCX · 2 avril 2026" },
       { nom: "Liste des clients qui recrutent.xlsx", meta: "XLSX · 20 juin 2026" },
     ], prochainRdv: "Jeudi 11 août 2026 · 15h00 – 16h00" },
-  { id: "aminata-ndiaye-couture", nom: "Aminata Ndiaye", role: "Couturière & Styliste", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
-  { id: "moussa-diop-menuisier", nom: "Moussa Diop", role: "Maître Menuisier", exp: 10, photo: "/images/plateforme/portraits/moussa-diop.jpg" },
-  { id: "fatou-sarr-elec", nom: "Fatou Sarr", role: "Électricienne Bâtiment", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
-  { id: "ousmane-ba-macon", nom: "Ousmane Ba", role: "Chef Maçon BTP", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
-  { id: "mariama-sow-plomberie", nom: "Mariama Sow", role: "Plombière Sanitaire", exp: 14, photo: "/images/plateforme/portraits/mariama-sow.jpg" },
-  { id: "ibrahima-diallo-soudeur", nom: "Ibrahima Diallo", role: "Soudeur Industriel", exp: 20, photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
-  { id: "aissatou-dia-patisserie", nom: "Aissatou Dia", role: "Pâtissière & Restauratrice", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia.jpg" },
-  { id: "papa-seck-btp", nom: "Papa Seck", role: "Entrepreneur BTP", exp: 16, photo: "/images/plateforme/portraits/papa-seck.jpg" },
-  { id: "khady-toure-teinture", nom: "Khady Touré", role: "Teinturière & Formatrice", exp: 11, photo: "/images/plateforme/portraits/khady-toure.jpg" },
-  { id: "babacar-niang-carrelage", nom: "Babacar Niang", role: "Carreleur & Décorateur", exp: 22, photo: "/images/plateforme/portraits/babacar-niang.jpg" },
-  { id: "ndeye-mbaye-coiffure", nom: "Ndèye Mbaye", role: "Coiffeuse & Gérante de Salon", exp: 9, photo: "/images/plateforme/portraits/ndeye-mbaye.jpg" },
+  { id: "aminata-ndiaye-couture", domaines: ["couture"], competences: ["Couture sur mesure", "Patronage", "Gestion d'atelier", "Tarifs et devis"], nom: "Aminata Ndiaye", role: "Couturière & Styliste", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
+  { id: "moussa-diop-menuisier", domaines: ["menuiserie"], competences: ["Mobilier sur mesure", "Lecture de plans", "Devis", "Sécurité en atelier"], nom: "Moussa Diop", role: "Maître Menuisier", exp: 10, photo: "/images/plateforme/portraits/moussa-diop.jpg" },
+  { id: "fatou-sarr-elec", domaines: ["electricite"], competences: ["Normes NF C 15-100", "Installation résidentielle", "Sécurité sur chantier", "Devis & Facturation"], nom: "Fatou Sarr", role: "Électricienne Bâtiment", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
+  { id: "ousmane-ba-macon", domaines: ["btp"], competences: ["Maçonnerie", "Lecture de plans", "Gestion de chantier", "Devis"], nom: "Ousmane Ba", role: "Chef Maçon BTP", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
+  { id: "mariama-sow-plomberie", domaines: ["plomberie"], competences: ["Installation sanitaire", "Recherche de fuite", "Relation client", "Devis"], nom: "Mariama Sow", role: "Plombière Sanitaire", exp: 14, photo: "/images/plateforme/portraits/mariama-sow.jpg" },
+  { id: "ibrahima-diallo-soudeur", domaines: ["metallerie"], competences: ["Soudure TIG/MIG", "Portails et grilles", "Sécurité", "Devis"], nom: "Ibrahima Diallo", role: "Soudeur Industriel", exp: 20, photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
+  { id: "aissatou-dia-patisserie", domaines: ["cuisine"], competences: ["Pâtisserie", "Hygiène alimentaire", "Prix de revient", "Vente"], nom: "Aissatou Dia", role: "Pâtissière & Restauratrice", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia.jpg" },
+  { id: "papa-seck-btp", domaines: ["btp", "electricite", "plomberie", "menuiserie", "metallerie"], competences: ["Créer son entreprise", "Répondre aux appels d'offres", "Gestion de chantier", "Constituer une équipe"], nom: "Papa Seck", role: "Entrepreneur BTP", exp: 16, photo: "/images/plateforme/portraits/papa-seck.jpg" },
+  { id: "khady-toure-teinture", domaines: ["couture"], competences: ["Teinture", "Création de motifs", "Vente en ligne", "Gestion de stock"], nom: "Khady Touré", role: "Teinturière & Formatrice", exp: 11, photo: "/images/plateforme/portraits/khady-toure.jpg" },
+  { id: "babacar-niang-carrelage", domaines: ["btp"], competences: ["Carrelage", "Finitions", "Métrés", "Devis"], nom: "Babacar Niang", role: "Carreleur & Décorateur", exp: 22, photo: "/images/plateforme/portraits/babacar-niang.jpg" },
+  { id: "ndeye-mbaye-coiffure", domaines: ["coiffure"], competences: ["Coiffure", "Tresses", "Gestion de salon", "Fidélisation"], nom: "Ndèye Mbaye", role: "Coiffeuse & Gérante de Salon", exp: 9, photo: "/images/plateforme/portraits/ndeye-mbaye.jpg" },
 ];
 
+const MENTORS_PAR_PAGE = 5;
+
+/* Encart « Votre mentor » en tête de l'écran Mentors : le mentor attitré (celui qui a un historique de séances),
+   son prochain coaching et l'accès direct à son profil. */
+function MentorAttitreCard({ m, coachings, onOpen }) {
+  const profil = mentorProfile(m);
+  const prochain = coachings.upcoming[0];
+  return (
+    <section aria-labelledby="mentor-attitre" className="overflow-hidden rounded-lg border border-marque bg-surface">
+      <div className="flex flex-col gap-5 p-5 sm:p-6 lg:flex-row lg:items-center">
+        <div className="flex min-w-0 flex-1 items-start gap-4">
+          <SafeImg src={m.photo} alt={m.nom} className="h-20 w-20 shrink-0 rounded-full object-cover" />
+          <div className="min-w-0">
+            <App.Badge ton="marque" point taille="moyen">Votre mentor</App.Badge>
+            <h2 id="mentor-attitre" className="mt-2 text-xl font-semibold text-principal">{m.nom}</h2>
+            <p className="text-sm text-secondaire">{m.role} · {m.exp} ans d'expérience</p>
+            <p className="mt-2 text-sm leading-[1.7] text-secondaire">{profil.bio}</p>
+          </div>
+        </div>
+        <div className="grid shrink-0 grid-cols-2 gap-3 lg:w-72 lg:grid-cols-1">
+          <div className="rounded-md bg-marque-doux px-4 py-3">
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-marque"><Calendar size={14} aria-hidden="true" /> Prochain coaching</p>
+            <p className="mt-0.5 text-sm font-semibold text-principal">{prochain ? prochain.date : "Aucun coaching prévu"}</p>
+            {prochain && <p className="text-xs text-secondaire">{prochain.theme} · {prochain.format}</p>}
+          </div>
+          <div className="rounded-md bg-doux px-4 py-3">
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-secondaire"><CheckCircle2 size={14} aria-hidden="true" /> Séances réalisées</p>
+            <p className="mt-0.5 text-sm font-semibold text-principal">{coachings.history.length}</p>
+          </div>
+        </div>
+      </div>
+      <div className="flex flex-wrap items-center justify-between gap-3 border-t border-base bg-doux/50 px-5 py-3 sm:px-6">
+        <Etiquettes items={m.competences || profil.themes} max={3} />
+        <App.Bouton petit onClick={() => onOpen(m)} aria-label={`Voir le profil et les séances de ${m.nom}`}>
+          Voir son profil et mes séances <ChevronRight size={15} aria-hidden="true" />
+        </App.Bouton>
+      </div>
+    </section>
+  );
+}
+const FORMATS_MENTORAT = ["Visio", "Téléphone", "Au bureau de Dakar"];
+
 function MentorsScreen({ initialMentorId, dataset }) {
-  const ALL = dataset || MENTORS;
+  const BASE = dataset || MENTORS;
+  const estPrestataire = BASE === MENTORS_PRESTATAIRE;
+  const { metier, domaine } = useDomainePrestataire();
+  const ALL = estPrestataire ? BASE.filter((m) => dansDomaine(m, domaine)) : BASE;
   const [query, setQuery] = useState("");
+  const [format, setFormat] = useState("tous");
   const [selected, setSelected] = useState(() => ALL.find((m) => m.id === initialMentorId) || null);
-  const [coachings, setCoachings] = useStore(`coachings-${ALL === MENTORS_PRESTATAIRE ? "p" : "c"}`, {});
+  const [coachings, setCoachings] = useStore(`coachings-${estPrestataire ? "p" : "c"}`, {});
   const [page, setPage] = useState(1);
+  const ouvrir = (m) => { setSelected(m); window.scrollTo(0, 0); };
 
   if (selected) {
     const current = coachings[selected.id] || defaultCoachings(selected);
     return (
       <MentorDetail
+        key={selected.id}
         mentor={selected}
         coachings={current}
         onUpdate={(fn) => setCoachings((c) => ({ ...c, [selected.id]: fn(c[selected.id] || defaultCoachings(selected)) }))}
@@ -2193,28 +3136,183 @@ function MentorsScreen({ initialMentorId, dataset }) {
     );
   }
 
-  const filtered = ALL.filter((m) => (m.nom + m.role).toLowerCase().includes(query.toLowerCase()));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // Le mentor attitré est mis en avant à part ; la liste montre les autres mentors à découvrir.
+  const attitre = ALL.find((m) => m.historique);
+  const autres = attitre ? ALL.filter((m) => m.id !== attitre.id) : ALL;
+  const q = sansAccents(query.trim());
+  const filtered = autres.filter((m) => {
+    const profil = mentorProfile(m);
+    return (!q || sansAccents([m.nom, m.role, ...(m.competences || profil.themes)].join(" ")).includes(q)) &&
+      (format === "tous" || profil.formats.includes(format));
+  });
+  const pages = Math.max(1, Math.ceil(filtered.length / MENTORS_PAR_PAGE));
+  const pageCourante = Math.min(page, pages);
+  const paged = filtered.slice((pageCourante - 1) * MENTORS_PAR_PAGE, pageCourante * MENTORS_PAR_PAGE);
+  const filtresActifs = q || format !== "tous";
 
   return (
-    <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Un accompagnement personnalisé pour préparer votre insertion.</p>
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-        placeholder="Rechercher un mentor, une compétence..."
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
-        style={{ borderColor: COLORS.border }}
-      />
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paged.map((m) => (
-          <MentorCard key={m.id} m={m} onOpen={setSelected} />
-        ))}
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">
+        {estPrestataire
+          ? "Des professionnels de votre métier, vérifiés par LIGGEEY, vous aident à développer votre activité : devis, normes, clientèle."
+          : "Des professionnels vérifiés par LIGGEEY vous accompagnent pour préparer votre insertion : CV, entretiens, orientation."}
+      </p>
+      {estPrestataire && <NoteDomaine metier={metier} domaine={domaine} texte="Mentors choisis" />}
+
+      {attitre && <MentorAttitreCard m={attitre} coachings={coachings[attitre.id] || defaultCoachings(attitre)} onOpen={ouvrir} />}
+
+      <div>
+        <h2 className="text-lg font-semibold text-principal">{attitre ? "Découvrir d'autres mentors" : "Choisir un mentor"}</h2>
+        <p className="mt-1 text-sm text-secondaire">
+          {attitre
+            ? `Besoin d'un autre regard ? Consultez leurs profils et réservez un coaching avec le mentor de votre choix, en plus de ${attitre.nom.split(" ")[0]}.`
+            : "Consultez les profils et réservez un premier coaching avec le mentor de votre choix."}
+        </p>
       </div>
-      <Pagination page={page} pageSize={PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+
+      <BarreFiltres label="Rechercher et filtrer les mentors">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); setPage(1); }}
+          placeholder="Nom, métier ou compétence…"
+          label="Rechercher un mentor"
+          className="w-full lg:flex-1"
+        />
+        <App.SelecteurPeriode
+          icone={Video}
+          label="Format des séances"
+          valeur={format}
+          onChange={(v) => { setFormat(v); setPage(1); }}
+          options={[{ id: "tous", label: "Tous les formats" }, ...FORMATS_MENTORAT]}
+        />
+      </BarreFiltres>
+
+      <div className="flex justify-end">
+        <CompteResultats n={filtered.length} nom="mentor" />
+      </div>
+
+      {paged.length > 0 ? (
+        <div className="space-y-4">
+          {paged.map((m) => <MentorCard key={m.id} m={m} onOpen={ouvrir} />)}
+        </div>
+      ) : (
+        <div className="rounded-lg border border-base bg-surface">
+          <App.EtatVide
+            icone={Search}
+            titre="Aucun mentor ne correspond à votre recherche"
+            texte="Essayez d'autres mots-clés ou retirez un filtre."
+            action={filtresActifs && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setFormat("tous"); setPage(1); }}>Effacer les filtres</App.Bouton>}
+          />
+        </div>
+      )}
+
+      {filtered.length > MENTORS_PAR_PAGE && (
+        <Pagination page={pageCourante} pageSize={MENTORS_PAR_PAGE} totalItems={filtered.length} onPageChange={setPage} />
+      )}
     </div>
   );
+}
+
+/* ---------- Profils : pièces communes ----------
+   Chaque espace a sa page « Mon profil » au même format que les fiches (en-tête, chiffres clés,
+   contenu à gauche, colonne « Mes informations » à droite). Les chiffres viennent des mêmes données
+   que les autres écrans, et la complétion du profil est calculée par les mêmes fonctions que le
+   tableau de bord, pour que tout concorde. */
+
+function pourcentageFait(items) {
+  return Math.round((items.filter((i) => i.fait).length / items.length) * 100);
+}
+
+function CarteCompletion({ completion, onAction }) {
+  return (
+    <App.Carte titre="Profil complété" actions={<span className="text-lg font-semibold text-marque">{completion.valeur} %</span>}>
+      <App.BarreProgression valeur={completion.valeur} ton={completion.valeur === 100 ? "succes" : "marque"} label={`Profil complété à ${completion.valeur} %`} />
+      <div className="mt-4">
+        {completion.items.map((i) => <ChecklistItem key={i.label} label={i.label} done={i.fait} />)}
+      </div>
+      {onAction && completion.valeur < 100 && (
+        <div className="mt-4">
+          <App.Bouton petit variante="doux" onClick={onAction}>Compléter mon profil</App.Bouton>
+        </div>
+      )}
+    </App.Carte>
+  );
+}
+
+function ChiffresProfil({ items }) {
+  return (
+    <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
+      {items.map((s) => <StatCard key={s.label} icon={s.icone} value={s.valeur} label={s.label} detail={s.detail} tone={s.ton} onClick={s.onClick} />)}
+    </div>
+  );
+}
+
+/* ---------- Chercheur d'emploi ---------- */
+
+const CV_CHERCHEUR_INITIAL = { nom: "CV_Absatou_Diallo.pdf", date: "28/07/2026" };
+const LANGUES_CHERCHEUR = [{ l: "Français", n: "Courant" }, { l: "Wolof", n: "Langue maternelle" }, { l: "Anglais", n: "Intermédiaire" }];
+const COMPETENCES_CHERCHEUR = ["Relation client", "Communication", "Excel", "Comptabilité de base", "Anglais professionnel"];
+const VERIF_CHERCHEUR = {
+  "a-transmettre": { ton: "neutre", label: "Identité à vérifier" },
+  "en-cours": { ton: "alerte", label: "Vérification en cours" },
+  verifie: { ton: "succes", label: "Profil vérifié" },
+};
+
+function useCompletionChercheur() {
+  const [info] = useStore("profil-chercheur", PROFIL_CHERCHEUR_INITIAL);
+  const [cv] = useStore("cv-chercheur", CV_CHERCHEUR_INITIAL);
+  const [verif] = useStore("verif-chercheur", "a-transmettre");
+  const items = [
+    { label: "Informations personnelles", fait: ["email", "telephone", "ville", "profession"].every((k) => String(info[k] || "").trim()) },
+    { label: "CV", fait: !!cv },
+    { label: "Compétences et langues", fait: COMPETENCES_CHERCHEUR.length > 0 && LANGUES_CHERCHEUR.length > 0 },
+    { label: "Vérification d'identité", fait: verif === "verifie" },
+  ];
+  return { items, valeur: pourcentageFait(items) };
+}
+
+/* ---------- Prestataire ---------- */
+
+const PRESTATAIRE_DETAILS = {
+  experience: "8 ans",
+  membreDepuis: "Janvier 2024",
+  disponibilite: "Lundi – samedi, 8 h – 18 h · urgences 24 h/24",
+  langues: [{ l: "Wolof", n: "Langue maternelle" }, { l: "Français", n: "Courant" }],
+  certifications: ["CAP Électricité (2018)", "Formation sécurité électrique Senelec (2020)", "Attestation installation solaire (2023)"],
+};
+
+function useCompletionPrestataire() {
+  const [info] = useStore("profil-prestataire", PROFIL_PRESTATAIRE_INITIAL);
+  const [services] = useStore("services", SERVICES_INITIAL);
+  const api = usePlan();
+  const regul = api && api.regulSteps ? regulSummary(api.regulSteps) : null;
+  const items = [
+    { label: "Informations personnelles", fait: ["metier", "email", "telephone", "localisation"].every((k) => String(info[k] || "").trim()) },
+    { label: "Au moins un service", fait: services.length > 0 },
+    { label: "Réalisations", fait: PORTFOLIO_REALISATIONS.length > 0 },
+  ];
+  return { items, valeur: pourcentageFait(items), regul };
+}
+
+/* ---------- Entreprise ---------- */
+
+const CHAMPS_PROFIL_ENTREPRISE = [
+  ["nom", "Nom de l'entreprise"], ["secteurPrincipal", "Secteur"], ["ninea", "NINEA"], ["rccm", "RCCM"],
+  ["telephone", "Téléphone"], ["email", "E-mail"], ["siteWeb", "Site web"], ["adresse", "Adresse"], ["description", "Présentation"], ["logo", "Logo"],
+];
+const RECRUTEUR_ENTREPRISE = { fonction: "Responsable du recrutement", telephone: "+221 77 845 21 10", email: "awa.diallo@senegalconstruct.sn" };
+
+function useCompletionEntreprise() {
+  const [profile] = useStore("profil-entreprise", PROFIL_ENTREPRISE_INITIAL);
+  const manquants = CHAMPS_PROFIL_ENTREPRISE.filter(([k]) => !String(profile[k] || "").trim());
+  const items = [
+    { label: "Informations légales (NINEA, RCCM)", fait: !!(profile.ninea && profile.rccm) },
+    { label: "Coordonnées", fait: !!(profile.telephone && profile.email && profile.adresse) },
+    { label: "Présentation", fait: !!String(profile.description || "").trim() },
+    { label: "Logo", fait: !!profile.logo },
+  ];
+  return { items, valeur: Math.round(((CHAMPS_PROFIL_ENTREPRISE.length - manquants.length) / CHAMPS_PROFIL_ENTREPRISE.length) * 100) };
 }
 
 /* ---------- Screen 10 : Mon Profil ---------- */
@@ -2224,9 +3322,9 @@ function ChecklistItem({ label, done }) {
     <div className="flex items-center gap-2 py-1">
       <span
         className="w-4 h-4 rounded-full flex items-center justify-center shrink-0"
-        style={{ background: done ? "#16A34A" : "transparent", border: done ? "none" : `1.5px solid ${COLORS.orange}` }}
+        style={{ background: done ? COLORS.success : "transparent", border: done ? "none" : `1.5px solid ${COLORS.orange}` }}
       >
-        {done && <Check size={11} color="#fff" />}
+        {done && <Check size={11} color={COLORS.onStatus} />}
       </span>
       <span className="text-sm" style={{ color: done ? COLORS.slate : COLORS.orange, fontWeight: done ? 400 : 600 }}>{label}</span>
       {!done && <span className="text-xs" style={{ color: COLORS.slateLight }}> - à compléter</span>}
@@ -2235,71 +3333,159 @@ function ChecklistItem({ label, done }) {
 }
 
 function ProfilScreen({ onNavigate }) {
+  const user = USER_BY_ESPACE.chercheur;
   const [info, setInfo] = useStore("profil-chercheur", PROFIL_CHERCHEUR_INITIAL);
+  const [cv, setCv] = useStore("cv-chercheur", CV_CHERCHEUR_INITIAL);
+  const [verif, setVerif] = useStore("verif-chercheur", "a-transmettre");
+  const [candidatures] = useStore("candidatures-chercheur", CANDIDATURES);
+  const [formationsInscrites] = useStore("formations-inscrites-c", () => FORMATIONS_ALL.filter((f) => f.enrolled).map((f) => f.id));
   const [editing, setEditing] = useState(false);
-  const [cv, setCv] = useState({ nom: "CV_Absatou_Diallo.pdf", date: "28/07/2026" });
   const [showVerifInfo, setShowVerifInfo] = useState(false);
-  const [documentsSubmitted, setDocumentsSubmitted] = useState(false);
+  const completion = useCompletionChercheur();
 
-  const LANGUES = [{ l: "Français", n: "Courant" }, { l: "Wolof", n: "Langue maternelle" }, { l: "Anglais", n: "Intermédiaire" }];
-  const COMPETENCES = ["Gestion de projet", "Excel avancé", "Anglais professionnel", "Communication", "Comptabilité de base"];
+  const embauche = candidatures.find((c) => c.embauche);
+  const enCours = candidatures.filter(GROUPES_CANDIDATURE.find((g) => g.id === "cours").test).length;
+  const mentor = MENTORS.find((m) => m.historique);
+  const etatVerif = VERIF_CHERCHEUR[verif] || VERIF_CHERCHEUR["a-transmettre"];
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-secondaire">
-        Gérez vos informations personnelles, suivez la progression de votre dossier et mettez en valeur vos compétences.
-      </p>
       {editing && (
         <ProfilInfoModal
-          nom="Absatou Diallo"
+          nom={user.name}
           values={info}
-          fields={[{ key: "email", label: "E-mail", type: "email" }, { key: "telephone", label: "Téléphone", type: "tel" }, { key: "ville", label: "Ville" }, { key: "profession", label: "Profession" }]}
-          onSave={setInfo}
+          fields={[{ key: "profession", label: "Métier recherché" }, { key: "email", label: "E-mail", type: "email" }, { key: "telephone", label: "Téléphone", type: "tel" }, { key: "ville", label: "Ville" }]}
+          onSave={(v) => { setInfo(v); notify("Profil mis à jour."); }}
           onClose={() => setEditing(false)}
         />
       )}
 
-      <div className="grid grid-cols-1 gap-6 xl:grid-cols-[minmax(0,1fr),minmax(0,1.6fr)]">
-        {/* Colonne fiche */}
-        <div className="space-y-6">
-          <App.CarteProfil
-            photo="/images/plateforme/portraits/absatou-diallo.jpg"
-            nom="Absatou Diallo"
-            sousTitre={info.profession}
-            badges={
-              <>
-                <ProfileTierBadge />
-                <App.Badge ton="alerte" taille="moyen">Vérification en cours</App.Badge>
-                <App.Badge ton="succes" taille="moyen" point>Disponible immédiatement</App.Badge>
-              </>
-            }
-            infos={[
-              { icone: Mail, libelle: "E-mail", valeur: info.email },
-              { icone: Phone, libelle: "Téléphone", valeur: info.telephone },
-              { icone: MapPin, libelle: "Ville", valeur: info.ville },
-              { icone: Briefcase, libelle: "Profession", valeur: info.profession },
-            ]}
-            actions={
-              <>
-                <App.Bouton petit onClick={() => setEditing(true)}>Modifier le profil</App.Bouton>
-                <App.Bouton petit variante="neutre" onClick={() => onNavigate("candidatures")}>Mes candidatures</App.Bouton>
-              </>
-            }
-          />
+      <EnTeteFiche
+        visuel={<AvatarListe nom={user.name} photo="/images/plateforme/portraits/absatou-diallo.jpg" taille="lg" />}
+        badges={<>
+          <ProfileTierBadge />
+          <App.Badge ton={etatVerif.ton} taille="moyen">{etatVerif.label}</App.Badge>
+          {embauche
+            ? <App.Badge ton="succes" point taille="moyen">En poste chez {embauche.entreprise}</App.Badge>
+            : <App.Badge ton="succes" point taille="moyen">Disponible immédiatement</App.Badge>}
+        </>}
+        titre={user.name}
+        sousTitre={embauche ? `${embauche.poste} · ${embauche.entreprise}` : info.profession}
+        meta={<>
+          <MetaOffre icone={MapPin}>{info.ville}</MetaOffre>
+          {!embauche && <MetaOffre icone={Briefcase}>Métier recherché : {info.profession}</MetaOffre>}
+          {embauche && <MetaOffre icone={HeartHandshake}>Suivi post-embauche en cours</MetaOffre>}
+        </>}
+        actions={<>
+          <App.Bouton onClick={() => setEditing(true)}><Pencil size={16} aria-hidden="true" /> Modifier le profil</App.Bouton>
+        </>}
+      />
 
-          <App.Carte titre="Progression du profil" sousTitre="Complétion de votre dossier" actions={<span className="text-lg font-semibold text-marque">75 %</span>}>
-            <App.BarreProgression valeur={75} label="Profil complété à 75 %" />
-            <div className="mt-4">
-              <ChecklistItem label="Informations personnelles" done />
-              <ChecklistItem label="Compétences" done />
-              <ChecklistItem label="Disponibilité" done />
-              <ChecklistItem label="Vérification d'identité" done={false} />
+      <ChiffresProfil
+        items={[
+          { icone: FileText, valeur: candidatures.length, label: "Candidatures envoyées", detail: "Voir mes candidatures", onClick: () => onNavigate("candidatures") },
+          { icone: ClipboardList, valeur: enCours, label: "Candidatures en cours", detail: "En attente de réponse", ton: "alerte", onClick: () => onNavigate("candidatures") },
+          { icone: GraduationCap, valeur: formationsInscrites.length, label: "Formations suivies", detail: "Voir mes formations", ton: "info", onClick: () => onNavigate("formations", { tab: "mes" }) },
+          { icone: UserCircle2, valeur: `${completion.valeur} %`, label: "Profil complété", detail: completion.valeur < 100 ? "Encore quelques étapes" : "Profil complet", ton: "succes" },
+        ]}
+      />
+
+      <MiseEnPageFiche
+        principal={<>
+          {embauche && (
+            <App.Carte titre="Mon emploi" actions={<StatusBadge status="Candidature Retenue" />}>
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <LogoEntreprise nom={embauche.entreprise} />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-principal">{embauche.poste}</p>
+                    <p className="text-sm text-discret">{embauche.entreprise} · {embauche.ville} · retenue le {embauche.date}</p>
+                  </div>
+                </div>
+                <App.Bouton petit variante="doux" onClick={() => onNavigate("suivi")}><HeartHandshake size={15} aria-hidden="true" /> Mon suivi post-embauche</App.Bouton>
+              </div>
+            </App.Carte>
+          )}
+
+          <App.Carte titre="Compétences">
+            <Etiquettes items={COMPETENCES_CHERCHEUR} />
+          </App.Carte>
+
+          <App.Carte titre="Mon CV">
+            <div className="flex items-center justify-between gap-3 rounded-md border border-base px-4 py-3">
+              <div className="flex min-w-0 items-center gap-3">
+                <App.PastilleIcone icone={FileText} taille="sm" />
+                <div className="min-w-0">
+                  <p className="break-all text-sm font-medium text-principal">{cv ? cv.nom : "Aucun CV"}</p>
+                  {cv && <p className="text-xs text-discret">Ajouté le {cv.date}</p>}
+                </div>
+              </div>
+              <FilePickerButton
+                accept=".pdf,.doc,.docx"
+                onPick={(f) => { setCv({ nom: f.name, date: demoNow().toLocaleDateString("fr-FR") }); notify("CV remplacé."); }}
+                className="inline-flex min-h-[44px] shrink-0 items-center rounded bg-marque-doux px-4 text-sm font-semibold text-marque hover:bg-marque-doux-survol"
+              >
+                {cv ? "Remplacer" : "Ajouter"}
+              </FilePickerButton>
             </div>
           </App.Carte>
 
-          <App.Carte titre="Langues" actions={<App.Badge ton="succes">{LANGUES.length} langues</App.Badge>}>
+          <App.Carte titre="Vérification d'identité" sousTitre="Obtenez le badge « profil vérifié »" actions={<App.Badge ton={etatVerif.ton} taille="moyen">{etatVerif.label}</App.Badge>}>
+            {verif === "verifie" ? (
+              <p className="text-sm text-secondaire">Votre pièce d'identité et vos diplômes ont été vérifiés par l'équipe LIGGEEY.</p>
+            ) : verif === "en-cours" ? (
+              <p className="inline-flex items-center gap-2 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
+                <CheckCircle2 size={16} aria-hidden="true" /> Documents transmis : vérification sous 48 h ouvrées.
+              </p>
+            ) : (
+              <>
+                <p className="mb-4 text-sm text-secondaire">
+                  Pour rassurer les employeurs, transmettez une pièce d'identité en cours de validité et vos diplômes.
+                </p>
+                <div className="flex flex-wrap gap-3">
+                  <App.Bouton petit onClick={() => { setVerif("en-cours"); notify("Documents transmis. Vérification sous 48 h ouvrées."); }}>Transmettre mes documents</App.Bouton>
+                  <App.Bouton petit variante="neutre" onClick={() => setShowVerifInfo((v) => !v)} aria-expanded={showVerifInfo}>
+                    {showVerifInfo ? "Masquer" : "En savoir plus"}
+                  </App.Bouton>
+                </div>
+                {showVerifInfo && (
+                  <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondaire">
+                    L'équipe LIGGEEY contrôle votre pièce d'identité et vos diplômes sous 48&nbsp;h ouvrées. Un profil vérifié affiche un badge auprès des recruteurs et remonte en priorité dans leurs recherches. Vos documents ne sont jamais partagés sans votre accord.
+                  </p>
+                )}
+              </>
+            )}
+          </App.Carte>
+
+          {mentor && (
+            <App.Carte titre="Mon mentor">
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <AvatarListe nom={mentor.nom} photo={mentor.photo} />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-principal">{mentor.nom}</p>
+                    <p className="text-sm text-discret">{mentor.role} · {mentor.exp} ans d'expérience</p>
+                  </div>
+                </div>
+                <App.Bouton petit variante="neutre" onClick={() => onNavigate("mentors", { mentorId: mentor.id })}>Voir mon mentor</App.Bouton>
+              </div>
+            </App.Carte>
+          )}
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Mes informations"
+            items={[
+              { icone: Briefcase, libelle: "Métier recherché", valeur: info.profession },
+              { icone: Mail, libelle: "E-mail", valeur: info.email },
+              { icone: Phone, libelle: "Téléphone", valeur: info.telephone },
+              { icone: MapPin, libelle: "Ville", valeur: info.ville },
+            ]}
+          />
+          <CarteCompletion completion={completion} />
+          <App.Carte titre="Langues">
             <ul className="divide-y divide-dashed divide-base">
-              {LANGUES.map((x) => (
+              {LANGUES_CHERCHEUR.map((x) => (
                 <li key={x.l} className="flex items-center justify-between py-2.5 text-sm">
                   <span className="font-medium text-principal">{x.l}</span>
                   <span className="text-secondaire">{x.n}</span>
@@ -2307,68 +3493,9 @@ function ProfilScreen({ onNavigate }) {
               ))}
             </ul>
           </App.Carte>
-        </div>
-
-        {/* Colonne détail */}
-        <div className="space-y-6">
-          <div className="grid grid-cols-1 gap-4 sm:grid-cols-2">
-            <StatCard icon={FileText} value={5} label="Candidatures envoyées" detail="Voir mes candidatures" onClick={() => onNavigate("candidatures")} />
-            <StatCard icon={GraduationCap} value={5} label="Formations suivies" detail="Voir mes formations" tone="info" onClick={() => onNavigate("formations", { tab: "mes" })} />
-          </div>
-
           <ProfileTierCard />
-
-          <App.Carte titre="Disponibilité et CV">
-            <div className="flex items-center justify-between gap-3 rounded-md border border-base px-4 py-3">
-              <div className="flex min-w-0 items-center gap-3">
-                <App.PastilleIcone icone={FileText} taille="sm" />
-                <div className="min-w-0">
-                  <p className="break-all text-sm font-medium text-principal">{cv.nom}</p>
-                  <p className="text-xs text-discret">Ajouté le {cv.date}</p>
-                </div>
-              </div>
-              <FilePickerButton
-                accept=".pdf,.doc,.docx"
-                onPick={(f) => { setCv({ nom: f.name, date: demoNow().toLocaleDateString("fr-FR") }); notify("CV remplacé."); }}
-                className="shrink-0 rounded-md bg-marque-doux px-4 py-2 text-sm font-semibold text-marque-fort hover:bg-primaire-150"
-              >
-                Remplacer
-              </FilePickerButton>
-            </div>
-          </App.Carte>
-
-          <App.Carte titre="Compétences">
-            <div className="flex flex-wrap gap-2">
-              {COMPETENCES.map((c) => (
-                <App.Badge key={c} ton="marque" taille="moyen">{c}</App.Badge>
-              ))}
-            </div>
-          </App.Carte>
-
-          <App.Carte titre="Vérification d'identité" sousTitre="Obtenez le badge « profil vérifié »">
-            <p className="mb-4 text-sm text-secondaire">
-              Pour rassurer les employeurs sénégalais partenaires, transmettez une pièce d'identité en cours de validité ainsi que vos diplômes.
-            </p>
-            {documentsSubmitted ? (
-              <p className="inline-flex items-center gap-2 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
-                <CheckCircle2 size={16} aria-hidden="true" /> Documents transmis : vérification en cours sous 48 h.
-              </p>
-            ) : (
-              <div className="flex flex-wrap gap-3">
-                <App.Bouton petit onClick={() => setDocumentsSubmitted(true)}>Transmettre mes documents</App.Bouton>
-                <App.Bouton petit variante="neutre" onClick={() => setShowVerifInfo((v) => !v)} aria-expanded={showVerifInfo}>
-                  {showVerifInfo ? "Masquer" : "En savoir plus"}
-                </App.Bouton>
-              </div>
-            )}
-            {showVerifInfo && !documentsSubmitted && (
-              <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondaire">
-                L'équipe LIGGEEY contrôle votre pièce d'identité et vos diplômes sous 48&nbsp;h ouvrées. Un profil vérifié affiche un badge auprès des recruteurs et remonte en priorité dans leurs recherches. Vos documents ne sont jamais partagés sans votre accord.
-              </p>
-            )}
-          </App.Carte>
-        </div>
-      </div>
+        </>}
+      />
     </div>
   );
 }
@@ -2377,7 +3504,7 @@ function ProfilScreen({ onNavigate }) {
 
 const DEMANDES_RECENTES = [
   { titre: "Installation électrique", client: "Fatou Sarr", ville: "Dakar Plateau", prix: "85 000 FCFA", priorite: "Urgent", date: "Aujourd'hui, 10:30" },
-  { titre: "Réparation plomberie", client: "Ousmane Ba", ville: "Médina", prix: "35 000 FCFA", priorite: "Normal", date: "Hier, 18:15" },
+  { titre: "Remplacement de disjoncteur", client: "Ousmane Ba", ville: "Médina", prix: "35 000 FCFA", priorite: "Normal", date: "Hier, 18:15" },
   { titre: "Câblage réseau bureau", client: "Aminata Diop", ville: "Almadies", prix: "120 000 FCFA", priorite: "Normal", date: "Aujourd'hui, 09:10" },
   { titre: "Dépannage compteur", client: "Cheikh Fall", ville: "Parcelles Assainies", prix: "25 000 FCFA", priorite: "Urgent", date: "Aujourd'hui, 08:45" },
 ];
@@ -2401,17 +3528,21 @@ function DemandeCard({ d }) {
 }
 
 function PrestataireDashboardScreen({ user, onNavigate, todos }) {
-  const COMPLETION = 70;
-  const services = SERVICES_INITIAL.filter((sv) => sv.disponible);
+  const COMPLETION = useCompletionPrestataire().valeur;
+  const [tousServices] = useStore("services", SERVICES_INITIAL);
+  const [missions] = useStore("missions", MISSIONS_INITIAL);
+  const services = tousServices.filter((sv) => sv.disponible);
+  const missionsEnCours = missions.filter((m) => m.statut === "En cours" || m.statut === "Acceptée").length;
+  const missionsTerminees = missions.filter((m) => m.statut === "Terminée").length;
   const maxMissions = Math.max(...services.map((sv) => sv.missions), 1);
   return (
     <div className="space-y-6">
       <p className="text-sm text-secondaire">Voici un aperçu de votre activité de prestataire.</p>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={ClipboardList} value={3} label="Missions en cours" detail="À suivre cette semaine" onClick={() => onNavigate("missions")} />
-        <StatCard icon={Wallet} value="450 000 FCFA" label="Revenus générés" detail="Missions payées" tone="succes" />
-        <StatCard icon={Star} value="4,8/5" label="Note moyenne" detail="Avis de vos clients" tone="alerte" />
+        <StatCard icon={ClipboardList} value={missionsEnCours} label="Missions en cours" detail="Acceptées ou en cours" onClick={() => onNavigate("missions")} />
+        <StatCard icon={ClipboardCheck} value={missionsTerminees} label="Missions terminées" detail="Voir mes missions" tone="succes" onClick={() => onNavigate("missions")} />
+        <StatCard icon={Star} value={`${AVG_NOTE}/5`} label="Note moyenne" detail={`${REVIEWS_DATA.length} avis de vos clients`} tone="alerte" onClick={() => onNavigate("evaluations")} />
         <App.CarteStat
           icone={UserCircle2}
           ton="info"
@@ -2446,7 +3577,7 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
         <App.Carte
           titre="Mes services actifs"
           sousTitre="Missions réalisées par service"
-          actions={<App.BoutonIcone icone={Plus} label="Ajouter un service" variante="doux" taille="sm" onClick={() => onNavigate("services")} />}
+          actions={<App.BoutonIcone icone={Plus} label="Ajouter un service" variante="doux" taille="sm" onClick={() => onNavigate("services", { creer: true })} />}
         >
           <App.ListeClassee
             elements={services.slice(0, 5).map((sv) => ({
@@ -2467,204 +3598,371 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
 
 /* ---------- Screen 12 : Services (Prestataire) ---------- */
 
+/* ---------- Domaines de métier des prestataires ----------
+   Le domaine est déduit du métier inscrit sur le profil du prestataire connecté. Il décide de ce qu'on
+   lui propose : catégories et modèles de services, formations et mentors. Les formations et mentors
+   marqués « tous » (gestion, relation client) sont proposés à tous les métiers. */
+
+const DOMAINES_METIER = [
+  {
+    id: "electricite", label: "Électricité", mots: ["electri", "solaire", "domotique", "cablage"],
+    categories: ["Installation", "Dépannage", "Mise aux normes", "Énergie solaire", "Domotique", "Éclairage", "Câblage réseau", "Maintenance", "Formation"],
+    suggestions: [
+      { nom: "Installation électrique complète", tag: "Installation" },
+      { nom: "Remplacement de tableau électrique", tag: "Mise aux normes" },
+      { nom: "Dépannage urgent", tag: "Dépannage" },
+      { nom: "Pose de climatiseur", tag: "Installation" },
+      { nom: "Kit solaire domestique", tag: "Énergie solaire" },
+      { nom: "Contrôle annuel de l'installation", tag: "Maintenance" },
+    ],
+  },
+  {
+    id: "plomberie", label: "Plomberie", mots: ["plomb", "sanitaire"],
+    categories: ["Installation sanitaire", "Dépannage", "Débouchage", "Chauffe-eau", "Maintenance"],
+    suggestions: [
+      { nom: "Réparation de fuite", tag: "Dépannage" },
+      { nom: "Débouchage de canalisation", tag: "Débouchage" },
+      { nom: "Pose de sanitaires", tag: "Installation sanitaire" },
+      { nom: "Installation de chauffe-eau", tag: "Chauffe-eau" },
+    ],
+  },
+  {
+    id: "btp", label: "Bâtiment", mots: ["macon", "carrel", "peint", "btp", "batiment"],
+    categories: ["Maçonnerie", "Carrelage", "Peinture", "Rénovation", "Finitions"],
+    suggestions: [
+      { nom: "Pose de carrelage", tag: "Carrelage" },
+      { nom: "Peinture intérieure", tag: "Peinture" },
+      { nom: "Construction de mur", tag: "Maçonnerie" },
+      { nom: "Rénovation de pièce", tag: "Rénovation" },
+    ],
+  },
+  {
+    id: "metallerie", label: "Métallerie", mots: ["soud", "metal", "ferron"],
+    categories: ["Soudure", "Portails et grilles", "Structures métalliques", "Réparation"],
+    suggestions: [
+      { nom: "Fabrication de portail", tag: "Portails et grilles" },
+      { nom: "Grilles de fenêtre", tag: "Portails et grilles" },
+      { nom: "Soudure sur place", tag: "Soudure" },
+    ],
+  },
+  {
+    id: "menuiserie", label: "Menuiserie", mots: ["menuis", "ebenist", "bois"],
+    categories: ["Mobilier sur mesure", "Portes et fenêtres", "Réparation", "Agencement"],
+    suggestions: [
+      { nom: "Meuble sur mesure", tag: "Mobilier sur mesure" },
+      { nom: "Pose de porte", tag: "Portes et fenêtres" },
+      { nom: "Placard et dressing", tag: "Agencement" },
+    ],
+  },
+  {
+    id: "couture", label: "Couture", mots: ["coutur", "styl", "tailleur", "confection", "teintur"],
+    categories: ["Confection sur mesure", "Retouches", "Tenues de cérémonie", "Teinture"],
+    suggestions: [
+      { nom: "Tenue sur mesure", tag: "Confection sur mesure" },
+      { nom: "Retouches", tag: "Retouches" },
+      { nom: "Grand boubou de cérémonie", tag: "Tenues de cérémonie" },
+    ],
+  },
+  {
+    id: "coiffure", label: "Coiffure et esthétique", mots: ["coiff", "esthet", "maquill"],
+    categories: ["Coiffure", "Tresses", "Soins", "Maquillage", "À domicile"],
+    suggestions: [
+      { nom: "Tresses", tag: "Tresses" },
+      { nom: "Coiffure de mariage", tag: "Coiffure" },
+      { nom: "Maquillage", tag: "Maquillage" },
+    ],
+  },
+  {
+    id: "mecanique", label: "Mécanique", mots: ["mecan", "garag", "moto", "auto"],
+    categories: ["Diagnostic", "Entretien", "Réparation", "Dépannage sur place"],
+    suggestions: [
+      { nom: "Vidange et entretien", tag: "Entretien" },
+      { nom: "Diagnostic de panne", tag: "Diagnostic" },
+      { nom: "Dépannage sur place", tag: "Dépannage sur place" },
+    ],
+  },
+  {
+    id: "cuisine", label: "Cuisine et pâtisserie", mots: ["cuisin", "patiss", "restaur", "traiteur"],
+    categories: ["Traiteur", "Pâtisserie", "Cours de cuisine", "Événements"],
+    suggestions: [
+      { nom: "Service traiteur", tag: "Traiteur" },
+      { nom: "Gâteau sur commande", tag: "Pâtisserie" },
+      { nom: "Buffet pour cérémonie", tag: "Événements" },
+    ],
+  },
+];
+
+function domaineDuMetier(metier) {
+  const t = sansAccents(metier);
+  return DOMAINES_METIER.find((d) => d.mots.some((m) => t.includes(m))) || null;
+}
+
+/* Domaine du prestataire connecté (d'après le métier de son profil). */
+function useDomainePrestataire() {
+  const [info] = useStore("profil-prestataire", PROFIL_PRESTATAIRE_INITIAL);
+  const metier = (info && info.metier) || PROFIL_PRESTATAIRE_INITIAL.metier;
+  return { metier, domaine: domaineDuMetier(metier) };
+}
+
+/* Un élément (formation, mentor) concerne le domaine s'il le cite, ou s'il est marqué « tous ». */
+function dansDomaine(item, domaine) {
+  if (!domaine || !item.domaines) return true;
+  return item.domaines.includes("tous") || item.domaines.includes(domaine.id);
+}
+
+function NoteDomaine({ metier, domaine, texte }) {
+  if (!domaine) return null;
+  return (
+    <p className="flex items-start gap-2 rounded-md bg-marque-doux px-4 py-3 text-sm text-principal">
+      <Wrench size={16} className="mt-0.5 shrink-0 text-marque" aria-hidden="true" />
+      <span>{texte} pour votre métier : <span className="font-semibold">{metier}</span> ({domaine.label}). Pour changer de métier, modifiez votre profil.</span>
+    </p>
+  );
+}
+
 const SERVICES_INITIAL = [
-  { id: "elec-bat", nom: "Électricité bâtiment", tag: "Bâtiment", tarifBase: "25 000 FCFA", note: 4.5, missions: 15, disponible: true, description: "Installation, réparation et mise aux normes de systèmes électriques résidentiels et commerciaux. Câblage complet, pose de tableaux électriques, installation de prises et éclairage, dépannage urgent.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine, Guédiawaye, Rufisque", disponibilite: "Lundi-Samedi, 8h-18h | Urgences 24h/7", avis: [{ auteur: "Fatou Sarr", note: 5, commentaire: "Excellent travail, rapide et soigné" }, { auteur: "Ousmane Ba", note: 4, commentaire: "Bon prestataire, ponctuel" }] },
-  { id: "cablage", nom: "Câblage réseau", tag: "Informatique", tarifBase: "50 000 FCFA", note: 4.8, missions: 8, disponible: true, description: "Installation et maintenance de réseaux informatiques et de télécommunication pour bureaux et résidences.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 60 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8h-18h", avis: [{ auteur: "Aminata Diop", note: 5, commentaire: "Très satisfaite du câblage de mon bureau" }] },
-  { id: "depannage", nom: "Dépannage électrique", tag: "Urgence", tarifBase: "15 000 FCFA", note: 4.6, missions: 32, disponible: false, description: "Intervention rapide en cas de panne électrique, urgences comprises, 24h/24 et 7j/7.", tarifDeplacement: "5 000 FCFA", tarifSimple: "10 000 - 20 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Guédiawaye", disponibilite: "Urgences 24h/7", avis: [{ auteur: "Cheikh Fall", note: 5, commentaire: "Intervention rapide en urgence" }] },
-  { id: "solaire", nom: "Installation solaire", tag: "Énergie", tarifBase: "150 000 FCFA", note: 4.4, missions: 5, disponible: true, description: "Pose et raccordement de panneaux solaires domestiques.", tarifDeplacement: "10 000 FCFA", tarifSimple: "120 000 - 180 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Vendredi, 8h-17h", avis: [] },
+  { id: "elec-bat", nom: "Électricité bâtiment", tag: "Installation", tarifBase: "25 000 FCFA", note: 4.5, missions: 15, disponible: true, description: "Installation, réparation et mise aux normes de systèmes électriques résidentiels et commerciaux. Câblage complet, pose de tableaux électriques, installation de prises et éclairage, dépannage urgent.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine, Guédiawaye, Rufisque", disponibilite: "Lundi-Samedi, 8h-18h | Urgences 24h/7", avis: [{ auteur: "Fatou Sarr", note: 5, commentaire: "Excellent travail, rapide et soigné" }, { auteur: "Ousmane Ba", note: 4, commentaire: "Bon prestataire, ponctuel" }] },
+  { id: "cablage", nom: "Câblage réseau", tag: "Câblage réseau", tarifBase: "50 000 FCFA", note: 4.8, missions: 8, disponible: true, description: "Installation et maintenance de réseaux informatiques et de télécommunication pour bureaux et résidences.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 60 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8h-18h", avis: [{ auteur: "Aminata Diop", note: 5, commentaire: "Très satisfaite du câblage de mon bureau" }] },
+  { id: "depannage", nom: "Dépannage électrique", tag: "Dépannage", tarifBase: "15 000 FCFA", note: 4.6, missions: 32, disponible: false, description: "Intervention rapide en cas de panne électrique, urgences comprises, 24h/24 et 7j/7.", tarifDeplacement: "5 000 FCFA", tarifSimple: "10 000 - 20 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Guédiawaye", disponibilite: "Urgences 24h/7", avis: [{ auteur: "Cheikh Fall", note: 5, commentaire: "Intervention rapide en urgence" }] },
+  { id: "solaire", nom: "Installation solaire", tag: "Énergie solaire", tarifBase: "150 000 FCFA", note: 4.4, missions: 5, disponible: true, description: "Pose et raccordement de panneaux solaires domestiques.", tarifDeplacement: "10 000 FCFA", tarifSimple: "120 000 - 180 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Vendredi, 8h-17h", avis: [] },
   { id: "maintenance", nom: "Maintenance préventive", tag: "Maintenance", tarifBase: "20 000 FCFA", note: 4.7, missions: 12, disponible: false, description: "Contrôle et entretien périodique des installations électriques.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
-  { id: "plomberie", nom: "Plomberie sanitaire", tag: "Plomberie", tarifBase: "30 000 FCFA", note: 4.9, missions: 22, disponible: true, description: "Installation et réparation de systèmes sanitaires, débouchage de canalisations, pose de sanitaires.", tarifDeplacement: "5 000 FCFA", tarifSimple: "20 000 - 40 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
-  { id: "soudure", nom: "Soudure métallique", tag: "Métallurgie", tarifBase: "35 000 FCFA", note: 4.3, missions: 18, disponible: true, description: "Soudure et fabrication de structures métalliques sur mesure.", tarifDeplacement: "8 000 FCFA", tarifSimple: "25 000 - 45 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
-  { id: "menuiserie", nom: "Menuiserie bois", tag: "Artisanat", tarifBase: "45 000 FCFA", note: 4.6, missions: 9, disponible: true, description: "Fabrication et réparation de mobilier en bois sur mesure.", tarifDeplacement: "5 000 FCFA", tarifSimple: "35 000 - 55 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Vendredi, 8h-17h", avis: [] },
+  { id: "domotique", nom: "Installation domotique", tag: "Domotique", tarifBase: "60 000 FCFA", note: 4.9, missions: 22, disponible: true, description: "Pilotage de l'éclairage, des volets et de la climatisation depuis un téléphone ou un interrupteur central.", tarifDeplacement: "5 000 FCFA", tarifSimple: "60 000 - 90 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
+  { id: "eclairage", nom: "Éclairage LED", tag: "Éclairage", tarifBase: "20 000 FCFA", note: 4.3, missions: 18, disponible: true, description: "Remplacement de l'éclairage par des LED basse consommation, à l'intérieur comme à l'extérieur.", tarifDeplacement: "5 000 FCFA", tarifSimple: "20 000 - 45 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
+  { id: "normes", nom: "Mise aux normes électriques", tag: "Mise aux normes", tarifBase: "40 000 FCFA", note: 4.6, missions: 9, disponible: true, description: "Diagnostic de l'installation et mise en conformité avec la norme NF C 15-100, avec un rapport remis au client.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 65 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Vendredi, 8h-17h", avis: [] },
   { id: "formation-elec", nom: "Formation électricité", tag: "Formation", tarifBase: "75 000 FCFA", note: 5.0, missions: 2, disponible: true, description: "Initiation aux normes électriques et aux gestes de sécurité pour particuliers et professionnels.", tarifDeplacement: "—", tarifSimple: "75 000 FCFA / session", tarifComplete: "Sur devis (groupe)", zone: "Dakar", disponibilite: "Sur rendez-vous", avis: [] },
 ];
 
 function ServiceCard({ s, onOpen, onEdit, onArchive }) {
   return (
-    <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-      <p className="font-semibold text-base mb-1.5" style={{ color: COLORS.slate }}>{s.nom}</p>
-      <span className="inline-block text-xs font-semibold px-2.5 py-1 rounded-full mb-3" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{s.tag}</span>
-      <p className="text-sm mb-0.5" style={{ color: COLORS.slate }}>À partir de {s.tarifBase}</p>
-      <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>{s.note.toFixed(1)}/5</p>
-      <div className="flex items-center justify-between mb-3">
-        <span className="text-xs font-semibold px-2.5 py-1 rounded-full text-sur-sombre" style={{ background: s.disponible ? "#16A34A" : COLORS.danger }}>
-          {s.disponible ? "Disponible" : "Indisponible"}
-        </span>
-        <span className="text-sm" style={{ color: COLORS.slateLight }}>{s.missions} missions</span>
-      </div>
-      <div className="flex gap-2">
-        <button type="button" onClick={() => onOpen(s)} className="w-9 h-9 rounded-md border flex items-center justify-center" style={{ borderColor: COLORS.border }} title="Voir">
-          <Eye size={15} color={COLORS.slate} />
-        </button>
-        <button type="button" onClick={() => onEdit(s)} className="w-9 h-9 rounded-md border flex items-center justify-center" style={{ borderColor: COLORS.border }} title="Modifier">
-          <Pencil size={15} color={COLORS.slate} />
-        </button>
-        <button type="button" onClick={() => onArchive(s)} className="w-9 h-9 rounded-md border flex items-center justify-center" style={{ borderColor: COLORS.border }} title="Archiver">
-          <Archive size={15} color={COLORS.slate} />
-        </button>
-      </div>
-    </div>
+    <CarteListe
+      onOpen={() => onOpen(s)}
+      visuel={<VisuelIcone icone={Wrench} />}
+      titre={s.nom}
+      badges={<App.Badge ton={s.disponible ? "succes" : "neutre"} point taille="moyen">{s.disponible ? "Disponible" : "Indisponible"}</App.Badge>}
+      sousTitre={s.tag}
+      meta={<>
+        <MetaOffre icone={Wallet}>À partir de {s.tarifBase}</MetaOffre>
+        <MetaOffre icone={Star}>{Number(s.note || 0).toFixed(1)}/5</MetaOffre>
+        <MetaOffre icone={ClipboardCheck}>{s.missions} missions</MetaOffre>
+        {s.zone && <MetaOffre icone={MapPin}>{s.zone}</MetaOffre>}
+      </>}
+      actions={<>
+        {onEdit && <App.BoutonIcone icone={Pencil} label={`Modifier ${s.nom}`} onClick={() => onEdit(s)} />}
+        {onArchive && <App.BoutonIcone icone={Archive} label={`Archiver ${s.nom}`} onClick={() => onArchive(s)} />}
+        <App.Bouton petit variante="neutre" onClick={() => onOpen(s)}>Voir le service</App.Bouton>
+      </>}
+    />
   );
 }
 
 function ServiceForm({ initial, onSave, onCancel }) {
+  const { metier, domaine } = useDomainePrestataire();
   const [values, setValues] = useState(
     initial || { nom: "", tag: "", description: "", tarifBase: "", tarifDeplacement: "", tarifSimple: "", tarifComplete: "Sur devis", zone: "", disponibilite: "", disponible: true, note: 0, missions: 0, avis: [] }
   );
-  const valid = values.nom.trim() && values.tag.trim() && values.description.trim() && values.tarifBase.trim();
+  const [essai, setEssai] = useState(false);
+  const erreurs = {
+    nom: !values.nom.trim() && "Donnez un nom à votre service.",
+    tag: !values.tag.trim() && "Choisissez une catégorie.",
+    description: !values.description.trim() && "Décrivez votre service en quelques phrases.",
+    tarifBase: !values.tarifBase.trim() && "Indiquez un tarif de base.",
+  };
+  const err = (k) => (essai ? erreurs[k] : null);
 
   function set(k, v) {
     setValues((s) => ({ ...s, [k]: v }));
   }
 
+  function enregistrer(e) {
+    e.preventDefault();
+    setEssai(true);
+    if (Object.values(erreurs).some(Boolean)) return;
+    onSave({ ...values, id: initial?.id || values.nom.toLowerCase().replace(/\s+/g, "-") });
+  }
+
+  const attrs = (id, k, requis, aide) => ({
+    id,
+    value: values[k],
+    onChange: (e) => set(k, e.target.value),
+    "aria-required": requis || undefined,
+    "aria-invalid": err(k) ? true : undefined,
+    "aria-describedby": err(k) || aide ? `${id}-aide` : undefined,
+  });
+
   return (
-    <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-      <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>{initial ? "Modifier un service" : "Ajouter un service"}</h3>
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="col-span-2">
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Nom du service *</label>
-          <input value={values.nom} onChange={(e) => set("nom", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Catégorie *</label>
-          <input value={values.tag} onChange={(e) => set("tag", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Zone d'intervention</label>
-          <input value={values.zone} onChange={(e) => set("zone", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div className="col-span-2">
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Description *</label>
-          <textarea value={values.description} onChange={(e) => set("description", e.target.value)} rows={3} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Tarif de base *</label>
-          <input value={values.tarifBase} onChange={(e) => set("tarifBase", e.target.value)} placeholder="Ex: 25 000 FCFA" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Disponibilité</label>
-          <input value={values.disponibilite} onChange={(e) => set("disponibilite", e.target.value)} placeholder="Ex: Lundi-Samedi, 8h-18h" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
+    <App.Carte
+      as="form"
+      onSubmit={enregistrer}
+      noValidate
+      titre={initial ? "Modifier un service" : "Ajouter un service"}
+      sousTitre="Les champs marqués d'un * sont obligatoires."
+    >
+      {!initial && domaine && (
+        <fieldset className="mb-6 rounded-lg bg-doux p-4">
+          <legend className="sr-only">Services courants</legend>
+          <p className="mb-3 text-sm text-secondaire">Services courants pour votre métier ({metier}) : choisissez-en un pour gagner du temps.</p>
+          <div className="flex flex-wrap gap-2">
+            {domaine.suggestions.map((sg) => {
+              const choisi = values.nom === sg.nom;
+              return (
+                <button
+                  key={sg.nom}
+                  type="button"
+                  onClick={() => setValues((v) => ({ ...v, nom: sg.nom, tag: sg.tag }))}
+                  aria-pressed={choisi}
+                  className={FORM.pastille(choisi)}
+                >
+                  {choisi && <Check size={15} className="text-marque" aria-hidden="true" />}
+                  {sg.nom}
+                </button>
+              );
+            })}
+          </div>
+        </fieldset>
+      )}
+
+      <h3 className={FORM.section}>Le service</h3>
+      <div className={`${FORM.grille} mb-8`}>
+        <Champ id="service-nom" label="Nom du service" requis erreur={err("nom")} large>
+          <input {...attrs("service-nom", "nom", true)} placeholder="Ex : Installation électrique" className={AUTH.champ(err("nom"))} />
+        </Champ>
+        <Champ id="service-categorie" label="Catégorie" requis erreur={err("tag")}>
+          {domaine ? (
+            <ListeChamp {...attrs("service-categorie", "tag", true)} erreur={err("tag")}>
+              <option value="">Choisir ({domaine.label})</option>
+              {[...domaine.categories, ...(values.tag && !domaine.categories.includes(values.tag) ? [values.tag] : [])].map((c) => <option key={c}>{c}</option>)}
+            </ListeChamp>
+          ) : (
+            <input {...attrs("service-categorie", "tag", true)} placeholder="Ex : Électricité" className={AUTH.champ(err("tag"))} />
+          )}
+        </Champ>
+        <Champ id="service-zone" label="Zone d'intervention" aide="Quartiers ou villes où vous vous déplacez.">
+          <input {...attrs("service-zone", "zone", false, true)} placeholder="Ex : Dakar, Pikine" className={AUTH.champ()} />
+        </Champ>
+        <Champ id="service-description" label="Description" requis erreur={err("description")} aide="Ce que vous faites, votre matériel, votre expérience." large>
+          <textarea {...attrs("service-description", "description", true, true)} rows={4} className={FORM.zone(err("description"))} />
+        </Champ>
       </div>
-      <label className="flex items-center gap-2 mb-5 cursor-pointer select-none">
-        <input type="checkbox" checked={values.disponible} onChange={(e) => set("disponible", e.target.checked)} className="w-4 h-4 rounded accent-primaire-500" />
-        <span className="text-sm" style={{ color: COLORS.slate }}>Service disponible</span>
-      </label>
-      <div className="flex gap-3">
-        <button type="button" onClick={onCancel} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          Annuler
-        </button>
-        <button
-          type="button"
-          disabled={!valid}
-          onClick={() => onSave({ ...values, id: initial?.id || values.nom.toLowerCase().replace(/\s+/g, "-") })}
-          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque"
-          style={{ background: COLORS.orange, opacity: valid ? 1 : 0.5 }}
-        >
-          Enregistrer
-        </button>
+
+      <h3 className={FORM.section}>Tarif et disponibilité</h3>
+      <div className={`${FORM.grille} mb-4`}>
+        <Champ id="service-tarif" label="Tarif de base" requis erreur={err("tarifBase")} aide="Le prix de départ affiché aux clients.">
+          <input {...attrs("service-tarif", "tarifBase", true, true)} placeholder="Ex : 25 000 FCFA" className={AUTH.champ(err("tarifBase"))} />
+        </Champ>
+        <Champ id="service-disponibilite" label="Disponibilité">
+          <input {...attrs("service-disponibilite", "disponibilite")} placeholder="Ex : Lundi au samedi, 8 h à 18 h" className={AUTH.champ()} />
+        </Champ>
       </div>
-    </div>
+      <div className="rounded-lg border border-base px-4 py-2">
+        <App.Interrupteur
+          actif={values.disponible}
+          onChange={(v) => set("disponible", v)}
+          label="Service disponible"
+          description="Les clients peuvent vous envoyer une demande pour ce service."
+        />
+      </div>
+
+      {essai && Object.values(erreurs).some(Boolean) && (
+        <p role="alert" className="mt-5 text-sm text-statut-danger">Complétez les champs signalés pour enregistrer le service.</p>
+      )}
+      <div className={FORM.actions}>
+        <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
+        <App.Bouton type="submit">{initial ? "Enregistrer les modifications" : "Ajouter le service"}</App.Bouton>
+      </div>
+    </App.Carte>
   );
 }
 
 function ArchiveConfirm({ onCancel, onConfirm }) {
   return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-6" style={{ background: "rgba(15,11,8,0.55)" }} onClick={onCancel}>
-      <div className="w-full max-w-sm rounded-lg bg-surface p-6" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-semibold mb-2" style={{ color: COLORS.slate }}>Archiver ce service ?</h3>
-        <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>
+    <ModalFrame onClose={onCancel} labelledBy="archive-service-title" maxWidth="max-w-sm">
+      <div className="p-6">
+        <h3 id="archive-service-title" className="mb-2 text-lg font-semibold text-principal">Archiver ce service ?</h3>
+        <p className="mb-6 text-sm text-secondaire">
           Ce service ne sera plus visible par vos clients. Vous pourrez le réactiver plus tard.
         </p>
-        <div className="flex justify-end gap-3">
-          <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-            Annuler
-          </button>
-          <button type="button" onClick={onConfirm} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.danger }}>
-            Archiver
-          </button>
+        <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+          <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
+          <BoutonDanger onClick={onConfirm}>Archiver</BoutonDanger>
         </div>
       </div>
-    </div>
+    </ModalFrame>
   );
 }
 
 function ServiceDetail({ service, onEdit, onDelete, onBack }) {
+  const note = Number(service.note || 0).toFixed(1);
+  const tarifs = [
+    ["Déplacement", service.tarifDeplacement],
+    ["Intervention simple", service.tarifSimple],
+    ["Installation complète", service.tarifComplete],
+  ].filter(([, v]) => v);
   return (
-    <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
-        <ArrowLeft size={14} /> Retour aux services
-      </button>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour aux services</BoutonRetour>
 
-      <div className="flex items-center justify-between mb-1 flex-wrap gap-3">
-        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{service.nom}</h2>
-        <div className="flex gap-3">
-          <button type="button" onClick={onEdit} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
-            Modifier le service
-          </button>
-          <button type="button" onClick={onDelete} className="text-sm font-semibold" style={{ color: COLORS.orange }}>
-            {service.disponible ? "Désactiver" : "Réactiver"}
-          </button>
-        </div>
-      </div>
-      <div className="flex gap-1 overflow-x-auto border-b border-base mb-6">
-        <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: service.disponible ? "#DCFCE7" : "#FEE2E2", color: service.disponible ? "#16A34A" : COLORS.danger }}>
-          {service.disponible ? "Actif" : "Inactif"}
-        </span>
-        <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{service.tag}</span>
-      </div>
+      <EnTeteFiche
+        visuel={<VisuelIcone icone={Wrench} taille="lg" />}
+        badges={<>
+          <App.Badge ton={service.disponible ? "succes" : "neutre"} point taille="moyen">{service.disponible ? "Actif" : "Inactif"}</App.Badge>
+          <App.Badge ton="marque" taille="moyen">{service.tag}</App.Badge>
+        </>}
+        titre={service.nom}
+        sousTitre={`À partir de ${service.tarifBase}`}
+        meta={<>
+          <MetaOffre icone={Star}>{note}/5</MetaOffre>
+          <MetaOffre icone={ClipboardCheck}>{service.missions} missions réalisées</MetaOffre>
+          {service.zone && <MetaOffre icone={MapPin}>{service.zone}</MetaOffre>}
+        </>}
+        actions={<>
+          <App.Bouton variante="neutre" onClick={onEdit}><Pencil size={16} aria-hidden="true" /> Modifier</App.Bouton>
+          <App.Bouton variante={service.disponible ? "doux" : "principal"} onClick={onDelete}>{service.disponible ? "Désactiver" : "Réactiver"}</App.Bouton>
+        </>}
+      />
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Description</h3>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>{service.description}</p>
-          </div>
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Tarification</h3>
-            <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Déplacement</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.tarifDeplacement}</p></div>
-            <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Intervention simple</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.tarifSimple}</p></div>
-            <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Installation complète</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.tarifComplete}</p></div>
-          </div>
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Zone d'intervention</h3>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>{service.zone}</p>
-          </div>
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Disponibilité</h3>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>{service.disponibilite}</p>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Stats</h3>
-            <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Note moyenne</p><p className="text-sm font-semibold" style={{ color: COLORS.orange }}>{service.note.toFixed(1)}/5</p></div>
-            <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Missions réalisées</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{service.missions}</p></div>
-          </div>
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Derniers avis clients</h3>
-            {service.avis.length === 0 && <p className="text-sm" style={{ color: COLORS.slateLight }}>Aucun avis pour le moment.</p>}
-            {service.avis.map((a, i) => (
-              <div key={i} className="py-2" style={{ borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none" }}>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{a.auteur}</p>
-                  <p className="text-sm font-semibold" style={{ color: COLORS.orange }}>{a.note}/5</p>
-                </div>
-                <p className="text-sm" style={{ color: COLORS.slateLight }}>{a.commentaire}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Description">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{service.description}</p>
+          </App.Carte>
+          {tarifs.length > 0 && (
+            <App.Carte titre="Tarification">
+              <dl className="divide-y divide-base">
+                {tarifs.map(([libelle, valeur]) => (
+                  <div key={libelle} className="flex items-center justify-between gap-4 py-3 first:pt-0 last:pb-0">
+                    <dt className="text-sm text-secondaire">{libelle}</dt>
+                    <dd className="text-sm font-semibold text-principal">{valeur}</dd>
+                  </div>
+                ))}
+              </dl>
+            </App.Carte>
+          )}
+          <App.Carte titre="Derniers avis clients" sousTitre={`${(service.avis || []).length} avis`}>
+            <ListeAvis avis={service.avis || []} />
+          </App.Carte>
+        </>}
+        cote={
+          <ApercuFiche
+            titre="Aperçu du service"
+            items={[
+              { icone: Wallet, libelle: "Tarif de base", valeur: service.tarifBase },
+              { icone: MapPin, libelle: "Zone d'intervention", valeur: service.zone },
+              { icone: Clock, libelle: "Disponibilité", valeur: service.disponibilite },
+              { icone: Star, libelle: "Note moyenne", valeur: `${note}/5` },
+              { icone: ClipboardCheck, libelle: "Missions réalisées", valeur: service.missions },
+            ]}
+          />
+        }
+      />
     </div>
   );
 }
 
-function ServicesScreen() {
+function ServicesScreen({ creer = false }) {
   const [services, setServices] = useStore("services", SERVICES_INITIAL);
   const [query, setQuery] = useState("");
-  const [page, setPage] = useState(1);
+  const [categorie, setCategorie] = useState("toutes");
+  const [dispo, setDispo] = useState("tous");
   const [selected, setSelected] = useState(null);
   const [mode, setMode] = useState("view"); // view | edit | create
   const [toDelete, setToDelete] = useState(null);
@@ -2676,8 +3974,22 @@ function ServicesScreen() {
     if (services.length >= serviceLimit) { planApi.requestUpgrade("services"); return; }
     setMode("create");
   }
-  const filtered = services.filter((s) => (s.nom + s.tag).toLowerCase().includes(query.toLowerCase()));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  // Ouvert depuis le raccourci « Ajouter un service » de la barre d'icônes.
+  useEffect(() => { if (creer) openCreate(); }, []);
+
+  const categories = Array.from(new Set(services.map((s) => s.tag))).sort();
+  const q = sansAccents(query.trim());
+  const DISPOS = [
+    { id: "tous", label: "Tous", test: () => true },
+    { id: "disponibles", label: "Disponibles", test: (s) => s.disponible },
+    { id: "indisponibles", label: "Indisponibles", test: (s) => !s.disponible },
+  ];
+  const filtered = services.filter((s) =>
+    (!q || sansAccents([s.nom, s.tag, s.description, s.zone].join(" ")).includes(q)) &&
+    (categorie === "toutes" || s.tag === categorie) &&
+    DISPOS.find((d) => d.id === dispo).test(s));
+  const pagination = usePaginationListe(filtered);
+  const filtresActifs = q || categorie !== "toutes" || dispo !== "tous";
 
   function saveService(values) {
     setServices((list) => {
@@ -2686,6 +3998,7 @@ function ServicesScreen() {
     });
     setSelected(values);
     setMode("view");
+    notify("Service enregistré.");
   }
 
   function confirmDelete() {
@@ -2693,6 +4006,7 @@ function ServicesScreen() {
     setToDelete(null);
     setSelected(null);
     setMode("view");
+    notify("Service archivé.", "info");
   }
 
   function toggleDisponible(id) {
@@ -2701,10 +4015,20 @@ function ServicesScreen() {
   }
 
   if (mode === "create") {
-    return <ServiceForm onSave={saveService} onCancel={() => setMode("view")} />;
+    return (
+      <div className="space-y-6">
+        <BoutonRetour onClick={() => setMode("view")}>Retour aux services</BoutonRetour>
+        <ServiceForm onSave={saveService} onCancel={() => setMode("view")} />
+      </div>
+    );
   }
   if (selected && mode === "edit") {
-    return <ServiceForm initial={selected} onSave={saveService} onCancel={() => setMode("view")} />;
+    return (
+      <div className="space-y-6">
+        <BoutonRetour onClick={() => setMode("view")}>Retour au service</BoutonRetour>
+        <ServiceForm initial={selected} onSave={saveService} onCancel={() => setMode("view")} />
+      </div>
+    );
   }
   if (selected) {
     return (
@@ -2718,41 +4042,66 @@ function ServicesScreen() {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span aria-hidden="true" />
-        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-          <Plus size={15} /> Ajouter un service
-        </button>
-      </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">
         Gérez les prestations que vous proposez à vos clients.
         {serviceLimit !== UNLIMITED && <span> {services.length} / {serviceLimit} services utilisés avec le profil {planApi.plan.nom}.</span>}
       </p>
 
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-        placeholder="Rechercher un service..."
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-6 outline-none focus:border-primaire-400"
-        style={{ borderColor: COLORS.border }}
-      />
-
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paged.map((s) => (
-          <ServiceCard
-            key={s.id}
-            s={s}
-            onOpen={setSelected}
-            onEdit={(ss) => { setSelected(ss); setMode("edit"); }}
-            onArchive={(ss) => setToDelete(ss)}
+      <BarreFiltres label="Rechercher et filtrer mes services">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); pagination.setPage(1); }}
+          placeholder="Nom, catégorie ou zone…"
+          label="Rechercher un service"
+          className="w-full lg:flex-1"
+        />
+        <div className="flex flex-wrap items-center gap-2">
+          <App.SelecteurPeriode
+            icone={Layers}
+            label="Catégorie"
+            valeur={categorie}
+            onChange={(v) => { setCategorie(v); pagination.setPage(1); }}
+            options={[{ id: "toutes", label: "Toutes les catégories" }, ...categories]}
           />
-        ))}
-        {paged.length === 0 && <p className="text-sm col-span-full" style={{ color: COLORS.slateLight }}>Aucun service à afficher.</p>}
+          <App.Bouton petit onClick={openCreate}><Plus size={15} aria-hidden="true" /> Ajouter un service</App.Bouton>
+        </div>
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Disponibilité"
+          actif={dispo}
+          onChange={(v) => { setDispo(v); pagination.setPage(1); }}
+          options={DISPOS.map((d) => ({ id: d.id, label: `${d.label} (${services.filter(d.test).length})` }))}
+        />
+        <CompteResultats n={filtered.length} nom="service" />
       </div>
 
-      <Pagination page={page} pageSize={PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((s) => (
+            <ServiceCard
+              key={s.id}
+              s={s}
+              onOpen={(ss) => { setSelected(ss); window.scrollTo(0, 0); }}
+              onEdit={(ss) => { setSelected(ss); setMode("edit"); }}
+              onArchive={(ss) => setToDelete(ss)}
+            />
+          ))}
+        </div>
+      ) : services.length === 0 ? (
+        <ListeVide icone={Wrench} titre="Aucun service pour le moment" texte="Ajoutez votre premier service pour recevoir des demandes de clients." action={<App.Bouton petit onClick={openCreate}>Ajouter un service</App.Bouton>} />
+      ) : (
+        <ListeVide
+          titre="Aucun service ne correspond"
+          texte="Essayez d'autres mots-clés ou retirez un filtre."
+          action={filtresActifs && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setCategorie("toutes"); setDispo("tous"); }}>Effacer les filtres</App.Bouton>}
+        />
+      )}
+
+      <PiedListe pagination={pagination} />
       {toDelete && <ArchiveConfirm onCancel={() => setToDelete(null)} onConfirm={confirmDelete} />}
     </div>
   );
@@ -2781,29 +4130,26 @@ const MISSION_TABS = [
 
 function MissionCard({ m, onOpen, onAccept, onRefuse }) {
   return (
-    <div className="rounded-lg border bg-surface p-5 mb-4" style={{ borderColor: COLORS.border }}>
-      <div className="flex items-start justify-between mb-1">
-        <button type="button" onClick={() => onOpen(m)} className="font-semibold text-sm text-left flex items-center gap-1.5" style={{ color: COLORS.slate }}>
-          {m.titre} <Check size={14} color="#16A34A" />
-        </button>
-        <StatusBadge status={m.statut} />
-      </div>
-      <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>{m.client} · {m.ville}</p>
-      <div className="flex items-center justify-between flex-wrap gap-3">
-        <div className="flex gap-8">
-          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>Date de demande</p><p className="text-sm" style={{ color: COLORS.slate }}>{m.dateDemande}</p></div>
-          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>Budget proposé</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{m.budget}</p></div>
-        </div>
-        {m.statut === "En attente" ? (
-          <div className="flex gap-2">
-            <button type="button" onClick={() => onAccept(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Accepter</button>
-            <button type="button" onClick={() => onRefuse(m.id)} className="rounded-md px-4 py-1.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Refuser</button>
-          </div>
-        ) : (
-          <button type="button" onClick={() => onOpen(m)} className="text-sm font-medium" style={{ color: COLORS.orange }}>Voir détails</button>
-        )}
-      </div>
-    </div>
+    <CarteListe
+      onOpen={() => onOpen(m)}
+      visuel={<AvatarListe nom={m.client} />}
+      titre={m.titre}
+      badges={<StatusBadge status={m.statut} />}
+      sousTitre={`${m.client} · ${m.ville}`}
+      meta={<>
+        <MetaOffre icone={Wallet}>{m.budget}</MetaOffre>
+        <MetaOffre icone={Clock}>{m.dateDemande}</MetaOffre>
+        {m.type && <MetaOffre icone={Wrench}>{m.type}</MetaOffre>}
+      </>}
+      actions={m.statut === "En attente" ? (
+        <>
+          <App.Bouton petit variante="neutre" onClick={() => onRefuse(m.id)}>Refuser</App.Bouton>
+          <App.Bouton petit onClick={() => onAccept(m.id)}>Accepter</App.Bouton>
+        </>
+      ) : (
+        <App.Bouton petit variante="neutre" onClick={() => onOpen(m)}>Voir la mission</App.Bouton>
+      )}
+    />
   );
 }
 
@@ -2811,111 +4157,101 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
   const planApi = usePlan();
   const [counterMode, setCounterMode] = useState(false);
   const [counterValue, setCounterValue] = useState("");
+  const enAttente = mission.statut === "En attente";
 
   return (
-    <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
-        <ArrowLeft size={14} /> Retour aux missions
-      </button>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour aux missions</BoutonRetour>
 
-      <div className="flex items-start justify-between flex-wrap gap-3 mb-1">
-        <div className="flex items-center gap-3">
-          <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>{mission.titre}</h2>
+      <EnTeteFiche
+        visuel={<AvatarListe nom={mission.client} taille="lg" />}
+        badges={<>
           <StatusBadge status={mission.statut} />
-        </div>
-        {mission.statut === "En attente" && !counterMode && (
-          <div className="flex gap-3">
-            <button type="button" onClick={() => onRefuse(mission.id)} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-              Refuser
-            </button>
-            <button type="button" onClick={() => (planApi ? planApi.gate("contreOffre", () => setCounterMode(true)) : setCounterMode(true))} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}>
-              {planApi && !planApi.can("contreOffre") && <Lock size={13} />} Proposer un autre tarif
-            </button>
-            <button type="button" onClick={() => onAccept(mission.id)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-              Accepter la mission
-            </button>
-          </div>
+          {mission.type && <App.Badge ton="neutre" taille="moyen">{mission.type}</App.Badge>}
+        </>}
+        titre={mission.titre}
+        sousTitre={`Demande de ${mission.client} · ${mission.dateDemande}`}
+        meta={<>
+          <MetaOffre icone={MapPin}>{mission.lieu}</MetaOffre>
+          <MetaOffre icone={CalendarDays}>{mission.dateSouhaitee}</MetaOffre>
+          <MetaOffre icone={Clock}>{mission.dureeEstimee}</MetaOffre>
+        </>}
+        actions={enAttente && !counterMode && (
+          <>
+            <App.Bouton variante="neutre" onClick={() => onRefuse(mission.id)}>Refuser</App.Bouton>
+            <App.Bouton variante="doux" onClick={() => (planApi ? planApi.gate("contreOffre", () => setCounterMode(true)) : setCounterMode(true))}>
+              {planApi && !planApi.can("contreOffre") && <Lock size={15} aria-hidden="true" />} Proposer un autre tarif
+            </App.Bouton>
+            <App.Bouton onClick={() => onAccept(mission.id)}>Accepter la mission</App.Bouton>
+          </>
         )}
-      </div>
-      <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Demande reçue le {mission.dateDemande}</p>
+      />
 
       {counterMode && (
-        <div className="rounded-lg border bg-surface p-5 flex items-end gap-3 mb-4" style={{ borderColor: COLORS.border }}>
-          <div className="flex-1">
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Votre contre-proposition (FCFA)</label>
-            <input
-              type="text"
-              value={counterValue}
-              onChange={(e) => setCounterValue(e.target.value)}
-              placeholder="Ex: 70 000"
-              className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400"
-              style={{ borderColor: COLORS.border }}
-            />
-          </div>
-          <button
-            type="button"
-            disabled={!counterValue.trim()}
-            onClick={() => { onCounterOffer(mission.id, counterValue); setCounterMode(false); }}
-            className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque"
-            style={{ background: COLORS.orange, opacity: counterValue.trim() ? 1 : 0.5 }}
+        <App.Carte titre="Votre contre-proposition">
+          <form
+            className="flex flex-col gap-3 sm:flex-row sm:items-end"
+            onSubmit={(e) => { e.preventDefault(); if (!counterValue.trim()) return; onCounterOffer(mission.id, counterValue); setCounterMode(false); }}
           >
-            Envoyer
-          </button>
-          <button type="button" onClick={() => setCounterMode(false)} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-            Annuler
-          </button>
-        </div>
+            <div className="flex-1">
+              <label htmlFor="contre-proposition" className={AUTH.libelle}>Montant proposé (FCFA)</label>
+              <input
+                id="contre-proposition"
+                type="text"
+                inputMode="numeric"
+                value={counterValue}
+                onChange={(e) => setCounterValue(e.target.value)}
+                placeholder="Ex : 70 000"
+                className={FORM.champ()}
+              />
+            </div>
+            <App.Bouton variante="neutre" onClick={() => setCounterMode(false)} className="min-h-[48px]">Annuler</App.Bouton>
+            <App.Bouton type="submit" disabled={!counterValue.trim()} className="min-h-[48px]">Envoyer</App.Bouton>
+          </form>
+        </App.Carte>
       )}
 
       {mission.contreOffre && (
-        <div className="rounded-md px-4 py-3 text-sm mb-4" style={{ background: "#ECFDF5", color: "#047857" }}>
-          Contre-proposition envoyée : {mission.contreOffre} FCFA — en attente de la réponse du client.
-        </div>
+        <p className="rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
+          Contre-proposition envoyée : {mission.contreOffre} FCFA. En attente de la réponse du client.
+        </p>
       )}
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1.6fr,1fr] gap-4">
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Description de la mission</h3>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>{mission.description}</p>
-          </div>
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Détails</h3>
-            <div className="grid grid-cols-2 gap-4">
-              <Row label="Type" value={mission.type} />
-              <Row label="Lieu" value={mission.lieu} />
-              <Row label="Date souhaitée" value={mission.dateSouhaitee} />
-              <Row label="Durée estimée" value={mission.dureeEstimee} />
-            </div>
-          </div>
-        </div>
-
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Informations client</h3>
-            <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-                {initials(mission.client)}
-              </div>
-              <div>
-                <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{mission.client}</p>
-                <p className="text-xs" style={{ color: COLORS.slateLight }}>Client LIGGEEY</p>
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Description de la mission">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{mission.description}</p>
+          </App.Carte>
+          <App.Carte titre="Le client">
+            <div className="mb-4 flex items-center gap-3">
+              <AvatarListe nom={mission.client} />
+              <div className="min-w-0">
+                <p className="font-semibold text-principal">{mission.client}</p>
+                <p className="text-sm text-discret">Client LIGGEEY depuis {mission.membreDepuis.toLowerCase()}</p>
               </div>
             </div>
-            <Row label="Téléphone" value={mission.telephone} />
-            <div className="h-2" />
-            <Row label="Email" value={mission.email} />
-            <div className="h-2" />
-            <Row label="Membre depuis" value={mission.membreDepuis} />
-            <div className="h-2" />
-            <Row label="Missions précédentes" value={mission.missionsPrecedentes} />
-          </div>
-          <div className="rounded-lg border bg-surface p-5 text-center" style={{ borderColor: COLORS.border }}>
-            <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>Budget proposé</p>
-            <p className="text-2xl font-bold" style={{ color: COLORS.orange }}>{mission.budget}</p>
-          </div>
-        </div>
-      </div>
+            <div className="divide-y divide-dashed divide-base">
+              <App.LigneInfo icone={Phone} libelle="Téléphone">{mission.telephone}</App.LigneInfo>
+              <App.LigneInfo icone={Mail} libelle="E-mail">{mission.email}</App.LigneInfo>
+              <App.LigneInfo icone={ClipboardCheck} libelle="Missions précédentes">{mission.missionsPrecedentes}</App.LigneInfo>
+            </div>
+          </App.Carte>
+        </>}
+        cote={<>
+          <App.Carte titre="Budget proposé">
+            <p className="text-[28px] font-semibold leading-none text-principal">{mission.budget}</p>
+          </App.Carte>
+          <ApercuFiche
+            titre="Détails de la mission"
+            items={[
+              { icone: Wrench, libelle: "Type", valeur: mission.type },
+              { icone: MapPin, libelle: "Lieu", valeur: mission.lieu },
+              { icone: CalendarDays, libelle: "Date souhaitée", valeur: mission.dateSouhaitee },
+              { icone: Clock, libelle: "Durée estimée", valeur: mission.dureeEstimee },
+            ]}
+          />
+        </>}
+      />
     </div>
   );
 }
@@ -2923,23 +4259,23 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
 function MissionsScreen() {
   const [missions, setMissions] = useStore("missions", MISSIONS_INITIAL);
   const [tab, setTab] = useState("toutes");
+  const [query, setQuery] = useState("");
   const [selectedId, setSelectedId] = useState(null);
-  const [page, setPage] = useState(1);
 
-  const counts = MISSION_TABS.reduce((acc, t) => {
-    acc[t.id] = t.id === "toutes" ? missions.length : missions.filter((m) => m.statut === t.id).length;
-    return acc;
-  }, {});
-
-  const filtered = tab === "toutes" ? missions : missions.filter((m) => m.statut === tab);
-  const paged = filtered.slice((page - 1) * 4, page * 4);
+  const q = sansAccents(query.trim());
+  const filtered = missions.filter((m) =>
+    (tab === "toutes" || m.statut === tab) &&
+    (!q || sansAccents([m.titre, m.client, m.ville, m.type].join(" ")).includes(q)));
+  const pagination = usePaginationListe(filtered);
   const selected = missions.find((m) => m.id === selectedId);
 
   function setStatut(id, statut) {
     setMissions((list) => list.map((m) => (m.id === id ? { ...m, statut } : m)));
+    notify(statut === "Acceptée" ? "Mission acceptée. Le client est prévenu." : "Mission refusée. Le client est prévenu.", statut === "Acceptée" ? "success" : "info");
   }
   function setCounterOffer(id, value) {
     setMissions((list) => list.map((m) => (m.id === id ? { ...m, contreOffre: value } : m)));
+    notify("Contre-proposition envoyée au client.");
   }
 
   if (selected) {
@@ -2955,35 +4291,52 @@ function MissionsScreen() {
   }
 
   return (
-    <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les demandes de prestations reçues de vos clients.</p>
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Suivez les demandes de prestations reçues de vos clients.</p>
 
-      <div className="flex gap-2 mb-5 flex-wrap">
-        {MISSION_TABS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => { setTab(t.id); setPage(1); }}
-            className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`}
-            
-          >
-            {t.label} ({counts[t.id]})
-          </button>
-        ))}
+      <BarreFiltres label="Rechercher dans mes missions">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); pagination.setPage(1); }}
+          placeholder="Mission, client ou quartier…"
+          label="Rechercher une mission"
+          className="w-full lg:flex-1"
+        />
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Statut"
+          actif={tab}
+          onChange={(v) => { setTab(v); pagination.setPage(1); }}
+          options={MISSION_TABS.map((t) => ({ id: t.id, label: `${t.label} (${t.id === "toutes" ? missions.length : missions.filter((m) => m.statut === t.id).length})` }))}
+        />
+        <CompteResultats n={filtered.length} nom="mission" feminin />
       </div>
 
-      {paged.map((m) => (
-        <MissionCard
-          key={m.id}
-          m={m}
-          onOpen={(mm) => setSelectedId(mm.id)}
-          onAccept={(id) => setStatut(id, "Acceptée")}
-          onRefuse={(id) => setStatut(id, "Refusée")}
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((m) => (
+            <MissionCard
+              key={m.id}
+              m={m}
+              onOpen={(mm) => { setSelectedId(mm.id); window.scrollTo(0, 0); }}
+              onAccept={(id) => setStatut(id, "Acceptée")}
+              onRefuse={(id) => setStatut(id, "Refusée")}
+            />
+          ))}
+        </div>
+      ) : (
+        <ListeVide
+          icone={ClipboardList}
+          titre="Aucune mission dans cette catégorie"
+          texte={q ? "Essayez d'autres mots-clés." : "Les nouvelles demandes de vos clients apparaîtront ici."}
+          action={(q || tab !== "toutes") && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setTab("toutes"); }}>Voir toutes les missions</App.Bouton>}
         />
-      ))}
-      {paged.length === 0 && <p className="text-sm" style={{ color: COLORS.slateLight }}>Aucune demande dans cette catégorie.</p>}
+      )}
 
-      <Pagination page={page} pageSize={4} totalItems={filtered.length} onPageChange={setPage} />
+      <PiedListe pagination={pagination} />
     </div>
   );
 }
@@ -3051,142 +4404,131 @@ function RealisationsScreen({ onBack }) {
 }
 
 function ProfilPrestataireScreen({ onNavigate }) {
-  const [info, setInfo] = useStore("profil-prestataire", PROFIL_PRESTATAIRE_INITIAL);
+  const user = USER_BY_ESPACE.prestataire;
+  const [stored, setInfo] = useStore("profil-prestataire", PROFIL_PRESTATAIRE_INITIAL);
+  const info = { ...PROFIL_PRESTATAIRE_INITIAL, ...stored };
+  const [services] = useStore("services", SERVICES_INITIAL);
+  const [missions] = useStore("missions", MISSIONS_INITIAL);
   const [editing, setEditing] = useState(false);
+  const completion = useCompletionPrestataire();
+
+  const actifs = services.filter((s) => s.disponible);
+  const enCours = missions.filter((m) => m.statut === "En cours" || m.statut === "Acceptée").length;
+  const enAttente = missions.filter((m) => m.statut === "En attente").length;
+  const zones = Array.from(new Set(services.flatMap((s) => String(s.zone || "").split(",").map((z) => z.trim()).filter(Boolean))));
+
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-3">
-          <span aria-hidden="true" />
-          <ProfileTierBadge />
-          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>Vérifié</span>
-        </div>
-        <button type="button" onClick={() => setEditing(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          Modifier le profil
-        </button>
-      </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Complétez votre profil pour augmenter votre visibilité auprès des clients.</p>
-      <ProfileTierCard />
+    <div className="space-y-6">
       {editing && (
         <ProfilInfoModal
-          nom="Mamadou Ndiaye"
+          nom={user.name}
           values={info}
           fields={[{ key: "metier", label: "Métier" }, { key: "email", label: "E-mail", type: "email" }, { key: "telephone", label: "Téléphone", type: "tel" }, { key: "localisation", label: "Localisation" }]}
-          onSave={setInfo}
+          onSave={(v) => { setInfo(v); notify("Profil mis à jour."); }}
           onClose={() => setEditing(false)}
         />
       )}
 
-      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-start gap-5 flex-wrap">
-          <SafeImg src="/images/plateforme/portraits/mamadou-ndiaye.jpg" alt="Mamadou Ndiaye" className="w-24 h-24 rounded-full object-cover shrink-0" />
-          <div className="flex flex-wrap gap-x-16 gap-y-3 flex-1">
-            <div className="w-full flex items-center gap-2">
-              <p className="text-lg font-bold" style={{ color: COLORS.slate }}>Mamadou Ndiaye</p>
-              <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}>Actif</span>
-              <RegulBadge size="sm" />
+      <EnTeteFiche
+        visuel={<AvatarListe nom={user.name} photo="/images/plateforme/portraits/mamadou-ndiaye.jpg" taille="lg" />}
+        badges={<>
+          <ProfileTierBadge />
+          <RegulBadge size="sm" />
+          <App.Badge ton={actifs.length ? "succes" : "neutre"} point taille="moyen">{actifs.length ? "Disponible pour des missions" : "Aucun service actif"}</App.Badge>
+        </>}
+        titre={user.name}
+        sousTitre={`${info.metier} · ${PRESTATAIRE_DETAILS.experience} d'expérience`}
+        meta={<>
+          <MetaOffre icone={MapPin}>{info.localisation}</MetaOffre>
+          <MetaOffre icone={Star}>{AVG_NOTE}/5 · {REVIEWS_DATA.length} avis</MetaOffre>
+          <MetaOffre icone={CalendarCheck}>Membre depuis {PRESTATAIRE_DETAILS.membreDepuis.toLowerCase()}</MetaOffre>
+        </>}
+        actions={<>
+          <App.Bouton onClick={() => setEditing(true)}><Pencil size={16} aria-hidden="true" /> Modifier le profil</App.Bouton>
+        </>}
+      />
+
+      <ChiffresProfil
+        items={[
+          { icone: ClipboardList, valeur: enCours, label: "Missions en cours", detail: `${enAttente} demande${enAttente > 1 ? "s" : ""} en attente`, onClick: () => onNavigate("missions") },
+          { icone: Wrench, valeur: actifs.length, label: "Services actifs", detail: `${services.length} au total`, ton: "info", onClick: () => onNavigate("services") },
+          { icone: Star, valeur: `${AVG_NOTE}/5`, label: "Note moyenne", detail: "Voir mes évaluations", ton: "alerte", onClick: () => onNavigate("evaluations") },
+          { icone: UserCircle2, valeur: `${completion.valeur} %`, label: "Profil complété", detail: completion.valeur === 100 ? "Profil complet" : "Voir ce qui manque", ton: "succes", onClick: completion.valeur < 100 ? () => onNavigate("profil") : undefined },
+        ]}
+      />
+
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Mes services" sousTitre={`${actifs.length} service${actifs.length > 1 ? "s" : ""} proposé${actifs.length > 1 ? "s" : ""} aux clients`} actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("services")}>Gérer</App.Bouton>} flush>
+            {actifs.length === 0 ? (
+              <p className="px-6 pb-6 text-sm text-secondaire">Aucun service actif. Ajoutez-en un pour recevoir des demandes.</p>
+            ) : (
+              <ul className="divide-y divide-base border-t border-base">
+                {actifs.slice(0, 4).map((s) => (
+                  <li key={s.id} className="flex items-center justify-between gap-3 px-6 py-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <App.PastilleIcone icone={Wrench} forme="carre" taille="sm" />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-principal">{s.nom}</p>
+                        <p className="truncate text-xs text-discret">{s.tag} · à partir de {s.tarifBase}</p>
+                      </div>
+                    </div>
+                    <span className="shrink-0 text-xs text-discret">{s.missions} missions</span>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </App.Carte>
+
+          <App.Carte titre="Réalisations" sousTitre={`${PORTFOLIO_REALISATIONS.length} réalisations sur votre profil`} actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("realisations")}>Tout voir</App.Bouton>}>
+            <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
+              {PORTFOLIO_REALISATIONS.slice(0, 4).map((r) => (
+                <div key={r.id}>
+                  <SafeImg kind="photo" src={r.photo} alt={r.titre} className="mb-1.5 h-24 w-full rounded-md object-cover" />
+                  <p className="truncate text-xs font-medium text-principal">{r.titre}</p>
+                </div>
+              ))}
             </div>
-            <InfoField label="Métier" value={info.metier} />
-            <InfoField label="Membre depuis" value="Janvier 2024" />
-            <InfoField label="E-mail" value={info.email} />
-            <InfoField label="Téléphone" value={info.telephone} />
-            <InfoField label="Localisation" value={info.localisation} />
-          </div>
-        </div>
-      </div>
+          </App.Carte>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-4">
-        <StatCard icon={ClipboardList} value={24} label="Missions terminées" />
-        <StatCard icon={Star} value={`${AVG_NOTE}/5`} label="Note moyenne" />
-        <StatCard icon={CalendarCheck} value={8} label="Ans d'expérience" />
-        <StatCard icon={Check} value="96%" label="Taux de satisfaction" />
-      </div>
+          <App.Carte titre="Avis récents" sousTitre={`${REVIEWS_DATA.length} avis · ${AVG_NOTE}/5`} actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("evaluations")}>Mes évaluations</App.Bouton>}>
+            <ListeAvis avis={REVIEWS_DATA.slice(0, 2)} />
+          </App.Carte>
 
-      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center justify-between mb-2">
-          <h3 className="font-semibold" style={{ color: COLORS.slate }}>Profil complété à 75%</h3>
-        </div>
-        <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.softStrong }}>
-          <div className="h-1.5 rounded-full" style={{ width: "75%", background: COLORS.orange }} />
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Compétences & Métiers</h3>
-          <div className="inline-flex flex-wrap gap-1 rounded-md bg-doux p-1">
-            {["Électricité bâtiment", "Câblage réseau", "Installation solaire", "Dépannage", "Mise aux normes", "Tableau électrique"].map((c) => (
-              <span key={c} className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Disponibilité</h3>
-          <p className="text-sm" style={{ color: COLORS.slate }}>Lundi – Samedi · 8h-18h</p>
-          <p className="text-sm" style={{ color: COLORS.slate }}>Urgences · 24h/7j</p>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Certifications</h3>
-          {[
-            { titre: "Certificat d'aptitude professionnelle (CAP) Électricité", annee: 2018 },
-            { titre: "Formation sécurité électrique SENELEC", annee: 2020 },
-            { titre: "Attestation installation solaire", annee: 2023 },
-          ].map((c) => (
-            <div key={c.titre} className="flex items-start gap-2 py-1.5">
-              <Check size={14} color="#16A34A" className="mt-0.5 shrink-0" />
-              <p className="text-sm" style={{ color: COLORS.slate }}>{c.titre} <span style={{ color: COLORS.slateLight }}>· {c.annee}</span></p>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Langues & Zone d'intervention</h3>
-          <div className="flex items-center gap-2 text-sm mb-1"><Check size={14} color="#16A34A" /><span style={{ color: COLORS.slate }}>Wolof</span><span style={{ color: COLORS.slateLight }}>natif</span></div>
-          <div className="flex items-center gap-2 text-sm mb-3"><Check size={14} color="#16A34A" /><span style={{ color: COLORS.slate }}>Français</span><span style={{ color: COLORS.slateLight }}>courant</span></div>
-          <div className="inline-flex flex-wrap gap-1 rounded-md bg-doux p-1">
-            {["Dakar", "Pikine", "Guédiawaye", "Rufisque", "Thiès"].map((v) => (
-              <span key={v} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{v}</span>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold" style={{ color: COLORS.slate }}>Portfolio / Réalisations</h3>
-        </div>
-        <div className="grid grid-cols-4 gap-3 mb-3">
-          {PORTFOLIO_REALISATIONS.slice(0, 4).map((r) => (
-            <div key={r.id}>
-              <SafeImg kind="photo" src={r.photo} alt={r.titre} className="w-full h-24 object-cover rounded-md mb-1.5" />
-              <p className="text-xs font-medium truncate" style={{ color: COLORS.slate }}>{r.titre}</p>
-            </div>
-          ))}
-        </div>
-        <button type="button" onClick={() => onNavigate("realisations")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
-          Voir mes réalisations
-        </button>
-      </div>
-
-      <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold" style={{ color: COLORS.slate }}>Avis récents</h3>
-          <button type="button" onClick={() => onNavigate("evaluations")} className="text-sm font-medium" style={{ color: COLORS.orange }}>
-            Voir mes évaluations
-          </button>
-        </div>
-        {REVIEWS_DATA.slice(0, 2).map((r) => (
-          <div key={r.auteur} className="py-2">
-            <div className="flex items-center justify-between">
-              <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{r.auteur}</p>
-              <Stars note={r.note} />
-            </div>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>"{r.commentaire}"</p>
-          </div>
-        ))}
-      </div>
+          <App.Carte titre="Certifications">
+            <ListeCoches items={PRESTATAIRE_DETAILS.certifications} />
+          </App.Carte>
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Mes informations"
+            items={[
+              { icone: Wrench, libelle: "Métier", valeur: info.metier },
+              { icone: TrendingUp, libelle: "Expérience", valeur: PRESTATAIRE_DETAILS.experience },
+              { icone: Mail, libelle: "E-mail", valeur: info.email },
+              { icone: Phone, libelle: "Téléphone", valeur: info.telephone },
+              { icone: MapPin, libelle: "Localisation", valeur: info.localisation },
+              { icone: Clock, libelle: "Disponibilité", valeur: PRESTATAIRE_DETAILS.disponibilite },
+            ]}
+          />
+          <App.Carte titre="Zone d'intervention" sousTitre="D'après vos services">
+            <Etiquettes items={zones} />
+          </App.Carte>
+          <App.Carte titre="Langues">
+            <ul className="divide-y divide-dashed divide-base">
+              {PRESTATAIRE_DETAILS.langues.map((x) => (
+                <li key={x.l} className="flex items-center justify-between py-2.5 text-sm">
+                  <span className="font-medium text-principal">{x.l}</span>
+                  <span className="text-secondaire">{x.n}</span>
+                </li>
+              ))}
+            </ul>
+          </App.Carte>
+          <CarteCompletion completion={completion} />
+          <CarteRegularisationProfil onNavigate={onNavigate} />
+          <ProfileTierCard />
+        </>}
+      />
     </div>
   );
 }
@@ -3240,13 +4582,13 @@ function EvaluationsScreen({ onNavigate }) {
       </div>
 
       <div className="flex flex-wrap items-center gap-3 mb-5">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setPage(1); }}
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); setPage(1); }}
           placeholder="Rechercher un avis"
-          className="rounded-md border px-4 py-2 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
-          style={{ borderColor: COLORS.border }}
+          label="Rechercher un avis"
+          className="min-w-[220px] flex-1 max-w-xs"
         />
         {[{ id: "tous", label: "Tous" }, { id: "5", label: "5 étoiles" }, { id: "4", label: "4 étoiles" }, { id: "3", label: "3 étoiles" }, { id: "recents", label: "Récents" }].map((f) => (
           <button
@@ -3285,6 +4627,9 @@ function EvaluationsScreen({ onNavigate }) {
 
 /* ---------- Screen 15 : Dashboard & Offres (Entreprise) ---------- */
 
+/* Entreprise connectée dans la démo : ses offres passent par la vérification de l'admin. */
+const ENTREPRISE_DEMO_NOM = "Senegal Construction SARL";
+
 const OFFRES_ENTREPRISE_INITIAL = [
   { id: "off1", titre: "Chef d'équipe électricité", categorie: "BTP", contrat: "CDI", salaire: "350 000 FCFA/mois", localisation: "Dakar, Plateau", statut: "Active", nbCandidatures: 12, experience: "5-10 ans", dateLimite: "30 nov. 2026", description: "Nous recherchons un Chef d'équipe électricité expérimenté pour superviser nos chantiers résidentiels et tertiaires à Dakar. Vous serez garant de la conformité réglementaire (normes NF C 15-100) et animerez une équipe d'électriciens qualifiés.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe"], candidats: [
     { nom: "Moussa Diop", metier: "Électricien bâtiment", date: "15/08", statut: "Nouveau", photo: "/images/plateforme/portraits/moussa-diop.jpg" },
@@ -3308,12 +4653,13 @@ const OFFRES_ENTREPRISE_INITIAL = [
   { id: "off6", titre: "Peintre bâtiment", categorie: "BTP", contrat: "CDD", salaire: "220 000 FCFA/mois", localisation: "Dakar, Parcelles", statut: "Active", nbCandidatures: 9, experience: "1-3 ans", dateLimite: "20 nov. 2026", description: "Peintre bâtiment pour travaux de finition sur nos chantiers résidentiels.", competences: ["Peinture intérieure/extérieure", "Enduits"], candidats: [
     { nom: "Abdoulaye Sow", metier: "Peintre bâtiment", date: "18/08", statut: "Nouveau", photo: "/images/plateforme/portraits/abdoulaye-sow.jpg" },
   ] },
+  { id: "off7", titre: "Aide-électricien (apprenti)", categorie: "BTP", contrat: "CDD", salaire: "120 000 FCFA/mois", localisation: "Dakar, Pikine", statut: "En vérification", soumiseLe: "18/10/2026", nbCandidatures: 0, experience: "Débutant accepté", dateLimite: "15 déc. 2026", description: "Nous recherchons un aide-électricien pour accompagner nos chefs d'équipe sur des chantiers résidentiels. Formation assurée sur le terrain, encadrement par un électricien confirmé.", competences: ["Motivation", "Travail en équipe", "Bases en électricité"], candidats: [] },
 ];
 
 function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
   const [candidaturesRecues] = useStore("candidatures-entreprise", CANDIDATURES_ENTREPRISE_INITIAL);
   const actives = offres.filter((o) => o.statut !== "Clôturée");
-  const COMPLETION = 85;
+  const COMPLETION = useCompletionEntreprise().valeur;
   const maxCand = Math.max(...actives.map((o) => o.nbCandidatures || 0), 1);
   return (
     <div className="space-y-6">
@@ -3321,7 +4667,7 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Briefcase} value={offres.filter((o) => o.statut === "Active").length} label="Offres actives" detail="Visibles par les talents" onClick={() => onNavigate("offres")} />
-        <StatCard icon={FileText} value={47} label="Candidatures reçues" detail="Toutes offres confondues" tone="info" onClick={() => onNavigate("candidatures")} />
+        <StatCard icon={FileText} value={offres.reduce((t, o) => t + (o.nbCandidatures || 0), 0)} label="Candidatures reçues" detail="Toutes offres confondues" tone="info" onClick={() => onNavigate("candidatures")} />
         <StatCard icon={Users2} value={8} label="Prestataires engagés" detail="Missions confiées" tone="succes" />
         <App.CarteStat
           icone={Building2}
@@ -3377,90 +4723,138 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
 
 function OffreEntrepriseCard({ o, onOpen }) {
   return (
-    <button type="button" onClick={() => onOpen(o)} className="text-left rounded-lg border bg-surface p-5 transition-shadow hover:shadow-md" style={{ borderColor: o.sponsorisee ? COLORS.orange : COLORS.border }}>
-      <div className="flex items-center justify-between mb-2">
-        <span className="flex items-center gap-1.5">
-          <span className="text-xs font-semibold px-2.5 py-0.5 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{o.categorie}</span>
-          {o.sponsorisee && <PremiumChip label="Sponsorisée" />}
-        </span>
+    <CarteListe
+      onOpen={() => onOpen(o)}
+      accent={!!o.sponsorisee}
+      visuel={<VisuelIcone icone={Briefcase} />}
+      titre={o.titre}
+      badges={<>
         <StatusBadge status={o.statut} />
-      </div>
-      <p className="font-semibold text-sm mb-0.5" style={{ color: COLORS.slate }}>{o.titre}</p>
-      <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>{o.salaire} · {o.localisation}</p>
-      <p className="text-xs font-semibold" style={{ color: COLORS.orange }}>{o.nbCandidatures} candidatures</p>
-    </button>
+        {o.sponsorisee && <PremiumChip label="Sponsorisée" />}
+      </>}
+      sousTitre={`${o.categorie} · ${o.salaire}`}
+      meta={<>
+        <App.Badge ton="info" taille="moyen">{o.contrat}</App.Badge>
+        <MetaOffre icone={MapPin}>{o.localisation}</MetaOffre>
+        {o.dateLimite && <MetaOffre icone={Clock}>Jusqu'au {o.dateLimite}</MetaOffre>}
+      </>}
+      aside={
+        <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded bg-marque-doux px-3 text-sm font-semibold text-marque">
+          <UsersRound size={15} aria-hidden="true" /> {o.nbCandidatures} candidature{o.nbCandidatures > 1 ? "s" : ""}
+        </span>
+      }
+      actions={<App.Bouton petit variante="neutre" onClick={() => onOpen(o)}>Gérer</App.Bouton>}
+    />
   );
 }
 
 function OffreEntrepriseForm({ initial, onSave, onCancel }) {
   const [v, setV] = useState(initial || { titre: "", categorie: "", contrat: "CDI", salaire: "", localisation: "", experience: "", dateLimite: "", description: "", competencesTxt: "" });
-  const valid = v.titre.trim() && v.categorie.trim() && v.localisation.trim() && v.salaire.trim() && v.description.trim();
+  const [essai, setEssai] = useState(false);
+  const erreurs = {
+    titre: !v.titre.trim() && "Indiquez le titre du poste.",
+    categorie: !v.categorie.trim() && "Indiquez la catégorie.",
+    localisation: !v.localisation.trim() && "Indiquez où se trouve le poste.",
+    salaire: !v.salaire.trim() && "Indiquez le salaire mensuel.",
+    description: !v.description.trim() && "Décrivez le poste et ses missions.",
+  };
+  const err = (k) => (essai ? erreurs[k] : null);
 
   function set(k, val) { setV((s) => ({ ...s, [k]: val })); }
+  const attrs = (id, k, requis, aide) => ({
+    id,
+    value: v[k],
+    onChange: (e) => set(k, e.target.value),
+    "aria-required": requis || undefined,
+    "aria-invalid": err(k) ? true : undefined,
+    "aria-describedby": err(k) || aide ? `${id}-aide` : undefined,
+  });
+
+  function envoyer(e) {
+    e.preventDefault();
+    setEssai(true);
+    if (Object.values(erreurs).some(Boolean)) return;
+    onSave({
+      id: initial?.id || v.titre.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now(),
+      titre: v.titre, categorie: v.categorie, contrat: v.contrat, salaire: v.salaire, localisation: v.localisation,
+      // Nouvelle offre, ou offre refusée puis corrigée : elle repart en vérification chez l'admin.
+      statut: !initial || initial.statut === "Refusée" ? "En vérification" : initial.statut,
+      soumiseLe: !initial || initial.statut === "Refusée" ? demoNow().toLocaleDateString("fr-FR") : initial.soumiseLe,
+      motifRefus: null,
+      nbCandidatures: initial?.nbCandidatures || 0, experience: v.experience,
+      dateLimite: v.dateLimite, description: v.description,
+      competences: v.competencesTxt.split(",").map((s) => s.trim()).filter(Boolean),
+      candidats: initial?.candidats || [],
+    });
+  }
 
   return (
-    <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-      <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>{initial ? "Modifier l'offre" : "Créer une offre d'emploi"}</h3>
-      <div className="grid grid-cols-2 gap-4 mb-4">
-        <div className="col-span-2">
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Titre du poste *</label>
-          <input value={v.titre} onChange={(e) => set("titre", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Catégorie *</label>
-          <input value={v.categorie} onChange={(e) => set("categorie", e.target.value)} placeholder="Ex: BTP, Plomberie..." className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Type de contrat *</label>
-          <select value={v.contrat} onChange={(e) => set("contrat", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }}>
+    <App.Carte
+      as="form"
+      onSubmit={envoyer}
+      noValidate
+      titre={initial ? "Modifier l'offre" : "Créer une offre d'emploi"}
+      sousTitre="Les champs marqués d'un * sont obligatoires."
+    >
+      {(!initial || initial.statut === "Refusée") && (
+        <p className="mb-6 flex items-start gap-3 rounded-lg bg-doux p-4 text-sm text-secondaire">
+          <ShieldCheck size={18} className="mt-0.5 shrink-0 text-marque" aria-hidden="true" />
+          L'équipe LIGGEEY vérifie chaque offre avant sa mise en ligne. Elle sera visible des candidats dès sa validation.
+        </p>
+      )}
+      {initial?.statut === "Refusée" && initial.motifRefus && (
+        <p className="mb-6 rounded-lg bg-statut-danger-doux px-4 py-3 text-sm text-principal"><span className="font-semibold">Motif du refus :</span> {initial.motifRefus}</p>
+      )}
+
+      <h3 className={FORM.section}>Le poste</h3>
+      <div className={`${FORM.grille} mb-8`}>
+        <Champ id="offre-titre" label="Titre du poste" requis erreur={err("titre")} large>
+          <input {...attrs("offre-titre", "titre", true)} placeholder="Ex : Électricien du bâtiment" className={FORM.champ(err("titre"))} />
+        </Champ>
+        <Champ id="offre-categorie" label="Catégorie" requis erreur={err("categorie")}>
+          <input {...attrs("offre-categorie", "categorie", true)} placeholder="Ex : BTP, plomberie" className={FORM.champ(err("categorie"))} />
+        </Champ>
+        <Champ id="offre-contrat" label="Type de contrat" requis>
+          <ListeChamp {...attrs("offre-contrat", "contrat", true)}>
             {["CDI", "CDD", "Stage", "Freelance", "Bénévolat"].map((c) => <option key={c}>{c}</option>)}
-          </select>
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Localisation *</label>
-          <input value={v.localisation} onChange={(e) => set("localisation", e.target.value)} placeholder="Ex: Dakar, Plateau" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Salaire mensuel *</label>
-          <input value={v.salaire} onChange={(e) => set("salaire", e.target.value)} placeholder="Ex: 300 000 FCFA/mois" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Expérience requise</label>
-          <input value={v.experience} onChange={(e) => set("experience", e.target.value)} placeholder="Ex: 3-5 ans" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div>
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Date limite</label>
-          <input value={v.dateLimite} onChange={(e) => set("dateLimite", e.target.value)} placeholder="Ex : 30 nov. 2026" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div className="col-span-2">
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Description du poste *</label>
-          <textarea value={v.description} onChange={(e) => set("description", e.target.value)} rows={3} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
-        <div className="col-span-2">
-          <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Compétences requises</label>
-          <input value={v.competencesTxt} onChange={(e) => set("competencesTxt", e.target.value)} placeholder="Séparées par des virgules" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
+          </ListeChamp>
+        </Champ>
+        <Champ id="offre-description" label="Description du poste" requis erreur={err("description")} aide="Les missions, le cadre de travail, les horaires." large>
+          <textarea {...attrs("offre-description", "description", true, true)} rows={4} className={FORM.zone(err("description"))} />
+        </Champ>
       </div>
-      <div className="flex gap-3">
-        <button type="button" onClick={onCancel} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-        <button
-          type="button"
-          disabled={!valid}
-          onClick={() => onSave({
-            id: initial?.id || v.titre.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now(),
-            titre: v.titre, categorie: v.categorie, contrat: v.contrat, salaire: v.salaire, localisation: v.localisation,
-            statut: initial?.statut || "Active", nbCandidatures: initial?.nbCandidatures || 0, experience: v.experience,
-            dateLimite: v.dateLimite, description: v.description,
-            competences: v.competencesTxt.split(",").map((s) => s.trim()).filter(Boolean),
-            candidats: initial?.candidats || [],
-          })}
-          className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque"
-          style={{ background: COLORS.orange, opacity: valid ? 1 : 0.5 }}
-        >
-          {initial ? "Enregistrer" : "Publier l'offre"}
-        </button>
+
+      <h3 className={FORM.section}>Conditions</h3>
+      <div className={`${FORM.grille} mb-8`}>
+        <Champ id="offre-localisation" label="Localisation" requis erreur={err("localisation")}>
+          <input {...attrs("offre-localisation", "localisation", true)} placeholder="Ex : Dakar, Plateau" className={FORM.champ(err("localisation"))} />
+        </Champ>
+        <Champ id="offre-salaire" label="Salaire mensuel" requis erreur={err("salaire")}>
+          <input {...attrs("offre-salaire", "salaire", true)} placeholder="Ex : 300 000 FCFA par mois" className={FORM.champ(err("salaire"))} />
+        </Champ>
+        <Champ id="offre-experience" label="Expérience requise">
+          <input {...attrs("offre-experience", "experience")} placeholder="Ex : 3 à 5 ans" className={FORM.champ()} />
+        </Champ>
+        <Champ id="offre-date-limite" label="Date limite de candidature">
+          <input {...attrs("offre-date-limite", "dateLimite")} placeholder="Ex : 30 nov. 2026" className={FORM.champ()} />
+        </Champ>
       </div>
-    </div>
+
+      <h3 className={FORM.section}>Profil recherché</h3>
+      <div className={FORM.grille}>
+        <Champ id="offre-competences" label="Compétences requises" aide="Séparez-les par des virgules." large>
+          <input {...attrs("offre-competences", "competencesTxt", false, true)} placeholder="Ex : lecture de plans, câblage, habilitation électrique" className={FORM.champ()} />
+        </Champ>
+      </div>
+
+      {essai && Object.values(erreurs).some(Boolean) && (
+        <p role="alert" className="mt-5 text-sm text-statut-danger">Complétez les champs signalés pour envoyer l'offre.</p>
+      )}
+      <div className={FORM.actions}>
+        <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
+        <App.Bouton type="submit">{!initial ? "Envoyer pour vérification" : initial.statut === "Refusée" ? "Renvoyer pour vérification" : "Enregistrer"}</App.Bouton>
+      </div>
+    </App.Carte>
   );
 }
 
@@ -3475,89 +4869,119 @@ function BorderedField({ label, value, badge }) {
 
 function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBack }) {
   const planApi = usePlan();
+  const candidats = offre.candidats || [];
   return (
-    <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
-        <ArrowLeft size={14} /> Retour aux offres
-      </button>
-      <h2 className="text-xl font-semibold mb-6" style={{ color: COLORS.slate }}>{offre.titre}</h2>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour aux offres</BoutonRetour>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-4">
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Détails de l'offre</h3>
-          <BorderedField label="Catégorie" value={offre.categorie} />
-          <BorderedField label="Contrat" value={offre.contrat} />
-          <BorderedField label="Localisation" value={offre.localisation} />
-          <BorderedField label="Salaire" value={offre.salaire} />
-          <BorderedField label="Expérience" value={offre.experience} />
-          <BorderedField label="Date limite" value={offre.dateLimite} />
-          <div className="flex items-center justify-between">
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>Statut</p>
-            <StatusBadge status={offre.statut} />
+      <EnTeteFiche
+        visuel={<VisuelIcone icone={Briefcase} taille="lg" />}
+        badges={<>
+          <StatusBadge status={offre.statut} />
+          {offre.sponsorisee && <PremiumChip label="Sponsorisée" />}
+        </>}
+        titre={offre.titre}
+        sousTitre={`${offre.categorie} · ${offre.localisation}`}
+        meta={<>
+          <App.Badge ton="info" taille="moyen">{offre.contrat}</App.Badge>
+          <MetaOffre icone={Wallet}>{offre.salaire}</MetaOffre>
+          {offre.experience && <MetaOffre icone={TrendingUp}>{offre.experience}</MetaOffre>}
+          {offre.dateLimite && <MetaOffre icone={Clock}>Jusqu'au {offre.dateLimite}</MetaOffre>}
+        </>}
+        actions={<>
+          {offre.statut === "Active" && onSponsor && (
+            offre.sponsorisee ? (
+              <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded bg-marque-doux px-4 text-sm font-semibold text-marque">
+                <Crown size={15} aria-hidden="true" /> Sponsorisée 7 jours
+              </span>
+            ) : (
+              <App.Bouton variante="doux" onClick={() => planApi.gate("sponsoring", onSponsor)}>
+                {planApi.can("sponsoring") ? <Sparkles size={16} aria-hidden="true" /> : <Lock size={16} aria-hidden="true" />} Sponsoriser
+              </App.Bouton>
+            )
+          )}
+          <App.Bouton variante="neutre" onClick={onEdit}><Pencil size={16} aria-hidden="true" /> Modifier</App.Bouton>
+          {offre.statut !== "Clôturée" && offre.statut !== "En vérification" && offre.statut !== "Refusée" && <App.Bouton onClick={onToggleStatut}>Clôturer l'offre</App.Bouton>}
+        </>}
+      />
+
+      {offre.statut === "En vérification" && (
+        <div className="flex items-start gap-3 rounded-lg border border-base bg-statut-alerte-doux p-4" role="status">
+          <ShieldCheck size={20} className="mt-0.5 shrink-0 text-principal" aria-hidden="true" />
+          <div>
+            <p className="text-sm font-semibold text-principal">En cours de vérification par l'équipe LIGGEEY</p>
+            <p className="text-sm text-secondaire">Envoyée le {offre.soumiseLe || "—"}. L'offre n'est pas encore visible des candidats : elle sera publiée dès sa validation.</p>
           </div>
         </div>
+      )}
+      {offre.statut === "Refusée" && (
+        <div className="flex flex-col gap-3 rounded-lg border border-base bg-statut-danger-doux p-4 sm:flex-row sm:items-center sm:justify-between" role="status">
+          <div className="flex items-start gap-3">
+            <AlertCircle size={20} className="mt-0.5 shrink-0 text-statut-danger" aria-hidden="true" />
+            <div>
+              <p className="text-sm font-semibold text-principal">Offre refusée par l'équipe LIGGEEY</p>
+              <p className="text-sm text-secondaire">{offre.motifRefus ? `Motif : ${offre.motifRefus}` : "Corrigez l'offre puis renvoyez-la."}</p>
+            </div>
+          </div>
+          <App.Bouton petit onClick={onEdit}><Pencil size={15} aria-hidden="true" /> Corriger et renvoyer</App.Bouton>
+        </div>
+      )}
 
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>Description du poste</h3>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>{offre.description}</p>
-            {offre.competences?.length > 0 && (
-              <div className="flex flex-wrap gap-1.5 mt-4">
-                {offre.competences.map((c) => (
-                  <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Description du poste">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{offre.description}</p>
+          </App.Carte>
+          {offre.competences?.length > 0 && (
+            <App.Carte titre="Compétences recherchées">
+              <Etiquettes items={offre.competences} />
+            </App.Carte>
+          )}
+          <App.Carte titre="Candidatures reçues" sousTitre={`${candidats.length} candidature${candidats.length > 1 ? "s" : ""}`} flush>
+            {candidats.length === 0 ? (
+              <p className="px-6 pb-6 text-sm text-secondaire">Aucune candidature pour le moment.</p>
+            ) : (
+              <ul className="divide-y divide-base border-t border-base">
+                {candidats.map((c, i) => (
+                  <li key={i} className="flex items-center justify-between gap-3 px-6 py-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <AvatarListe nom={c.nom} photo={c.photo} />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-principal">{c.nom}</p>
+                        <p className="truncate text-xs text-discret">{c.metier} · Postulé le {c.date}</p>
+                      </div>
+                    </div>
+                    <StatusBadge status={c.statut} />
+                  </li>
                 ))}
-              </div>
+              </ul>
             )}
-          </div>
-
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Candidatures reçues ({offre.candidats?.length || 0})</h3>
-            {(offre.candidats || []).map((c, i) => (
-              <div key={i} className="flex items-center justify-between py-3" style={{ borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none" }}>
-                <div className="flex items-center gap-3 min-w-0">
-                  <SafeImg src={c.photo} alt={c.nom} className="w-10 h-10 rounded-full object-cover shrink-0" />
-                  <div className="min-w-0">
-                    <p className="text-sm font-semibold truncate" style={{ color: COLORS.slate }}>{c.nom}</p>
-                    <p className="text-xs truncate" style={{ color: COLORS.slateLight }}>{c.metier} · Postulé le {c.date}</p>
-                  </div>
-                </div>
-                <StatusBadge status={c.statut} />
-              </div>
-            ))}
-            {(!offre.candidats || offre.candidats.length === 0) && <p className="text-sm" style={{ color: COLORS.slateLight }}>Aucune candidature pour le moment.</p>}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex justify-end flex-wrap gap-3">
-        {offre.statut === "Active" && onSponsor && (
-          offre.sponsorisee ? (
-            <span className="rounded-md px-5 py-2.5 text-sm font-semibold inline-flex items-center gap-1.5" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-              <Crown size={14} /> Sponsorisée pendant 7 jours
-            </span>
-          ) : (
-            <button type="button" onClick={() => planApi.gate("sponsoring", onSponsor)} className="rounded-md px-5 py-2.5 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}>
-              {planApi.can("sponsoring") ? <Sparkles size={14} /> : <Lock size={14} />} Sponsoriser l'offre
-            </button>
-          )
-        )}
-        <button type="button" onClick={onEdit} className="rounded-md px-5 py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
-          Modifier
-        </button>
-        {offre.statut !== "Clôturée" && (
-          <button type="button" onClick={onToggleStatut} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-            Clôturer l'offre
-          </button>
-        )}
-      </div>
+          </App.Carte>
+        </>}
+        cote={
+          <ApercuFiche
+            titre="Aperçu de l'offre"
+            items={[
+              { icone: Layers, libelle: "Catégorie", valeur: offre.categorie },
+              { icone: FileText, libelle: "Type de contrat", valeur: offre.contrat },
+              { icone: MapPin, libelle: "Lieu", valeur: offre.localisation },
+              { icone: Wallet, libelle: "Salaire", valeur: offre.salaire },
+              { icone: TrendingUp, libelle: "Expérience", valeur: offre.experience },
+              { icone: Clock, libelle: "Date limite", valeur: offre.dateLimite },
+              { icone: UsersRound, libelle: "Candidatures", valeur: offre.nbCandidatures },
+            ]}
+          />
+        }
+      />
     </div>
   );
 }
 
-function MesOffresScreen({ offres, setOffres }) {
+const STATUTS_OFFRE_ENTREPRISE = ["Tous", "Active", "En vérification", "Refusée", "En pause", "Clôturée"];
+
+function MesOffresScreen({ offres, setOffres, creer = false }) {
   const [query, setQuery] = useState("");
   const [statutFilter, setStatutFilter] = useState("Tous");
-  const [page, setPage] = useState(1);
   const [selectedId, setSelectedId] = useState(null);
   const [mode, setMode] = useState("view");
 
@@ -3567,15 +4991,18 @@ function MesOffresScreen({ offres, setOffres }) {
     if (offresRestantes <= 0) { planApi.requestUpgrade("offres"); return; }
     setMode("create");
   }
+  // Ouvert depuis le raccourci « Publier une offre » de la barre d'icônes.
+  useEffect(() => { if (creer) openCreate(); }, []);
   function sponsoriser(id) {
     setOffres((list) => list.map((o) => (o.id === id ? { ...o, sponsorisee: true } : o)));
     notify("Offre sponsorisée : elle apparaît en tête des résultats pendant 7 jours.");
   }
+  const q = sansAccents(query.trim());
   const filtered = offres.filter((o) =>
-    (o.titre + o.categorie + o.localisation).toLowerCase().includes(query.toLowerCase()) &&
+    (!q || sansAccents([o.titre, o.categorie, o.localisation].join(" ")).includes(q)) &&
     (statutFilter === "Tous" || o.statut === statutFilter)
   ).sort((a, b) => (b.sponsorisee ? 1 : 0) - (a.sponsorisee ? 1 : 0));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pagination = usePaginationListe(filtered);
   const selected = offres.find((o) => o.id === selectedId);
 
   function saveOffre(values) {
@@ -3586,13 +5013,29 @@ function MesOffresScreen({ offres, setOffres }) {
     });
     setSelectedId(values.id);
     setMode("view");
+    notify(values.statut === "En vérification" ? "Offre envoyée à l'équipe LIGGEEY. Elle sera publiée après vérification." : "Offre enregistrée.");
   }
   function cloturer(id) {
     setOffres((list) => list.map((o) => (o.id === id ? { ...o, statut: "Clôturée" } : o)));
+    notify("Offre clôturée.", "info");
   }
 
-  if (mode === "create") return <OffreEntrepriseForm onSave={saveOffre} onCancel={() => setMode("view")} />;
-  if (selected && mode === "edit") return <OffreEntrepriseForm initial={selected} onSave={saveOffre} onCancel={() => setMode("view")} />;
+  if (mode === "create") {
+    return (
+      <div className="space-y-6">
+        <BoutonRetour onClick={() => setMode("view")}>Retour aux offres</BoutonRetour>
+        <OffreEntrepriseForm onSave={saveOffre} onCancel={() => setMode("view")} />
+      </div>
+    );
+  }
+  if (selected && mode === "edit") {
+    return (
+      <div className="space-y-6">
+        <BoutonRetour onClick={() => setMode("view")}>Retour à l'offre</BoutonRetour>
+        <OffreEntrepriseForm initial={selected} onSave={saveOffre} onCancel={() => setMode("view")} />
+      </div>
+    );
+  }
   if (selected) {
     return (
       <OffreEntrepriseDetail
@@ -3606,48 +5049,49 @@ function MesOffresScreen({ offres, setOffres }) {
   }
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <span aria-hidden="true" />
-        <button type="button" onClick={openCreate} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-          <Plus size={15} /> Nouvelle offre
-        </button>
-      </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">
         Gérez vos offres d'emploi et suivez les candidatures reçues.
         {offresRestantes !== UNLIMITED && <span> {Math.max(0, offresRestantes)} nouvelle{offresRestantes > 1 ? "s" : ""} offre{offresRestantes > 1 ? "s" : ""} disponible{offresRestantes > 1 ? "s" : ""} ce mois-ci avec le profil {planApi.plan.nom}.</span>}
       </p>
 
-      <div className="flex flex-wrap gap-3 mb-6">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-          placeholder="Rechercher une offre..."
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
-          style={{ borderColor: COLORS.border }}
+      <BarreFiltres label="Rechercher dans mes offres">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); pagination.setPage(1); }}
+          placeholder="Poste, catégorie ou lieu…"
+          label="Rechercher une offre"
+          className="w-full lg:flex-1"
         />
-        {["Tous", "Active", "En pause", "Clôturée"].map((s) => (
-          <button
-            key={s}
-            type="button"
-            onClick={() => { setStatutFilter(s); setPage(1); }}
-            className={`min-h-[32px] rounded px-3 text-xs font-semibold transition-colors ${statutFilter === s ? "bg-surface text-principal shadow-[0_1px_2px_rgb(var(--neutre-800)/0.08)]" : "text-secondaire hover:text-principal"}`}
-            aria-pressed={statutFilter === s}
-          >
-            {s}
-          </button>
-        ))}
+        <App.Bouton petit onClick={openCreate}><Plus size={15} aria-hidden="true" /> Nouvelle offre</App.Bouton>
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Statut"
+          actif={statutFilter}
+          onChange={(v) => { setStatutFilter(v); pagination.setPage(1); }}
+          options={STATUTS_OFFRE_ENTREPRISE.map((s) => ({ id: s, label: `${s === "Tous" ? "Toutes" : s} (${s === "Tous" ? offres.length : offres.filter((o) => o.statut === s).length})` }))}
+        />
+        <CompteResultats n={filtered.length} nom="offre" feminin />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paged.map((o) => (
-          <OffreEntrepriseCard key={o.id} o={o} onOpen={(oo) => setSelectedId(oo.id)} />
-        ))}
-        {paged.length === 0 && <p className="text-sm col-span-full" style={{ color: COLORS.slateLight }}>Aucune offre ne correspond.</p>}
-      </div>
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((o) => <OffreEntrepriseCard key={o.id} o={o} onOpen={(oo) => { setSelectedId(oo.id); window.scrollTo(0, 0); }} />)}
+        </div>
+      ) : offres.length === 0 ? (
+        <ListeVide icone={Briefcase} titre="Aucune offre publiée" texte="Publiez votre première offre : l'équipe LIGGEEY la vérifie avant sa mise en ligne." action={<App.Bouton petit onClick={openCreate}>Nouvelle offre</App.Bouton>} />
+      ) : (
+        <ListeVide
+          titre="Aucune offre ne correspond"
+          texte="Essayez d'autres mots-clés ou un autre statut."
+          action={<App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setStatutFilter("Tous"); }}>Effacer les filtres</App.Bouton>}
+        />
+      )}
 
-      <Pagination page={page} pageSize={PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+      <PiedListe pagination={pagination} />
     </div>
   );
 }
@@ -3666,26 +5110,25 @@ const CANDIDATURES_ENTREPRISE_INITIAL = [
 ];
 
 function CandidatureEntrepriseRow({ c, onOpen }) {
+  const premium = PREMIUM_CANDIDATS.has(c.id);
   return (
-    <button
-      type="button"
-      onClick={() => onOpen(c)}
-      className="w-full flex items-center justify-between gap-4 rounded-lg border bg-surface px-5 py-4 mb-3 text-left transition-shadow hover:shadow-md"
-      style={{ borderColor: PREMIUM_CANDIDATS.has(c.id) ? COLORS.orange : COLORS.border }}
-    >
-      <div className="flex items-center gap-3 min-w-0" style={{ flex: "1 1 30%" }}>
-        <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-          {initials(c.nom)}
-        </div>
-        <div className="min-w-0">
-          <p className="text-sm font-semibold truncate flex items-center gap-1.5" style={{ color: COLORS.slate }}>{c.nom} {PREMIUM_CANDIDATS.has(c.id) && <TierBadge premium size="sm" />}</p>
-          <p className="text-xs truncate" style={{ color: COLORS.slateLight }}>{c.metier}</p>
-        </div>
-      </div>
-      <p className="text-sm truncate" style={{ flex: "1 1 25%", color: COLORS.slate }}>{c.offre}</p>
-      <p className="text-sm" style={{ flex: "0 0 auto", color: COLORS.slateLight }}>{c.date}</p>
-      <StatusBadge status={c.statut} />
-    </button>
+    <CarteListe
+      onOpen={() => onOpen(c)}
+      accent={premium}
+      visuel={<AvatarListe nom={c.nom} photo={c.photo} />}
+      titre={c.nom}
+      badges={<>
+        {premium && <TierBadge premium size="sm" />}
+        <StatusBadge status={c.statut} />
+      </>}
+      sousTitre={`${c.metier} · ${c.experience}`}
+      meta={<>
+        <MetaOffre icone={Briefcase}>{c.offre}</MetaOffre>
+        <MetaOffre icone={MapPin}>{c.localisation}</MetaOffre>
+        <MetaOffre icone={CalendarDays}>Reçue le {c.date}</MetaOffre>
+      </>}
+      actions={<App.Bouton petit variante="neutre" onClick={() => onOpen(c)}>Voir la candidature</App.Bouton>}
+    />
   );
 }
 
@@ -3704,107 +5147,111 @@ function CandidatureEntrepriseDetail({ candidat, onDecide, onBack }) {
   const planApi = usePlan();
   const coordOk = !planApi || planApi.can("coordonnees");
   const unlock = () => planApi.requestUpgrade("coordonnees");
+  const premium = PREMIUM_CANDIDATS.has(candidat.id);
+  const verrou = (
+    <button type="button" onClick={unlock} className="inline-flex min-h-[32px] items-center gap-1.5 font-semibold text-marque">
+      <Lock size={13} aria-hidden="true" /> Débloquer avec le profil Premium
+    </button>
+  );
   return (
-    <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}>
-        <ArrowLeft size={14} /> Retour aux candidatures
-      </button>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour aux candidatures</BoutonRetour>
 
-      <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.4fr] gap-4 mb-6">
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-              {initials(candidat.nom)}
-            </div>
-            <div>
-              <p className="font-semibold" style={{ color: COLORS.slate }}>{candidat.nom}</p>
-              <p className="text-xs" style={{ color: COLORS.slateLight }}>{candidat.metier}</p>
-            </div>
-          </div>
-          <Row label="Localisation" value={candidat.localisation} />
-          <div className="h-2" />
-          <Row label="Expérience" value={candidat.experience} />
-          <div className="h-2" />
-          {coordOk ? <Row label="Téléphone" value={candidat.telephone} /> : <LockedRow label="Téléphone" onUnlock={unlock} />}
-          <div className="h-2" />
-          {coordOk ? <Row label="Email" value={candidat.email} /> : <LockedRow label="Email" onUnlock={unlock} />}
-        </div>
+      <EnTeteFiche
+        visuel={<AvatarListe nom={candidat.nom} photo={candidat.photo} taille="lg" />}
+        badges={<>
+          <StatusBadge status={candidat.statut} />
+          {premium && <TierBadge premium size="sm" />}
+        </>}
+        titre={candidat.nom}
+        sousTitre={`${candidat.metier} · ${candidat.experience}`}
+        meta={<>
+          <MetaOffre icone={Briefcase}>{candidat.offre}</MetaOffre>
+          <MetaOffre icone={MapPin}>{candidat.localisation}</MetaOffre>
+          <MetaOffre icone={CalendarDays}>Reçue le {candidat.date}</MetaOffre>
+        </>}
+        actions={<>
+          <App.Bouton variante="neutre" onClick={() => onDecide(candidat.id, "Rejeté")}>Rejeter</App.Bouton>
+          <App.Bouton variante="doux" onClick={() => onDecide(candidat.id, "En cours")}><CalendarCheck size={16} aria-hidden="true" /> Planifier un entretien</App.Bouton>
+          <App.Bouton onClick={() => onDecide(candidat.id, "Retenu")}>Retenir</App.Bouton>
+        </>}
+      />
 
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <div className="flex items-center justify-between mb-1">
-              <h3 className="font-semibold" style={{ color: COLORS.slate }}>Détails de la candidature</h3>
-              <StatusBadge status={candidat.statut} />
-            </div>
-            <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>Offre : {candidat.offre} · Déposée le {candidat.date}</p>
-            <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>Lettre de motivation</p>
-            <p className="text-sm" style={{ color: COLORS.slate }}>{candidat.lettre}</p>
-          </div>
-          <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-            <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Compétences clés</p>
-            <div className="flex flex-wrap gap-1.5 mb-4">
-              {candidat.competences.map((c) => (
-                <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Lettre de motivation">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{candidat.lettre}</p>
+          </App.Carte>
+          <App.Carte titre="Compétences clés">
+            <Etiquettes items={candidat.competences} />
+          </App.Carte>
+          <App.Carte titre="Documents joints" flush>
+            <ul className="divide-y divide-base border-t border-base">
+              {candidat.documents.map((d) => (
+                <li key={d.nom} className="flex items-center justify-between gap-3 px-6 py-3">
+                  <span className="flex min-w-0 items-center gap-3">
+                    <App.PastilleIcone icone={FileText} ton="neutre" forme="carre" taille="sm" />
+                    <span className="min-w-0">
+                      <span className="block truncate text-sm font-medium text-principal">{d.nom}</span>
+                      <span className="block text-xs text-discret">{d.taille}</span>
+                    </span>
+                  </span>
+                  {coordOk ? (
+                    <App.BoutonIcone icone={Download} label={`Télécharger ${d.nom}`} onClick={() => notify(`${d.nom} téléchargé.`)} />
+                  ) : (
+                    <App.BoutonIcone icone={Lock} label={`Débloquer ${d.nom}`} onClick={unlock} />
+                  )}
+                </li>
               ))}
+            </ul>
+          </App.Carte>
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Aperçu du candidat"
+            items={[
+              { icone: Briefcase, libelle: "Métier", valeur: candidat.metier },
+              { icone: TrendingUp, libelle: "Expérience", valeur: candidat.experience },
+              { icone: MapPin, libelle: "Localisation", valeur: candidat.localisation },
+              { icone: FileText, libelle: "Offre", valeur: candidat.offre },
+              { icone: CalendarDays, libelle: "Reçue le", valeur: candidat.date },
+            ]}
+          />
+          <App.Carte titre="Coordonnées">
+            <div className="divide-y divide-dashed divide-base">
+              <App.LigneInfo icone={Phone} libelle="Téléphone">{coordOk ? candidat.telephone : verrou}</App.LigneInfo>
+              <App.LigneInfo icone={Mail} libelle="E-mail">{coordOk ? candidat.email : verrou}</App.LigneInfo>
             </div>
-            <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Documents joints</p>
-            {candidat.documents.map((d) => (
-              <div key={d.nom} className="flex items-center justify-between py-1.5">
-                <div className="flex items-center gap-2">
-                  <FileText size={15} color={COLORS.slateLight} />
-                  <p className="text-sm" style={{ color: COLORS.slate }}>{d.nom}</p>
-                </div>
-                {coordOk ? (
-                  <button type="button" onClick={() => notify(`${d.nom} téléchargé.`)} className="text-xs inline-flex items-center gap-1" style={{ color: COLORS.slateLight }}>
-                    {d.taille} <Download size={13} />
-                  </button>
-                ) : (
-                  <button type="button" onClick={unlock} className="text-xs inline-flex items-center gap-1 font-medium" style={{ color: COLORS.orange }}>
-                    <Lock size={12} /> Débloquer
-                  </button>
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="flex gap-3">
-        <button type="button" onClick={() => onDecide(candidat.id, "Rejeté")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>
-          Rejeter
-        </button>
-        <button type="button" onClick={() => onDecide(candidat.id, "En cours")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.orange, color: COLORS.orange }}>
-          Planifier entretien
-        </button>
-        <button type="button" onClick={() => onDecide(candidat.id, "Retenu")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-          Retenir la candidature
-        </button>
-      </div>
+          </App.Carte>
+        </>}
+      />
     </div>
   );
 }
 
+const STATUTS_CANDIDATURE_ENTREPRISE = ["Tous", "Nouveau", "En cours", "Retenu", "Rejeté"];
+const LIBELLES_STATUT_CANDIDATURE = { Tous: "Toutes", Nouveau: "Nouvelles", "En cours": "En cours", Retenu: "Retenues", Rejeté: "Rejetées" };
+
 function CandidaturesEntrepriseScreen() {
   const [candidats, setCandidats] = useStore("candidatures-entreprise", CANDIDATURES_ENTREPRISE_INITIAL);
   const [query, setQuery] = useState("");
-  const [offreFilter, setOffreFilter] = useState("Toutes les offres");
-  const [statutFilter, setStatutFilter] = useState("Tous les statuts");
-  const [page, setPage] = useState(1);
+  const [offreFilter, setOffreFilter] = useState("toutes");
+  const [statutFilter, setStatutFilter] = useState("Tous");
   const [selectedId, setSelectedId] = useState(null);
 
-  const offresList = ["Toutes les offres", ...Array.from(new Set(CANDIDATURES_ENTREPRISE_INITIAL.map((c) => c.offre)))];
-  const statutsList = ["Tous les statuts", "Nouveau", "En cours", "Retenu", "Rejeté"];
-
+  const offresList = Array.from(new Set(candidats.map((c) => c.offre)));
+  const q = sansAccents(query.trim());
   const filtered = candidats.filter((c) =>
-    (c.nom + c.metier).toLowerCase().includes(query.toLowerCase()) &&
-    (offreFilter === "Toutes les offres" || c.offre === offreFilter) &&
-    (statutFilter === "Tous les statuts" || c.statut === statutFilter)
+    (!q || sansAccents([c.nom, c.metier, c.localisation, ...(c.competences || [])].join(" ")).includes(q)) &&
+    (offreFilter === "toutes" || c.offre === offreFilter) &&
+    (statutFilter === "Tous" || c.statut === statutFilter)
   ).sort(premiumFirst((c) => PREMIUM_CANDIDATS.has(c.id)));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pagination = usePaginationListe(filtered);
   const selected = candidats.find((c) => c.id === selectedId);
 
   function decide(id, statut) {
     setCandidats((list) => list.map((c) => (c.id === id ? { ...c, statut } : c)));
+    notify({ Retenu: "Candidature retenue.", "En cours": "Candidature passée en entretien.", Rejeté: "Candidature rejetée." }[statut] || "Candidature mise à jour.", statut === "Rejeté" ? "info" : "success");
   }
 
   if (selected) {
@@ -3812,32 +5259,51 @@ function CandidaturesEntrepriseScreen() {
   }
 
   return (
-    <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Visualisez et gérez toutes les candidatures reçues pour vos offres d'emploi.</p>
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Visualisez et gérez toutes les candidatures reçues pour vos offres d'emploi.</p>
 
-      <div className="flex flex-wrap gap-3 mb-6">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-          placeholder="Rechercher un candidat..."
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
-          style={{ borderColor: COLORS.border }}
+      <BarreFiltres label="Rechercher et filtrer les candidatures">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); pagination.setPage(1); }}
+          placeholder="Nom, métier ou compétence…"
+          label="Rechercher un candidat"
+          className="w-full lg:flex-1"
         />
-        <select value={offreFilter} onChange={(e) => { setOffreFilter(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          {offresList.map((o) => <option key={o}>{o}</option>)}
-        </select>
-        <select value={statutFilter} onChange={(e) => { setStatutFilter(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          {statutsList.map((s) => <option key={s}>{s}</option>)}
-        </select>
+        <App.SelecteurPeriode
+          icone={Briefcase}
+          label="Offre"
+          valeur={offreFilter}
+          onChange={(v) => { setOffreFilter(v); pagination.setPage(1); }}
+          options={[{ id: "toutes", label: "Toutes les offres" }, ...offresList]}
+        />
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Statut"
+          actif={statutFilter}
+          onChange={(v) => { setStatutFilter(v); pagination.setPage(1); }}
+          options={STATUTS_CANDIDATURE_ENTREPRISE.map((s) => ({ id: s, label: `${LIBELLES_STATUT_CANDIDATURE[s]} (${s === "Tous" ? candidats.length : candidats.filter((c) => c.statut === s).length})` }))}
+        />
+        <CompteResultats n={filtered.length} nom="candidature" feminin />
       </div>
 
-      {paged.map((c) => (
-        <CandidatureEntrepriseRow key={c.id} c={c} onOpen={(cc) => setSelectedId(cc.id)} />
-      ))}
-      {paged.length === 0 && <p className="text-sm" style={{ color: COLORS.slateLight }}>Aucune candidature ne correspond à ces filtres.</p>}
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((c) => <CandidatureEntrepriseRow key={c.id} c={c} onOpen={(cc) => { setSelectedId(cc.id); window.scrollTo(0, 0); }} />)}
+        </div>
+      ) : (
+        <ListeVide
+          icone={ClipboardList}
+          titre="Aucune candidature ne correspond"
+          texte="Essayez d'autres mots-clés ou retirez un filtre."
+          action={<App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setOffreFilter("toutes"); setStatutFilter("Tous"); }}>Effacer les filtres</App.Bouton>}
+        />
+      )}
 
-      <Pagination page={page} pageSize={PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+      <PiedListe pagination={pagination} />
     </div>
   );
 }
@@ -3867,31 +5333,35 @@ const PRESTATAIRES_SEARCH = [
   { id: "p6", nom: "Ousmane Diaw", metier: "Soudeur TIG/MIG", localisation: "Thiès", experience: "7 ans d'expérience", note: 4.4, disponible: false, telephone: "+221 78 901 23 45", email: "ousmane.diaw@email.sn", timeline: [{ poste: "Soudeur TIG/MIG", periode: "2019 – Présent", lieu: "Industries Sénégal", description: "Soudure de structures métalliques industrielles." }], competences: ["Soudure TIG", "Soudure MIG"], avis: [{ auteur: "Babacar Niang", date: "18 mars 2026", note: 4, commentaire: "Bon travail, quelques retards sur le planning." }], certifications: ["Certificat de soudage industriel"] },
 ];
 
+function BadgesPrestataire({ p }) {
+  return (
+    <>
+      {PREMIUM_PRESTATAIRES.has(p.id) && <TierBadge premium size="sm" />}
+      {PRESTATAIRES_REGULARISES.has(p.id) && <App.Badge ton="succes" taille="moyen"><BadgeCheck size={13} aria-hidden="true" /> Activité régularisée</App.Badge>}
+    </>
+  );
+}
+
 function PrestataireSearchCard({ p, onOpen }) {
   return (
-    <div className="rounded-lg border bg-surface p-5 flex flex-col" style={{ borderColor: PREMIUM_PRESTATAIRES.has(p.id) ? COLORS.orange : COLORS.border }}>
-      <div className="flex flex-wrap gap-1.5 mb-3 min-h-[20px]">
-        {PREMIUM_PRESTATAIRES.has(p.id) && <TierBadge premium size="sm" />}
-        {PRESTATAIRES_REGULARISES.has(p.id) && <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: "#DCFCE7", color: "#16A34A" }}><BadgeCheck size={10} /> Activité régularisée</span>}
-      </div>
-      <div className="flex items-center gap-2.5 mb-3">
-        <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-          {initials(p.nom)}
-        </div>
-        <div className="min-w-0">
-          <p className="font-semibold text-sm truncate" style={{ color: COLORS.slate }}>{p.nom}</p>
-          <p className="text-xs truncate" style={{ color: COLORS.slateLight }}>{p.metier}</p>
-        </div>
-      </div>
-      <p className="text-xs mb-2" style={{ color: COLORS.slateLight }}>{p.localisation} · {p.experience}</p>
-      <div className="flex items-center justify-between mb-3">
-        <Stars note={Math.round(p.note)} />
+    <CarteListe
+      onOpen={() => onOpen(p)}
+      accent={PREMIUM_PRESTATAIRES.has(p.id)}
+      visuel={<AvatarListe nom={p.nom} photo={p.photo} />}
+      titre={p.nom}
+      badges={<BadgesPrestataire p={p} />}
+      sousTitre={`${p.metier} · ${p.experience}`}
+      meta={<>
         <StatusBadge status={p.disponible ? "Disponible" : "Occupé"} />
+        <MetaOffre icone={Star}>{p.note.toFixed(1)}/5</MetaOffre>
+        <MetaOffre icone={MapPin}>{p.localisation}</MetaOffre>
+      </>}
+      actions={<App.Bouton petit variante="neutre" onClick={() => onOpen(p)}>Voir le profil</App.Bouton>}
+    >
+      <div className="mt-3">
+        <Etiquettes items={p.competences} max={3} />
       </div>
-      <button type="button" onClick={() => onOpen(p)} className="w-full rounded-md py-2.5 text-sm font-semibold mt-auto" style={{ background: COLORS.softStrong, color: COLORS.slate }}>
-        Voir profil
-      </button>
-    </div>
+    </CarteListe>
   );
 }
 
@@ -3903,155 +5373,149 @@ function PrestataireProfilDetail({ p, onBack }) {
   const [contactOpen, setContactOpen] = useState(false);
   const [message, setMessage] = useState("");
   return (
-    <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.slateLight }}>
-        <ArrowLeft size={14} /> Retour à la recherche
-      </button>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour à la recherche</BoutonRetour>
 
-      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <div className="flex items-center gap-3 mb-4">
-            <div className="w-14 h-14 rounded-full flex items-center justify-center text-lg font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-              {initials(p.nom)}
-            </div>
-            <div>
-              <p className="text-lg font-bold" style={{ color: COLORS.slate }}>{p.nom}</p>
-              <p className="text-sm" style={{ color: COLORS.slateLight }}>{p.metier}</p>
-              <Stars note={Math.round(p.note)} size={14} />
-            </div>
-          </div>
-          <span className="inline-block text-xs font-semibold px-3 py-1 rounded-full mb-4" style={{ background: p.disponible ? "#DCFCE7" : COLORS.orangeSoft, color: p.disponible ? "#16A34A" : COLORS.orange }}>
-            {p.disponible ? "Disponible" : "Occupé"}
-          </span>
-          <div className="flex items-center gap-2 text-sm mb-1.5"><Phone size={14} color={COLORS.slateLight} /><span style={{ color: COLORS.slate }}>{p.telephone}</span></div>
-          <div className="flex items-center gap-2 text-sm mb-1.5"><Mail size={14} color={COLORS.slateLight} /><span style={{ color: COLORS.slate }}>{p.email}</span></div>
-          <div className="flex items-center gap-2 text-sm"><MapPin size={14} color={COLORS.slateLight} /><span style={{ color: COLORS.slate }}>{p.localisation}</span></div>
-        </div>
+      <EnTeteFiche
+        visuel={<AvatarListe nom={p.nom} photo={p.photo} taille="lg" />}
+        badges={<>
+          <StatusBadge status={p.disponible ? "Disponible" : "Occupé"} />
+          <BadgesPrestataire p={p} />
+        </>}
+        titre={p.nom}
+        sousTitre={`${p.metier} · ${p.experience}`}
+        meta={<>
+          <MetaOffre icone={Star}>{p.note.toFixed(1)}/5 · {p.avis.length} avis</MetaOffre>
+          <MetaOffre icone={MapPin}>{p.localisation}</MetaOffre>
+        </>}
+        actions={proposed ? (
+          <App.Badge ton="succes" taille="moyen"><Check size={13} aria-hidden="true" /> Mission proposée</App.Badge>
+        ) : (
+          <>
+            <App.Bouton variante="neutre" onClick={() => gateContact(() => setContactOpen((o) => !o))} aria-expanded={contactOpen}>
+              {contactOk ? <MessageCircle size={16} aria-hidden="true" /> : <Lock size={16} aria-hidden="true" />} Contacter
+            </App.Bouton>
+            <App.Bouton onClick={() => gateContact(() => { setProposed(true); notify(`Mission proposée à ${p.nom}. Vous serez prévenu(e) de sa réponse.`); })}>
+              {contactOk ? <Send size={16} aria-hidden="true" /> : <Lock size={16} aria-hidden="true" />} Proposer une mission
+            </App.Bouton>
+          </>
+        )}
+      />
 
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Expérience professionnelle</h3>
-          <div className="flex flex-col gap-3">
-            {p.timeline.map((t, i) => (
-              <div key={i} className="pb-3" style={{ borderBottom: i < p.timeline.length - 1 ? `1px solid ${COLORS.border}` : "none" }}>
-                <div className="flex items-center justify-between">
-                  <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{t.poste}</p>
-                  <span className="text-xs font-semibold" style={{ color: COLORS.orange }}>{t.periode}</span>
-                </div>
-                <p className="text-xs" style={{ color: COLORS.slateLight }}>{t.lieu}</p>
-                <p className="text-xs mt-1" style={{ color: COLORS.slateLight }}>{t.description}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Compétences</h3>
-          <div className="flex flex-wrap gap-1.5">
-            {p.competences.map((c) => (
-              <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>
-            ))}
-          </div>
-        </div>
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Avis clients</h3>
-          {p.avis.map((a, i) => (
-            <div key={i} className="py-2" style={{ borderTop: i > 0 ? `1px solid ${COLORS.border}` : "none" }}>
-              <div className="flex items-center justify-between">
-                <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{a.auteur}</p>
-                <span className="text-xs" style={{ color: COLORS.slateLight }}>{a.date}</span>
-              </div>
-              <Stars note={a.note} size={12} />
-              <p className="text-xs mt-1" style={{ color: COLORS.slateLight }}>{a.commentaire}</p>
-            </div>
-          ))}
-        </div>
-        <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Certifications</h3>
-          {p.certifications.map((c) => (
-            <div key={c} className="flex items-start gap-2 py-1">
-              <ShieldCheck size={14} color={COLORS.orange} className="mt-0.5 shrink-0" />
-              <p className="text-sm" style={{ color: COLORS.slate }}>{c}</p>
-            </div>
-          ))}
-        </div>
-
-      </div>
-
-      {proposed ? (
-        <div className="rounded-md px-4 py-3 text-sm inline-block" style={{ background: "#ECFDF5", color: "#047857" }}>
-          Mission proposée à {p.nom} — vous serez notifié(e) de sa réponse.
-        </div>
-      ) : (
-        <div className="flex gap-3">
-          <button type="button" onClick={() => gateContact(() => setContactOpen((o) => !o))} aria-expanded={contactOpen} className="rounded-md px-5 py-2.5 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}>{!contactOk && <Lock size={13} />} Contacter</button>
-          <button type="button" onClick={() => gateContact(() => setProposed(true))} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>{!contactOk && <Lock size={13} />} Proposer une mission</button>
-        </div>
-      )}
       {contactOpen && (
-        <div className="rounded-lg border bg-surface p-5 mt-4 max-w-xl" style={{ borderColor: COLORS.border }}>
-          <label htmlFor="contact-msg" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Message à {p.nom}</label>
-          <textarea id="contact-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Bonjour, je souhaiterais échanger sur un besoin…" className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          <div className="flex gap-2 mt-3">
-            <button type="button" disabled={!message.trim()} onClick={() => { notify(`Message envoyé à ${p.nom}.`); setMessage(""); setContactOpen(false); }} className="flex items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: message.trim() ? 1 : 0.5 }}>
-              <Send size={14} /> Envoyer
-            </button>
-            <button type="button" onClick={() => setContactOpen(false)} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+        <App.Carte titre={`Message à ${p.nom}`}>
+          <label htmlFor="contact-msg" className="sr-only">Message à {p.nom}</label>
+          <textarea id="contact-msg" rows={3} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Bonjour, je souhaiterais échanger sur un besoin…" className={FORM.zone()} />
+          <div className="mt-3 flex flex-wrap gap-2">
+            <App.Bouton petit disabled={!message.trim()} onClick={() => { notify(`Message envoyé à ${p.nom}.`); setMessage(""); setContactOpen(false); }}>
+              <Send size={15} aria-hidden="true" /> Envoyer
+            </App.Bouton>
+            <App.Bouton petit variante="neutre" onClick={() => setContactOpen(false)}>Annuler</App.Bouton>
           </div>
-        </div>
+        </App.Carte>
       )}
+
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Expérience professionnelle">
+            <FriseParcours etapes={p.timeline.map((t) => ({ poste: t.poste, structure: t.lieu, periode: t.periode, description: t.description }))} />
+          </App.Carte>
+          <App.Carte titre="Avis clients" sousTitre={`${p.avis.length} avis · note moyenne ${p.note.toFixed(1)}/5`}>
+            <ListeAvis avis={p.avis} />
+          </App.Carte>
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Aperçu du prestataire"
+            items={[
+              { icone: Wrench, libelle: "Métier", valeur: p.metier },
+              { icone: TrendingUp, libelle: "Expérience", valeur: p.experience },
+              { icone: MapPin, libelle: "Localisation", valeur: p.localisation },
+              { icone: Star, libelle: "Note moyenne", valeur: `${p.note.toFixed(1)}/5` },
+              { icone: Phone, libelle: "Téléphone", valeur: p.telephone },
+              { icone: Mail, libelle: "E-mail", valeur: p.email },
+            ]}
+          />
+          <App.Carte titre="Compétences">
+            <Etiquettes items={p.competences} />
+          </App.Carte>
+          <App.Carte titre="Certifications">
+            <ListeCoches items={p.certifications} />
+          </App.Carte>
+        </>}
+      />
     </div>
   );
 }
 
 function PrestatairesSearchScreen() {
   const [query, setQuery] = useState("");
-  const [metier, setMetier] = useState("Tous les métiers");
-  const [dispo, setDispo] = useState("Tous");
-  const [page, setPage] = useState(1);
+  const [metier, setMetier] = useState("tous");
+  const [dispo, setDispo] = useState("tous");
   const [selectedId, setSelectedId] = useState(null);
 
-  const metiers = ["Tous les métiers", ...Array.from(new Set(PRESTATAIRES_SEARCH.map((p) => p.metier)))];
+  const metiers = Array.from(new Set(PRESTATAIRES_SEARCH.map((p) => p.metier))).sort();
+  const DISPOS = [
+    { id: "tous", label: "Tous", test: () => true },
+    { id: "disponibles", label: "Disponibles", test: (p) => p.disponible },
+    { id: "occupes", label: "Occupés", test: (p) => !p.disponible },
+  ];
+  const q = sansAccents(query.trim());
   const filtered = PRESTATAIRES_SEARCH.filter((p) =>
-    (p.nom + p.metier + p.localisation).toLowerCase().includes(query.toLowerCase()) &&
-    (metier === "Tous les métiers" || p.metier === metier) &&
-    (dispo === "Tous" || (dispo === "Disponible" ? p.disponible : !p.disponible))
+    (!q || sansAccents([p.nom, p.metier, p.localisation, ...p.competences].join(" ")).includes(q)) &&
+    (metier === "tous" || p.metier === metier) &&
+    DISPOS.find((d) => d.id === dispo).test(p)
   ).sort(premiumFirst((p) => PREMIUM_PRESTATAIRES.has(p.id)));
-  const paged = filtered.slice((page - 1) * PAGE_SIZE, page * PAGE_SIZE);
+  const pagination = usePaginationListe(filtered);
   const selected = PRESTATAIRES_SEARCH.find((p) => p.id === selectedId);
 
-  if (selected) return <PrestataireProfilDetail p={selected} onBack={() => setSelectedId(null)} />;
+  if (selected) return <PrestataireProfilDetail key={selected.id} p={selected} onBack={() => setSelectedId(null)} />;
 
   return (
-    <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Trouvez des artisans et techniciens qualifiés pour vos besoins.</p>
+    <div className="space-y-6">
+      <p className="text-sm text-secondaire">Trouvez des artisans et techniciens qualifiés, vérifiés par LIGGEEY, pour vos besoins.</p>
 
-      <div className="flex flex-wrap gap-3 mb-6">
-        <input
-          type="text"
-          value={query}
-          onChange={(e) => { setQuery(e.target.value); setPage(1); }}
-          placeholder="Rechercher un artisan..."
-          className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs"
-          style={{ borderColor: COLORS.border }}
+      <BarreFiltres label="Rechercher et filtrer les prestataires">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); pagination.setPage(1); }}
+          placeholder="Nom, métier, compétence ou ville…"
+          label="Rechercher un prestataire"
+          className="w-full lg:flex-1"
         />
-        <select value={metier} onChange={(e) => { setMetier(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          {metiers.map((m) => <option key={m}>{m}</option>)}
-        </select>
-        <select value={dispo} onChange={(e) => { setDispo(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          {["Tous", "Disponible", "Occupé"].map((d) => <option key={d}>{d}</option>)}
-        </select>
+        <App.SelecteurPeriode
+          icone={Wrench}
+          label="Métier"
+          valeur={metier}
+          onChange={(v) => { setMetier(v); pagination.setPage(1); }}
+          options={[{ id: "tous", label: "Tous les métiers" }, ...metiers]}
+        />
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Disponibilité"
+          actif={dispo}
+          onChange={(v) => { setDispo(v); pagination.setPage(1); }}
+          options={DISPOS.map((d) => ({ id: d.id, label: `${d.label} (${PRESTATAIRES_SEARCH.filter(d.test).length})` }))}
+        />
+        <CompteResultats n={filtered.length} nom="prestataire" />
       </div>
 
-      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        {paged.map((p) => (
-          <PrestataireSearchCard key={p.id} p={p} onOpen={(pp) => setSelectedId(pp.id)} />
-        ))}
-        {paged.length === 0 && <p className="text-sm col-span-full" style={{ color: COLORS.slateLight }}>Aucun prestataire ne correspond à ces critères.</p>}
-      </div>
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((p) => <PrestataireSearchCard key={p.id} p={p} onOpen={(pp) => { setSelectedId(pp.id); window.scrollTo(0, 0); }} />)}
+        </div>
+      ) : (
+        <ListeVide
+          titre="Aucun prestataire ne correspond"
+          texte="Essayez d'autres mots-clés ou retirez un filtre."
+          action={<App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setMetier("tous"); setDispo("tous"); }}>Effacer les filtres</App.Bouton>}
+        />
+      )}
 
-      <Pagination page={page} pageSize={PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
+      <PiedListe pagination={pagination} />
     </div>
   );
 }
@@ -4072,7 +5536,7 @@ const PROFIL_ENTREPRISE_INITIAL = {
   fondee: "2008",
   ville: "Dakar, Sénégal",
   description: "Senegal Construction SARL est un acteur leader du BTP au Sénégal depuis plus de 15 ans. Nous intervenons sur des projets d'envergure nationale, résidentiels et industriels, en garantissant des standards de qualité et de sécurité internationaux. Notre force réside dans nos équipes locales hautement qualifiées.",
-  secteurs: ["BTP", "Électricité", "Plomberie", "Maçonnerie"],
+  secteurs: ["BTP", "Électricité", "Plomberie", "Maçonnerie", "Métallerie"],
 };
 
 function EditableTags({ tags, onChange }) {
@@ -4085,223 +5549,233 @@ function EditableTags({ tags, onChange }) {
   }
   return (
     <div>
-      <div className="flex flex-wrap gap-2 mb-3">
-        {tags.map((t) => (
-          <span key={t} className="flex items-center gap-1.5 text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-            {t}
-            <button type="button" onClick={() => onChange(tags.filter((x) => x !== t))} className="leading-none">×</button>
-          </span>
-        ))}
-      </div>
+      {tags.length > 0 && (
+        <ul className="mb-3 flex flex-wrap gap-2">
+          {tags.map((t) => (
+            <li key={t} className="inline-flex items-center gap-1 rounded-full bg-marque-doux py-1 pl-3 pr-1 text-sm font-medium text-marque">
+              {t}
+              <button type="button" onClick={() => onChange(tags.filter((x) => x !== t))} aria-label={`Retirer ${t}`} className="grid h-7 w-7 place-items-center rounded-full hover:bg-marque-doux-survol">
+                <X size={14} aria-hidden="true" />
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
       <div className="flex gap-2">
         <input
           value={input}
           onChange={(e) => setInput(e.target.value)}
           onKeyDown={(e) => { if (e.key === "Enter") { e.preventDefault(); add(); } }}
-          placeholder="Ajouter un secteur..."
-          className="rounded-md border px-3 py-1.5 text-sm outline-none focus:border-primaire-400"
-          style={{ borderColor: COLORS.border }}
+          placeholder="Ajouter un secteur"
+          aria-label="Ajouter un secteur"
+          className={`${FORM.champ()} flex-1`}
         />
-        <button type="button" onClick={add} className="rounded-md px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          + Ajouter
-        </button>
+        <App.Bouton variante="doux" onClick={add} className="min-h-[48px]"><Plus size={16} aria-hidden="true" /> Ajouter</App.Bouton>
       </div>
     </div>
   );
 }
 
+const TAILLES_ENTREPRISE = ["1-10 employés", "11-45 employés", "45-50 employés", "50-100 employés", "100+ employés"];
+
 function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
-  const [v, setV] = useState(profile);
-  function set(k, val) { setV((s) => ({ ...s, [k]: val })); }
+  const vide = (x) => !String(x || "").trim();
+  const f = useFormulaire(profile, (v) => ({
+    nom: vide(v.nom) && "Indiquez le nom de l'entreprise.",
+    secteurPrincipal: vide(v.secteurPrincipal) && "Indiquez le secteur principal.",
+    ninea: vide(v.ninea) && "Indiquez le NINEA.",
+    rccm: vide(v.rccm) && "Indiquez le numéro RCCM.",
+    telephone: vide(v.telephone) && "Indiquez un numéro de téléphone.",
+    email: vide(v.email) ? "Indiquez une adresse e-mail." : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email) && "Saisissez une adresse e-mail valide, par exemple nom@exemple.com.",
+    adresse: vide(v.adresse) && "Indiquez l'adresse de l'établissement.",
+    description: vide(v.description) && "Présentez votre entreprise en quelques phrases.",
+  }));
+  const { v, set, err, attrs } = f;
+  const texte = (id, k, label, props = {}) => (
+    <Champ id={id} label={label} requis={props.requis} erreur={err(k)} aide={props.aide} large={props.large}>
+      <input {...attrs(id, k, { requis: props.requis, aide: props.aide })} type={props.type || "text"} placeholder={props.placeholder} className={FORM.champ(err(k))} />
+    </Champ>
+  );
 
   return (
-    <div>
-      <h2 className="text-xl font-semibold mb-6" style={{ color: COLORS.slate }}>Modifier le profil</h2>
-      <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center gap-4 mb-6">
-          {v.logo ? (
-            <img src={v.logo} alt={`Logo ${v.nom}`} className="w-14 h-14 rounded-md object-cover" />
-          ) : (
-            <div className="w-14 h-14 rounded-md flex items-center justify-center text-sm font-bold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-              {initials(v.nom)}
-            </div>
-          )}
-          <FilePickerButton
-            accept="image/*"
-            onPick={(f) => { const r = new FileReader(); r.onload = () => set("logo", r.result); r.readAsDataURL(f); }}
-            className="rounded-md px-4 py-2 text-sm font-semibold border"
-            style={{ borderColor: COLORS.border, color: COLORS.slate }}
-          >
-            Changer le logo
-          </FilePickerButton>
+    <App.Carte as="form" onSubmit={f.soumettre(onSave)} noValidate titre="Modifier le profil" sousTitre="Les champs marqués d'un * sont obligatoires.">
+      <div className="mb-8 flex flex-wrap items-center gap-4 rounded-lg bg-doux p-4">
+        {v.logo ? (
+          <img src={v.logo} alt={`Logo ${v.nom}`} className="h-16 w-16 rounded-lg object-cover" />
+        ) : (
+          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-marque-doux text-base font-semibold text-marque" aria-hidden="true">
+            {initials(v.nom)}
+          </div>
+        )}
+        <div className="min-w-0 flex-1">
+          <p className="text-sm font-semibold text-principal">Logo de l'entreprise</p>
+          <p className="text-sm text-discret">Image carrée, au format JPG ou PNG.</p>
         </div>
+        <FilePickerButton
+          accept="image/*"
+          onPick={(fichier) => { const r = new FileReader(); r.onload = () => set("logo", r.result); r.readAsDataURL(fichier); }}
+          className={FORM.fichier}
+        >
+          <Upload size={15} aria-hidden="true" /> Changer le logo
+        </FilePickerButton>
+      </div>
 
-        <div className="grid grid-cols-2 gap-4 mb-4">
-          <div className="col-span-2">
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Nom de l'entreprise *</label>
-            <input value={v.nom} onChange={(e) => set("nom", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Secteur principal *</label>
-            <input value={v.secteurPrincipal} onChange={(e) => set("secteurPrincipal", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Taille de l'entreprise *</label>
-            <select value={v.taille} onChange={(e) => set("taille", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }}>
-              {["1-10 employés", "11-45 employés", "45-50 employés", "50-100 employés", "100+ employés"].map((t) => <option key={t}>{t}</option>)}
-            </select>
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>NINEA *</label>
-            <input value={v.ninea} onChange={(e) => set("ninea", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>RCCM *</label>
-            <input value={v.rccm} onChange={(e) => set("rccm", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Téléphone *</label>
-            <input value={v.telephone} onChange={(e) => set("telephone", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Email de contact *</label>
-            <input value={v.email} onChange={(e) => set("email", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Site web</label>
-            <input value={v.siteWeb} onChange={(e) => set("siteWeb", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div>
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Adresse de l'établissement principal *</label>
-            <input value={v.adresse} onChange={(e) => set("adresse", e.target.value)} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Présentation / Description *</label>
-            <textarea value={v.description} onChange={(e) => set("description", e.target.value)} rows={4} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-          </div>
-          <div className="col-span-2">
-            <label className="block text-xs font-semibold mb-1.5" style={{ color: COLORS.slate }}>Tags de secteurs d'activité associés</label>
-            <EditableTags tags={v.secteurs} onChange={(tags) => set("secteurs", tags)} />
-          </div>
-        </div>
-
-        <div className="flex gap-3">
-          <button type="button" onClick={onCancel} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={() => onSave(v)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Enregistrer</button>
+      <h3 className={FORM.section}>L'entreprise</h3>
+      <div className={`${FORM.grille} mb-8`}>
+        {texte("ent-nom", "nom", "Nom de l'entreprise", { requis: true, large: true })}
+        {texte("ent-secteur", "secteurPrincipal", "Secteur principal", { requis: true, placeholder: "Ex : BTP" })}
+        <Champ id="ent-taille" label="Taille de l'entreprise" requis>
+          <ListeChamp {...attrs("ent-taille", "taille", { requis: true })}>
+            {TAILLES_ENTREPRISE.map((t) => <option key={t}>{t}</option>)}
+          </ListeChamp>
+        </Champ>
+        <Champ id="ent-description" label="Présentation" requis erreur={err("description")} aide="Votre activité, vos valeurs, ce que vous proposez à vos équipes." large>
+          <textarea {...attrs("ent-description", "description", { requis: true, aide: true })} rows={4} className={FORM.zone(err("description"))} />
+        </Champ>
+        <div className="sm:col-span-2">
+          <p className={AUTH.libelle}>Secteurs d'activité associés</p>
+          <EditableTags tags={v.secteurs || []} onChange={(tags) => set("secteurs", tags)} />
         </div>
       </div>
-    </div>
+
+      <h3 className={FORM.section}>Informations légales</h3>
+      <div className={`${FORM.grille} mb-8`}>
+        {texte("ent-ninea", "ninea", "NINEA", { requis: true })}
+        {texte("ent-rccm", "rccm", "RCCM", { requis: true, placeholder: "Ex : SN-DKR-2020-B-1234" })}
+      </div>
+
+      <h3 className={FORM.section}>Coordonnées</h3>
+      <div className={FORM.grille}>
+        {texte("ent-telephone", "telephone", "Téléphone", { requis: true, type: "tel", placeholder: "Ex : 77 123 45 67" })}
+        {texte("ent-email", "email", "E-mail de contact", { requis: true, type: "email", placeholder: "contact@entreprise.sn" })}
+        {texte("ent-site", "siteWeb", "Site web", { placeholder: "Ex : www.entreprise.sn" })}
+        {texte("ent-adresse", "adresse", "Adresse de l'établissement principal", { requis: true, placeholder: "Ex : Rue 10, Plateau, Dakar" })}
+      </div>
+
+      <AlerteFormulaire visible={f.essai && f.invalide}>Complétez les champs signalés pour enregistrer le profil.</AlerteFormulaire>
+      <div className={FORM.actions}>
+        <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
+        <App.Bouton type="submit">Enregistrer le profil</App.Bouton>
+      </div>
+    </App.Carte>
   );
 }
 
 function ProfilEntrepriseScreen({ offres, onNavigate }) {
-  const [profile, setProfile] = useState(PROFIL_ENTREPRISE_INITIAL);
+  const user = USER_BY_ESPACE.entreprise;
+  const [profile, setProfile] = useStore("profil-entreprise", PROFIL_ENTREPRISE_INITIAL);
+  const [candidats] = useStore("candidatures-entreprise", CANDIDATURES_ENTREPRISE_INITIAL);
   const [editing, setEditing] = useState(false);
+  const completion = useCompletionEntreprise();
 
   if (editing) {
     return (
-      <ProfilEntrepriseEdit
-        profile={profile}
-        onCancel={() => setEditing(false)}
-        onSave={(v) => { setProfile(v); setEditing(false); }}
-      />
+      <div className="space-y-6">
+        <BoutonRetour onClick={() => setEditing(false)}>Retour au profil</BoutonRetour>
+        <ProfilEntrepriseEdit
+          profile={profile}
+          onCancel={() => setEditing(false)}
+          onSave={(v) => { setProfile(v); setEditing(false); notify("Profil de l'entreprise mis à jour."); }}
+        />
+      </div>
     );
   }
 
-  const activesOffres = offres.filter((o) => o.statut !== "Clôturée");
+  const actives = offres.filter((o) => o.statut === "Active");
+  const totalCandidatures = offres.reduce((s, o) => s + (o.nbCandidatures || 0), 0);
+  const aTraiter = candidats.filter((c) => c.statut === "Nouveau").length;
 
   return (
-    <div>
-      <div className="flex items-center justify-between mb-1">
-        <div className="flex items-center gap-3">
-          <span aria-hidden="true" />
+    <div className="space-y-6">
+      <EnTeteFiche
+        visuel={profile.logo
+          ? <img src={profile.logo} alt={`Logo ${profile.nom}`} className="h-16 w-16 shrink-0 rounded-lg object-cover" />
+          : <LogoEntreprise nom={profile.nom} taille="lg" />}
+        badges={<>
           <ProfileTierBadge />
-        </div>
-        <button type="button" onClick={() => setEditing(true)} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-          <Pencil size={14} /> Modifier le profil
-        </button>
-      </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez la visibilité publique de votre marque employeur.</p>
-      <ProfileTierCard />
+          <App.Badge ton="marque" taille="moyen">{profile.secteurPrincipal}</App.Badge>
+        </>}
+        titre={profile.nom}
+        sousTitre={`${profile.taille} · fondée en ${profile.fondee}`}
+        meta={<>
+          <MetaOffre icone={MapPin}>{profile.ville}</MetaOffre>
+          <MetaOffre icone={Briefcase}>{actives.length} offre{actives.length > 1 ? "s" : ""} active{actives.length > 1 ? "s" : ""}</MetaOffre>
+          {profile.siteWeb && <MetaOffre icone={Building2}>{profile.siteWeb}</MetaOffre>}
+        </>}
+        actions={<>
+          <App.Bouton variante="neutre" onClick={() => onNavigate("offres", { creer: true })}><Plus size={16} aria-hidden="true" /> Publier une offre</App.Bouton>
+          <App.Bouton onClick={() => setEditing(true)}><Pencil size={16} aria-hidden="true" /> Modifier le profil</App.Bouton>
+        </>}
+      />
 
-      <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center justify-between flex-wrap gap-3">
-          <div className="flex items-center gap-3">
-            {profile.logo ? (
-              <img src={profile.logo} alt={`Logo ${profile.nom}`} className="w-12 h-12 rounded-md object-cover" />
+      <ChiffresProfil
+        items={[
+          { icone: Briefcase, valeur: actives.length, label: "Offres actives", detail: `${offres.length} offres au total`, onClick: () => onNavigate("offres") },
+          { icone: FileText, valeur: totalCandidatures, label: "Candidatures reçues", detail: "Toutes offres confondues", ton: "info", onClick: () => onNavigate("candidatures") },
+          { icone: ClipboardList, valeur: aTraiter, label: "Candidatures à traiter", detail: "Nouvelles candidatures", ton: "alerte", onClick: () => onNavigate("candidatures") },
+          { icone: Building2, valeur: `${completion.valeur} %`, label: "Profil complété", detail: completion.valeur < 100 ? "Ajoutez les éléments manquants" : "Profil complet", ton: "succes", onClick: completion.valeur < 100 ? () => setEditing(true) : undefined },
+        ]}
+      />
+
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="À propos de l'entreprise">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{profile.description}</p>
+          </App.Carte>
+          <App.Carte titre="Nos offres actives" sousTitre="Visibles par les talents sur LIGGEEY" actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("offres")}>Gérer les offres</App.Bouton>} flush>
+            {actives.length === 0 ? (
+              <p className="px-6 pb-6 text-sm text-secondaire">Aucune offre active pour le moment.</p>
             ) : (
-              <div className="w-12 h-12 rounded-md flex items-center justify-center text-sm font-bold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>
-                {initials(profile.nom)}
-              </div>
+              <ul className="divide-y divide-base border-t border-base">
+                {actives.map((o) => (
+                  <li key={o.id} className="flex items-center justify-between gap-3 px-6 py-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <App.PastilleIcone icone={Briefcase} forme="carre" taille="sm" />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-principal">{o.titre}</p>
+                        <p className="truncate text-xs text-discret">{o.localisation} · {o.contrat} · {o.salaire}</p>
+                      </div>
+                    </div>
+                    <span className="shrink-0 text-xs font-semibold text-marque">{o.nbCandidatures} candidatures</span>
+                  </li>
+                ))}
+              </ul>
             )}
-            <div>
-              <p className="text-lg font-bold" style={{ color: COLORS.slate }}>{profile.nom}</p>
-              <p className="text-sm" style={{ color: COLORS.slateLight }}>{profile.secteurPrincipal} · {profile.ville} · Fondé en {profile.fondee}</p>
-            </div>
-          </div>
-          <div className="text-right w-40 shrink-0">
-            <div className="flex items-center justify-between mb-1.5">
-              <p className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>Profil complété</p>
-              <p className="text-sm font-bold" style={{ color: COLORS.orange }}>85%</p>
-            </div>
-            <div className="w-full h-1.5 rounded-full" style={{ background: COLORS.softStrong }}>
-              <div className="h-1.5 rounded-full" style={{ width: "85%", background: COLORS.orange }} />
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
-        <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Informations administratives</h3>
-          <Row label="NINEA" value={profile.ninea} />
-          <div className="h-2" />
-          <Row label="RCCM" value={profile.rccm} />
-          <div className="h-2" />
-          <Row label="Taille de l'entreprise" value={profile.taille} />
-          <div className="h-2" />
-          <Row label="Chiffre d'affaires" value={profile.chiffreAffaires} />
-          <div className="h-2" />
-          <Row label="Téléphone" value={profile.telephone} />
-          <div className="h-2" />
-          <Row label="Email" value={profile.email} />
-          <div className="h-2" />
-          <Row label="Site web" value={profile.siteWeb} />
-        </div>
-        <div className="flex flex-col gap-4">
-          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-2" style={{ color: COLORS.slate }}>À propos de l'entreprise</h3>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>{profile.description}</p>
-          </div>
-          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Secteurs d'activité</h3>
-            <div className="flex flex-wrap gap-2">
-              {profile.secteurs.map((s) => (
-                <span key={s} className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{s}</span>
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-
-      <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-        <div className="flex items-center justify-between mb-3">
-          <h3 className="font-semibold" style={{ color: COLORS.slate }}>Nos offres d'emploi actives</h3>
-          <button type="button" onClick={() => onNavigate("offres")} className="text-sm font-medium" style={{ color: COLORS.orange }}>Gérer les offres</button>
-        </div>
-        <div className="grid grid-cols-3 gap-3">
-          {activesOffres.map((o) => (
-            <div key={o.id} className="rounded-md border px-4 py-3 flex items-center justify-between" style={{ borderColor: COLORS.border }}>
-              <div>
-                <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{o.titre}</p>
-                <p className="text-xs" style={{ color: COLORS.slateLight }}>{o.localisation.split(",")[0]} · {o.contrat}</p>
+          </App.Carte>
+          <App.Carte titre="Secteurs d'activité">
+            <Etiquettes items={profile.secteurs} />
+          </App.Carte>
+        </>}
+        cote={<>
+          <App.Carte titre="Votre contact recrutement">
+            <div className="mb-4 flex items-center gap-3">
+              <AvatarListe nom={user.name} />
+              <div className="min-w-0">
+                <p className="font-semibold text-principal">{user.name}</p>
+                <p className="text-sm text-discret">{RECRUTEUR_ENTREPRISE.fonction}</p>
               </div>
-              <StatusBadge status={o.statut} />
             </div>
-          ))}
-          {activesOffres.length === 0 && <p className="text-sm col-span-full" style={{ color: COLORS.slateLight }}>Aucune offre active pour le moment.</p>}
-        </div>
-      </div>
+            <div className="divide-y divide-dashed divide-base">
+              <App.LigneInfo icone={Phone} libelle="Téléphone">{RECRUTEUR_ENTREPRISE.telephone}</App.LigneInfo>
+              <App.LigneInfo icone={Mail} libelle="E-mail">{RECRUTEUR_ENTREPRISE.email}</App.LigneInfo>
+            </div>
+          </App.Carte>
+          <ApercuFiche
+            titre="Informations administratives"
+            items={[
+              { icone: FileCheck2, libelle: "NINEA", valeur: profile.ninea },
+              { icone: FileText, libelle: "RCCM", valeur: profile.rccm },
+              { icone: Users2, libelle: "Taille", valeur: profile.taille },
+              { icone: Wallet, libelle: "Chiffre d'affaires", valeur: profile.chiffreAffaires },
+              { icone: MapPin, libelle: "Adresse", valeur: profile.adresse },
+              { icone: Phone, libelle: "Standard", valeur: profile.telephone },
+              { icone: Mail, libelle: "E-mail", valeur: profile.email },
+            ]}
+          />
+          <CarteCompletion completion={completion} onAction={() => setEditing(true)} />
+          <ProfileTierCard />
+        </>}
+      />
     </div>
   );
 }
@@ -4313,7 +5787,7 @@ const ADMIN_PAGE_SIZE = 8;
 function ActionButton({ label, variant = "primary", onClick, icon: Icon }) {
   const styles = {
     danger: { border: `1px solid ${COLORS.danger}`, color: COLORS.danger, background: COLORS.surface },
-    warning: { border: `1px solid #D97706`, color: "#D97706", background: COLORS.surface },
+    warning: { border: `1px solid ${COLORS.warning}`, color: COLORS.warning, background: COLORS.surface },
     primary: { border: "none", color: COLORS.onOrange, background: COLORS.orange },
     neutral: { border: `1px solid ${COLORS.border}`, color: COLORS.slate, background: COLORS.surface },
   };
@@ -4356,7 +5830,7 @@ function AdminInfoCard({ title, rows }) {
   );
 }
 
-function AdminEntityModule({ title, subtitle, columns, filters, initialData, searchKeys, renderDetail }) {
+function AdminEntityModule({ title, subtitle, columns, filters, initialData, searchKeys, renderDetail, exportExtra = [] }) {
   const [data, setData] = useState(initialData);
   const [query, setQuery] = useState("");
   const [filterValues, setFilterValues] = useState(() => Object.fromEntries(filters.map((f) => [f.key, "all"])));
@@ -4387,6 +5861,20 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
     return matchesQuery && matchesFilters;
   });
   const paged = filtered.slice((page - 1) * ADMIN_PAGE_SIZE, page * ADMIN_PAGE_SIZE);
+
+  // Export : toutes les lignes filtrées. Une colonne exporte row[key], ou exportValue(row) ;
+  // exportSub ajoute le sous-texte de la cellule (métier, entreprise…) dans sa propre colonne.
+  const colonnesExport = [
+    ...columns.flatMap((c) => [
+      { titre: c.label, valeur: c.exportValue || ((r) => r[c.key]) },
+      ...(c.exportSub ? [{ titre: c.exportSub.label, valeur: (r) => r[c.exportSub.key] }] : []),
+    ]),
+    ...exportExtra.map((x) => ({ titre: x.label, valeur: x.value || ((r) => r[x.key]) })),
+  ];
+  const filtresActifs = [
+    ...filters.filter((f) => filterValues[f.key] !== "all").map((f) => filterValues[f.key]),
+    ...(query.trim() ? [`recherche « ${query.trim()} »`] : []),
+  ];
 
   const colonnes = [
     ...columns.map((c) => ({ cle: c.key, titre: c.label, rendu: c.render ? c.render : (row) => <span className="text-principal">{row[c.key]}</span> })),
@@ -4424,6 +5912,7 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
               options={[{ id: "all", label: f.label }, ...f.options.map((o) => ({ id: o, label: o }))]}
             />
           ))}
+          <ExportAdmin titre={title} colonnes={colonnesExport} lignes={filtered} filtres={filtresActifs} className="ml-auto" />
         </div>
         <App.Tableau colonnes={colonnes} lignes={paged} onLigne={(row) => setSelectedId(row.id)} vide="Aucun résultat pour cette recherche." legende={title} className="px-6" />
         <div className="px-6 py-4">
@@ -4431,6 +5920,21 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
         </div>
       </App.Carte>
     </div>
+  );
+}
+
+/* Bouton « Exporter » des listes admin (PDF, Excel, CSV), avec notification à la fin. */
+function ExportAdmin({ titre, colonnes, lignes, filtres = [], className }) {
+  return (
+    <App.MenuExport
+      titre={titre}
+      colonnes={colonnes}
+      lignes={lignes}
+      sousTitre={filtres.length ? `Filtres : ${filtres.join(", ")}` : undefined}
+      onTermine={(nom) => notify(`Fichier « ${nom} » téléchargé.`)}
+      onErreur={() => notify("L'export n'a pas abouti. Réessayez dans un instant.", "info")}
+      className={className}
+    />
   );
 }
 
@@ -4453,7 +5957,7 @@ const INSCRIPTIONS_MENSUELLES = [
 ];
 const REPARTITION_PROFILS = [
   { name: "Chercheurs", value: 58, color: "rgb(var(--primaire-500))" },
-  { name: "Prestataires", value: 27, color: "rgb(var(--neutre-800))" },
+  { name: "Prestataires", value: 27, color: "rgb(var(--texte-secondaire))" },
   { name: "Entreprises", value: 15, color: "rgb(var(--primaire-250))" },
 ];
 const DERNIERES_INSCRIPTIONS = [
@@ -4647,12 +6151,13 @@ function ChercheursAdminScreen() {
         { key: "profil", label: "Tous les profils", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "chercheur") === v },
       ]}
       columns={[
-        { key: "nom", label: "Utilisateur", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} /> },
-        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "chercheur") === "Premium"} size="sm" /> },
+        { key: "nom", label: "Utilisateur", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
+        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "chercheur") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "chercheur") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "date", label: "Date d'inscription", flex: 1 },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
+      exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
       renderDetail={ChercheursAdminDetail}
     />
   );
@@ -4719,13 +6224,14 @@ function PrestatairesAdminScreen() {
       searchKeys={["nom", "metier", "ville"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Tous les profils", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "prestataire") === v }]}
       columns={[
-        { key: "nom", label: "Prestataire", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} /> },
-        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "prestataire") === "Premium"} size="sm" /> },
+        { key: "nom", label: "Prestataire", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
+        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "prestataire") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "prestataire") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "missions", label: "Missions", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.missions} missions</span> },
         { key: "note", label: "Note", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orange }}>★ {r.note}</span> },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
+      exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
       renderDetail={PrestatairesAdminDetail}
     />
   );
@@ -4793,13 +6299,14 @@ function EntreprisesAdminScreen() {
       searchKeys={["nom", "secteur", "ville"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Tous les profils", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "entreprise") === v }]}
       columns={[
-        { key: "nom", label: "Entreprise", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.secteur} /> },
-        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "entreprise") === "Premium"} size="sm" /> },
+        { key: "nom", label: "Entreprise", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.secteur} />, exportSub: { label: "Secteur", key: "secteur" } },
+        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "entreprise") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "entreprise") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "offresActives", label: "Offres actives", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.offresActives} offres</span> },
         { key: "employes", label: "Employés", flex: 1 },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
+      exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
       renderDetail={EntreprisesAdminDetail}
     />
   );
@@ -4865,8 +6372,150 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
   );
 }
 
-function OffresAdminScreen() {
+/* Points contrôlés par l'admin avant de publier une offre d'entreprise. */
+const CONTROLES_OFFRE = [
+  { id: "entreprise", label: "L'entreprise est vérifiée (NINEA, RCCM, coordonnées)" },
+  { id: "poste", label: "Le poste, les missions et le lieu sont clairs et réels" },
+  { id: "salaire", label: "Le salaire et le type de contrat sont indiqués et cohérents" },
+  { id: "frais", label: "Aucun frais n'est demandé aux candidats" },
+  { id: "discrimination", label: "Aucun critère discriminatoire (âge, sexe, religion, ethnie…)" },
+];
+const MOTIFS_REFUS_OFFRE = [
+  "Informations sur le poste incomplètes",
+  "Salaire absent ou incohérent",
+  "Frais demandés aux candidats",
+  "Critère discriminatoire dans l'annonce",
+  "Entreprise non vérifiée",
+];
+
+function OffreAVerifierCard({ offre, entreprise, onDecide }) {
+  const [ouverte, setOuverte] = useState(false);
+  const [coches, setCoches] = useState({});
+  const [refus, setRefus] = useState(false);
+  const [motif, setMotif] = useState("");
+  const toutCoche = CONTROLES_OFFRE.every((c) => coches[c.id]);
   return (
+    <div className="rounded-lg border border-base bg-surface p-5">
+      <div className="flex flex-col gap-3 md:flex-row md:items-start md:justify-between">
+        <div className="min-w-0">
+          <div className="mb-1 flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-principal">{offre.titre}</p>
+            <StatusBadge status={offre.statut} />
+          </div>
+          <p className="text-xs text-discret">{entreprise} · {offre.categorie} · envoyée le {offre.soumiseLe || "—"}</p>
+          <p className="mt-1 text-sm text-secondaire">{offre.contrat} · {offre.localisation} · {offre.salaire}{offre.experience ? ` · ${offre.experience}` : ""}</p>
+        </div>
+        <App.Bouton petit variante="neutre" onClick={() => setOuverte((o) => !o)} aria-expanded={ouverte}>
+          {ouverte ? "Masquer" : "Vérifier l'offre"}
+        </App.Bouton>
+      </div>
+
+      {ouverte && (
+        <div className="mt-4 grid grid-cols-1 gap-5 border-t border-dashed border-base pt-4 lg:grid-cols-[1.3fr,1fr]">
+          <div>
+            <p className="mb-1 text-xs font-semibold text-discret">Description du poste</p>
+            <p className="mb-3 text-sm leading-[1.7] text-principal">{offre.description}</p>
+            {offre.competences?.length > 0 && (<>
+              <p className="mb-1.5 text-xs font-semibold text-discret">Compétences demandées</p>
+              <Etiquettes items={offre.competences} />
+            </>)}
+            {offre.dateLimite && <p className="mt-3 text-sm text-secondaire">Date limite : {offre.dateLimite}</p>}
+          </div>
+          <fieldset>
+            <legend className="mb-2 text-xs font-semibold text-discret">Points à contrôler avant publication</legend>
+            <div className="space-y-1">
+              {CONTROLES_OFFRE.map((c) => (
+                <label key={c.id} className="flex min-h-[44px] cursor-pointer items-center gap-3 rounded-md px-2 text-sm text-principal hover:bg-doux">
+                  <input type="checkbox" checked={!!coches[c.id]} onChange={(e) => setCoches((x) => ({ ...x, [c.id]: e.target.checked }))} className="h-4 w-4 shrink-0 accent-[rgb(var(--fond-marque))]" />
+                  {c.label}
+                </label>
+              ))}
+            </div>
+          </fieldset>
+        </div>
+      )}
+
+      {ouverte && !refus && (
+        <div className="mt-4 flex flex-wrap justify-end gap-2">
+          <button type="button" onClick={() => setRefus(true)} className="min-h-[44px] rounded-md border px-4 text-sm font-semibold" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Refuser</button>
+          <button type="button" disabled={!toutCoche} onClick={() => onDecide("Active")} title={toutCoche ? undefined : "Cochez tous les points de contrôle"} className="min-h-[44px] rounded-md px-4 text-sm font-semibold text-sur-marque disabled:cursor-not-allowed disabled:opacity-50" style={{ background: COLORS.orange }}>
+            Valider et publier
+          </button>
+        </div>
+      )}
+      {ouverte && refus && (
+        <div className="mt-4 space-y-2">
+          <label className={AUTH.libelle} htmlFor={`motif-${offre.id}`}>Motif du refus, visible par l'entreprise</label>
+          <div className="flex flex-wrap gap-2">
+            {MOTIFS_REFUS_OFFRE.map((m) => (
+              <button key={m} type="button" onClick={() => setMotif(m)} aria-pressed={motif === m} className={FORM.pastille(motif === m)}>{m}</button>
+            ))}
+          </div>
+          <div className="flex flex-col gap-3 sm:flex-row">
+            <input id={`motif-${offre.id}`} value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Expliquez ce que l'entreprise doit corriger" className={`${FORM.champ()} flex-1`} />
+            <App.Bouton variante="neutre" onClick={() => { setRefus(false); setMotif(""); }} className="min-h-[48px]">Annuler</App.Bouton>
+            <BoutonDanger disabled={!motif.trim()} onClick={() => onDecide("Refusée", motif.trim())}>Confirmer le refus</BoutonDanger>
+          </div>
+        </div>
+      )}
+    </div>
+  );
+}
+
+/* Offres créées par les entreprises : vérifiées par l'admin avant d'être visibles des candidats. */
+function VerificationOffresAdmin({ offres, setOffres, entreprise }) {
+  const aVerifier = offres.filter((o) => o.statut === "En vérification");
+  const traitees = offres.filter((o) => o.decision);
+
+  function decide(o, statut, motif) {
+    const le = demoNow().toLocaleDateString("fr-FR");
+    setOffres((l) => l.map((x) => (x.id === o.id ? { ...x, statut, motifRefus: motif || null, decision: { statut, le, motif: motif || null } } : x)));
+    notify(statut === "Active" ? `Offre « ${o.titre} » validée : elle est maintenant visible des candidats.` : `Offre « ${o.titre} » refusée. L'entreprise est prévenue.`, statut === "Active" ? "success" : "info");
+  }
+
+  return (
+    <section aria-labelledby="offres-a-verifier" className="mb-8">
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 id="offres-a-verifier" className="text-lg font-semibold text-principal">Offres à vérifier ({aVerifier.length})</h2>
+        <ExportAdmin
+          titre="Offres à vérifier"
+          lignes={aVerifier}
+          colonnes={[
+            { titre: "Offre", valeur: (o) => o.titre },
+            { titre: "Entreprise", valeur: () => entreprise },
+            { titre: "Catégorie", valeur: (o) => o.categorie },
+            { titre: "Contrat", valeur: (o) => o.contrat },
+            { titre: "Lieu", valeur: (o) => o.localisation },
+            { titre: "Salaire", valeur: (o) => o.salaire },
+            { titre: "Envoyée le", valeur: (o) => o.soumiseLe },
+          ]}
+        />
+      </div>
+      <div className="space-y-3">
+        {aVerifier.length === 0 && (
+          <div className="rounded-lg border border-base bg-surface p-6 text-sm text-secondaire">Aucune offre en attente. Les nouvelles offres des entreprises apparaîtront ici avant leur publication.</div>
+        )}
+        {aVerifier.map((o) => <OffreAVerifierCard key={o.id} offre={o} entreprise={entreprise} onDecide={(statut, motif) => decide(o, statut, motif)} />)}
+      </div>
+      {traitees.length > 0 && (<>
+        <h3 className="mb-2 mt-6 text-sm font-semibold text-principal">Vérifiées récemment</h3>
+        <div className="flex flex-col gap-2">
+          {traitees.map((o) => (
+            <div key={o.id} className="flex flex-wrap items-center justify-between gap-2 rounded-md border border-base bg-surface px-4 py-3">
+              <span className="text-sm text-principal">{o.titre} · {entreprise}<span className="text-discret"> · le {o.decision.le}{o.decision.motif ? ` · ${o.decision.motif}` : ""}</span></span>
+              <StatusBadge status={o.decision.statut === "Active" ? "Validé" : "Refusé"} />
+            </div>
+          ))}
+        </div>
+      </>)}
+    </section>
+  );
+}
+
+function OffresAdminScreen({ offresEntreprise, setOffresEntreprise }) {
+  return (
+    <>
+    {offresEntreprise && <VerificationOffresAdmin offres={offresEntreprise} setOffres={setOffresEntreprise} entreprise={ENTREPRISE_DEMO_NOM} />}
     <AdminEntityModule
       title="Offres d'emploi"
       subtitle="Gérez toutes les offres d'emploi publiées sur la plateforme LIGGEEY"
@@ -4877,14 +6526,16 @@ function OffresAdminScreen() {
         { key: "secteur", label: "Tous les secteurs", options: Array.from(new Set(OFFRES_ADMIN_INITIAL.map((o) => o.secteur))), matcher: (r, v) => r.secteur === v },
       ]}
       columns={[
-        { key: "titre", label: "Offre", flex: 2, render: (r) => <IdentityCell nom={r.titre} sub={r.entreprise} /> },
+        { key: "titre", label: "Offre", flex: 2, render: (r) => <IdentityCell nom={r.titre} sub={r.entreprise} />, exportSub: { label: "Entreprise", key: "entreprise" } },
         { key: "secteur", label: "Secteur", flex: 1 },
         { key: "candidatures", label: "Candidatures", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.candidatures} candidatures</span> },
         { key: "date", label: "Date de publication", flex: 1 },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
+      exportExtra={[{ label: "Lieu", key: "localisation" }, { label: "Contrat", key: "contrat" }, { label: "Salaire", key: "salaire" }]}
       renderDetail={OffresAdminDetail}
     />
+    </>
   );
 }
 
@@ -4957,7 +6608,7 @@ function FormationsAdminScreen() {
         { key: "categorie", label: "Toutes les catégories", options: Array.from(new Set(FORMATIONS_ADMIN_INITIAL.map((f) => f.categorie))), matcher: (r, v) => r.categorie === v },
       ]}
       columns={[
-        { key: "nom", label: "Formation", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.organisme} /> },
+        { key: "nom", label: "Formation", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.organisme} />, exportSub: { label: "Organisme", key: "organisme" } },
         { key: "categorie", label: "Catégorie", flex: 1 },
         { key: "inscrits", label: "Inscrits", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.inscrits} inscrits</span> },
         { key: "duree", label: "Durée", flex: 1 },
@@ -5037,12 +6688,13 @@ function MentoratAdminScreen() {
       searchKeys={["nom", "metier", "specialite"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Inactif"], matcher: (r, v) => r.statut === v }]}
       columns={[
-        { key: "nom", label: "Mentor", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} /> },
+        { key: "nom", label: "Mentor", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
         { key: "mentoresActifs", label: "Mentorés actifs", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.mentoresActifs} mentorés</span> },
         { key: "specialite", label: "Spécialité", flex: 1 },
         { key: "note", label: "Note globale", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orange }}>★ {r.note}/5</span> },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
+      exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
       renderDetail={MentoratAdminDetail}
     />
   );
@@ -5112,7 +6764,7 @@ function ServicesAdminScreen() {
         { key: "categorie", label: "Toutes les catégories", options: Array.from(new Set(SERVICES_ADMIN_INITIAL.map((s) => s.categorie))), matcher: (r, v) => r.categorie === v },
       ]}
       columns={[
-        { key: "prestataire", label: "Prestataire", flex: 2, render: (r) => <IdentityCell nom={r.prestataire} sub={r.metier} /> },
+        { key: "prestataire", label: "Prestataire", flex: 2, render: (r) => <IdentityCell nom={r.prestataire} sub={r.metier} />, exportSub: { label: "Métier", key: "metier" } },
         { key: "service", label: "Service proposé", flex: 1.4 },
         { key: "categorie", label: "Catégorie", flex: 1 },
         { key: "tarif", label: "Tarif", flex: 1 },
@@ -5200,12 +6852,13 @@ function CandidaturesAdminScreen() {
       searchKeys={["nom", "offre", "entreprise"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Nouveau", "En cours", "Retenu", "Rejeté"], matcher: (r, v) => r.statut === v }]}
       columns={[
-        { key: "nom", label: "Candidat", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} /> },
+        { key: "nom", label: "Candidat", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} />, exportSub: { label: "Métier", key: "metier" } },
         { key: "offre", label: "Offre postulée", flex: 1.2 },
         { key: "entreprise", label: "Entreprise", flex: 1 },
         { key: "date", label: "Date", flex: 1 },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
+      exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
       renderDetail={CandidaturesAdminDetail}
     />
   );
@@ -5292,6 +6945,7 @@ function MissionsAdminScreen() {
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
         { key: "montant", label: "Montant", flex: 1 },
       ]}
+      exportExtra={[{ label: "Description", key: "description" }, { label: "Début", key: "dateDebut" }, { label: "Paiement", key: "statutPaiement" }]}
       renderDetail={MissionsAdminDetail}
     />
   );
@@ -5336,8 +6990,10 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             </div>
           </div>
           <div className="rounded-lg border bg-surface p-10 flex items-center justify-center" style={{ borderColor: COLORS.border, minHeight: 480 }}>
+            {/* Fac-similé d'un document papier : il reste clair, quel que soit le thème. */}
             <div
-              className="text-center px-10 py-10"
+              data-theme="clair"
+              className="bg-surface text-center px-10 py-10"
               style={{ transform: `scale(${zoom / 100})`, transition: "transform 0.15s", border: "1px solid #E5E0D5", maxWidth: 460 }}
             >
               <p className="text-xs tracking-widest mb-6" style={{ color: "#9A8F7A" }}>RÉPUBLIQUE DU SÉNÉGAL</p>
@@ -5364,19 +7020,19 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             <Row label="N° de dossier" value={`LIG-2026-${doc.id.slice(2).padStart(4, "0")}`} />
           </div>
 
-          <div className="rounded-lg p-4" style={{ background: "#ECFDF5" }}>
+          <div className="rounded-lg p-4" style={{ background: COLORS.successSoft }}>
             <div className="flex items-center justify-between mb-1.5">
-              <p className="text-sm font-semibold" style={{ color: "#047857" }}>Correspondance profil</p>
-              <span className="text-sm font-bold" style={{ color: "#047857" }}>{doc.correspondance}%</span>
+              <p className="text-sm font-semibold" style={{ color: COLORS.success }}>Correspondance profil</p>
+              <span className="text-sm font-bold" style={{ color: COLORS.success }}>{doc.correspondance}%</span>
             </div>
-            <p className="text-xs" style={{ color: "#047857" }}>Le diplôme et la spécialité correspondent aux compétences déclarées sur le profil.</p>
+            <p className="text-xs" style={{ color: COLORS.success }}>Le diplôme et la spécialité correspondent aux compétences déclarées sur le profil.</p>
           </div>
 
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Points de contrôle</h3>
             {["Nom identique au profil", "Document lisible et complet", "Institution identifiable", "Date et signature présentes"].map((p) => (
               <div key={p} className="flex items-center gap-2 py-1">
-                <Check size={13} color="#16A34A" />
+                <Check size={13} color={COLORS.success} />
                 <p className="text-sm" style={{ color: COLORS.slate }}>{p}</p>
               </div>
             ))}
@@ -5386,7 +7042,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Décision de contrôle</h3>
             <p className="text-xs mb-4" style={{ color: COLORS.slateLight }}>Confirmez uniquement après avoir vérifié toutes les informations visibles.</p>
             <button type="button" onClick={() => onDecide(doc.id, "Validé")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-marque mb-2" style={{ background: COLORS.orange }}>Valider</button>
-            <button type="button" onClick={() => onDecide(doc.id, "Rejeté")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.danger }}>Rejeter</button>
+            <button type="button" onClick={() => onDecide(doc.id, "Rejeté")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-statut" style={{ background: COLORS.danger }}>Rejeter</button>
           </div>
         </div>
       </div>
@@ -5436,13 +7092,13 @@ function VerificationCVScreen() {
         ))}
       </div>
 
-      <input
-        type="text"
-        value={query}
-        onChange={(e) => { setQuery(e.target.value); setPage(1); }}
+      <App.ChampRecherche
+        variante="carre"
+        valeur={query}
+        onChange={(v) => { setQuery(v); setPage(1); }}
         placeholder="Rechercher un candidat..."
-        className="w-full max-w-sm rounded-md border px-4 py-2.5 text-sm mb-5 outline-none focus:border-primaire-400"
-        style={{ borderColor: COLORS.border }}
+        label="Rechercher un candidat"
+        className="mb-6 w-full max-w-sm"
       />
 
       <div className="rounded-lg border bg-surface overflow-hidden" style={{ borderColor: COLORS.border }}>
@@ -5472,7 +7128,12 @@ function VerificationCVScreen() {
   );
 }
 
-/* ---------- Messagerie (Admin) ---------- */
+/* ---------- Messagerie (Admin et profils) ----------
+   Une seule messagerie : chaque profil échange avec l'équipe LIGGEEY, et l'admin répond depuis
+   Communication › Messagerie. Les conversations sont partagées (mémoire « conversations »).
+   - de : "moi" = l'équipe LIGGEEY (admin), "eux" = le profil ;
+   - espace : rattache la conversation au profil connecté de cet espace (démo) ;
+   - nonLu : messages non lus par l'admin ; nonLuProfil : non lus par le profil. */
 
 const CONVERSATIONS_INITIAL = [
   {
@@ -5485,16 +7146,22 @@ const CONVERSATIONS_INITIAL = [
     ],
   },
   {
-    id: "c2", nom: "Senegal Construction SARL", role: "Entreprise · BTP", nonLu: 1,
+    id: "c2", espace: "entreprise", nom: "Senegal Construction SARL", role: "Entreprise · BTP", nonLu: 1,
     messages: [
       { de: "eux", texte: "Notre offre « Chef de chantier » a été signalée. Pouvons-nous savoir pourquoi ?", heure: "Hier" },
     ],
   },
   {
-    id: "c3", nom: "Absatou Diallo", role: "Chercheuse d'emploi", nonLu: 0,
+    id: "c3", espace: "chercheur", nom: "Absatou Diallo", role: "Chercheuse d'emploi", nonLu: 0, nonLuProfil: 1,
     messages: [
       { de: "eux", texte: "Merci pour la mise en relation avec Cheikh Fall, la première séance s'est très bien passée.", heure: "Lun." },
       { de: "moi", texte: "Avec plaisir Absatou ! N'hésitez pas à revenir vers nous après la simulation d'entretien.", heure: "Lun." },
+    ],
+  },
+  {
+    id: "c6", espace: "prestataire", nom: "Mamadou Ndiaye", role: "Prestataire · Électricien", nonLu: 0, nonLuProfil: 1,
+    messages: [
+      { de: "moi", texte: "Bonjour Mamadou, bienvenue sur LIGGEEY ! Si un jour vous souhaitez régulariser votre activité, nous pouvons vous accompagner : tout est expliqué dans l'écran Régularisation. Ce n'est pas obligatoire.", heure: "Hier" },
     ],
   },
   {
@@ -5514,7 +7181,7 @@ const CONVERSATIONS_INITIAL = [
 ];
 
 function MessagerieTab() {
-  const [convs, setConvs] = useState(CONVERSATIONS_INITIAL);
+  const [convs, setConvs] = useStore("conversations", CONVERSATIONS_INITIAL);
   // Sur ordinateur, la première conversation est ouverte d'emblée ; sur mobile, on part de la liste.
   const [activeId, setActiveId] = useState(() => (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(min-width: 768px)").matches ? CONVERSATIONS_INITIAL[0]?.id ?? null : null));
   const [query, setQuery] = useState("");
@@ -5538,7 +7205,7 @@ function MessagerieTab() {
     const texte = (contenu ?? draft).trim();
     if (!texte || !active) return;
     const heure = new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" });
-    setConvs((list) => list.map((c) => (c.id === active.id ? { ...c, messages: [...c.messages, { de: "moi", texte, heure }] } : c)));
+    setConvs((list) => list.map((c) => (c.id === active.id ? { ...c, messages: [...c.messages, { de: "moi", texte, heure }], nonLuProfil: (c.nonLuProfil || 0) + 1 } : c)));
     setDraft("");
   }
 
@@ -5611,6 +7278,84 @@ function MessagerieTab() {
   );
 }
 
+/* ---------- Messages (profils) : conversation avec l'équipe LIGGEEY ---------- */
+
+const ROLE_CONVERSATION = { chercheur: "Chercheur d'emploi", prestataire: "Prestataire", entreprise: "Entreprise", jeune: "Cap Métier", mentor: "Mentor" };
+
+function MessagesScreen({ espace, user }) {
+  const [convs, setConvs] = useStore("conversations", CONVERSATIONS_INITIAL);
+  const conv = convs.find((c) => c.espace === espace);
+  const messages = conv?.messages || [];
+  const endRef = useRef(null);
+  const nonLus = conv?.nonLuProfil || 0;
+
+  useEffect(() => {
+    if (nonLus > 0) setConvs((l) => l.map((c) => (c.espace === espace ? { ...c, nonLuProfil: 0 } : c)));
+  }, [nonLus]);
+  useEffect(() => {
+    if (endRef.current && endRef.current.scrollIntoView) endRef.current.scrollIntoView({ block: "end" });
+  }, [messages.length]);
+
+  function envoyer(texte) {
+    const t = texte.trim();
+    if (!t) return;
+    const msg = { de: "eux", texte: t, heure: new Date().toLocaleTimeString("fr-FR", { hour: "2-digit", minute: "2-digit" }) };
+    setConvs((l) =>
+      l.some((c) => c.espace === espace)
+        ? l.map((c) => (c.espace === espace ? { ...c, messages: [...c.messages, msg], nonLu: (c.nonLu || 0) + 1 } : c))
+        : [{ id: `conv-${espace}`, espace, nom: espace === "entreprise" ? user.role : user.name, role: ROLE_CONVERSATION[espace], nonLu: 1, nonLuProfil: 0, messages: [msg] }, ...l]
+    );
+  }
+
+  return (
+    <div className="grid grid-cols-1 gap-4 lg:grid-cols-[1fr,300px]">
+      <App.Carte flush className="flex min-w-0 flex-col">
+        <div className="flex items-center gap-3 border-b border-base px-5 py-4">
+          <span className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-sombre"><Logo height={14} iconOnly /></span>
+          <div className="min-w-0">
+            <h2 className="truncate font-semibold text-principal">Équipe LIGGEEY</h2>
+            <p className="truncate text-sm text-discret">Une question sur votre compte, une offre, un paiement ? Écrivez-nous ici.</p>
+          </div>
+        </div>
+        <div className="flex max-h-[460px] min-h-[360px] flex-1 flex-col gap-4 overflow-y-auto px-5 py-5" aria-live="polite">
+          {messages.length === 0 ? (
+            <App.EtatVide icone={MessageCircle} titre="Aucun message pour l'instant" texte="Écrivez votre question ci-dessous : l'équipe LIGGEEY vous répond ici même." />
+          ) : (
+            messages.map((m, i) => {
+              const suivant = messages[i + 1];
+              return (
+                <App.BulleMessage
+                  key={i}
+                  texte={m.texte}
+                  heure={m.heure}
+                  moi={m.de === "eux"}
+                  nom={m.de === "eux" ? user.name : "Équipe LIGGEEY"}
+                  photo={m.de === "eux" ? undefined : "/logo/monogramme-orange.svg"}
+                  montrerAvatar={!suivant || suivant.de !== m.de}
+                />
+              );
+            })
+          )}
+          <div ref={endRef} />
+        </div>
+        <App.ZoneSaisie onEnvoyer={envoyer} placeholder="Écrire à l'équipe LIGGEEY…" />
+      </App.Carte>
+
+      <div className="space-y-4">
+        <App.Carte titre="Autres moyens de nous joindre">
+          <p className="mb-3 text-sm text-secondaire">Vous préférez parler de vive voix ? Écrivez-nous sur WhatsApp ou passez au bureau d'accueil de Dakar.</p>
+          <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-2 rounded bg-doux px-4 text-sm font-semibold text-principal hover:bg-doux-fort">
+            <MessageCircle size={16} aria-hidden="true" /> WhatsApp
+          </a>
+        </App.Carte>
+        <App.Carte titre="Votre sécurité">
+          <p className="text-sm text-secondaire">L'équipe LIGGEEY ne vous demandera jamais votre mot de passe ni un code de paiement Wave ou Orange Money.</p>
+        </App.Carte>
+      </div>
+    </div>
+  );
+}
+
 /* ---------- Archives (Admin) ---------- */
 
 const ARCHIVES_INITIAL = [
@@ -5651,13 +7396,17 @@ function ArchivesTab() {
       </div>
 
       <div className="flex flex-wrap gap-3 mb-4 items-center">
-        <div className="flex items-center gap-2 rounded-md border px-3 py-2 bg-surface flex-1 max-w-xs" style={{ borderColor: COLORS.border }}>
-          <Search size={14} color={COLORS.slateLight} />
-          <input value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder="Rechercher dans les archives" aria-label="Rechercher dans les archives" className="flex-1 text-sm outline-none bg-transparent min-w-0" />
-        </div>
-        <div className="flex gap-2">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); setPage(1); }}
+          placeholder="Rechercher dans les archives…"
+          label="Rechercher dans les archives"
+          className="w-full sm:max-w-xs sm:flex-1"
+        />
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Type d'archive">
           {["Tous", "Document", "Discussion"].map((t) => (
-            <button key={t} type="button" onClick={() => { setType(t); setPage(1); }} className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: type === t ? COLORS.softStrong : COLORS.surface, color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
+            <button key={t} type="button" onClick={() => { setType(t); setPage(1); }} aria-pressed={type === t} className={FORM.pastille(type === t)}>
               {t === "Tous" ? "Tous" : t === "Document" ? "Documents" : "Discussions"}
             </button>
           ))}
@@ -5696,10 +7445,10 @@ function ArchivesTab() {
 /* ---------- Planning (Admin) ---------- */
 
 const EVENT_TYPE_COLORS = {
-  Formation: { bg: "#DBEAFE", color: "#1D4ED8" },
+  Formation: { bg: COLORS.infoSoft, color: COLORS.info },
   Mission: { bg: COLORS.orangeSoft, color: COLORS.orange },
-  Deadline: { bg: "#FEE2E2", color: "#B91C1C" },
-  Événement: { bg: "#DCFCE7", color: "#16A34A" },
+  Deadline: { bg: COLORS.dangerSoft, color: COLORS.danger },
+  Événement: { bg: COLORS.successSoft, color: COLORS.success },
 };
 
 const PLANNING_EVENTS_INITIAL = [
@@ -5753,47 +7502,49 @@ function EventChip({ e }) {
 }
 
 function EventForm({ defaultDate, onSave, onCancel }) {
-  const [v, setV] = useState({ titre: "", type: "Formation", debut: defaultDate, fin: defaultDate, meta: "" });
-  const [error, setError] = useState("");
-  function set(k, val) { setV((s) => ({ ...s, [k]: val, ...(k === "debut" && s.fin < val ? { fin: val } : {}) })); }
-  function submit() {
-    if (!v.titre.trim()) return setError("Donnez un titre à l'événement.");
-    if (v.fin < v.debut) return setError("La date de fin doit suivre la date de début.");
-    onSave({ ...v, titre: v.titre.trim(), id: `e${Date.now()}` });
-  }
-  const field = "w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400";
+  const f = useFormulaire({ titre: "", type: "Formation", debut: defaultDate, fin: defaultDate, meta: "" }, (v) => ({
+    titre: !v.titre.trim() && "Donnez un titre à l'événement.",
+    fin: v.fin < v.debut && "La date de fin doit suivre la date de début.",
+  }));
+  const { v, err, attrs } = f;
+  // Un début après la fin repousse la fin.
+  const changerDebut = (e) => { const val = e.target.value; f.setV((s) => ({ ...s, debut: val, ...(s.fin < val ? { fin: val } : {}) })); };
+
   return (
-    <div className="fixed inset-0 z-40 flex items-center justify-center p-4" style={{ background: "rgba(15,11,8,0.55)" }} role="dialog" aria-modal="true" aria-labelledby="event-form-title">
-      <div className="w-full max-w-md rounded-lg bg-surface p-6">
-        <div className="flex items-center justify-between mb-5">
-          <h2 id="event-form-title" className="text-lg font-bold" style={{ color: COLORS.slate }}>Ajouter un événement</h2>
-          <button type="button" onClick={onCancel} aria-label="Fermer"><X size={18} color={COLORS.slateLight} /></button>
-        </div>
-        <label htmlFor="ev-titre" className="block text-xs font-semibold mb-1" style={{ color: COLORS.slate }}>Titre *</label>
-        <input id="ev-titre" value={v.titre} onChange={(e) => set("titre", e.target.value)} placeholder="Ex. Formation Soudure niveau 1" className={`${field} mb-3`} style={{ borderColor: COLORS.border }} />
-        <label htmlFor="ev-type" className="block text-xs font-semibold mb-1" style={{ color: COLORS.slate }}>Type</label>
-        <select id="ev-type" value={v.type} onChange={(e) => set("type", e.target.value)} className={`${field} mb-3`} style={{ borderColor: COLORS.border }}>
-          {Object.keys(EVENT_TYPE_COLORS).map((t) => <option key={t}>{t}</option>)}
-        </select>
-        <div className="grid grid-cols-2 gap-3 mb-3">
+    <ModalFrame onClose={onCancel} labelledBy="event-form-title">
+      <form onSubmit={f.soumettre((val) => onSave({ ...val, titre: val.titre.trim(), id: `e${Date.now()}` }))} noValidate className="p-6">
+        <div className="mb-5 flex items-start justify-between gap-4">
           <div>
-            <label htmlFor="ev-debut" className="block text-xs font-semibold mb-1" style={{ color: COLORS.slate }}>Début</label>
-            <input id="ev-debut" type="date" value={v.debut} onChange={(e) => set("debut", e.target.value)} className={field} style={{ borderColor: COLORS.border }} />
+            <h2 id="event-form-title" className="text-lg font-semibold text-principal">Ajouter un événement</h2>
+            <p className="mt-0.5 text-sm text-discret">Les champs marqués d'un * sont obligatoires.</p>
           </div>
-          <div>
-            <label htmlFor="ev-fin" className="block text-xs font-semibold mb-1" style={{ color: COLORS.slate }}>Fin</label>
-            <input id="ev-fin" type="date" value={v.fin} min={v.debut} onChange={(e) => set("fin", e.target.value)} className={field} style={{ borderColor: COLORS.border }} />
-          </div>
+          <App.BoutonIcone icone={X} label="Fermer" onClick={onCancel} />
         </div>
-        <label htmlFor="ev-meta" className="block text-xs font-semibold mb-1" style={{ color: COLORS.slate }}>Détail (lieu, places…)</label>
-        <input id="ev-meta" value={v.meta} onChange={(e) => set("meta", e.target.value)} placeholder="Ex. 20 places · Pikine" className={`${field} mb-4`} style={{ borderColor: COLORS.border }} />
-        {error && <p className="text-xs mb-3" style={{ color: COLORS.danger }}>{error}</p>}
-        <div className="flex gap-2 justify-end">
-          <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Ajouter l'événement</button>
+        <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+          <Champ id="ev-titre" label="Titre" requis erreur={err("titre")} large>
+            <input {...attrs("ev-titre", "titre", { requis: true })} placeholder="Ex : Formation soudure, niveau 1" className={FORM.champ(err("titre"))} />
+          </Champ>
+          <Champ id="ev-type" label="Type" large>
+            <ListeChamp {...attrs("ev-type", "type")}>
+              {Object.keys(EVENT_TYPE_COLORS).map((t) => <option key={t}>{t}</option>)}
+            </ListeChamp>
+          </Champ>
+          <Champ id="ev-debut" label="Début">
+            <input {...attrs("ev-debut", "debut")} onChange={changerDebut} type="date" className={FORM.champ()} />
+          </Champ>
+          <Champ id="ev-fin" label="Fin" erreur={err("fin")}>
+            <input {...attrs("ev-fin", "fin")} type="date" min={v.debut} className={FORM.champ(err("fin"))} />
+          </Champ>
+          <Champ id="ev-meta" label="Détail" aide="Lieu, nombre de places…" large>
+            <input {...attrs("ev-meta", "meta", { aide: true })} placeholder="Ex : 20 places, Pikine" className={FORM.champ()} />
+          </Champ>
         </div>
-      </div>
-    </div>
+        <div className={FORM.actions}>
+          <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
+          <App.Bouton type="submit">Ajouter l'événement</App.Bouton>
+        </div>
+      </form>
+    </ModalFrame>
   );
 }
 
@@ -5954,8 +7705,8 @@ const NOTIFICATIONS_INITIAL = [
   { id: "n5", titre: "3 nouveaux avis à modérer", badge: "Utilisateurs", description: "Les avis d'utilisateurs sur les prestataires de Pikine attendent approbation.", temps: "Hier", lu: true, icon: AlertCircle, target: "prestataires" },
 ];
 
-function CommunicationScreen({ onNavigate }) {
-  const [mainTab, setMainTab] = useState("Notifications");
+function CommunicationScreen({ onNavigate, ongletInitial }) {
+  const [mainTab, setMainTab] = useState(ongletInitial || "Notifications");
   const [subTab, setSubTab] = useState("Toutes");
   const [notifs, setNotifs] = useState(NOTIFICATIONS_INITIAL);
 
@@ -6006,7 +7757,7 @@ function CommunicationScreen({ onNavigate }) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{n.titre}</p>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: n.badge === "Système" ? COLORS.orangeSoft : "#EDE9FE", color: n.badge === "Système" ? COLORS.orange : "#7C3AED" }}>{n.badge}</span>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: n.badge === "Système" ? COLORS.orangeSoft : COLORS.infoSoft, color: n.badge === "Système" ? COLORS.orange : COLORS.info }}>{n.badge}</span>
                     </div>
                     <p className="text-sm" style={{ color: COLORS.slateLight }}>{n.description}</p>
                   </div>
@@ -6023,7 +7774,7 @@ function CommunicationScreen({ onNavigate }) {
             <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Statistiques de communication</h3>
               <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Total envoyées</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>1 247</p></div>
-              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Taux de lecture</p><p className="text-sm font-bold" style={{ color: "#16A34A" }}>78%</p></div>
+              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Taux de lecture</p><p className="text-sm font-bold" style={{ color: COLORS.success }}>78%</p></div>
               <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Messages en attente</p><p className="text-sm font-bold" style={{ color: COLORS.orange }}>5</p></div>
             </div>
             <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -6042,42 +7793,45 @@ function CommunicationScreen({ onNavigate }) {
 
 /* ---------- Paramètres (Admin) ---------- */
 
+const CHAMPS_MOT_DE_PASSE = [
+  { k: "actuel", l: "Mot de passe actuel", auto: "current-password" },
+  { k: "nouveau", l: "Nouveau mot de passe", auto: "new-password", aide: "8 caractères minimum." },
+  { k: "confirmation", l: "Confirmer le nouveau mot de passe", auto: "new-password" },
+];
+
 function PasswordChanger() {
   const [open, setOpen] = useState(false);
-  const [pwd, setPwd] = useState({ actuel: "", nouveau: "", confirmation: "" });
-  const [error, setError] = useState("");
+  const f = useFormulaire({ actuel: "", nouveau: "", confirmation: "" }, (p) => ({
+    actuel: !p.actuel && "Saisissez votre mot de passe actuel.",
+    nouveau: p.nouveau.length < 8 && "Le nouveau mot de passe doit contenir au moins 8 caractères.",
+    confirmation: p.nouveau !== p.confirmation && "Les deux nouveaux mots de passe ne correspondent pas.",
+  }));
 
-  function submit() {
-    if (!pwd.actuel) return setError("Saisissez votre mot de passe actuel.");
-    if (pwd.nouveau.length < 8) return setError("Le nouveau mot de passe doit contenir au moins 8 caractères.");
-    if (pwd.nouveau !== pwd.confirmation) return setError("Les deux nouveaux mots de passe ne correspondent pas.");
-    setError("");
-    setPwd({ actuel: "", nouveau: "", confirmation: "" });
+  function fermer() {
+    f.setV({ actuel: "", nouveau: "", confirmation: "" });
+    f.setEssai(false);
     setOpen(false);
-    notify("Mot de passe modifié.");
   }
 
   if (!open) {
     return (
-      <button type="button" onClick={() => setOpen(true)} className="mt-3 rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-        Changer le mot de passe
-      </button>
+      <App.Bouton variante="neutre" petit onClick={() => setOpen(true)} className="mt-3">
+        <Lock size={15} aria-hidden="true" /> Changer le mot de passe
+      </App.Bouton>
     );
   }
   return (
-    <div className="mt-3 rounded-md border p-4 max-w-md" style={{ borderColor: COLORS.border }}>
-      {[{ k: "actuel", l: "Mot de passe actuel" }, { k: "nouveau", l: "Nouveau mot de passe" }, { k: "confirmation", l: "Confirmer le nouveau mot de passe" }].map((f) => (
-        <div key={f.k} className="mb-3">
-          <label htmlFor={`pwd-${f.k}`} className="block text-xs font-semibold mb-1" style={{ color: COLORS.slate }}>{f.l}</label>
-          <input id={`pwd-${f.k}`} type="password" value={pwd[f.k]} onChange={(e) => setPwd((s) => ({ ...s, [f.k]: e.target.value }))} className="w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-        </div>
+    <form onSubmit={f.soumettre(() => { fermer(); notify("Mot de passe modifié."); })} noValidate className="mt-3 max-w-md space-y-4 rounded-lg border border-base p-5">
+      {CHAMPS_MOT_DE_PASSE.map((c) => (
+        <Champ key={c.k} id={`pwd-${c.k}`} label={c.l} requis aide={c.aide} erreur={f.err(c.k)}>
+          <input {...f.attrs(`pwd-${c.k}`, c.k, { requis: true, aide: c.aide })} type="password" autoComplete={c.auto} className={FORM.champ(f.err(c.k))} />
+        </Champ>
       ))}
-      {error && <p className="text-xs mb-3" style={{ color: COLORS.danger }}>{error}</p>}
-      <div className="flex gap-2">
-        <button type="button" onClick={submit} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Changer le mot de passe</button>
-        <button type="button" onClick={() => { setOpen(false); setError(""); }} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+      <div className="flex flex-col-reverse gap-3 pt-1 sm:flex-row sm:justify-end">
+        <App.Bouton variante="neutre" onClick={fermer}>Annuler</App.Bouton>
+        <App.Bouton type="submit">Changer le mot de passe</App.Bouton>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -6116,6 +7870,10 @@ function ParametresScreen() {
         </div>
       </div>
 
+      <App.Carte titre="Apparence" sousTitre="Le thème s'applique tout de suite et reste mémorisé sur cet appareil." className="mb-4">
+        <App.ChoixTheme label="Thème de la plateforme" />
+      </App.Carte>
+
       <div className="rounded-lg border bg-surface p-6 mb-4" style={{ borderColor: COLORS.border }}>
         <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Notifications administrateur</h3>
         {[
@@ -6133,7 +7891,7 @@ function ParametresScreen() {
       <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
         Enregistrer les modifications
       </button>
-      {saved && <span className="ml-3 text-sm" style={{ color: "#047857" }}>Préférences enregistrées.</span>}
+      {saved && <span className="ml-3 text-sm" style={{ color: COLORS.success }}>Préférences enregistrées.</span>}
     </div>
   );
 }
@@ -6198,7 +7956,7 @@ const UPGRADE_REASONS = {
   sponsoring: { titre: "Les offres sponsorisées sont réservées au profil Premium", texte: "Placez votre offre en tête des résultats pendant 7 jours.", feature: "sponsoring" },
 };
 
-const PREMIUM_FORMATIONS = new Set(["devweb", "excel", "leadership", "entrepreneuriat", "peinture-moderne", "soudure-tech"]);
+const PREMIUM_FORMATIONS = new Set(["devweb", "excel", "leadership", "entrepreneuriat", "peinture-moderne", "soudure-tech", "solaire-pv"]);
 
 const SUBS_INITIAL = {
   chercheur: { planId: "essentiel", cycle: "mensuel", moyen: "Wave", depuis: "01/09/2026", prochain: "01/11/2026" },
@@ -6325,7 +8083,7 @@ function UsageMeter({ label, used, limit }) {
         <span className="font-semibold text-sur-sombre">{unlimited ? "Illimité" : `${used} / ${limit}`}</span>
       </div>
       <div className="h-1.5 rounded-full overflow-hidden" style={{ background: COLORS.darkLine }}>
-        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: unlimited ? "#4ADE80" : full ? "#F87171" : COLORS.orange }} />
+        <div className="h-full rounded-full transition-all" style={{ width: `${pct}%`, background: unlimited ? COLORS.successBright : full ? COLORS.dangerBright : COLORS.orange }} />
       </div>
     </div>
   );
@@ -6381,7 +8139,7 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
           <ul className="flex flex-col gap-2 mb-6">
             {target.avantages.slice(0, 4).map((a) => (
               <li key={a} className="flex items-start gap-2 text-sm" style={{ color: COLORS.slate }}>
-                <Check size={15} color="#16A34A" className="mt-0.5 shrink-0" /> {a}
+                <Check size={15} color={COLORS.success} className="mt-0.5 shrink-0" /> {a}
               </li>
             ))}
           </ul>
@@ -6435,53 +8193,69 @@ function PaymentModal({ planId, initialCycle, onClose }) {
     }, 2200);
   }
 
-  const inputCls = "w-full rounded-md border px-3 py-2.5 text-sm outline-none focus:border-primaire-400";
-
   return (
     <ModalFrame onClose={step === "pending" ? () => {} : onClose} labelledBy="pay-title">
       {step === "form" && (
-        <div className="p-6">
-          <div className="flex items-start justify-between mb-5">
+        <form onSubmit={(e) => { e.preventDefault(); pay(); }} noValidate className="p-6">
+          <div className="mb-6 flex items-start justify-between gap-4">
             <div>
-              <h3 id="pay-title" className="text-lg font-bold" style={{ color: COLORS.slate }}>Passer au profil {target.nom}</h3>
-              <p className="text-sm" style={{ color: COLORS.slateLight }}>{target.description}</p>
+              <h3 id="pay-title" className="text-lg font-semibold text-principal">Passer au profil {target.nom}</h3>
+              <p className="mt-0.5 text-sm text-secondaire">{target.description}</p>
             </div>
-            <button type="button" onClick={onClose} aria-label="Fermer" className="text-xl leading-none" style={{ color: COLORS.slateLight }}>×</button>
+            <App.BoutonIcone icone={X} label="Fermer" onClick={onClose} />
           </div>
 
-          <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Moyen de paiement</p>
-          <div className="grid grid-cols-2 gap-2 mb-5">
-            {PAYMENT_METHODS.map((pm) => (
-              <button key={pm.id} type="button" onClick={() => { setMethod(pm.id); setTouched(false); }} aria-pressed={method === pm.id} className="rounded-md border px-3 py-2.5 flex items-center gap-2.5 text-sm font-medium" style={{ borderColor: method === pm.id ? COLORS.orange : COLORS.border, color: COLORS.slate, background: method === pm.id ? COLORS.orangeSoft : COLORS.surface }}>
-                <span className="w-6 h-6 rounded-full flex items-center justify-center shrink-0" style={{ background: pm.couleur }}>
-                  <Smartphone size={12} color="#fff" />
-                </span>
-                {pm.nom}
-              </button>
-            ))}
-          </div>
+          <fieldset className="mb-5">
+            <legend className={AUTH.libelle}>Moyen de paiement</legend>
+            <div className="grid grid-cols-2 gap-3">
+              {PAYMENT_METHODS.map((pm) => (
+                <button
+                  key={pm.id}
+                  type="button"
+                  onClick={() => { setMethod(pm.id); setTouched(false); }}
+                  aria-pressed={method === pm.id}
+                  className={`flex min-h-[48px] items-center gap-2.5 rounded-md border px-3 text-[15px] font-medium text-principal transition-colors ${method === pm.id ? "border-marque bg-marque-doux" : "border-base bg-surface hover:border-forte"}`}
+                >
+                  <span className="flex h-7 w-7 shrink-0 items-center justify-center rounded-full" style={{ background: pm.couleur }}>
+                    <Smartphone size={14} className="text-sur-sombre" aria-hidden="true" />
+                  </span>
+                  {pm.nom}
+                </button>
+              ))}
+            </div>
+          </fieldset>
 
           <div className="mb-5">
-            <label htmlFor="pay-phone" className="block text-sm font-semibold mb-1.5" style={{ color: COLORS.slate }}>Numéro {m.nom}</label>
+            <label htmlFor="pay-phone" className={AUTH.libelle}>Numéro {m.nom}</label>
             <div className="flex">
-              <span className="rounded-l-md border border-r-0 px-3 py-2.5 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight, background: COLORS.soft }}>+221</span>
-              <input id="pay-phone" inputMode="tel" value={phone} onChange={(e) => setPhone(e.target.value)} className={`${inputCls} rounded-l-none`} style={{ borderColor: touched && !phoneValid ? COLORS.danger : COLORS.border }} />
+              <span className="inline-flex h-12 items-center rounded-l-md border border-r-0 border-base bg-doux px-3.5 text-[15px] text-secondaire">+221</span>
+              <input
+                id="pay-phone"
+                type="tel"
+                inputMode="tel"
+                autoComplete="tel-national"
+                value={phone}
+                onChange={(e) => setPhone(e.target.value)}
+                aria-invalid={(touched && !phoneValid) || undefined}
+                aria-describedby="pay-phone-aide"
+                className={`${FORM.champ(touched && !phoneValid)} rounded-l-none`}
+              />
             </div>
-            {touched && !phoneValid && <p className="text-xs mt-1" style={{ color: COLORS.danger }}>Saisissez un numéro sénégalais à 9 chiffres, par exemple 77 123 45 67.</p>}
+            <p id="pay-phone-aide" className={AUTH.aide(touched && !phoneValid)}>
+              {touched && !phoneValid ? "Saisissez un numéro sénégalais à 9 chiffres, par exemple 77 123 45 67." : `Vous recevrez une demande de paiement ${m.nom} sur ce numéro.`}
+            </p>
           </div>
 
-          <div className="rounded-md px-4 py-3 mb-5 flex items-center justify-between" style={{ background: COLORS.soft }}>
-            <span className="text-sm" style={{ color: COLORS.slateLight }}>Total à payer</span>
-            <span className="text-lg font-bold" style={{ color: COLORS.slate }}>{fcfa(montant)}</span>
+          <div className="mb-5 flex items-center justify-between rounded-lg bg-doux px-4 py-3">
+            <span className="text-sm text-secondaire">Total à payer</span>
+            <span className="text-lg font-semibold text-principal">{fcfa(montant)}</span>
           </div>
 
-          <button type="button" onClick={pay} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
-            Payer {fcfa(montant)}
-          </button>
-          <p className="text-xs text-center mt-3 flex items-center justify-center gap-1.5" style={{ color: COLORS.slateLight }}>
-            <Lock size={11} /> Paiement sécurisé · résiliable à tout moment
+          <App.Bouton type="submit" pleineLargeur className="min-h-[48px]">Payer {fcfa(montant)}</App.Bouton>
+          <p className="mt-3 flex items-center justify-center gap-1.5 text-xs text-discret">
+            <Lock size={12} aria-hidden="true" /> Paiement sécurisé · résiliable à tout moment
           </p>
-        </div>
+        </form>
       )}
 
       {step === "pending" && (
@@ -6498,8 +8272,8 @@ function PaymentModal({ planId, initialCycle, onClose }) {
 
       {step === "done" && receipt && (
         <div className="p-8 text-center">
-          <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: "#DCFCE7" }}>
-            <CheckCircle2 size={24} color="#16A34A" />
+          <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: COLORS.successSoft }}>
+            <CheckCircle2 size={24} color={COLORS.success} />
           </div>
           <h3 id="pay-title" className="text-lg font-bold mb-1" style={{ color: COLORS.slate }}>Paiement confirmé</h3>
           <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>
@@ -6582,7 +8356,7 @@ function AbonnementScreen() {
               <ul className="flex flex-col gap-2.5 mb-6 flex-1">
                 {p.avantages.map((a) => (
                   <li key={a} className="flex items-start gap-2 text-sm" style={{ color: COLORS.slate }}>
-                    <Check size={15} color={isBase ? COLORS.slateLight : "#16A34A"} className="mt-0.5 shrink-0" /> {a}
+                    <Check size={15} color={isBase ? COLORS.slateLight : COLORS.success} className="mt-0.5 shrink-0" /> {a}
                   </li>
                 ))}
               </ul>
@@ -6741,14 +8515,55 @@ function AbonnementsAdminScreen() {
 
       {tab !== "tarifs" && (
         <>
-          <div className="flex flex-wrap gap-3 mb-4">
-            <input type="text" value={query} onChange={(e) => { setQuery(e.target.value); setPage(1); }} placeholder={tab === "abonnes" ? "Rechercher un abonné..." : "Rechercher un client ou une référence..."} className="rounded-md border px-4 py-2.5 text-sm outline-none focus:border-primaire-400 flex-1 max-w-xs" style={{ borderColor: COLORS.border }} />
-            <select value={espaceFilter} onChange={(e) => { setEspaceFilter(e.target.value); setPage(1); }} className="rounded-md border px-3 py-2.5 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }} aria-label="Filtrer par espace">
-              <option value="tous">Tous les espaces</option>
-              <option value="chercheur">Chercheurs d'emploi</option>
-              <option value="prestataire">Prestataires</option>
-              <option value="entreprise">Entreprises</option>
-            </select>
+          <div className="mb-4 flex flex-col gap-3 rounded-lg border border-base bg-surface p-4 lg:flex-row lg:items-center">
+            <App.ChampRecherche
+              variante="carre"
+              valeur={query}
+              onChange={(v) => { setQuery(v); setPage(1); }}
+              placeholder={tab === "abonnes" ? "Rechercher un abonné…" : "Rechercher un client ou une référence…"}
+              label={tab === "abonnes" ? "Rechercher un abonné" : "Rechercher une transaction"}
+              className="w-full lg:flex-1"
+            />
+            <App.SelecteurPeriode
+              icone={Layers}
+              label="Filtrer par espace"
+              valeur={espaceFilter}
+              onChange={(v) => { setEspaceFilter(v); setPage(1); }}
+              options={[
+                { id: "tous", label: "Tous les espaces" },
+                { id: "chercheur", label: "Chercheurs d'emploi" },
+                { id: "prestataire", label: "Prestataires" },
+                { id: "entreprise", label: "Entreprises" },
+              ]}
+            />
+            <ExportAdmin
+              className="lg:ml-auto"
+              titre={tab === "abonnes" ? "Abonnés" : "Transactions"}
+              lignes={list}
+              filtres={[...(espaceFilter !== "tous" ? [ESPACE_LABELS[espaceFilter]] : []), ...(query.trim() ? [`recherche « ${query.trim()} »`] : [])]}
+              colonnes={tab === "abonnes"
+                ? [
+                    { titre: "Abonné", valeur: (a) => a.nom },
+                    { titre: "Espace", valeur: (a) => ESPACE_LABELS[a.espace] },
+                    { titre: "Offre", valeur: (a) => a.offre },
+                    { titre: "Cycle", valeur: (a) => a.cycle },
+                    { titre: "Montant (FCFA)", valeur: (a) => a.montant },
+                    { titre: "Abonné depuis", valeur: (a) => a.depuis },
+                    { titre: "Prochain paiement", valeur: (a) => a.prochain },
+                    { titre: "Statut", valeur: (a) => a.statut },
+                  ]
+                : [
+                    { titre: "Date", valeur: (t) => t.date },
+                    { titre: "Référence", valeur: (t) => t.ref },
+                    { titre: "Client", valeur: (t) => t.client },
+                    { titre: "Espace", valeur: (t) => ESPACE_LABELS[t.espace] },
+                    { titre: "Offre", valeur: (t) => t.offre },
+                    { titre: "Cycle", valeur: (t) => t.cycle },
+                    { titre: "Montant (FCFA)", valeur: (t) => t.montant },
+                    { titre: "Moyen", valeur: (t) => t.moyen },
+                    { titre: "Statut", valeur: (t) => t.statut },
+                  ]}
+            />
           </div>
 
           <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
@@ -6769,7 +8584,7 @@ function AbonnementsAdminScreen() {
                     <td className="px-4 py-3"><StatusBadge status={a.statut} /></td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       {a.statut === "Échec de paiement" && <button type="button" onClick={() => notify(`Relance de paiement envoyée à ${a.nom}.`)} className="text-xs font-semibold mr-3" style={{ color: COLORS.orange }}>Relancer</button>}
-                      <button type="button" onClick={() => { setAbonnes((l) => l.map((x) => (x.id === a.id ? { ...x, statut: x.statut === "Suspendu" ? "Actif" : "Suspendu" } : x))); notify(a.statut === "Suspendu" ? `Abonnement de ${a.nom} réactivé.` : `Abonnement de ${a.nom} suspendu.`, "info"); }} className="text-xs font-semibold" style={{ color: a.statut === "Suspendu" ? "#16A34A" : COLORS.danger }}>
+                      <button type="button" onClick={() => { setAbonnes((l) => l.map((x) => (x.id === a.id ? { ...x, statut: x.statut === "Suspendu" ? "Actif" : "Suspendu" } : x))); notify(a.statut === "Suspendu" ? `Abonnement de ${a.nom} réactivé.` : `Abonnement de ${a.nom} suspendu.`, "info"); }} className="text-xs font-semibold" style={{ color: a.statut === "Suspendu" ? COLORS.success : COLORS.danger }}>
                         {a.statut === "Suspendu" ? "Réactiver" : "Suspendre"}
                       </button>
                     </td>
@@ -6813,13 +8628,13 @@ function AbonnementsAdminScreen() {
                     return (
                       <div key={p.id} className="rounded-md p-4" style={{ background: COLORS.soft }}>
                         <p className="font-semibold mb-3" style={{ color: COLORS.slate }}>{p.nom}</p>
-                        <label className="block text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }} htmlFor={`prix-${esp}-${p.id}`}>Prix mensuel (FCFA)</label>
-                        <input id={`prix-${esp}-${p.id}`} type="number" min={0} step={500} value={p.prixMensuel} onChange={(e) => setPlanField(esp, p.id, "prix", Math.max(0, Number(e.target.value) || 0))} className="w-full rounded-md border px-3 py-2 text-sm mb-3 bg-surface outline-none focus:border-primaire-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
-                        <label className="block text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }} htmlFor={`lim-${esp}-${p.id}`}>{LIMIT_LABELS[limitKey]}</label>
-                        <div className="flex items-center gap-2">
-                          <input id={`lim-${esp}-${p.id}`} type="number" min={1} disabled={lim === UNLIMITED} value={lim === UNLIMITED ? "" : lim} placeholder="Illimité" onChange={(e) => setPlanField(esp, p.id, limitKey, Math.max(1, Number(e.target.value) || 1))} className="flex-1 min-w-0 rounded-md border px-3 py-2 text-sm bg-surface outline-none focus:border-primaire-400 disabled:opacity-60" style={{ borderColor: COLORS.border }} />
-                          <label className="flex items-center gap-1.5 text-xs whitespace-nowrap" style={{ color: COLORS.slate }}>
-                            <input type="checkbox" checked={lim === UNLIMITED} onChange={(e) => setPlanField(esp, p.id, limitKey, e.target.checked ? UNLIMITED : 5)} /> Illimité
+                        <label className={AUTH.libelle} htmlFor={`prix-${esp}-${p.id}`}>Prix mensuel (FCFA)</label>
+                        <input id={`prix-${esp}-${p.id}`} type="number" min={0} step={500} value={p.prixMensuel} onChange={(e) => setPlanField(esp, p.id, "prix", Math.max(0, Number(e.target.value) || 0))} className={`${FORM.champ()} mb-4`} />
+                        <label className={AUTH.libelle} htmlFor={`lim-${esp}-${p.id}`}>{LIMIT_LABELS[limitKey]}</label>
+                        <div className="flex items-center gap-3">
+                          <input id={`lim-${esp}-${p.id}`} type="number" min={1} disabled={lim === UNLIMITED} value={lim === UNLIMITED ? "" : lim} placeholder="Illimité" onChange={(e) => setPlanField(esp, p.id, limitKey, Math.max(1, Number(e.target.value) || 1))} className={`${FORM.champ()} min-w-0 flex-1 disabled:bg-doux disabled:text-discret`} />
+                          <label className="flex min-h-[44px] cursor-pointer items-center gap-2 whitespace-nowrap text-sm text-principal">
+                            <input type="checkbox" checked={lim === UNLIMITED} onChange={(e) => setPlanField(esp, p.id, limitKey, e.target.checked ? UNLIMITED : 5)} className={AUTH.case} /> Illimité
                           </label>
                         </div>
                       </div>
@@ -6938,7 +8753,7 @@ function ProfileTierCard() {
       )}
       {premium && api.espace !== "chercheur" && (
         <div className="px-6 py-4 flex items-center gap-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
-          <TrendingUp size={18} color="#16A34A" />
+          <TrendingUp size={18} color={COLORS.success} />
           <p className="text-sm" style={{ color: COLORS.slate }}>
             {api.espace === "prestataire" ? "Votre profil s'affiche en priorité : 3,2 fois plus de vues que le mois dernier." : "Vos offres portent le badge Recruteur Premium et remontent dans les résultats."}
           </p>
@@ -7002,11 +8817,11 @@ function mentorProfile(m) {
   const debut = 2026 - m.exp;
   const pivot = 2026 - Math.max(2, Math.round(m.exp / 3));
   const milieu = Math.round((debut + pivot) / 2);
-  const ancien = 1 + (h % 3);
+  const ancien = (m.stats && parseInt(m.stats.anciennete, 10)) || 1 + (h % 3);
   return {
     bio: m.tagline || `${m.role} avec ${m.exp} ans d'expérience. ${m.nom.split(" ")[0]} accompagne les professionnels qui veulent progresser dans son domaine.`,
     langues: ["Français", "Wolof", ...(h % 2 ? ["Anglais"] : [])],
-    formats: ["Visio", "Téléphone", ...(h % 3 === 0 ? [] : ["Présentiel à Dakar"])],
+    formats: ["Visio", "Téléphone", ...(h % 3 === 0 ? [] : ["Au bureau de Dakar"])],
     stats: m.stats || { mentores: 6 + (h % 20), note: `${(4.3 + (h % 7) / 10).toFixed(1)}/5`, anciennete: `${ancien} an${ancien > 1 ? "s" : ""}`, heures: 20 + (h % 90) },
     parcours: [
       { poste: m.role, structure: emp(0), periode: `${pivot} – aujourd'hui`, description: "Pilote une équipe et forme les nouvelles recrues sur le terrain." },
@@ -7049,44 +8864,55 @@ function nextSlots(n = 6) {
 
 function BookingPanel({ profile, title, submitLabel, onConfirm, onCancel }) {
   const slots = React.useMemo(() => nextSlots(6), []);
-  const [slot, setSlot] = useState(null);
-  const [theme, setTheme] = useState(profile.themes[0]);
-  const [format, setFormat] = useState(profile.formats[0]);
-  const [message, setMessage] = useState("");
+  const f = useFormulaire({ slot: null, theme: profile.themes[0], format: profile.formats[0], message: "" }, (v) => ({
+    slot: !v.slot && "Choisissez un créneau.",
+  }));
+  const { v, set, err, attrs } = f;
   return (
-    <div className="rounded-lg border bg-surface p-5 mb-4" style={{ borderColor: COLORS.orange }}>
-      <h4 className="font-semibold mb-3" style={{ color: COLORS.slate }}>{title}</h4>
-      <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Créneaux disponibles</p>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 mb-4">
-        {slots.map((s) => (
-          <button key={s} type="button" onClick={() => setSlot(s)} aria-pressed={slot === s} className="rounded-md border px-3 py-2 text-sm text-left" style={{ borderColor: slot === s ? COLORS.orange : COLORS.border, background: slot === s ? COLORS.orangeSoft : COLORS.surface, color: COLORS.slate }}>
-            {s}
-          </button>
-        ))}
-      </div>
-      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mb-3">
-        <label className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>
-          Sujet de la séance
-          <select value={theme} onChange={(e) => setTheme(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
+    <form
+      onSubmit={f.soumettre((val) => onConfirm({ date: val.slot, theme: val.theme, format: val.format, message: val.message }))}
+      noValidate
+      className="mb-4 rounded-lg border border-marque bg-surface p-5"
+    >
+      <h4 className="mb-4 font-semibold text-principal">{title}</h4>
+      <fieldset className="mb-5" aria-describedby={err("slot") ? "booking-slot-aide" : undefined}>
+        <legend className={AUTH.libelle}>Créneaux disponibles <span aria-hidden="true" className="text-marque">*</span></legend>
+        <div className="grid grid-cols-1 gap-2 sm:grid-cols-2">
+          {slots.map((s) => (
+            <button
+              key={s}
+              type="button"
+              onClick={() => set("slot", s)}
+              aria-pressed={v.slot === s}
+              className={`flex min-h-[48px] items-center gap-2 rounded-md border px-3.5 text-left text-[15px] text-principal transition-colors ${v.slot === s ? "border-marque bg-marque-doux font-medium" : "border-base bg-surface hover:border-forte"}`}
+            >
+              <Clock size={15} className={v.slot === s ? "text-marque" : "text-discret"} aria-hidden="true" />
+              {s}
+            </button>
+          ))}
+        </div>
+        {err("slot") && <p id="booking-slot-aide" className={AUTH.aide(true)}>{err("slot")}</p>}
+      </fieldset>
+      <div className={`${FORM.grille} mb-5`}>
+        <Champ id="booking-theme" label="Sujet de la séance">
+          <ListeChamp {...attrs("booking-theme", "theme")}>
             {profile.themes.map((t) => <option key={t}>{t}</option>)}
-          </select>
-        </label>
-        <label className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>
-          Format
-          <select value={format} onChange={(e) => setFormat(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-            {profile.formats.map((f) => <option key={f}>{f}</option>)}
-          </select>
-        </label>
+          </ListeChamp>
+        </Champ>
+        <Champ id="booking-format" label="Format">
+          <ListeChamp {...attrs("booking-format", "format")}>
+            {profile.formats.map((fo) => <option key={fo}>{fo}</option>)}
+          </ListeChamp>
+        </Champ>
+        <Champ id="booking-message" label="Message au mentor (facultatif)" large>
+          <textarea {...attrs("booking-message", "message")} rows={3} placeholder="Ce que vous aimeriez travailler pendant la séance…" className={FORM.zone()} />
+        </Champ>
       </div>
-      <label className="block text-xs font-semibold mb-4" style={{ color: COLORS.slateLight }}>
-        Message au mentor (facultatif)
-        <textarea rows={2} value={message} onChange={(e) => setMessage(e.target.value)} placeholder="Ce que vous aimeriez travailler pendant la séance…" className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
-      </label>
-      <div className="flex gap-2">
-        <button type="button" disabled={!slot} onClick={() => onConfirm({ date: slot, theme, format, message })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: slot ? 1 : 0.5 }}>{submitLabel}</button>
-        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+      <div className="flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
+        <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
+        <App.Bouton type="submit">{submitLabel}</App.Bouton>
       </div>
-    </div>
+    </form>
   );
 }
 
@@ -7127,70 +8953,74 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
     { id: "documents", label: "Documents et notes" },
   ];
 
+  const themes = mentor.competences || profile.themes;
+
   return (
-    <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}>
-        <ArrowLeft size={14} /> Retour aux mentors
-      </button>
+    <div className="space-y-6">
+      <BoutonRetour onClick={onBack}>Retour aux mentors</BoutonRetour>
 
-      <div className="rounded-lg p-6 mb-6 flex flex-col md:flex-row md:items-center justify-between gap-5" style={{ background: COLORS.dark }}>
-        <div className="flex items-center gap-4 min-w-0">
-          <SafeImg src={mentor.photo} alt={mentor.nom} className="w-16 h-16 rounded-full object-cover border-2 shrink-0" style={{ borderColor: COLORS.orange }} />
-          <div className="min-w-0">
-            <p className="text-xl font-bold text-sur-sombre">{mentor.nom}</p>
-            <p className="text-sm mb-1" style={{ color: COLORS.orange }}>{mentor.role} · {mentor.exp} ans d'expérience</p>
-            <p className="text-sm text-white/60">{profile.bio}</p>
-            <p className="text-xs mt-2" style={{ color: COLORS.onDarkSubtle }}>Parle {profile.langues.join(", ")} · {profile.formats.join(", ")}</p>
-          </div>
-        </div>
-        <button type="button" onClick={openBooking} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque shrink-0 inline-flex items-center gap-1.5 self-start md:self-auto" style={{ background: COLORS.orange }}>
-          {locked ? <Lock size={14} /> : <Calendar size={14} />} Réserver un coaching
-        </button>
-      </div>
+      <EnTeteFiche
+        visuel={<SafeImg src={mentor.photo} alt={mentor.nom} className="h-16 w-16 shrink-0 rounded-full object-cover" />}
+        badges={<>
+          <App.Badge ton="succes" taille="moyen"><BadgeCheck size={13} aria-hidden="true" /> Mentor vérifié</App.Badge>
+          {mentor.historique && <App.Badge ton="marque" point taille="moyen">Votre mentor</App.Badge>}
+        </>}
+        titre={mentor.nom}
+        sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
+        meta={<>
+          <MetaOffre icone={Star}>{profile.stats.note}</MetaOffre>
+          <MetaOffre icone={UsersRound}>{profile.stats.mentores} mentorés</MetaOffre>
+          <MetaOffre icone={Clock}>{profile.stats.heures} h de mentorat</MetaOffre>
+        </>}
+        actions={
+          <App.Bouton onClick={openBooking}>
+            {locked ? <Lock size={16} aria-hidden="true" /> : <Calendar size={16} aria-hidden="true" />} Réserver un coaching
+          </App.Bouton>
+        }
+      />
 
-      <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 mb-6">
-        <StatMini value={profile.stats.mentores} label="Mentorés accompagnés" />
-        <StatMini value={profile.stats.note} label="Note de satisfaction" />
-        <StatMini value={profile.stats.anciennete} label="Sur LIGGEEY" />
-        <StatMini value={profile.stats.heures} label="Heures de mentorat" />
-      </div>
-
-      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5" role="tablist">
-        {tabs.map((t) => (
-          <button key={t.id} type="button" role="tab" aria-selected={tab === t.id} onClick={() => setTab(t.id)} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
-            {t.label}
-          </button>
-        ))}
-      </div>
+      <MiseEnPageFiche
+        cote={<>
+          <ApercuFiche
+            titre="Aperçu du mentor"
+            items={[
+              { icone: Briefcase, libelle: "Expérience", valeur: `${mentor.exp} ans · ${mentor.role}` },
+              { icone: MessageCircle, libelle: "Langues", valeur: profile.langues.join(", ") },
+              { icone: Video, libelle: "Formats des séances", valeur: profile.formats.join(", ") },
+              { icone: UsersRound, libelle: "Mentorés accompagnés", valeur: profile.stats.mentores },
+              { icone: Star, libelle: "Note de satisfaction", valeur: profile.stats.note },
+              { icone: CalendarDays, libelle: "Sur LIGGEEY depuis", valeur: profile.stats.anciennete },
+            ]}
+          />
+          <App.Carte titre="Domaines d'accompagnement">
+            <Etiquettes items={themes} />
+          </App.Carte>
+        </>}
+        principal={<>
+      <App.Onglets onglets={tabs} actif={tab} onChange={setTab} label="Sections du profil du mentor" />
 
       {tab === "profil" && (
-        <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4">
-          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Parcours professionnel</h3>
+        <div className="space-y-6">
+          <App.Carte titre="À propos">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{profile.bio}</p>
+          </App.Carte>
+          <App.Carte titre="Parcours professionnel">
             <ol className="relative">
               {profile.parcours.map((p, i) => (
                 <li key={i} className="flex gap-3 pb-5 last:pb-0">
                   <div className="flex flex-col items-center">
-                    <div className="w-2.5 h-2.5 rounded-full mt-1.5" style={{ background: i === 0 ? COLORS.orange : COLORS.border }} />
-                    {i < profile.parcours.length - 1 && <div className="w-px flex-1 mt-1" style={{ background: COLORS.border }} />}
+                    <div className={`mt-1.5 h-2.5 w-2.5 rounded-full ${i === 0 ? "bg-marque" : "bg-doux-fort"}`} />
+                    {i < profile.parcours.length - 1 && <div className="mt-1 w-px flex-1 bg-doux-fort" />}
                   </div>
                   <div>
-                    <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{p.poste} · {p.structure}</p>
-                    <p className="text-xs mb-1" style={{ color: COLORS.slateLight }}>{p.periode}</p>
-                    <p className="text-sm" style={{ color: COLORS.slateLight }}>{p.description}</p>
+                    <p className="text-sm font-semibold text-principal">{p.poste} · {p.structure}</p>
+                    <p className="mb-1 text-xs text-discret">{p.periode}</p>
+                    <p className="text-sm text-secondaire">{p.description}</p>
                   </div>
                 </li>
               ))}
             </ol>
-          </div>
-          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Domaines d'accompagnement</h3>
-            <div className="flex flex-wrap gap-2">
-              {(mentor.competences || profile.themes).map((c) => (
-                <span key={c} className="text-xs font-medium px-3 py-1.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>
-              ))}
-            </div>
-          </div>
+          </App.Carte>
         </div>
       )}
 
@@ -7233,7 +9063,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
                   </div>
                 ) : (
                   <div className="flex gap-2 flex-wrap">
-                    {u.format !== "Présentiel à Dakar" && (
+                    {u.format !== "Au bureau de Dakar" && (
                       <button type="button" onClick={() => notify(`Connexion à la séance avec ${mentor.nom}…`)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Rejoindre</button>
                     )}
                     <button type="button" onClick={() => setBooking({ mode: "move", id: u.id })} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Reprogrammer</button>
@@ -7279,7 +9109,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
       )}
 
       {tab === "documents" && (
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 xl:grid-cols-2 gap-4">
           <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Documents partagés</h3>
             {mentor.documents ? (
@@ -7301,14 +9131,18 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
               <p className="text-sm" style={{ color: COLORS.slateLight }}>{prenom} partagera ses documents après votre première séance.</p>
             )}
           </div>
-          <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Mes notes personnelles</h3>
-            <textarea value={note} onChange={(e) => { setNote(e.target.value); setSaved(false); }} placeholder="Ajoutez vos notes ici..." rows={4} className="w-full rounded-md border px-4 py-3 text-sm outline-none focus:border-primaire-400 mb-3" style={{ borderColor: COLORS.border }} />
-            <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Enregistrer</button>
-            {saved && <span className="ml-3 text-sm" style={{ color: "#047857" }}>Note enregistrée.</span>}
-          </div>
+          <App.Carte titre="Mes notes personnelles" sousTitre="Visibles par vous seul.">
+            <label htmlFor="notes-mentor" className="sr-only">Mes notes personnelles</label>
+            <textarea id="notes-mentor" value={note} onChange={(e) => { setNote(e.target.value); setSaved(false); }} placeholder="Ajoutez vos notes ici…" rows={4} className={`${FORM.zone()} mb-4`} />
+            <div className="flex flex-wrap items-center gap-3">
+              <App.Bouton onClick={() => setSaved(true)}>Enregistrer</App.Bouton>
+              {saved && <span role="status" className="inline-flex items-center gap-1.5 text-sm text-statut-succes"><CheckCircle2 size={16} aria-hidden="true" /> Note enregistrée.</span>}
+            </div>
+          </App.Carte>
         </div>
       )}
+        </>}
+      />
     </div>
   );
 }
@@ -7410,12 +9244,12 @@ function ProgressBar({ pct, color = COLORS.orange, track = COLORS.softStrong }) 
 
 function RatingInput({ label, value, onChange }) {
   return (
-    <div className="flex items-center justify-between gap-3 py-1">
-      <span className="text-sm" style={{ color: COLORS.slate }}>{label}</span>
-      <div className="flex gap-0.5" role="radiogroup" aria-label={label}>
+    <div className="flex flex-wrap items-center justify-between gap-x-3 gap-y-1 py-1">
+      <span className="text-sm font-medium text-principal">{label}</span>
+      <div className="flex" role="radiogroup" aria-label={label}>
         {[1, 2, 3, 4, 5].map((n) => (
-          <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} sur 5`} onClick={() => onChange(n)}>
-            <Star size={18} color={COLORS.orange} fill={n <= value ? COLORS.orange : "none"} />
+          <button key={n} type="button" role="radio" aria-checked={value === n} aria-label={`${n} sur 5`} onClick={() => onChange(n)} className="grid h-11 w-11 place-items-center rounded-md hover:bg-doux">
+            <Star size={20} className="text-primaire-500" fill={n <= value ? "currentColor" : "none"} aria-hidden="true" />
           </button>
         ))}
       </div>
@@ -7427,60 +9261,76 @@ function CheckinForm({ jalon, onSubmit, onCancel }) {
   const [humeur, setHumeur] = useState(0);
   const [rep, setRep] = useState({});
   const [commentaire, setCommentaire] = useState("");
+  const [essai, setEssai] = useState(false);
   const complete = humeur > 0 && CHECKIN_QUESTIONS.every((q) => rep[q.id]);
+  const idCommentaire = `checkin-${jalon?.id || "point"}-commentaire`;
+  function envoyer(e) {
+    e.preventDefault();
+    setEssai(true);
+    if (complete) onSubmit({ humeur, reponses: rep, commentaire });
+  }
   return (
-    <div className="rounded-md p-4 mt-3" style={{ background: COLORS.soft }}>
-      <p className="text-sm font-semibold mb-2" style={{ color: COLORS.slate }}>Comment se passe votre poste en ce moment ?</p>
-      <div className="flex flex-wrap gap-1.5 mb-4">
-        {HUMEURS.map((h, i) => (
-          <button key={h} type="button" onClick={() => setHumeur(i + 1)} aria-pressed={humeur === i + 1} className="rounded-full px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: humeur === i + 1 ? COLORS.orange : COLORS.border, background: humeur === i + 1 ? COLORS.orange : COLORS.surface, color: humeur === i + 1 ? COLORS.onOrange : COLORS.slate }}>
-            {h}
-          </button>
+    <form onSubmit={envoyer} noValidate className={`${FORM.encart} mt-3`}>
+      <fieldset className="mb-5">
+        <legend className={AUTH.libelle}>Comment se passe votre poste en ce moment ?</legend>
+        <div className="flex flex-wrap gap-2">
+          {HUMEURS.map((h, i) => (
+            <button key={h} type="button" onClick={() => setHumeur(i + 1)} aria-pressed={humeur === i + 1} className={FORM.pastille(humeur === i + 1)}>
+              {h}
+            </button>
+          ))}
+        </div>
+      </fieldset>
+      <div className="divide-y divide-base border-y border-base">
+        {CHECKIN_QUESTIONS.map((q) => (
+          <div key={q.id} role="group" aria-label={q.label} className="flex flex-wrap items-center justify-between gap-3 py-3">
+            <span className="text-sm text-principal">{q.label}</span>
+            <div className="flex gap-2">
+              {["Oui", "En partie", "Non"].map((o) => (
+                <button key={o} type="button" onClick={() => setRep((r) => ({ ...r, [q.id]: o }))} aria-pressed={rep[q.id] === o} className={FORM.pastille(rep[q.id] === o)}>
+                  {o}
+                </button>
+              ))}
+            </div>
+          </div>
         ))}
       </div>
-      {CHECKIN_QUESTIONS.map((q) => (
-        <div key={q.id} className="flex items-center justify-between gap-3 py-1.5 flex-wrap">
-          <span className="text-sm" style={{ color: COLORS.slate }}>{q.label}</span>
-          <div className="flex gap-1">
-            {["Oui", "En partie", "Non"].map((o) => (
-              <button key={o} type="button" onClick={() => setRep((r) => ({ ...r, [q.id]: o }))} aria-pressed={rep[q.id] === o} className="rounded-md px-2.5 py-1 text-xs font-semibold border" style={{ borderColor: rep[q.id] === o ? COLORS.slate : COLORS.border, background: rep[q.id] === o ? COLORS.dark : COLORS.surface, color: rep[q.id] === o ? COLORS.onDark : COLORS.slate }}>
-                {o}
-              </button>
-            ))}
-          </div>
-        </div>
-      ))}
-      <textarea rows={2} value={commentaire} onChange={(e) => setCommentaire(e.target.value)} placeholder="Un commentaire pour votre référente LIGGEEY (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-3 outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border }} />
-      <div className="flex gap-2 mt-3">
-        <button type="button" disabled={!complete} onClick={() => onSubmit({ humeur, reponses: rep, commentaire })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: complete ? 1 : 0.5 }}>Envoyer le point de suivi</button>
-        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Plus tard</button>
+      <div className="mt-5">
+        <label htmlFor={idCommentaire} className={AUTH.libelle}>Un commentaire pour votre référente LIGGEEY (facultatif)</label>
+        <textarea id={idCommentaire} rows={3} value={commentaire} onChange={(e) => setCommentaire(e.target.value)} className={FORM.zone()} />
       </div>
-      {!complete && <p className="text-xs mt-2" style={{ color: COLORS.slateLight }}>Répondez à toutes les questions pour envoyer le point de suivi.</p>}
-    </div>
+      <AlerteFormulaire visible={essai && !complete}>Répondez à toutes les questions pour envoyer le point de suivi.</AlerteFormulaire>
+      <div className={FORM.actions}>
+        <App.Bouton variante="neutre" onClick={onCancel}>Plus tard</App.Bouton>
+        <App.Bouton type="submit">Envoyer le point de suivi</App.Bouton>
+      </div>
+    </form>
   );
 }
 
 function SignalementForm({ types, onSubmit, onCancel, intro }) {
-  const [type, setType] = useState(types[0]);
-  const [description, setDescription] = useState("");
+  const f = useFormulaire({ type: types[0], description: "" }, (v) => ({
+    description: !v.description.trim() && "Décrivez la situation en quelques mots.",
+  }));
+  const { err, attrs } = f;
   return (
-    <div className="rounded-md p-4" style={{ background: COLORS.soft }}>
-      {intro && <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>{intro}</p>}
-      <label className="block text-xs font-semibold mb-3" style={{ color: COLORS.slateLight }}>
-        Type de difficulté
-        <select value={type} onChange={(e) => setType(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-          {types.map((t) => <option key={t}>{t}</option>)}
-        </select>
-      </label>
-      <label className="block text-xs font-semibold mb-3" style={{ color: COLORS.slateLight }}>
-        Décrivez la situation
-        <textarea rows={3} value={description} onChange={(e) => setDescription(e.target.value)} className="mt-1 w-full rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
-      </label>
-      <div className="flex gap-2">
-        <button type="button" disabled={!description.trim()} onClick={() => onSubmit({ type, description })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange, opacity: description.trim() ? 1 : 0.5 }}><Flag size={14} /> Envoyer le signalement</button>
-        {onCancel && <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>}
+    <form onSubmit={f.soumettre(onSubmit)} noValidate className={FORM.encart}>
+      {intro && <p className="mb-4 text-sm text-secondaire">{intro}</p>}
+      <div className="space-y-5">
+        <Champ id="signalement-type" label="Type de difficulté">
+          <ListeChamp {...attrs("signalement-type", "type")}>
+            {types.map((t) => <option key={t}>{t}</option>)}
+          </ListeChamp>
+        </Champ>
+        <Champ id="signalement-description" label="Décrivez la situation" requis erreur={err("description")}>
+          <textarea {...attrs("signalement-description", "description", { requis: true })} rows={4} className={FORM.zone(err("description"))} />
+        </Champ>
       </div>
-    </div>
+      <div className={FORM.actions}>
+        {onCancel && <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>}
+        <App.Bouton type="submit"><Flag size={16} aria-hidden="true" /> Envoyer le signalement</App.Bouton>
+      </div>
+    </form>
   );
 }
 
@@ -7534,7 +9384,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
               return (
                 <li key={j.id} className="flex gap-3 pb-5 last:pb-0">
                   <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0" style={{ background: statut === "Fait" ? "#DCFCE7" : statut === "À compléter" ? COLORS.orange : COLORS.softStrong, color: statut === "Fait" ? "#16A34A" : statut === "À compléter" ? COLORS.onOrange : COLORS.slateLight }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0" style={{ background: statut === "Fait" ? COLORS.successSoft : statut === "À compléter" ? COLORS.orange : COLORS.softStrong, color: statut === "Fait" ? COLORS.success : statut === "À compléter" ? COLORS.onOrange : COLORS.slateLight }}>
                       {statut === "Fait" ? <Check size={12} /> : i + 1}
                     </div>
                     {i < JALONS.length - 1 && <div className="w-px flex-1 mt-1" style={{ background: COLORS.border }} />}
@@ -7585,7 +9435,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
               <h3 className="font-semibold" style={{ color: COLORS.slate }}>Objectifs d'intégration</h3>
               <span className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>{objectifsFaits}/{OBJECTIFS_INTEGRATION.length}</span>
             </div>
-            <div className="mb-3"><ProgressBar pct={(objectifsFaits / OBJECTIFS_INTEGRATION.length) * 100} color="#16A34A" /></div>
+            <div className="mb-3"><ProgressBar pct={(objectifsFaits / OBJECTIFS_INTEGRATION.length) * 100} color={COLORS.success} /></div>
             {OBJECTIFS_INTEGRATION.map((o) => (
               <label key={o.id} className="flex items-start gap-2.5 py-1.5 cursor-pointer">
                 <input type="checkbox" className="mt-0.5 accent-primaire-500" checked={!!suivi.objectifs[o.id]} onChange={(ev) => setSuivi((s) => ({ ...s, objectifs: { ...s.objectifs, [o.id]: ev.target.checked } }))} />
@@ -7631,18 +9481,30 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
 
 function EvaluationRecrueForm({ onSubmit, onCancel }) {
   const [v, setV] = useState({ competences: 0, integration: 0, ponctualite: 0, commentaire: "" });
+  const [essai, setEssai] = useState(false);
   const ok = v.competences && v.integration && v.ponctualite;
+  function envoyer(e) {
+    e.preventDefault();
+    setEssai(true);
+    if (ok) onSubmit(v);
+  }
   return (
-    <div className="rounded-md p-4 mt-3" style={{ background: COLORS.soft }}>
-      <RatingInput label="Compétences techniques" value={v.competences} onChange={(n) => setV((s) => ({ ...s, competences: n }))} />
-      <RatingInput label="Intégration dans l'équipe" value={v.integration} onChange={(n) => setV((s) => ({ ...s, integration: n }))} />
-      <RatingInput label="Ponctualité et assiduité" value={v.ponctualite} onChange={(n) => setV((s) => ({ ...s, ponctualite: n }))} />
-      <textarea rows={2} value={v.commentaire} onChange={(e) => setV((s) => ({ ...s, commentaire: e.target.value }))} placeholder="Commentaire (facultatif)" className="w-full rounded-md border px-3 py-2 text-sm mt-2 outline-none focus:border-primaire-400 bg-surface" style={{ borderColor: COLORS.border }} />
-      <div className="flex gap-2 mt-3">
-        <button type="button" disabled={!ok} onClick={() => onSubmit(v)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: ok ? 1 : 0.5 }}>Enregistrer l'évaluation</button>
-        <button type="button" onClick={onCancel} className="rounded-md px-4 py-2 text-sm font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+    <form onSubmit={envoyer} noValidate className={`${FORM.encart} mt-3`}>
+      <div className="divide-y divide-base border-b border-base pb-1">
+        <RatingInput label="Compétences techniques" value={v.competences} onChange={(n) => setV((s) => ({ ...s, competences: n }))} />
+        <RatingInput label="Intégration dans l'équipe" value={v.integration} onChange={(n) => setV((s) => ({ ...s, integration: n }))} />
+        <RatingInput label="Ponctualité et assiduité" value={v.ponctualite} onChange={(n) => setV((s) => ({ ...s, ponctualite: n }))} />
       </div>
-    </div>
+      <div className="mt-5">
+        <label htmlFor="evaluation-commentaire" className={AUTH.libelle}>Commentaire (facultatif)</label>
+        <textarea id="evaluation-commentaire" rows={3} value={v.commentaire} onChange={(e) => setV((s) => ({ ...s, commentaire: e.target.value }))} className={FORM.zone()} />
+      </div>
+      <AlerteFormulaire visible={essai && !ok}>Donnez une note à chacun des trois critères.</AlerteFormulaire>
+      <div className={FORM.actions}>
+        <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
+        <App.Bouton type="submit">Enregistrer l'évaluation</App.Bouton>
+      </div>
+    </form>
   );
 }
 
@@ -7660,7 +9522,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
         </div>
         <div className="flex gap-2 flex-wrap">
           {r.statut !== "Confirmé" && (
-            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre inline-flex items-center gap-1.5" style={{ background: "#16A34A" }}><UserCheck size={14} /> Confirmer l'embauche</button>
+            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-statut inline-flex items-center gap-1.5" style={{ background: COLORS.success }}><UserCheck size={14} /> Confirmer l'embauche</button>
           )}
           <button type="button" onClick={() => setSignalOpen((o) => !o)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}><Flag size={14} /> Signaler un problème</button>
         </div>
@@ -7717,7 +9579,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
           <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Ressenti de la recrue</h3>
             <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>Partagé par la recrue lors de son dernier point de suivi.</p>
-            <p className="text-lg font-bold" style={{ color: r.ressenti <= 2 ? COLORS.danger : r.ressenti >= 4 ? "#16A34A" : COLORS.slate }}>{HUMEURS[r.ressenti - 1]}</p>
+            <p className="text-lg font-bold" style={{ color: r.ressenti <= 2 ? COLORS.danger : r.ressenti >= 4 ? COLORS.success : COLORS.slate }}>{HUMEURS[r.ressenti - 1]}</p>
           </div>
         </div>
       </div>
@@ -7746,7 +9608,7 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
           const jour = joursDepuis(r.dateIso);
           const next = JALONS.find((j) => !r.evaluations[j.id]);
           return (
-            <button key={r.id} type="button" onClick={() => setSelectedId(r.id)} className="w-full text-left rounded-lg border bg-surface px-5 py-4 grid grid-cols-1 md:grid-cols-[1.4fr,1.2fr,1fr,auto] gap-3 md:items-center hover:shadow-md transition-shadow" style={{ borderColor: r.statut === "À risque" ? "#FCA5A5" : COLORS.border }}>
+            <button key={r.id} type="button" onClick={() => setSelectedId(r.id)} className="w-full text-left rounded-lg border bg-surface px-5 py-4 grid grid-cols-1 md:grid-cols-[1.4fr,1.2fr,1fr,auto] gap-3 md:items-center hover:shadow-md transition-shadow" style={{ borderColor: r.statut === "À risque" ? COLORS.danger : COLORS.border }}>
               <div className="flex items-center gap-3 min-w-0">
                 <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(r.nom)}</div>
                 <div className="min-w-0">
@@ -7785,10 +9647,25 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
         <StatCard icon={Flag} value={ouverts.length} label="Signalements ouverts" />
       </div>
 
-      <h2 className="text-lg font-semibold mb-3" style={{ color: COLORS.slate }}>Signalements</h2>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold" style={{ color: COLORS.slate }}>Signalements</h2>
+        <ExportAdmin
+          titre="Signalements post-embauche"
+          lignes={signalements}
+          colonnes={[
+            { titre: "Date", valeur: (x) => x.date },
+            { titre: "Type", valeur: (x) => x.type },
+            { titre: "Auteur", valeur: (x) => x.auteur },
+            { titre: "Espace", valeur: (x) => ESPACE_LABELS[x.espace] },
+            { titre: "Concerne", valeur: (x) => x.concerne },
+            { titre: "Description", valeur: (x) => x.description },
+            { titre: "Statut", valeur: (x) => x.statut },
+          ]}
+        />
+      </div>
       <div className="flex flex-col gap-3 mb-8">
         {signalements.map((s) => (
-          <div key={s.id} className="rounded-lg border bg-surface p-5 flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: s.statut === "Ouvert" ? "#FCA5A5" : COLORS.border }}>
+          <div key={s.id} className="rounded-lg border bg-surface p-5 flex flex-col md:flex-row md:items-center justify-between gap-3" style={{ borderColor: s.statut === "Ouvert" ? COLORS.danger : COLORS.border }}>
             <div>
               <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{s.type}</p>
               <p className="text-xs mb-1" style={{ color: COLORS.slateLight }}>{s.date} · par {s.auteur} ({ESPACE_LABELS[s.espace]}) · concerne {s.concerne}</p>
@@ -7807,7 +9684,20 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
         ))}
       </div>
 
-      <h2 className="text-lg font-semibold mb-3" style={{ color: COLORS.slate }}>Placements en cours de suivi</h2>
+      <div className="mb-3 flex flex-wrap items-center justify-between gap-3">
+        <h2 className="text-lg font-semibold" style={{ color: COLORS.slate }}>Placements en cours de suivi</h2>
+        <ExportAdmin
+          titre="Placements suivis"
+          lignes={placements}
+          colonnes={[
+            { titre: "Personne placée", valeur: (p) => p.nom },
+            { titre: "Poste", valeur: (p) => p.poste },
+            { titre: "Employeur", valeur: (p) => p.entreprise },
+            { titre: "Ancienneté (jours)", valeur: (p) => p.jour },
+            { titre: "Statut", valeur: (p) => p.statut },
+          ]}
+        />
+      </div>
       <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
         <table className="w-full text-sm min-w-[640px]">
           <thead>
@@ -7837,7 +9727,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
 
 const REGUL_STEPS_INITIAL = [
   { id: "identite", titre: "Pièce d'identité", obligatoire: true, statut: "Validé", description: "Carte nationale d'identité CEDEAO ou passeport en cours de validité.", ou: "Déjà fournie lors de votre inscription.", document: "CNI_Mamadou_Ndiaye.pdf" },
-  { id: "ninea", titre: "Numéro NINEA", obligatoire: true, statut: "Refusé", motif: "Le document est illisible. Envoyez une photo nette de l'attestation complète.", champ: "Numéro NINEA", valeur: "", description: "Identifiant unique de votre activité auprès de l'administration fiscale.", ou: "Centre des services fiscaux de votre zone ou guichet unique de l'APIX.", document: "attestation_ninea.jpg" },
+  { id: "ninea", titre: "Numéro NINEA", obligatoire: true, statut: "À compléter", champ: "Numéro NINEA", valeur: "", description: "Identifiant unique de votre activité auprès de l'administration fiscale.", ou: "Centre des services fiscaux de votre zone ou guichet unique de l'APIX." },
   { id: "immatriculation", titre: "Immatriculation de l'activité", obligatoire: true, statut: "À compléter", champ: "Numéro d'immatriculation", valeur: "", description: "Inscription au Registre des métiers pour les artisans, ou au RCCM pour une activité commerciale.", ou: "Chambre de métiers de votre région, ou greffe du tribunal de commerce." },
   { id: "fiscal", titre: "Régime fiscal", obligatoire: true, statut: "À compléter", choix: ["Contribution globale unique (CGU)", "Régime du réel", "Je ne sais pas encore"], valeur: "", description: "Le régime d'imposition qui s'applique à votre activité, selon votre chiffre d'affaires.", ou: "Centre des services fiscaux ou conseiller LIGGEEY." },
   { id: "social", titre: "Protection sociale", obligatoire: false, statut: "À compléter", description: "Affiliation à une caisse de retraite ou à une mutuelle de santé pour vous protéger, vous et votre famille.", ou: "IPRES, Caisse de sécurité sociale ou mutuelle de santé de votre commune." },
@@ -7850,6 +9740,27 @@ const REGUL_DEMANDES_AUTRES = [
   { id: "rd3", prestataire: "Khady Ndiaye", metier: "Esthéticienne", etape: "Régime fiscal", document: "—", valeur: "Contribution globale unique (CGU)", date: "08/10/2026", statut: "En vérification" },
 ];
 
+/* La régularisation est facultative : le prestataire choisit de la faire (« regul-choix » : "oui"),
+   de la remettre à plus tard ("plus-tard"), ou n'a encore rien choisi (null). Envoyer un justificatif
+   vaut engagement. Les rappels (tâches, compteur du menu, badge « en cours ») ne concernent que
+   les prestataires engagés. */
+/* « Votre étape validée est gardée » / « Vos 2 étapes validées sur 4 sont gardées » */
+function etapesGardees(valides, total) {
+  return valides > 1
+    ? `Vos ${valides} étapes validées${total ? ` sur ${total}` : ""} sont gardées`
+    : `L'étape déjà validée${total ? ` (1 sur ${total})` : ""} est gardée`;
+}
+
+function regulCommencee(steps) {
+  return steps.some((st) => st.id !== "identite" && st.statut !== "À compléter");
+}
+
+function regulEngage(steps, choix) {
+  if (choix === "oui") return true;
+  if (choix === "plus-tard") return false;
+  return regulCommencee(steps);
+}
+
 function regulSummary(steps) {
   const obligatoires = steps.filter((s) => s.obligatoire);
   const valides = obligatoires.filter((s) => s.statut === "Validé").length;
@@ -7860,9 +9771,10 @@ function RegulBadge({ size = "md" }) {
   const api = usePlan();
   if (!api || !api.regulSteps) return null;
   const { complete } = regulSummary(api.regulSteps);
+  if (!complete && !regulEngage(api.regulSteps, api.regulChoix)) return null;
   const cls = size === "sm" ? "text-[11px] px-2 py-0.5" : "text-xs px-3 py-1";
   return complete ? (
-    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: "#DCFCE7", color: "#16A34A" }}><BadgeCheck size={12} /> Activité régularisée</span>
+    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.successSoft, color: COLORS.success }}><BadgeCheck size={12} /> Activité régularisée</span>
   ) : (
     <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.orangeSoft, color: COLORS.orange }}><Landmark size={12} /> Régularisation en cours</span>
   );
@@ -7877,15 +9789,15 @@ function RegulStepCard({ step, index, onChange }) {
   const ready = (!needsValue || valeur.trim()) && (file || step.choix);
 
   return (
-    <div className="rounded-lg border bg-surface" style={{ borderColor: step.statut === "Refusé" ? "#FCA5A5" : COLORS.border }}>
+    <div className="rounded-lg border bg-surface" style={{ borderColor: step.statut === "Refusé" ? COLORS.danger : COLORS.border }}>
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: step.statut === "Validé" ? "#DCFCE7" : COLORS.softStrong, color: step.statut === "Validé" ? "#16A34A" : COLORS.slate }}>
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: step.statut === "Validé" ? COLORS.successSoft : COLORS.softStrong, color: step.statut === "Validé" ? COLORS.success : COLORS.slate }}>
             {step.statut === "Validé" ? <Check size={13} /> : index + 1}
           </div>
           <div className="min-w-0">
             <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{step.titre}</p>
-            <p className="text-xs" style={{ color: COLORS.slateLight }}>{step.obligatoire ? "Obligatoire" : "Recommandé"}</p>
+            <p className="text-xs" style={{ color: COLORS.slateLight }}>{step.obligatoire ? "Requis pour le badge" : "Conseillé, en plus"}</p>
           </div>
         </div>
         <div className="flex items-center gap-2 shrink-0">
@@ -7898,37 +9810,37 @@ function RegulStepCard({ step, index, onChange }) {
           <p className="text-sm mt-4" style={{ color: COLORS.slate }}>{step.description}</p>
           <p className="text-sm mt-1 mb-3" style={{ color: COLORS.slateLight }}><span className="font-semibold">Où l'obtenir : </span>{step.ou}</p>
           {step.statut === "Refusé" && step.motif && (
-            <div className="rounded-md px-3 py-2 text-sm mb-3 flex items-start gap-2" style={{ background: "#FEE2E2", color: "#B91C1C" }}><AlertCircle size={15} className="mt-0.5 shrink-0" /> {step.motif}</div>
+            <div className="rounded-md px-3 py-2 text-sm mb-3 flex items-start gap-2" style={{ background: COLORS.dangerSoft, color: COLORS.danger }}><AlertCircle size={15} className="mt-0.5 shrink-0" /> {step.motif}</div>
           )}
           {step.statut === "En vérification" && <p className="text-sm" style={{ color: COLORS.orange }}>Document reçu le {step.envoyeLe}. Vérification par l'équipe LIGGEEY sous 72 h.</p>}
-          {step.statut === "Validé" && step.document && <p className="text-sm flex items-center gap-1.5" style={{ color: "#16A34A" }}><FileCheck2 size={15} /> {step.document}{step.valeur ? ` · ${step.valeur}` : ""}</p>}
+          {step.statut === "Validé" && step.document && <p className="text-sm flex items-center gap-1.5" style={{ color: COLORS.success }}><FileCheck2 size={15} /> {step.document}{step.valeur ? ` · ${step.valeur}` : ""}</p>}
           {editable && (
             <div className="flex flex-col gap-3">
               {step.champ && (
-                <label className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>
-                  {step.champ}
-                  <input value={valeur} onChange={(e) => setValeur(e.target.value)} className="mt-1 w-full max-w-sm block rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border, color: COLORS.slate }} />
-                </label>
+                <div className="max-w-sm">
+                  <label htmlFor={`regul-${step.id ?? index}-valeur`} className={AUTH.libelle}>{step.champ}</label>
+                  <input id={`regul-${step.id ?? index}-valeur`} value={valeur} onChange={(e) => setValeur(e.target.value)} className={FORM.champ()} />
+                </div>
               )}
               {step.choix && (
-                <label className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>
-                  Votre régime
-                  <select value={valeur} onChange={(e) => setValeur(e.target.value)} className="mt-1 w-full max-w-sm block rounded-md border px-3 py-2 text-sm outline-none" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
+                <div className="max-w-sm">
+                  <label htmlFor={`regul-${step.id ?? index}-regime`} className={AUTH.libelle}>Votre régime</label>
+                  <ListeChamp id={`regul-${step.id ?? index}-regime`} value={valeur} onChange={(e) => setValeur(e.target.value)}>
                     <option value="">Choisir…</option>
                     {step.choix.map((c) => <option key={c}>{c}</option>)}
-                  </select>
-                </label>
+                  </ListeChamp>
+                </div>
               )}
-              <div className="flex items-center gap-3 flex-wrap">
-                <FilePickerButton accept=".pdf,image/*" onPick={(f) => setFile(f.name)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
-                  <Upload size={14} /> {file ? "Changer le justificatif" : step.choix ? "Ajouter un justificatif (facultatif)" : "Ajouter le justificatif"}
+              <div className="flex flex-wrap items-center gap-3">
+                <FilePickerButton accept=".pdf,image/*" onPick={(f) => setFile(f.name)} className={FORM.fichier}>
+                  <Upload size={15} aria-hidden="true" /> {file ? "Changer le justificatif" : step.choix ? "Ajouter un justificatif (facultatif)" : "Ajouter le justificatif"}
                 </FilePickerButton>
-                {file && <span className="text-sm" style={{ color: COLORS.slate }}>{file}</span>}
+                {file && <span className="inline-flex items-center gap-1.5 text-sm text-principal"><FileCheck2 size={15} className="text-statut-succes" aria-hidden="true" /> {file}</span>}
               </div>
               <div>
-                <button type="button" disabled={!ready} onClick={() => onChange({ statut: "En vérification", valeur, document: file || "—", envoyeLe: todayFr(), motif: null })} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: ready ? 1 : 0.5 }}>
+                <App.Bouton disabled={!ready} onClick={() => onChange({ statut: "En vérification", valeur, document: file || "—", envoyeLe: todayFr(), motif: null })}>
                   Envoyer pour vérification
-                </button>
+                </App.Bouton>
               </div>
             </div>
           )}
@@ -7938,50 +9850,307 @@ function RegulStepCard({ step, index, onChange }) {
   );
 }
 
+const REGUL_ETAPES_EXPLIQUEES = [
+  { icone: Compass, titre: "Vous décidez", texte: "Rien n'est imposé. Vous commencez quand vous voulez, et vous pouvez faire une pause." },
+  { icone: MapPin, titre: "Vous obtenez vos papiers", texte: "Pour chaque étape, nous indiquons le document et le guichet où l'obtenir." },
+  { icone: Upload, titre: "Vous les envoyez ici", texte: "Une photo nette suffit. L'équipe LIGGEEY vérifie chaque document." },
+  { icone: BadgeCheck, titre: "Vous recevez le badge", texte: "« Activité régularisée » s'affiche sur votre profil, à la vue des clients." },
+];
+
+const REGUL_AVEC_SANS = [
+  ["Publier vos services et recevoir des missions", true, true],
+  ["Être payé par Wave ou Orange Money via LIGGEEY", true, true],
+  ["Badge « Activité régularisée » sur votre profil", false, true],
+  ["Devis et factures avec votre NINEA, souvent demandés par les entreprises", false, true],
+  ["Dossier prêt pour un crédit ou un microfinancement", false, true],
+  ["Protection sociale et assurance (étapes conseillées)", false, true],
+];
+
+const REGUL_QUESTIONS = [
+  { q: "Est-ce obligatoire pour travailler sur LIGGEEY ?", r: "Non. Vous pouvez proposer vos services et être payé sans régulariser votre activité. La régularisation vous ouvre simplement plus de portes." },
+  { q: "Combien ça coûte ?", r: "Le suivi sur LIGGEEY est gratuit, avec un guide en ligne. Certains organismes demandent des frais pour leurs documents : renseignez-vous auprès d'eux. Avec Premium, un conseiller prépare les dossiers avec vous." },
+  { q: "Qui voit mes documents ?", r: "Seule l'équipe LIGGEEY, pour les vérifier. Vos clients voient uniquement le badge." },
+  { q: "Je change d'avis : puis-je commencer plus tard ?", r: "Oui. Même si vous avez répondu « Non », vous pouvez commencer à tout moment depuis cet écran ou depuis votre profil." },
+  { q: "J'ai commencé mais je ne veux plus continuer : que se passe-t-il ?", r: "Vous arrêtez quand vous voulez avec le bouton « Arrêter la régularisation ». Vous ne recevez plus de rappels, vos missions et vos paiements continuent normalement. Les étapes déjà validées sont gardées, et les documents envoyés restent vus seulement par l'équipe LIGGEEY. Si vous reprenez un jour, vous repartez là où vous vous étiez arrêté." },
+];
+
+/* Écran Régularisation, organisé autour d'une question :
+   - pas encore de réponse : « Souhaitez-vous qu'on vous accompagne… ? » ;
+   - Oui (ou démarche déjà commencée) : les étapes à suivre ;
+   - Non : seulement les informations à savoir, avec la possibilité de changer d'avis. */
+function RegulQuestion({ choix, onOui, onNon, reprise = null }) {
+  const dejaNon = choix === "plus-tard";
+  return (
+    <section aria-labelledby="regul-question" className="rounded-lg border border-marque bg-surface p-5 sm:p-6">
+      <div className="flex flex-col gap-4 sm:flex-row sm:items-start">
+        <App.PastilleIcone icone={HeartHandshake} taille="lg" />
+        <div className="min-w-0 flex-1">
+          <h2 id="regul-question" className="text-lg font-semibold text-principal">
+            {reprise ? "Vous voulez reprendre ?" : dejaNon ? "Vous changez d'avis ?" : "Souhaitez-vous qu'on vous accompagne dans la régularisation de votre activité ?"}
+          </h2>
+          <p className="mt-2 text-[15px] leading-[1.7] text-secondaire">
+            {reprise
+              ? `Vous repartez là où vous vous étiez arrêté : ${reprise.valides} étape${reprise.valides > 1 ? "s" : ""} sur ${reprise.total} déjà validée${reprise.valides > 1 ? "s" : ""}.`
+              : dejaNon
+              ? "LIGGEEY peut vous guider étape par étape quand vous le souhaitez : quels papiers demander, où les obtenir, et la vérification de vos documents."
+              : "Régulariser, c'est déclarer officiellement votre activité (NINEA, immatriculation, régime fiscal). Ce n'est pas obligatoire : vous pouvez travailler et être payé sur LIGGEEY sans le faire. Si vous le souhaitez, nous vous guidons étape par étape."}
+          </p>
+          <div className="mt-4 flex flex-wrap gap-2">
+            <App.Bouton onClick={onOui}>{reprise ? "Reprendre ma régularisation" : "Oui, accompagnez-moi"}</App.Bouton>
+            {!dejaNon && <App.Bouton variante="neutre" onClick={onNon}>Non, pas maintenant</App.Bouton>}
+          </div>
+          <p className="mt-3 text-xs text-discret">Votre réponse ne change rien à vos missions ni à vos paiements. Vous pourrez changer d'avis à tout moment.</p>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+function RegulInfos() {
+  return (
+    <>
+      <section aria-labelledby="regul-comment">
+        <h2 id="regul-comment" className="mb-3 text-lg font-semibold text-principal">Bon à savoir : comment ça marche</h2>
+        <ol className="grid grid-cols-1 gap-3 sm:grid-cols-2 xl:grid-cols-4">
+          {REGUL_ETAPES_EXPLIQUEES.map((e, i) => (
+            <li key={e.titre} className="rounded-lg border border-base bg-surface p-4">
+              <div className="mb-2 flex items-center gap-2">
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-marque-doux text-xs font-semibold text-marque">{i + 1}</span>
+                <e.icone size={17} className="text-marque" aria-hidden="true" />
+              </div>
+              <p className="text-sm font-semibold text-principal">{e.titre}</p>
+              <p className="mt-1 text-sm text-secondaire">{e.texte}</p>
+            </li>
+          ))}
+        </ol>
+      </section>
+
+      <App.Carte titre="Avec ou sans régularisation" flush>
+        <div className="overflow-x-auto px-6 pb-4">
+          <table className="w-full min-w-[480px] text-sm">
+            <caption className="sr-only">Ce que vous pouvez faire avec ou sans régularisation</caption>
+            <thead>
+              <tr className="text-left text-discret">
+                <th scope="col" className="py-2 pr-4 font-semibold">Sur LIGGEEY, vous pouvez…</th>
+                <th scope="col" className="w-28 py-2 text-center font-semibold">Sans</th>
+                <th scope="col" className="w-28 py-2 text-center font-semibold text-marque">Avec</th>
+              </tr>
+            </thead>
+            <tbody>
+              {REGUL_AVEC_SANS.map(([label, sans, avec]) => (
+                <tr key={label} className="border-t border-dashed border-base">
+                  <td className="py-2.5 pr-4 text-principal">{label}</td>
+                  {[sans, avec].map((ok, k) => (
+                    <td key={k} className="py-2.5 text-center">
+                      {ok ? <Check size={17} className="inline text-statut-succes" aria-label="Oui" /> : <span className="text-discret" aria-label="Non">—</span>}
+                    </td>
+                  ))}
+                </tr>
+              ))}
+            </tbody>
+          </table>
+        </div>
+      </App.Carte>
+    </>
+  );
+}
+
+function RegulQuestionsFrequentes() {
+  return (
+    <App.Carte titre="Vos questions">
+      <div className="divide-y divide-dashed divide-base">
+        {REGUL_QUESTIONS.map((x) => (
+          <details key={x.q} className="group py-3">
+            <summary className="flex min-h-[44px] cursor-pointer list-none items-center justify-between gap-3 text-sm font-semibold text-principal">
+              {x.q}
+              <ChevronRight size={16} className="shrink-0 text-discret transition-transform group-open:rotate-90" aria-hidden="true" />
+            </summary>
+            <p className="pb-1 text-sm leading-[1.7] text-secondaire">{x.r}</p>
+          </details>
+        ))}
+      </div>
+    </App.Carte>
+  );
+}
+
+/* Carte « Régularisation » du profil prestataire : reflète le choix (pas encore répondu, non, oui)
+   et mène à l'écran Régularisation. */
+function CarteRegularisationProfil({ onNavigate }) {
+  const api = usePlan();
+  const [choix, setChoix] = useStore("regul-choix", null);
+  if (!api || !api.regulSteps) return null;
+  const steps = api.regulSteps;
+  const { valides, total, complete } = regulSummary(steps);
+  const engage = complete || regulEngage(steps, choix);
+
+  if (complete) {
+    return (
+      <App.Carte titre="Régularisation">
+        <p className="flex items-center gap-2 text-sm font-semibold text-statut-succes"><BadgeCheck size={16} aria-hidden="true" /> Activité régularisée</p>
+        <p className="mt-1 text-sm text-secondaire">Le badge s'affiche sur votre profil, à la vue des clients.</p>
+      </App.Carte>
+    );
+  }
+  if (engage) {
+    return (
+      <App.Carte titre="Régularisation" actions={<App.Badge ton="alerte" taille="moyen">En cours</App.Badge>}>
+        <p className="mb-2 text-sm text-secondaire">{valides} étape{valides > 1 ? "s" : ""} validée{valides > 1 ? "s" : ""} sur {total} pour obtenir le badge.</p>
+        <App.BarreProgression valeur={Math.round((valides / total) * 100)} label={`${valides} étapes validées sur ${total}`} />
+        <div className="mt-4"><App.Bouton petit variante="doux" onClick={() => onNavigate("regularisation")}>Continuer mes étapes</App.Bouton></div>
+      </App.Carte>
+    );
+  }
+  if (choix === "plus-tard" && regulCommencee(steps)) {
+    return (
+      <App.Carte titre="Régularisation" actions={<App.Badge ton="neutre" taille="moyen">Arrêtée</App.Badge>}>
+        <p className="text-sm text-secondaire">Vous avez arrêté en cours de route. {etapesGardees(valides, total)}.</p>
+        <div className="mt-4"><App.Bouton petit variante="doux" onClick={() => { setChoix("oui"); onNavigate("regularisation"); }}>Reprendre ma régularisation</App.Bouton></div>
+      </App.Carte>
+    );
+  }
+  if (choix === "plus-tard") {
+    return (
+      <App.Carte titre="Régularisation" actions={<App.Badge ton="neutre" taille="moyen">Facultatif</App.Badge>}>
+        <p className="text-sm text-secondaire">Vous avez choisi de ne pas régulariser votre activité pour l'instant. Vos missions et vos paiements continuent normalement.</p>
+        <div className="mt-4 flex flex-wrap gap-2">
+          <App.Bouton petit onClick={() => { setChoix("oui"); onNavigate("regularisation"); }}>J'ai changé d'avis</App.Bouton>
+          <App.Bouton petit variante="doux" onClick={() => onNavigate("regularisation")}>En savoir plus</App.Bouton>
+        </div>
+      </App.Carte>
+    );
+  }
+  return (
+    <App.Carte titre="Régularisation" actions={<App.Badge ton="neutre" taille="moyen">Facultatif</App.Badge>}>
+      <p className="text-sm font-semibold text-principal">Souhaitez-vous qu'on vous accompagne dans la régularisation de votre activité ?</p>
+      <p className="mt-1 text-sm text-secondaire">Ce n'est pas obligatoire : vous pouvez travailler et être payé sans le faire.</p>
+      <div className="mt-4 flex flex-wrap gap-2">
+        <App.Bouton petit onClick={() => { setChoix("oui"); onNavigate("regularisation"); }}>Oui</App.Bouton>
+        <App.Bouton petit variante="neutre" onClick={() => { setChoix("plus-tard"); notify("C'est noté : aucun rappel ne vous sera envoyé.", "info"); }}>Non, pas maintenant</App.Bouton>
+      </div>
+    </App.Carte>
+  );
+}
+
 function RegularisationScreen({ steps, setSteps }) {
   const planApi = usePlan();
+  const [choix, setChoix] = useStore("regul-choix", null);
   const { valides, total, complete } = regulSummary(steps);
-  const enVerif = steps.filter((s) => s.statut === "En vérification").length;
+  const enVerif = steps.filter((st) => st.statut === "En vérification").length;
   const accompOk = planApi && planApi.can("accompagnementRegularisation");
-  return (
-    <div>
-      <div className="flex items-center gap-3 flex-wrap mb-1">
-        <span aria-hidden="true" />
-        <RegulBadge />
-      </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Formalisez votre activité pour rassurer vos clients et accéder aux missions des entreprises.</p>
+  const engage = complete || regulEngage(steps, choix);
+  const arretee = !engage && choix === "plus-tard" && regulCommencee(steps);
+  const [confirmerArret, setConfirmerArret] = useState(false);
 
-      <div className="rounded-lg p-6 mb-6 grid grid-cols-1 md:grid-cols-[1fr,1.2fr] gap-6" style={{ background: COLORS.dark }}>
-        <div>
-          <p className="text-sm mb-1" style={{ color: COLORS.onDarkMuted }}>Étapes obligatoires validées</p>
-          <p className="text-3xl font-bold text-sur-sombre mb-3">{valides} / {total}</p>
-          <ProgressBar pct={(valides / total) * 100} color={complete ? "#4ADE80" : COLORS.orange} track={COLORS.darkLine} />
-          <p className="text-sm mt-3" style={{ color: COLORS.onDarkMuted }}>{complete ? "Votre activité est régularisée. Le badge s'affiche sur votre profil." : enVerif ? `${enVerif} document${enVerif > 1 ? "s" : ""} en cours de vérification.` : "Complétez les étapes ci-dessous pour obtenir le badge."}</p>
+  const oui = () => { setChoix("oui"); window.scrollTo(0, 0); notify(arretee ? "Bon retour ! Vous reprenez là où vous vous étiez arrêté." : "C'est parti ! Voici les étapes à suivre, à votre rythme."); };
+  const non = () => { setChoix("plus-tard"); window.scrollTo(0, 0); notify("C'est noté : aucun rappel ne vous sera envoyé. Les informations restent disponibles ici.", "info"); };
+  const arreter = () => { setConfirmerArret(false); setChoix("plus-tard"); window.scrollTo(0, 0); notify("Régularisation arrêtée. Vos étapes validées sont gardées : vous pourrez reprendre à tout moment.", "info"); };
+
+  // Pas encore de réponse : la question seule.
+  if (!engage && choix === null) {
+    return (
+      <div className="space-y-6">
+        <RegulQuestion choix={choix} onOui={oui} onNon={non} />
+      </div>
+    );
+  }
+
+  // Non : les informations à savoir, et la possibilité de changer d'avis.
+  if (!engage) {
+    return (
+      <div className="space-y-6">
+        <div className="flex items-start gap-3 rounded-lg border border-base bg-doux p-4">
+          <Check size={18} className="mt-0.5 shrink-0 text-statut-succes" aria-hidden="true" />
+          <p className="text-sm text-principal">
+            {arretee
+              ? <>Vous avez arrêté votre régularisation. <span className="text-secondaire">Vos services, vos missions et vos paiements continuent normalement. {etapesGardees(valides, total)}{enVerif ? `, et ${enVerif} document${enVerif > 1 ? "s" : ""} déjà envoyé${enVerif > 1 ? "s" : ""} ${enVerif > 1 ? "sont" : "est"} encore vérifié${enVerif > 1 ? "s" : ""} par l'équipe` : ""}.</span></>
+              : <>Vous avez choisi de ne pas régulariser votre activité pour l'instant. <span className="text-secondaire">Vos services, vos missions et vos paiements continuent normalement.</span></>}
+          </p>
         </div>
+        {arretee && <RegulQuestion choix={choix} onOui={oui} onNon={non} reprise={{ valides, total }} />}
+        <RegulInfos />
+        <RegulQuestionsFrequentes />
+        {!arretee && <RegulQuestion choix={choix} onOui={oui} onNon={non} />}
+        <p className="text-xs text-discret">Les démarches et organismes indiqués sont donnés à titre d'orientation. Renseignez-vous auprès de l'organisme concerné pour les conditions et frais en vigueur.</p>
+      </div>
+    );
+  }
+
+  // Oui : les étapes à suivre.
+  return (
+    <div className="space-y-6">
+      <div className="grid grid-cols-1 gap-6 rounded-lg p-6 md:grid-cols-[1fr,auto] md:items-center" style={{ background: COLORS.dark }}>
         <div>
-          <p className="text-sm font-semibold text-sur-sombre mb-2">Ce que la régularisation vous apporte</p>
-          {["Badge « Activité régularisée » visible par les clients", "Accès aux missions proposées par les entreprises", "Factures et devis conformes", "Dossier prêt pour un crédit ou un microfinancement"].map((a) => (
-            <p key={a} className="text-sm flex items-start gap-2 py-0.5" style={{ color: COLORS.onDarkMuted }}><Check size={14} color={COLORS.orange} className="mt-0.5 shrink-0" /> {a}</p>
+          <div className="mb-2 flex flex-wrap items-center gap-2">
+            <p className="text-sm font-semibold text-sur-sombre">Votre régularisation, accompagnée par LIGGEEY</p>
+            <RegulBadge size="sm" />
+          </div>
+          <p className="mb-1 text-sm" style={{ color: COLORS.onDarkMuted }}>Étapes validées pour le badge</p>
+          <p className="mb-3 text-3xl font-bold text-sur-sombre">{valides} / {total}</p>
+          <ProgressBar pct={(valides / total) * 100} color={complete ? COLORS.successBright : COLORS.orange} track={COLORS.darkLine} />
+          <p className="mt-3 text-sm" style={{ color: COLORS.onDarkMuted }}>{complete ? "Votre activité est régularisée. Le badge s'affiche sur votre profil." : enVerif ? `${enVerif} document${enVerif > 1 ? "s" : ""} en cours de vérification.` : "Suivez les étapes ci-dessous, à votre rythme."}</p>
+        </div>
+        {!complete && (
+          <App.Bouton petit variante="clair" onClick={() => setConfirmerArret(true)} className="justify-self-start md:justify-self-end">
+            <X size={16} aria-hidden="true" /> Arrêter la régularisation
+          </App.Bouton>
+        )}
+      </div>
+
+      {confirmerArret && (
+        <ModalFrame onClose={() => setConfirmerArret(false)} labelledBy="regul-arret-titre">
+          <div className="p-6">
+            <h3 id="regul-arret-titre" className="mb-2 text-lg font-semibold text-principal">Ne plus continuer la régularisation ?</h3>
+            <p className="mb-3 text-sm text-secondaire">C'est votre choix, et vous pouvez revenir dessus à tout moment.</p>
+            <ul className="mb-6 space-y-2 text-sm text-principal">
+              {[
+                "Vos missions et vos paiements continuent normalement.",
+                "Vous ne recevez plus de rappels.",
+                `${etapesGardees(valides)} : vous reprendrez là où vous vous êtes arrêté.`,
+                "Le badge « Activité régularisée » ne s'affichera que si vous allez jusqu'au bout.",
+              ].map((t) => (
+                <li key={t} className="flex items-start gap-2"><Check size={15} className="mt-0.5 shrink-0 text-statut-succes" aria-hidden="true" /> {t}</li>
+              ))}
+            </ul>
+            <div className="flex flex-wrap justify-end gap-2">
+              <App.Bouton petit variante="neutre" onClick={() => setConfirmerArret(false)}>Continuer mes étapes</App.Bouton>
+              <App.Bouton petit onClick={arreter}>Oui, arrêter</App.Bouton>
+            </div>
+          </div>
+        </ModalFrame>
+      )}
+
+      <section aria-labelledby="regul-etapes">
+        <h2 id="regul-etapes" className="mb-1 text-lg font-semibold text-principal">Les étapes à suivre</h2>
+        <p className="mb-3 text-sm text-secondaire">Pour chaque étape : le document à obtenir, où le demander, puis l'envoi ici. L'équipe LIGGEEY vérifie chaque document.</p>
+        <div className="flex flex-col gap-3">
+          {steps.map((st, i) => (
+            <RegulStepCard key={st.id + st.statut} step={st} index={i} onChange={(patch) => { setSteps((l) => l.map((x) => (x.id === st.id ? { ...x, ...patch } : x))); if (choix !== "oui") setChoix("oui"); notify(`« ${st.titre} » envoyé pour vérification.`); }} />
           ))}
         </div>
-      </div>
+        {!complete && (
+          <div className="mt-3 flex flex-col gap-3 rounded-lg border border-base bg-doux p-4 sm:flex-row sm:items-center sm:justify-between">
+            <p className="text-sm text-principal">
+              Vous ne souhaitez plus continuer ? <span className="text-secondaire">Vous pouvez arrêter à tout moment : vos missions et vos paiements ne changent pas.</span>
+            </p>
+            <App.Bouton petit variante="neutre" onClick={() => setConfirmerArret(true)} className="shrink-0 border border-forte">
+              <X size={16} aria-hidden="true" /> Arrêter la régularisation
+            </App.Bouton>
+          </div>
+        )}
+      </section>
 
-      <div className="rounded-lg border bg-surface p-5 mb-6 flex flex-col sm:flex-row sm:items-center justify-between gap-3" style={{ borderColor: accompOk ? COLORS.border : COLORS.orange }}>
+      <div className="flex flex-col justify-between gap-3 rounded-lg border bg-surface p-5 sm:flex-row sm:items-center" style={{ borderColor: accompOk ? COLORS.border : COLORS.orange }}>
         <div>
-          <p className="font-semibold flex items-center gap-2" style={{ color: COLORS.slate }}>Accompagnement par un conseiller {!accompOk && <PremiumChip locked />}</p>
-          <p className="text-sm" style={{ color: COLORS.slateLight }}>Un conseiller LIGGEEY vous aide à préparer vos dossiers et vous oriente vers les bons guichets.</p>
+          <p className="flex items-center gap-2 font-semibold" style={{ color: COLORS.slate }}>Besoin d'aide pour vos dossiers ? {!accompOk && <PremiumChip locked />}</p>
+          <p className="text-sm" style={{ color: COLORS.slateLight }}>Un conseiller LIGGEEY prépare les dossiers avec vous et vous oriente vers les bons guichets.</p>
         </div>
-        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque shrink-0 inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           {!accompOk && <Lock size={13} />} Être rappelé(e) par un conseiller
         </button>
       </div>
 
-      <div className="flex flex-col gap-3">
-        {steps.map((s, i) => (
-          <RegulStepCard key={s.id + s.statut} step={s} index={i} onChange={(patch) => { setSteps((l) => l.map((x) => (x.id === s.id ? { ...x, ...patch } : x))); notify(`« ${s.titre} » envoyé pour vérification.`); }} />
-        ))}
-      </div>
-      <p className="text-xs mt-4" style={{ color: COLORS.slateLight }}>Les démarches et organismes indiqués sont donnés à titre d'orientation. Renseignez-vous auprès de l'organisme concerné pour les conditions et frais en vigueur.</p>
+      <RegulQuestionsFrequentes />
+      <p className="text-xs text-discret">Les démarches et organismes indiqués sont donnés à titre d'orientation. Renseignez-vous auprès de l'organisme concerné pour les conditions et frais en vigueur.</p>
     </div>
   );
 }
@@ -8004,7 +10173,22 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
 
   return (
     <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Vérifiez les justificatifs envoyés par les prestataires pour régulariser leur activité.</p>
+      <div className="mb-6 flex flex-wrap items-start justify-between gap-3">
+        <p className="text-sm" style={{ color: COLORS.slateLight }}>Vérifiez les justificatifs envoyés par les prestataires pour régulariser leur activité.</p>
+        <ExportAdmin
+          titre="Justificatifs de régularisation"
+          lignes={[...demandes, ...traitees]}
+          colonnes={[
+            { titre: "Prestataire", valeur: (d) => d.prestataire },
+            { titre: "Métier", valeur: (d) => d.metier },
+            { titre: "Étape", valeur: (d) => d.etape },
+            { titre: "Document", valeur: (d) => d.document },
+            { titre: "Valeur déclarée", valeur: (d) => d.valeur },
+            { titre: "Envoyé le", valeur: (d) => d.date },
+            { titre: "Statut", valeur: (d) => d.statut },
+          ]}
+        />
+      </div>
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <StatCard icon={FileCheck2} value={demandes.length} label="Justificatifs à vérifier" />
         <StatCard icon={BadgeCheck} value="38 %" label="Prestataires régularisés" />
@@ -8024,15 +10208,18 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
               {refusing !== d.id && (
                 <div className="flex gap-2 shrink-0">
                   <button type="button" onClick={() => setRefusing(d.id)} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Refuser</button>
-                  <button type="button" onClick={() => decide(d, "Validé")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: "#16A34A" }}>Valider</button>
+                  <button type="button" onClick={() => decide(d, "Validé")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-statut" style={{ background: COLORS.success }}>Valider</button>
                 </div>
               )}
             </div>
             {refusing === d.id && (
-              <div className="mt-3 flex flex-col sm:flex-row gap-2">
-                <input value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Motif du refus, visible par le prestataire" className="flex-1 rounded-md border px-3 py-2 text-sm outline-none focus:border-primaire-400" style={{ borderColor: COLORS.border }} />
-                <button type="button" disabled={!motif.trim()} onClick={() => decide(d, "Refusé", motif)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-sombre" style={{ background: COLORS.danger, opacity: motif.trim() ? 1 : 0.5 }}>Confirmer le refus</button>
-                <button type="button" onClick={() => { setRefusing(null); setMotif(""); }} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+              <div className="mt-4">
+                <label htmlFor={`motif-regul-${d.id}`} className={AUTH.libelle}>Motif du refus, visible par le prestataire</label>
+                <div className="flex flex-col gap-3 sm:flex-row">
+                  <input id={`motif-regul-${d.id}`} value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Ex : document illisible, merci de le renvoyer" className={`${FORM.champ()} flex-1`} />
+                  <App.Bouton variante="neutre" onClick={() => { setRefusing(null); setMotif(""); }} className="min-h-[48px]">Annuler</App.Bouton>
+                  <BoutonDanger disabled={!motif.trim()} onClick={() => decide(d, "Refusé", motif)}>Confirmer le refus</BoutonDanger>
+                </div>
               </div>
             )}
           </div>
@@ -8060,47 +10247,43 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
    PROFILS : informations modifiables (chercheur et prestataire)
    ===================================================================== */
 
-const PROFIL_CHERCHEUR_INITIAL = { email: "absatou.diallo@example.com", ville: "Dakar", profession: "Commerciale", telephone: "+221 77 123 45 67" };
+const PROFIL_CHERCHEUR_INITIAL = { email: "absatou.diallo@example.com", ville: "Dakar", profession: "Chargée de clientèle", telephone: "+221 77 123 45 67" };
 const PROFIL_PRESTATAIRE_INITIAL = { metier: "Électricien bâtiment", email: "mamadou.ndiaye@email.sn", telephone: "+221 76 412 33 08", localisation: "Dakar, Sénégal" };
 
 function ProfilInfoModal({ nom, fields, values, onSave, onClose }) {
-  const [v, setV] = useState(values);
-  const [touched, setTouched] = useState(false);
-  const emailOk = !("email" in v) || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email);
-  const filled = fields.every((f) => String(v[f.key] || "").trim());
-  function save() {
-    setTouched(true);
-    if (!emailOk || !filled) return;
+  const f = useFormulaire(values, (v) => Object.fromEntries(fields.map((c) => {
+    const val = String(v[c.key] || "").trim();
+    if (!val) return [c.key, `Indiquez : ${c.label.toLowerCase()}.`];
+    if (c.key === "email" && !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(val)) return [c.key, "Saisissez une adresse e-mail valide, par exemple nom@exemple.com."];
+    return [c.key, false];
+  })));
+  function save(v) {
     onSave(v);
     notify("Profil mis à jour.");
     onClose();
   }
   return (
     <ModalFrame onClose={onClose} labelledBy="edit-profil-title">
-      <div className="p-6">
-        <h3 id="edit-profil-title" className="text-lg font-bold mb-1" style={{ color: COLORS.slate }}>Modifier le profil</h3>
-        <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>{nom} · le nom est vérifié et ne peut pas être modifié ici.</p>
-        <div className="flex flex-col gap-3 mb-5">
-          {fields.map((f) => (
-            <label key={f.key} className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>
-              {f.label}
-              <input
-                type={f.type || "text"}
-                value={v[f.key] || ""}
-                onChange={(e) => setV((s) => ({ ...s, [f.key]: e.target.value }))}
-                className="mt-1 w-full block rounded-md border px-3 py-2.5 text-sm outline-none focus:border-primaire-400"
-                style={{ borderColor: touched && (!String(v[f.key] || "").trim() || (f.key === "email" && !emailOk)) ? COLORS.danger : COLORS.border, color: COLORS.slate }}
-              />
-            </label>
+      <form onSubmit={f.soumettre(save)} noValidate className="p-6">
+        <div className="mb-5 flex items-start justify-between gap-4">
+          <div>
+            <h3 id="edit-profil-title" className="text-lg font-semibold text-principal">Modifier le profil</h3>
+            <p className="mt-0.5 text-sm text-secondaire">{nom} · le nom est vérifié et ne peut pas être modifié ici.</p>
+          </div>
+          <App.BoutonIcone icone={X} label="Fermer" onClick={onClose} />
+        </div>
+        <div className="space-y-5">
+          {fields.map((c) => (
+            <Champ key={c.key} id={`profil-${c.key}`} label={c.label} requis erreur={f.err(c.key)}>
+              <input {...f.attrs(`profil-${c.key}`, c.key, { requis: true })} type={c.type || "text"} className={FORM.champ(f.err(c.key))} />
+            </Champ>
           ))}
-          {touched && !filled && <p className="text-xs" style={{ color: COLORS.danger }}>Tous les champs sont obligatoires.</p>}
-          {touched && filled && !emailOk && <p className="text-xs" style={{ color: COLORS.danger }}>Saisissez une adresse e-mail valide, par exemple nom@exemple.com.</p>}
         </div>
-        <div className="flex justify-end gap-2">
-          <button type="button" onClick={onClose} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
-          <button type="button" onClick={save} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Enregistrer</button>
+        <div className={FORM.actions}>
+          <App.Bouton variante="neutre" onClick={onClose}>Annuler</App.Bouton>
+          <App.Bouton type="submit">Enregistrer</App.Bouton>
         </div>
-      </div>
+      </form>
     </ModalFrame>
   );
 }
@@ -8459,42 +10642,91 @@ function CapOrientationScreen({ onNavigate }) {
 function CapAteliersScreen() {
   const { moi } = useJeuneConnecte();
   const [inscrits, setInscrits] = useStore("cap-ateliers", ["at-couture"]);
+  const [vue, setVue] = useState("tous");
+  const [query, setQuery] = useState("");
   const mineur = estMineur(moi);
 
   function basculer(a) {
     if (inscrits.includes(a.id)) {
       setInscrits((l) => l.filter((x) => x !== a.id));
-      notify("Inscription annulée.");
+      notify("Inscription annulée.", "info");
     } else {
       setInscrits((l) => [...l, a.id]);
       notify(mineur ? "Inscription enregistrée. Votre parent ou tuteur est prévenu par SMS." : "Inscription enregistrée.");
     }
   }
 
+  const q = sansAccents(query.trim());
+  const filtered = ATELIERS_CAP.filter((a) =>
+    (vue === "tous" || inscrits.includes(a.id)) &&
+    (!q || sansAccents([a.titre, a.texte, a.lieu].join(" ")).includes(q)));
+  const pagination = usePaginationListe(filtered);
+
   return (
     <div className="space-y-6">
       <p className="text-sm text-secondaire">Des ateliers courts pour découvrir un métier avant de vous lancer, avec des professionnels.</p>
-      <ul className="grid grid-cols-1 gap-4 md:grid-cols-2">
-        {ATELIERS_CAP.map((a) => {
-          const inscrit = inscrits.includes(a.id);
-          return (
-            <li key={a.id}>
-              <App.Carte titre={a.titre} actions={inscrit && <App.Badge ton="succes" taille="moyen">Inscrit</App.Badge>} className="h-full">
-                <p className="mb-3 text-sm text-secondaire">{a.texte}</p>
-                <App.LigneInfo icone={Calendar} libelle="Date">{dateLongue(a.date)} · {a.heure}</App.LigneInfo>
-                <App.LigneInfo icone={MapPin} libelle="Lieu">{a.lieu}</App.LigneInfo>
-                <App.LigneInfo icone={Users2} libelle="Places">{a.places}</App.LigneInfo>
-                {mineur && a.noteMineur && <p className="mt-2 text-xs font-medium text-statut-info">{a.noteMineur}</p>}
-                <div className="mt-4">
+
+      <BarreFiltres label="Rechercher un atelier">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); pagination.setPage(1); }}
+          placeholder="Métier ou lieu…"
+          label="Rechercher un atelier"
+          className="w-full lg:flex-1"
+        />
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Afficher"
+          actif={vue}
+          onChange={(v) => { setVue(v); pagination.setPage(1); }}
+          options={[
+            { id: "tous", label: `Tous (${ATELIERS_CAP.length})` },
+            { id: "mes", label: `Mes inscriptions (${ATELIERS_CAP.filter((a) => inscrits.includes(a.id)).length})` },
+          ]}
+        />
+        <CompteResultats n={filtered.length} nom="atelier" />
+      </div>
+
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((a) => {
+            const inscrit = inscrits.includes(a.id);
+            return (
+              <CarteListe
+                key={a.id}
+                visuel={<VisuelDate iso={a.date} />}
+                titre={a.titre}
+                badges={inscrit && <App.Badge ton="succes" point taille="moyen">Inscrit</App.Badge>}
+                sousTitre={a.texte}
+                meta={<>
+                  <MetaOffre icone={Clock}>{dateLongue(a.date)} · {a.heure}</MetaOffre>
+                  <MetaOffre icone={MapPin}>{a.lieu}</MetaOffre>
+                  <MetaOffre icone={UsersRound}>{a.places} places</MetaOffre>
+                </>}
+                actions={
                   <App.Bouton petit variante={inscrit ? "neutre" : "principal"} onClick={() => basculer(a)}>
                     {inscrit ? "Annuler mon inscription" : "M'inscrire"}
                   </App.Bouton>
-                </div>
-              </App.Carte>
-            </li>
-          );
-        })}
-      </ul>
+                }
+              >
+                {mineur && a.noteMineur && <p className="mt-3 text-xs font-medium text-statut-info">{a.noteMineur}</p>}
+              </CarteListe>
+            );
+          })}
+        </div>
+      ) : (
+        <ListeVide
+          icone={GraduationCap}
+          titre={vue === "mes" && !q ? "Vous n'êtes inscrit à aucun atelier" : "Aucun atelier ne correspond"}
+          texte={vue === "mes" && !q ? "Choisissez un atelier pour découvrir un métier." : "Essayez un autre mot-clé."}
+          action={<App.Bouton petit variante="neutre" onClick={() => { setVue("tous"); setQuery(""); }}>Voir tous les ateliers</App.Bouton>}
+        />
+      )}
+
+      <PiedListe pagination={pagination} />
     </div>
   );
 }
@@ -8508,7 +10740,7 @@ function DemandeSeanceForm({ mineur, onEnvoyer, libelle = "Envoyer ma demande", 
   const [format, setFormat] = useState(formats[0]);
   const [message, setMessage] = useState("");
   const [essai, setEssai] = useState(false);
-  const champ = "h-11 w-full rounded-md border border-base bg-surface px-3 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40";
+  const uid = React.useId();
 
   function envoyer(e) {
     e.preventDefault();
@@ -8521,34 +10753,30 @@ function DemandeSeanceForm({ mineur, onEnvoyer, libelle = "Envoyer ma demande", 
   }
 
   return (
-    <form onSubmit={envoyer} noValidate className="space-y-3">
-      <div className="grid grid-cols-1 gap-3 sm:grid-cols-3">
-        <label className="text-sm font-medium text-principal">
-          Date
-          <input type="date" value={date} min={isoDuJour()} onChange={(e) => setDate(e.target.value)} aria-invalid={(essai && !date) || undefined} className={`${champ} mt-1 ${essai && !date ? "border-statut-danger" : ""}`} />
-        </label>
-        <label className="text-sm font-medium text-principal">
-          Heure
-          <select value={heure} onChange={(e) => setHeure(e.target.value)} className={`${champ} mt-1`}>
+    <form onSubmit={envoyer} noValidate>
+      <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
+        <Champ id={`${uid}-date`} label="Date" requis erreur={essai && !date ? "Choisissez une date." : null} large>
+          <input id={`${uid}-date`} type="date" value={date} min={isoDuJour()} onChange={(e) => setDate(e.target.value)} aria-required="true" aria-invalid={(essai && !date) || undefined} aria-describedby={essai && !date ? `${uid}-date-aide` : undefined} className={FORM.champ(essai && !date)} />
+        </Champ>
+        <Champ id={`${uid}-heure`} label="Heure">
+          <ListeChamp id={`${uid}-heure`} value={heure} onChange={(e) => setHeure(e.target.value)}>
             {HEURES_SEANCE.map((h) => <option key={h}>{h}</option>)}
-          </select>
-        </label>
-        <label className="text-sm font-medium text-principal">
-          Format
-          <select value={format} onChange={(e) => setFormat(e.target.value)} className={`${champ} mt-1`}>
+          </ListeChamp>
+        </Champ>
+        <Champ id={`${uid}-format`} label="Format" aide={mineur ? "Avant 18 ans, les séances ont lieu au bureau de Dakar ou en groupe." : null}>
+          <ListeChamp id={`${uid}-format`} value={format} onChange={(e) => setFormat(e.target.value)} aria-describedby={mineur ? `${uid}-format-aide` : undefined}>
             {formats.map((f) => <option key={f}>{f}</option>)}
-          </select>
-        </label>
+          </ListeChamp>
+        </Champ>
+        {avecMessage && (
+          <Champ id={`${uid}-message`} label="Message (facultatif)" large>
+            <textarea id={`${uid}-message`} value={message} onChange={(e) => setMessage(e.target.value)} rows={3} className={FORM.zone()} />
+          </Champ>
+        )}
       </div>
-      {essai && !date && <p role="alert" className="text-xs text-statut-danger">Choisissez une date.</p>}
-      {avecMessage && (
-        <label className="block text-sm font-medium text-principal">
-          Message (facultatif)
-          <textarea value={message} onChange={(e) => setMessage(e.target.value)} rows={2} className="mt-1 w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
-        </label>
-      )}
-      {mineur && <p className="text-xs text-secondaire">Avant 18 ans, les séances ont lieu au bureau de Dakar ou en groupe.</p>}
-      <App.Bouton type="submit" petit>{libelle}</App.Bouton>
+      <div className="mt-5">
+        <App.Bouton type="submit">{libelle}</App.Bouton>
+      </div>
     </form>
   );
 }
@@ -8590,10 +10818,8 @@ function CapMentorScreen() {
       <div className="space-y-6">
         <App.Carte titre="Demander un mentor">
           <p className="mb-4 text-sm text-secondaire">Dites-nous quel professionnel vous aimeriez rencontrer. L'équipe LIGGEEY choisit votre mentor et vous prévient.</p>
-          <label className="block text-sm font-medium text-principal">
-            Le mentor que vous souhaitez
-            <textarea value={souhait} onChange={(e) => setSouhait(e.target.value)} rows={3} placeholder="Ex : une couturière qui a son propre atelier" className="mt-1 w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
-          </label>
+          <label htmlFor="souhait-mentor" className={AUTH.libelle}>Le mentor que vous souhaitez</label>
+          <textarea id="souhait-mentor" value={souhait} onChange={(e) => setSouhait(e.target.value)} rows={3} placeholder="Ex : une couturière qui a son propre atelier" className={FORM.zone()} />
           <div className="mt-4">
             <App.Bouton onClick={() => { majMoi({ souhait: souhait.trim() }); notify("Demande envoyée. L'équipe LIGGEEY vous propose un mentor dès que possible."); }}>Envoyer ma demande</App.Bouton>
           </div>
@@ -8603,20 +10829,25 @@ function CapMentorScreen() {
     );
   }
 
+  const profil = mentorProfile(mentor);
+  const prochaine = mesSeances[0];
+
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <App.CarteProfil
-          photo={mentor.photo}
-          nom={mentor.nom}
-          sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
-          badges={<App.Badge ton="succes" taille="moyen">Mentor vérifié par LIGGEEY</App.Badge>}
-        >
-          {mentor.tagline && <p className="mt-4 text-sm text-secondaire">{mentor.tagline}</p>}
-        </App.CarteProfil>
+      <EnTeteFiche
+        visuel={<AvatarListe nom={mentor.nom} photo={mentor.photo} taille="lg" />}
+        badges={<App.Badge ton="succes" taille="moyen"><BadgeCheck size={13} aria-hidden="true" /> Mentor vérifié par LIGGEEY</App.Badge>}
+        titre={mentor.nom}
+        sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
+        meta={<>
+          <MetaOffre icone={MessageCircle}>{profil.langues.join(", ")}</MetaOffre>
+          {prochaine && <MetaOffre icone={CalendarDays}>Prochaine séance : {dateLongue(prochaine.date)} · {prochaine.heure}</MetaOffre>}
+        </>}
+      />
 
-        <div className="space-y-4 xl:col-span-2">
-          <App.Carte titre="Mes séances">
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Mes séances" sousTitre={`${mesSeances.length} séance${mesSeances.length > 1 ? "s" : ""} prévue${mesSeances.length > 1 ? "s" : ""} ou demandée${mesSeances.length > 1 ? "s" : ""}`}>
             <ListeSeances seances={mesSeances} jeunes={[moi]} />
           </App.Carte>
           <App.Carte titre="Demander une séance">
@@ -8628,64 +10859,164 @@ function CapMentorScreen() {
               }}
             />
           </App.Carte>
-        </div>
-      </div>
-
-      <App.Carte titre="Comptes rendus de mon mentor">
-        {mesNotes.length === 0 ? (
-          <p className="text-sm text-secondaire">Après chaque séance, votre mentor écrit ici ce que vous avez vu ensemble.</p>
-        ) : (
-          <ul className="space-y-4">
-            {mesNotes.map((n) => (
-              <li key={n.date + n.note} className="border-l-2 border-marque pl-4">
-                <p className="text-xs font-semibold text-discret">{n.date}</p>
-                <p className="text-sm text-principal">{n.note}</p>
-              </li>
-            ))}
-          </ul>
-        )}
-      </App.Carte>
-
-      {mineur && <NoteMineur>Un souci avec une séance ou avec votre mentor ? Parlez-en à votre parent ou écrivez à l'équipe LIGGEEY sur WhatsApp : nous sommes là pour vous protéger.</NoteMineur>}
+          <App.Carte titre="Comptes rendus de mon mentor">
+            {mesNotes.length === 0 ? (
+              <p className="text-sm text-secondaire">Après chaque séance, votre mentor écrit ici ce que vous avez vu ensemble.</p>
+            ) : (
+              <ul className="space-y-4">
+                {mesNotes.map((n) => (
+                  <li key={n.date + n.note} className="border-l-2 border-marque pl-4">
+                    <p className="text-xs font-semibold text-discret">{n.date}</p>
+                    <p className="text-sm text-principal">{n.note}</p>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </App.Carte>
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Aperçu du mentor"
+            items={[
+              { icone: Briefcase, libelle: "Métier", valeur: mentor.role },
+              { icone: TrendingUp, libelle: "Expérience", valeur: `${mentor.exp} ans` },
+              { icone: MessageCircle, libelle: "Langues", valeur: profil.langues.join(", ") },
+              { icone: Video, libelle: "Séances", valeur: (mineur ? FORMATS_SEANCE_MINEUR : FORMATS_SEANCE).join(", ") },
+            ]}
+          />
+          {mentor.tagline && (
+            <App.Carte titre="À propos">
+              <p className="text-sm leading-[1.7] text-secondaire">{mentor.tagline}</p>
+            </App.Carte>
+          )}
+          {mineur && <NoteMineur>Un souci avec une séance ou avec votre mentor ? Parlez-en à votre parent ou écrivez à l'équipe LIGGEEY sur WhatsApp : nous sommes là pour vous protéger.</NoteMineur>}
+        </>}
+      />
     </div>
   );
 }
 
 /* ---------- Cap Métier (jeune) : mon profil ---------- */
 
-function CapProfilScreen() {
+function CapProfilScreen({ onNavigate = () => {} }) {
   const { moi } = useJeuneConnecte();
+  const [inscrits] = useStore("cap-ateliers", ["at-couture"]);
+  const [seances] = useStore("mentorat-seances", SEANCES_INITIAL);
+  const [notes] = useStore("mentorat-notes", NOTES_MENTORAT_INITIAL);
   const age = ageAu(moi.naissance);
+  const mineur = age < AGE_MAJORITE;
   const naissance = new Date(`${moi.naissance}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const mentor = MENTORS.find((m) => m.id === moi.mentorId);
+  const mesAteliers = ATELIERS_CAP.filter((a) => inscrits.includes(a.id));
+  const mesSeances = seances.filter((s) => s.mentoreId === moi.id && ["Confirmée", "Demandée"].includes(s.statut));
+  const mesNotes = notes[moi.id] || [];
+  const etape = ETAPES_CAP[Math.min(moi.etape, ETAPES_CAP.length - 1)];
+
   return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <App.CarteProfil
-        nom={moi.nom}
-        sousTitre={moi.piste ? `Cap Métier · ${moi.piste}` : "Cap Métier"}
-        badges={age < AGE_MAJORITE ? <BadgeMineur age={age} /> : null}
-        infos={[
-          { icone: Calendar, libelle: "Date de naissance", valeur: `${naissance} (${age} ans)` },
-          { icone: MapPin, libelle: "Ville", valeur: moi.ville },
-          { icone: Phone, libelle: "Téléphone", valeur: moi.telephone },
-          { icone: CalendarCheck, libelle: "Inscription", valeur: moi.inscription },
+    <div className="space-y-6">
+      <EnTeteFiche
+        visuel={<AvatarListe nom={moi.nom} taille="lg" />}
+        badges={<>
+          <App.Badge ton="marque" taille="moyen">Cap Métier</App.Badge>
+          {mineur && <BadgeMineur age={age} />}
+          {moi.parent && <StatusBadge status={moi.parent.accord === "Confirmé" ? "Accord confirmé" : "Accord en attente"} />}
+        </>}
+        titre={moi.nom}
+        sousTitre={moi.piste ? `Piste métier : ${moi.piste}` : "Piste métier à choisir avec votre mentor"}
+        meta={<>
+          <MetaOffre icone={MapPin}>{moi.ville}</MetaOffre>
+          <MetaOffre icone={CalendarCheck}>Inscription : {moi.inscription}</MetaOffre>
+        </>}
+      />
+
+      <ChiffresProfil
+        items={[
+          { icone: Flag, valeur: `${moi.etape + 1} / ${ETAPES_CAP.length}`, label: "Étape du parcours", detail: etape.label, onClick: () => onNavigate("dashboard") },
+          { icone: GraduationCap, valeur: mesAteliers.length, label: "Ateliers réservés", detail: "Voir les ateliers", ton: "info", onClick: () => onNavigate("ateliers") },
+          { icone: CalendarDays, valeur: mesSeances.length, label: "Séances avec mon mentor", detail: "Prévues ou demandées", ton: "alerte", onClick: () => onNavigate("mentor") },
+          { icone: FileText, valeur: mesNotes.length, label: "Comptes rendus", detail: "Écrits par votre mentor", ton: "succes", onClick: () => onNavigate("mentor") },
         ]}
       />
-      <div className="space-y-4">
-        {moi.parent && (
-          <App.Carte titre="Mon parent ou tuteur" actions={<StatusBadge status={moi.parent.accord === "Confirmé" ? "Accord confirmé" : "Accord en attente"} />}>
-            <App.LigneInfo icone={UserCircle2} libelle="Nom">{moi.parent.nom}</App.LigneInfo>
-            <App.LigneInfo icone={HeartHandshake} libelle="Lien">{moi.parent.lien}</App.LigneInfo>
-            <App.LigneInfo icone={Phone} libelle="Téléphone">{moi.parent.telephone}</App.LigneInfo>
+
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="Mon parcours" sousTitre={moi.piste ? `Piste : ${moi.piste}` : "Piste métier à choisir"}>
+            <EtapesCap etape={moi.etape} />
+            <p className="mb-2 mt-4 text-sm font-semibold text-principal">Mes objectifs</p>
+            {moi.objectifs.length === 0 ? (
+              <p className="text-sm text-secondaire">Vous les fixerez avec votre mentor.</p>
+            ) : (
+              <ListeCoches items={moi.objectifs} />
+            )}
           </App.Carte>
-        )}
-        <App.Carte titre="À 18 ans">
-          <p className="text-sm text-secondaire">
-            {age < AGE_MAJORITE
-              ? `À partir du ${dateMajorite(moi.naissance)}, vous pourrez ouvrir l'espace emploi pour postuler aux offres, ou l'espace prestataire pour travailler à votre compte. Votre parcours Cap Métier vous suivra.`
-              : "Vous pouvez ouvrir l'espace emploi ou l'espace prestataire. Votre mentor vous aide à choisir."}
-          </p>
-        </App.Carte>
-      </div>
+
+          <App.Carte titre="Mes ateliers" actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("ateliers")}>Voir les ateliers</App.Bouton>} flush>
+            {mesAteliers.length === 0 ? (
+              <p className="px-6 pb-6 text-sm text-secondaire">Vous n'êtes inscrit à aucun atelier pour le moment.</p>
+            ) : (
+              <ul className="divide-y divide-base border-t border-base">
+                {mesAteliers.map((a) => (
+                  <li key={a.id} className="flex items-center gap-3 px-6 py-4">
+                    <VisuelDate iso={a.date} />
+                    <div className="min-w-0">
+                      <p className="truncate text-sm font-semibold text-principal">{a.titre}</p>
+                      <p className="truncate text-xs text-discret">{a.heure} · {a.lieu}</p>
+                    </div>
+                  </li>
+                ))}
+              </ul>
+            )}
+          </App.Carte>
+
+          <App.Carte titre="Mon mentor">
+            {mentor ? (
+              <div className="flex flex-wrap items-center justify-between gap-4">
+                <div className="flex min-w-0 items-center gap-3">
+                  <AvatarListe nom={mentor.nom} photo={mentor.photo} />
+                  <div className="min-w-0">
+                    <p className="font-semibold text-principal">{mentor.nom}</p>
+                    <p className="text-sm text-discret">{mentor.role} · {mentor.exp} ans d'expérience</p>
+                  </div>
+                </div>
+                <App.Bouton petit variante="neutre" onClick={() => onNavigate("mentor")}>Voir mon mentor</App.Bouton>
+              </div>
+            ) : (
+              <p className="text-sm text-secondaire">
+                {mineur && moi.parent?.accord !== "Confirmé"
+                  ? "Votre mentor sera attribué dès que votre parent ou tuteur aura confirmé son accord."
+                  : "L'équipe LIGGEEY choisit votre mentor et vous prévient."}
+              </p>
+            )}
+          </App.Carte>
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Mes informations"
+            items={[
+              { icone: Calendar, libelle: "Date de naissance", valeur: `${naissance} (${age} ans)` },
+              { icone: MapPin, libelle: "Ville", valeur: moi.ville },
+              { icone: Phone, libelle: "Téléphone", valeur: moi.telephone },
+              { icone: CalendarCheck, libelle: "Inscription", valeur: moi.inscription },
+            ]}
+          />
+          {moi.parent && (
+            <App.Carte titre="Mon parent ou tuteur" actions={<StatusBadge status={moi.parent.accord === "Confirmé" ? "Accord confirmé" : "Accord en attente"} />}>
+              <div className="divide-y divide-dashed divide-base">
+                <App.LigneInfo icone={UserCircle2} libelle="Nom">{moi.parent.nom}</App.LigneInfo>
+                <App.LigneInfo icone={HeartHandshake} libelle="Lien">{moi.parent.lien}</App.LigneInfo>
+                <App.LigneInfo icone={Phone} libelle="Téléphone">{moi.parent.telephone}</App.LigneInfo>
+              </div>
+            </App.Carte>
+          )}
+          <App.Carte titre="À 18 ans">
+            <p className="text-sm text-secondaire">
+              {mineur
+                ? `À partir du ${dateMajorite(moi.naissance)}, vous pourrez ouvrir l'espace emploi pour postuler aux offres, ou l'espace prestataire pour travailler à votre compte. Votre parcours Cap Métier vous suivra.`
+                : "Vous pouvez ouvrir l'espace emploi ou l'espace prestataire. Votre mentor vous aide à choisir."}
+            </p>
+          </App.Carte>
+        </>}
+      />
     </div>
   );
 }
@@ -8765,6 +11096,8 @@ function MentoreDetail({ mentore, onBack }) {
   const sesNotes = notes[mentore.id] || [];
   const sesSeances = seances.filter((s) => s.mentoreId === mentore.id).sort(parDate);
   const majJeune = (patch) => setJeunes((l) => l.map((j) => (j.id === mentore.id ? { ...j, ...patch } : j)));
+  const ville = mentore.mineur ? "Masquée" : (jeune || mentore.chercheur).ville;
+  const depuis = jeune ? jeune.inscription : mentore.chercheur.depuis;
 
   function ajouterNote() {
     if (!brouillon.trim()) return;
@@ -8775,31 +11108,30 @@ function MentoreDetail({ mentore, onBack }) {
 
   return (
     <div className="space-y-6">
-      <button type="button" onClick={onBack} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-medium text-marque">
-        <ArrowLeft size={14} aria-hidden="true" /> Retour aux mentorés
-      </button>
+      <BoutonRetour onClick={onBack}>Retour aux mentorés</BoutonRetour>
 
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <div className="space-y-4">
-          <App.CarteProfil
-            nom={mentore.nom}
-            sousTitre={mentore.sous}
-            badges={<>{mentore.mineur && <BadgeMineur age={mentore.age} />}<App.Badge ton="marque" taille="moyen">{mentore.type}</App.Badge></>}
-            infos={[
-              { icone: MapPin, libelle: "Ville", valeur: mentore.mineur ? "Masquée" : (jeune || mentore.chercheur).ville },
-              { icone: Phone, libelle: "Téléphone", valeur: mentore.mineur ? "Masqué" : jeune ? jeune.telephone : "Par la messagerie LIGGEEY" },
-              { icone: CalendarCheck, libelle: "Suivi depuis", valeur: jeune ? jeune.inscription : mentore.chercheur.depuis },
-            ]}
-          />
-          {mentore.mineur && (
-            <NoteMineur>{prenom} a moins de 18 ans. Vos échanges passent par LIGGEEY, et les séances ont lieu en groupe ou au bureau de Dakar. Son parent ou tuteur est prévenu de chaque séance.</NoteMineur>
-          )}
-          <App.Bouton variante="neutre" pleineLargeur onClick={() => notify("Signalement transmis à l'équipe LIGGEEY. Elle vous recontacte rapidement.")}>
-            <AlertCircle size={16} aria-hidden="true" /> Signaler une situation préoccupante
+      <EnTeteFiche
+        visuel={<AvatarListe nom={mentore.nom} taille="lg" />}
+        badges={<>
+          {mentore.mineur && <BadgeMineur age={mentore.age} />}
+          <App.Badge ton="marque" taille="moyen">{mentore.type}</App.Badge>
+        </>}
+        titre={mentore.nom}
+        sousTitre={mentore.sous}
+        meta={<>
+          <MetaOffre icone={MapPin}>{ville}</MetaOffre>
+          <MetaOffre icone={CalendarCheck}>Suivi depuis le {depuis}</MetaOffre>
+          {jeune && <MetaOffre icone={Flag}>Étape {jeune.etape + 1} / {ETAPES_CAP.length}</MetaOffre>}
+        </>}
+        actions={
+          <App.Bouton variante="neutre" onClick={() => notify("Signalement transmis à l'équipe LIGGEEY. Elle vous recontacte rapidement.")}>
+            <AlertCircle size={16} aria-hidden="true" /> Signaler une situation
           </App.Bouton>
-        </div>
+        }
+      />
 
-        <div className="space-y-4 xl:col-span-2">
+      <MiseEnPageFiche
+        principal={<>
           {jeune && (
             <App.Carte
               titre="Parcours Cap Métier"
@@ -8822,36 +11154,36 @@ function MentoreDetail({ mentore, onBack }) {
               </ul>
               <form className="flex gap-2" onSubmit={(e) => { e.preventDefault(); if (!objectif.trim()) return; majJeune({ objectifs: [...jeune.objectifs, objectif.trim()] }); setObjectif(""); }}>
                 <label htmlFor="nouvel-objectif" className="sr-only">Nouvel objectif</label>
-                <input id="nouvel-objectif" value={objectif} onChange={(e) => setObjectif(e.target.value)} placeholder="Ajouter un objectif" className="h-11 min-w-0 flex-1 rounded-md border border-base bg-surface px-3 text-sm outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
-                <App.Bouton type="submit" petit variante="doux">Ajouter</App.Bouton>
+                <input id="nouvel-objectif" value={objectif} onChange={(e) => setObjectif(e.target.value)} placeholder="Ajouter un objectif" className={`${FORM.champ()} min-w-0 flex-1`} />
+                <App.Bouton type="submit" variante="doux" className="min-h-[48px]"><Plus size={16} aria-hidden="true" /> Ajouter</App.Bouton>
               </form>
             </App.Carte>
           )}
 
           {mentore.chercheur && (
-            <App.Carte titre="Candidatures" sousTitre={`Objectif : ${mentore.chercheur.objectif}`}>
-              <App.Tableau
-                legende={`Candidatures de ${mentore.nom}`}
-                cleLigne="poste"
-                lignes={mentore.chercheur.candidatures}
-                colonnes={[
-                  { cle: "poste", titre: "Poste", rendu: (c) => <App.CelluleIdentite titre={c.poste} sousTitre={c.entreprise} /> },
-                  { cle: "date", titre: "Envoyée le", masqueMobile: true },
-                  { cle: "statut", titre: "Statut", rendu: (c) => <StatusBadge status={c.statut} /> },
-                ]}
-              />
+            <App.Carte titre="Candidatures" sousTitre={`Objectif : ${mentore.chercheur.objectif}`} flush>
+              <ul className="divide-y divide-base border-t border-base">
+                {mentore.chercheur.candidatures.map((c) => (
+                  <li key={c.poste + c.entreprise} className="flex items-center justify-between gap-3 px-6 py-4">
+                    <div className="flex min-w-0 items-center gap-3">
+                      <LogoEntreprise nom={c.entreprise} />
+                      <div className="min-w-0">
+                        <p className="truncate text-sm font-semibold text-principal">{c.poste}</p>
+                        <p className="truncate text-xs text-discret">{c.entreprise} · {c.date}</p>
+                      </div>
+                    </div>
+                    <StatusBadge status={c.statut} />
+                  </li>
+                ))}
+              </ul>
             </App.Carte>
           )}
 
-          <App.Carte titre="Séances">
-            <ListeSeances seances={sesSeances} jeunes={jeunes} />
-          </App.Carte>
-
           <App.Carte titre="Comptes rendus" sousTitre={`${prenom} les voit dans son espace`}>
-            <label htmlFor="nouveau-compte-rendu" className="mb-1 block text-sm font-medium text-principal">Nouveau compte rendu</label>
-            <textarea id="nouveau-compte-rendu" value={brouillon} onChange={(e) => setBrouillon(e.target.value)} rows={3} placeholder="Ce que vous avez vu ensemble, et la prochaine étape" className="w-full rounded-md border border-base bg-surface px-3 py-2 text-sm text-principal outline-none focus:border-marque focus:ring-2 focus:ring-focus/40" />
-            <div className="mb-5 mt-2">
-              <App.Bouton petit onClick={ajouterNote} disabled={!brouillon.trim()}>Enregistrer</App.Bouton>
+            <label htmlFor="nouveau-compte-rendu" className={AUTH.libelle}>Nouveau compte rendu</label>
+            <textarea id="nouveau-compte-rendu" value={brouillon} onChange={(e) => setBrouillon(e.target.value)} rows={3} placeholder="Ce que vous avez vu ensemble, et la prochaine étape" className={FORM.zone()} />
+            <div className="mb-5 mt-3">
+              <App.Bouton onClick={ajouterNote} disabled={!brouillon.trim()}>Enregistrer</App.Bouton>
             </div>
             <ul className="space-y-4">
               {sesNotes.map((n) => (
@@ -8862,8 +11194,25 @@ function MentoreDetail({ mentore, onBack }) {
               ))}
             </ul>
           </App.Carte>
-        </div>
-      </div>
+        </>}
+        cote={<>
+          <ApercuFiche
+            titre="Aperçu du mentoré"
+            items={[
+              { icone: Compass, libelle: "Parcours", valeur: mentore.type },
+              { icone: MapPin, libelle: "Ville", valeur: ville },
+              { icone: Phone, libelle: "Téléphone", valeur: mentore.mineur ? "Masqué" : jeune ? jeune.telephone : "Par la messagerie LIGGEEY" },
+              { icone: CalendarCheck, libelle: "Suivi depuis", valeur: depuis },
+            ]}
+          />
+          <App.Carte titre="Séances">
+            <ListeSeances seances={sesSeances} jeunes={jeunes} />
+          </App.Carte>
+          {mentore.mineur && (
+            <NoteMineur>{prenom} a moins de 18 ans. Vos échanges passent par LIGGEEY, et les séances ont lieu en groupe ou au bureau de Dakar. Son parent ou tuteur est prévenu de chaque séance.</NoteMineur>
+          )}
+        </>}
+      />
     </div>
   );
 }
@@ -8875,49 +11224,69 @@ function MentoresScreen({ initialId }) {
   const [filtre, setFiltre] = useState("tous");
   const [recherche, setRecherche] = useState("");
   const selected = mentores.find((m) => m.id === selectedId);
+  const TYPES = [
+    { id: "tous", label: "Tous", test: () => true },
+    { id: "cap", label: "Cap Métier", test: (m) => m.type === "Cap Métier" },
+    { id: "chercheur", label: "Chercheurs d'emploi", test: (m) => m.type === "Chercheur" },
+  ];
+  const q = sansAccents(recherche.trim());
+  const liste = mentores.filter((m) => TYPES.find((t) => t.id === filtre).test(m) && (!q || sansAccents(m.nom + " " + m.sous).includes(q)));
+  const pagination = usePaginationListe(liste);
 
   if (selected) return <MentoreDetail mentore={selected} onBack={() => setSelectedId(null)} />;
-
-  const liste = mentores
-    .filter((m) => filtre === "tous" || (filtre === "cap" ? m.type === "Cap Métier" : m.type === "Chercheur"))
-    .filter((m) => (m.nom + m.sous).toLowerCase().includes(recherche.toLowerCase()));
 
   return (
     <div className="space-y-6">
       <p className="text-sm text-secondaire">Les jeunes que l'équipe LIGGEEY vous a confiés.</p>
-      <div className="flex flex-wrap items-center gap-3">
-        <App.ChampRecherche valeur={recherche} onChange={setRecherche} placeholder="Rechercher un mentoré" />
+
+      <BarreFiltres label="Rechercher un mentoré">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={recherche}
+          onChange={(v) => { setRecherche(v); pagination.setPage(1); }}
+          placeholder="Nom ou parcours…"
+          label="Rechercher un mentoré"
+          className="w-full lg:flex-1"
+        />
+      </BarreFiltres>
+
+      <div className="flex flex-wrap items-center justify-between gap-3">
         <App.Segments
           label="Type de parcours"
           actif={filtre}
-          onChange={setFiltre}
-          options={[{ id: "tous", label: "Tous" }, { id: "cap", label: "Cap Métier" }, { id: "chercheur", label: "Chercheurs d'emploi" }]}
+          onChange={(v) => { setFiltre(v); pagination.setPage(1); }}
+          options={TYPES.map((t) => ({ id: t.id, label: `${t.label} (${mentores.filter(t.test).length})` }))}
         />
+        <CompteResultats n={liste.length} nom="mentoré" />
       </div>
-      {liste.length === 0 ? (
-        <App.EtatVide icone={Users2} titre="Aucun mentoré" texte="Aucun mentoré ne correspond à votre recherche." />
-      ) : (
-        <ul className="grid grid-cols-1 gap-4 sm:grid-cols-2 lg:grid-cols-3">
-          {liste.map((m) => (
-            <li key={m.id}>
-              <button type="button" onClick={() => setSelectedId(m.id)} className="flex h-full w-full flex-col gap-3 rounded-lg border border-base bg-surface p-5 text-left transition-colors hover:border-marque">
-                <span className="flex items-center gap-3">
-                  <App.Avatar nom={m.nom} taille="md" />
-                  <span className="min-w-0">
-                    <span className="block font-semibold text-principal">{m.nom}</span>
-                    <span className="block text-sm text-discret">{m.sous}</span>
-                  </span>
-                </span>
-                <span className="flex flex-wrap gap-2">
-                  {m.mineur && <BadgeMineur age={m.age} />}
-                  {m.jeune && <App.Badge ton="neutre" taille="moyen">Étape {m.jeune.etape + 1} / {ETAPES_CAP.length}</App.Badge>}
-                  {m.chercheur && <App.Badge ton="neutre" taille="moyen">{m.chercheur.candidatures.length} candidatures</App.Badge>}
-                </span>
-              </button>
-            </li>
+
+      {pagination.paged.length > 0 ? (
+        <div className="space-y-4">
+          {pagination.paged.map((m) => (
+            <CarteListe
+              key={m.id}
+              onOpen={() => { setSelectedId(m.id); window.scrollTo(0, 0); }}
+              visuel={<AvatarListe nom={m.nom} />}
+              titre={m.nom}
+              badges={<>
+                {m.mineur && <BadgeMineur age={m.age} />}
+                <App.Badge ton="marque" taille="moyen">{m.type}</App.Badge>
+              </>}
+              sousTitre={m.sous}
+              meta={<>
+                {m.jeune && <MetaOffre icone={Flag}>Étape {m.jeune.etape + 1} / {ETAPES_CAP.length}</MetaOffre>}
+                {m.chercheur && <MetaOffre icone={ClipboardList}>{m.chercheur.candidatures.length} candidature{m.chercheur.candidatures.length > 1 ? "s" : ""}</MetaOffre>}
+                {!m.mineur && (m.jeune || m.chercheur)?.ville && <MetaOffre icone={MapPin}>{(m.jeune || m.chercheur).ville}</MetaOffre>}
+              </>}
+              actions={<App.Bouton petit variante="neutre" onClick={() => setSelectedId(m.id)}>Voir le suivi</App.Bouton>}
+            />
           ))}
-        </ul>
+        </div>
+      ) : (
+        <ListeVide icone={Users2} titre="Aucun mentoré" texte="Aucun mentoré ne correspond à votre recherche." />
       )}
+
+      <PiedListe pagination={pagination} />
     </div>
   );
 }
@@ -8936,111 +11305,171 @@ function SeancesMentorScreen() {
   const [pourId, setPourId] = useState(mentores[0]?.id || "");
   const pour = mentores.find((m) => m.id === pourId);
   const statut = (id, s) => setSeances((l) => l.map((x) => (x.id === id ? { ...x, statut: s } : x)));
+  const liste = onglet === "demandes" ? demandes : aVenir;
+  const pagination = usePaginationListe(liste);
 
   return (
     <div className="space-y-6">
-      <div className="grid grid-cols-1 gap-4 xl:grid-cols-3">
-        <App.Carte flush className="xl:col-span-2">
-          <div className="px-5 pt-2">
-            <App.Onglets
+      <p className="text-sm text-secondaire">Acceptez les demandes de vos mentorés et retrouvez vos séances à venir.</p>
+
+      <MiseEnPageFiche
+        principal={<>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <App.Segments
               label="Séances"
               actif={onglet}
-              onChange={setOnglet}
-              onglets={[{ id: "demandes", label: "Demandes", compte: demandes.length }, { id: "avenir", label: "À venir", compte: aVenir.length }]}
+              onChange={(v) => { setOnglet(v); pagination.setPage(1); }}
+              options={[{ id: "demandes", label: `Demandes (${demandes.length})` }, { id: "avenir", label: `À venir (${aVenir.length})` }]}
             />
+            <CompteResultats n={liste.length} nom="séance" feminin />
           </div>
-          <div className="px-5 pb-4">
-            {onglet === "demandes" ? (
-              <ListeSeances
-                seances={demandes}
-                jeunes={jeunes}
-                avecNom
-                actions={(s) => (
-                  <>
-                    <App.Bouton petit onClick={() => { statut(s.id, "Confirmée"); notify("Séance confirmée. Le mentoré est prévenu."); }}>Accepter</App.Bouton>
-                    <App.Bouton petit variante="neutre" onClick={() => { statut(s.id, "Refusée"); notify("Demande refusée. Proposez un autre créneau au mentoré."); }}>Refuser</App.Bouton>
-                  </>
-                )}
-              />
-            ) : (
-              <ListeSeances
-                seances={aVenir}
-                jeunes={jeunes}
-                avecNom
-                actions={(s) => <App.Bouton petit variante="neutre" onClick={() => { statut(s.id, "Annulée"); notify("Séance annulée. Le mentoré est prévenu."); }}>Annuler</App.Bouton>}
-              />
-            )}
-          </div>
-        </App.Carte>
 
-        <App.Carte titre="Proposer une séance">
-          <label className="mb-3 block text-sm font-medium text-principal">
-            Mentoré
-            <select value={pourId} onChange={(e) => setPourId(e.target.value)} className="mt-1 h-11 w-full rounded-md border border-base bg-surface px-3 text-sm text-principal outline-none focus:border-marque">
-              {mentores.map((m) => <option key={m.id} value={m.id}>{m.nom}{m.mineur ? " (mineur)" : ""}</option>)}
-            </select>
-          </label>
-          {pour && (
-            <DemandeSeanceForm
-              key={pour.id}
-              mineur={pour.mineur}
-              avecMessage={false}
-              libelle="Programmer la séance"
-              onEnvoyer={(s) => {
-                setSeances((l) => [...l, { id: `se${Date.now()}`, mentoreId: pour.id, statut: "Confirmée", ...s }]);
-                notify(pour.mineur ? `Séance programmée. ${pour.nom.split(" ")[0]} et son parent ou tuteur sont prévenus.` : `Séance programmée. ${pour.nom.split(" ")[0]} est prévenu.`);
-              }}
+          {pagination.paged.length > 0 ? (
+            <div className="space-y-4">
+              {pagination.paged.map((s) => {
+                const m = mentores.find((x) => x.id === s.mentoreId);
+                return (
+                  <CarteListe
+                    key={s.id}
+                    visuel={<VisuelDate iso={s.date} />}
+                    titre={nomMentore(s.mentoreId, jeunes)}
+                    badges={<>
+                      <StatusBadge status={s.statut} />
+                      {m?.mineur && <BadgeMineur age={m.age} />}
+                    </>}
+                    sousTitre={`${dateLongue(s.date)} · ${s.heure}`}
+                    meta={<MetaOffre icone={s.format === "Visio" ? Video : s.format === "Téléphone" ? Phone : MapPin}>{s.format}</MetaOffre>}
+                    actions={onglet === "demandes" ? (
+                      <>
+                        <App.Bouton petit variante="neutre" onClick={() => { statut(s.id, "Refusée"); notify("Demande refusée. Proposez un autre créneau au mentoré.", "info"); }}>Refuser</App.Bouton>
+                        <App.Bouton petit onClick={() => { statut(s.id, "Confirmée"); notify("Séance confirmée. Le mentoré est prévenu."); }}>Accepter</App.Bouton>
+                      </>
+                    ) : (
+                      <App.Bouton petit variante="neutre" onClick={() => { statut(s.id, "Annulée"); notify("Séance annulée. Le mentoré est prévenu.", "info"); }}>Annuler</App.Bouton>
+                    )}
+                  >
+                    {s.message && <p className="mt-3 text-sm italic text-secondaire">« {s.message} »</p>}
+                  </CarteListe>
+                );
+              })}
+            </div>
+          ) : (
+            <ListeVide
+              icone={CalendarDays}
+              titre={onglet === "demandes" ? "Aucune demande en attente" : "Aucune séance à venir"}
+              texte="Proposez une séance à l'un de vos mentorés."
             />
           )}
-        </App.Carte>
-      </div>
+
+          <PiedListe pagination={pagination} />
+        </>}
+        cote={
+          <App.Carte titre="Proposer une séance">
+            <div className="mb-5">
+              <label htmlFor="seance-mentore" className={AUTH.libelle}>Mentoré</label>
+              <ListeChamp id="seance-mentore" value={pourId} onChange={(e) => setPourId(e.target.value)}>
+                {mentores.map((m) => <option key={m.id} value={m.id}>{m.nom}{m.mineur ? " (mineur)" : ""}</option>)}
+              </ListeChamp>
+            </div>
+            {pour && (
+              <DemandeSeanceForm
+                key={pour.id}
+                mineur={pour.mineur}
+                avecMessage={false}
+                libelle="Programmer la séance"
+                onEnvoyer={(s) => {
+                  setSeances((l) => [...l, { id: `se${Date.now()}`, mentoreId: pour.id, statut: "Confirmée", ...s }]);
+                  notify(pour.mineur ? `Séance programmée. ${pour.nom.split(" ")[0]} et son parent ou tuteur sont prévenus.` : `Séance programmée. ${pour.nom.split(" ")[0]} est prévenu.`);
+                }}
+              />
+            )}
+          </App.Carte>
+        }
+      />
     </div>
   );
 }
 
 /* ---------- Espace mentor : mon profil ---------- */
 
-function MentorProfilScreen() {
+function MentorProfilScreen({ onNavigate = () => {} }) {
   const [disponible, setDisponible] = useStore("mentor-disponible", true);
-  const m = mentorProfile(MENTOR_CONNECTE);
-  return (
-    <div className="grid grid-cols-1 gap-4 xl:grid-cols-2">
-      <App.CarteProfil
-        photo={MENTOR_CONNECTE.photo}
-        nom={MENTOR_CONNECTE.nom}
-        sousTitre={`${MENTOR_CONNECTE.role} · ${MENTOR_CONNECTE.exp} ans d'expérience`}
-        badges={<App.Badge ton="succes" taille="moyen">Profil vérifié par LIGGEEY</App.Badge>}
-        infos={[
-          { icone: Users2, libelle: "Mentorés accompagnés", valeur: m.stats.mentores },
-          { icone: Star, libelle: "Note des mentorés", valeur: m.stats.note },
-          { icone: Clock, libelle: "Mentor depuis", valeur: m.stats.anciennete },
-        ]}
-      >
-        <p className="mb-2 mt-5 text-sm font-semibold text-principal">Compétences</p>
-        <div className="flex flex-wrap gap-1.5">
-          {(MENTOR_CONNECTE.competences || []).map((c) => <App.Badge key={c} ton="marque" taille="moyen">{c}</App.Badge>)}
-        </div>
-      </App.CarteProfil>
+  const [jeunes] = useStore("cap-jeunes", JEUNES_CAP_INITIAL);
+  const [seances] = useStore("mentorat-seances", SEANCES_INITIAL);
+  const [notes] = useStore("mentorat-notes", NOTES_MENTORAT_INITIAL);
+  const mentor = MENTOR_CONNECTE;
+  const m = mentorProfile(mentor);
+  const mentores = mentoresDe(mentor.id, jeunes);
+  const ids = new Set(mentores.map((x) => x.id));
+  const miennes = seances.filter((s) => ids.has(s.mentoreId));
+  const aVenir = miennes.filter((s) => s.statut === "Confirmée").length;
+  const demandes = miennes.filter((s) => s.statut === "Demandée").length;
+  const comptesRendus = mentores.reduce((n, x) => n + (notes[x.id] || []).length, 0);
 
-      <div className="space-y-4">
-        <App.Carte titre="Disponibilité">
-          <App.Interrupteur
-            actif={disponible}
-            onChange={setDisponible}
-            label="Accepter de nouveaux mentorés"
-            description="L'équipe LIGGEEY vous attribue des jeunes seulement si cette option est active."
+  return (
+    <div className="space-y-6">
+      <EnTeteFiche
+        visuel={<AvatarListe nom={mentor.nom} photo={mentor.photo} taille="lg" />}
+        badges={<>
+          <App.Badge ton="succes" taille="moyen"><BadgeCheck size={13} aria-hidden="true" /> Mentor vérifié par LIGGEEY</App.Badge>
+          <App.Badge ton={disponible ? "succes" : "neutre"} point taille="moyen">{disponible ? "Accepte de nouveaux mentorés" : "Complet pour le moment"}</App.Badge>
+        </>}
+        titre={mentor.nom}
+        sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
+        meta={<>
+          <MetaOffre icone={MessageCircle}>{m.langues.join(", ")}</MetaOffre>
+          <MetaOffre icone={Video}>{m.formats.join(", ")}</MetaOffre>
+          <MetaOffre icone={Star}>{m.stats.note}</MetaOffre>
+        </>}
+      />
+
+      <ChiffresProfil
+        items={[
+          { icone: Users2, valeur: mentores.length, label: "Mentorés suivis", detail: (() => { const n = mentores.filter((x) => x.mineur).length; return `dont ${n} mineur${n > 1 ? "s" : ""}`; })(), onClick: () => onNavigate("mentores") },
+          { icone: CalendarDays, valeur: aVenir, label: "Séances à venir", detail: "Confirmées", ton: "info", onClick: () => onNavigate("seances") },
+          { icone: ClipboardList, valeur: demandes, label: "Demandes à traiter", detail: "Séances demandées", ton: "alerte", onClick: () => onNavigate("seances") },
+          { icone: FileText, valeur: comptesRendus, label: "Comptes rendus", detail: "Rédigés pour vos mentorés", ton: "succes", onClick: () => onNavigate("mentores") },
+        ]}
+      />
+
+      <MiseEnPageFiche
+        principal={<>
+          <App.Carte titre="À propos">
+            <p className="text-[15px] leading-[1.7] text-secondaire">{m.bio}</p>
+          </App.Carte>
+          <App.Carte titre="Parcours professionnel">
+            <FriseParcours etapes={m.parcours} />
+          </App.Carte>
+          <App.Carte titre="Domaines d'accompagnement">
+            <Etiquettes items={mentor.competences || m.themes} />
+          </App.Carte>
+          <App.Carte titre="Charte du mentor" actions={<StatusBadge status="Signée" />}>
+            <ListeCoches items={CHARTE_MENTOR} />
+          </App.Carte>
+        </>}
+        cote={<>
+          <App.Carte titre="Disponibilité">
+            <App.Interrupteur
+              actif={disponible}
+              onChange={setDisponible}
+              label="Accepter de nouveaux mentorés"
+              description="L'équipe LIGGEEY vous attribue des jeunes seulement si cette option est active."
+            />
+          </App.Carte>
+          <ApercuFiche
+            titre="Mes informations"
+            items={[
+              { icone: Briefcase, libelle: "Métier", valeur: mentor.role },
+              { icone: TrendingUp, libelle: "Expérience", valeur: `${mentor.exp} ans` },
+              { icone: MessageCircle, libelle: "Langues", valeur: m.langues.join(", ") },
+              { icone: Video, libelle: "Formats des séances", valeur: m.formats.join(", ") },
+              { icone: CalendarCheck, libelle: "Mentor sur LIGGEEY depuis", valeur: m.stats.anciennete },
+              { icone: UsersRound, libelle: "Mentorés accompagnés au total", valeur: m.stats.mentores },
+              { icone: Star, libelle: "Note des mentorés", valeur: m.stats.note },
+            ]}
           />
-        </App.Carte>
-        <App.Carte titre="Charte du mentor" actions={<StatusBadge status="Signée" />}>
-          <ul className="space-y-2">
-            {CHARTE_MENTOR.map((r) => (
-              <li key={r} className="flex items-start gap-2 text-sm text-principal">
-                <CheckCircle2 size={16} className="mt-0.5 shrink-0 text-statut-succes" aria-hidden="true" />{r}
-              </li>
-            ))}
-          </ul>
-        </App.Carte>
-      </div>
+        </>}
+      />
     </div>
   );
 }
@@ -9100,14 +11529,14 @@ function CapMetierAdminDetail({ jeune, onBack, maj }) {
               <NoteMineur>Le mentor pourra être attribué après l'accord du parent ou tuteur.</NoteMineur>
             ) : (
               <div className="flex flex-wrap items-end gap-3">
-                <label className="min-w-[220px] flex-1 text-sm font-medium text-principal">
-                  Choisir un mentor
-                  <select value={mentorId} onChange={(e) => setMentorId(e.target.value)} className="mt-1 h-11 w-full rounded-md border border-base bg-surface px-3 text-sm text-principal outline-none focus:border-marque">
+                <div className="min-w-[220px] flex-1">
+                  <label htmlFor={`mentor-${jeune.id}`} className={AUTH.libelle}>Choisir un mentor</label>
+                  <ListeChamp id={`mentor-${jeune.id}`} value={mentorId} onChange={(e) => setMentorId(e.target.value)}>
                     <option value="">Choisir</option>
                     {MENTORS.map((m) => <option key={m.id} value={m.id}>{m.nom} · {m.role}</option>)}
-                  </select>
-                </label>
-                <App.Bouton onClick={attribuer} disabled={!mentorId || mentorId === jeune.mentorId}>{mentor ? "Changer de mentor" : "Attribuer"}</App.Bouton>
+                  </ListeChamp>
+                </div>
+                <App.Bouton className="min-h-[48px]" onClick={attribuer} disabled={!mentorId || mentorId === jeune.mentorId}>{mentor ? "Changer de mentor" : "Attribuer"}</App.Bouton>
               </div>
             )}
           </App.Carte>
@@ -9150,12 +11579,26 @@ function CapMetierAdminScreen() {
         <StatCard icon={Phone} value={compte("accord")} label="Accords parentaux" detail="En attente de réponse" tone="danger" onClick={() => setFiltre("accord")} />
       </div>
       <App.Carte flush>
-        <div className="p-4">
+        <div className="flex flex-wrap items-center justify-between gap-3 p-4">
           <App.Segments
             label="Filtrer les jeunes"
             actif={filtre}
             onChange={setFiltre}
             options={[{ id: "tous", label: "Tous" }, { id: "attribuer", label: "Mentor à attribuer" }, { id: "accord", label: "Accord en attente" }, { id: "mineurs", label: "Mineurs" }]}
+          />
+          <ExportAdmin
+            titre="Jeunes Cap Métier"
+            lignes={liste}
+            filtres={filtre !== "tous" ? [{ attribuer: "Mentor à attribuer", accord: "Accord en attente", mineurs: "Mineurs" }[filtre]] : []}
+            colonnes={[
+              { titre: "Jeune", valeur: (j) => j.nom },
+              { titre: "Ville", valeur: (j) => j.ville },
+              { titre: "Âge", valeur: (j) => ageAu(j.naissance) },
+              { titre: "Mineur", valeur: (j) => (estMineur(j) ? "Oui" : "Non") },
+              { titre: "Piste métier", valeur: (j) => j.piste || "À choisir" },
+              { titre: "Mentor", valeur: (j) => MENTORS.find((m) => m.id === j.mentorId)?.nom || "" },
+              { titre: "Statut", valeur: (j) => statutCap(j) },
+            ]}
           />
         </div>
         <div className="px-4 pb-4">
@@ -9185,7 +11628,8 @@ function CapMetierAdminScreen() {
      réinitialisation de la démo
    ===================================================================== */
 
-const TEST_STORAGE_KEY = "liggeey-test-v2";
+// v3 : régularisation facultative (question Oui / Non) ; les sessions de démo plus anciennes repartent de zéro.
+const TEST_STORAGE_KEY = "liggeey-test-v3";
 const TEST_SCENARIOS_KEY = "liggeey-test-scenarios-v1";
 
 function encodeState(value) {
@@ -9224,7 +11668,7 @@ const TEST_SCENARIOS = [
   { id: "c3", espace: "chercheur", to: "suivi", label: "Répondre au point de suivi post-embauche du premier mois" },
   { id: "c4", espace: "chercheur", to: "mentors", label: "Réserver, reprogrammer puis annuler un coaching avec un mentor" },
   { id: "c5", espace: "chercheur", to: "profil", label: "Modifier ses informations de profil" },
-  { id: "p1", espace: "prestataire", to: "regularisation", label: "Renvoyer le justificatif NINEA refusé" },
+  { id: "p1", espace: "prestataire", to: "regularisation", label: "Répondre à la question sur la régularisation, puis envoyer un justificatif" },
   { id: "p2", espace: "prestataire", to: "missions", label: "Accepter une demande de mission" },
   { id: "p3", espace: "prestataire", to: "services", label: "Ajouter des services jusqu'à la limite du profil Essentiel" },
   { id: "e1", espace: "entreprise", to: "offres", label: "Publier une offre, puis la retrouver dans l'espace chercheur" },
@@ -9305,7 +11749,7 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
               Paiements, e-mails, appels et documents sont simulés. Vos actions sont enregistrées dans ce navigateur uniquement. Pour vous connecter, gardez les identifiants déjà saisis et choisissez un espace.
             </p>
             <div className="mt-3 h-1.5 rounded-full overflow-hidden" style={{ background: COLORS.softStrong }}>
-              <div className="h-full rounded-full" style={{ width: `${(faits / total) * 100}%`, background: "#16A34A" }} />
+              <div className="h-full rounded-full" style={{ width: `${(faits / total) * 100}%`, background: COLORS.success }} />
             </div>
           </div>
 
@@ -9340,10 +11784,10 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
                 Réinitialiser la démo
               </button>
             ) : (
-              <div className="rounded-md p-3" style={{ background: "#FEF2F2" }}>
-                <p className="text-xs mb-2" style={{ color: "#B91C1C" }}>Toutes vos actions de test seront effacées et la démo repartira de zéro.</p>
+              <div className="rounded-md p-3" style={{ background: COLORS.dangerSoft }}>
+                <p className="text-xs mb-2" style={{ color: COLORS.danger }}>Toutes vos actions de test seront effacées et la démo repartira de zéro.</p>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => { clearSnapshot(); window.location.reload(); }} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold text-sur-sombre" style={{ background: COLORS.danger }}>Tout effacer</button>
+                  <button type="button" onClick={() => { clearSnapshot(); window.location.reload(); }} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold text-sur-statut" style={{ background: COLORS.danger }}>Tout effacer</button>
                   <button type="button" onClick={() => setConfirmReset(false)} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
                 </div>
               </div>
@@ -9355,16 +11799,82 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
   );
 }
 
-export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = null, profilInitial = null } = {}) {
+/* Écran valide pour un espace : entrée du menu ou sous-page (sinon, tableau de bord). */
+function ecranValide(espace, ecran) {
+  return (NAV_ITEMS_BY_ESPACE[espace] || []).some((n) => n.id === ecran) || (ecran in SUB_PAGES && espace === "prestataire");
+}
+
+/* Une session de test est ouverte quand le dernier écran enregistré est un écran de l'application. */
+function sessionOuverte(saved, espace) {
+  return !!saved && !ECRANS_AUTH.includes(saved.screen) && saved.espace === espace;
+}
+
+/* Écran d'ouverture :
+   1. ecranInitial / espaceInitial (Storybook) ;
+   2. l'adresse (/plateforme/connexion, /plateforme/admin/offres…) : un écran interne ne s'ouvre
+      que si une session est ouverte pour cet espace. Session ouverte dans un autre espace : son
+      tableau de bord ; aucune session : la connexion ;
+   3. /plateforme seul : la dernière session de test, sinon la connexion. */
+function ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminInitial, profilAdresse, saved }) {
+  const espaceSession = saved?.espace || "chercheur";
+  if (ecranInitial) return { screen: ecranInitial, espace: espaceInitial || espaceSession, profil: profilInitial };
+  const demande = cheminInitial?.length ? lireAdressePlateforme(cheminInitial, profilAdresse) : null;
+  if (demande?.type === "auth") return { screen: demande.screen, espace: espaceSession, profil: demande.profil || null };
+  if (demande?.type === "app") {
+    if (!sessionOuverte(saved, demande.espace)) {
+      return sessionOuverte(saved, saved?.espace) ? { screen: "dashboard", espace: saved.espace, profil: null } : { screen: "login", espace: "chercheur", profil: null };
+    }
+    return { screen: demande.screen && ecranValide(demande.espace, demande.screen) ? demande.screen : "dashboard", espace: demande.espace, profil: null };
+  }
+  return { screen: saved?.screen || "login", espace: espaceSession, profil: profilInitial };
+}
+
+export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = null, profilInitial = null, cheminInitial = null, profilAdresse = null, synchroniserAdresse = false } = {}) {
   const [saved] = useState(loadSnapshot);
-  /* Écran demandé par le site public (Connexion, Inscription, Offres), sinon la dernière session de test */
-  const [screen, setScreen] = useState(ecranInitial || saved?.screen || "login");
-  const [espace, setEspace] = useState(espaceInitial || saved?.espace || "chercheur");
-  const [signupProfile, setSignupProfile] = useState(profilInitial);
+  const [depart] = useState(() => ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminInitial, profilAdresse, saved }));
+  const [screen, setScreen] = useState(depart.screen);
+  const [espace, setEspace] = useState(depart.espace);
+  const [signupProfile, setSignupProfile] = useState(depart.profil);
+
+  /* Adresse du navigateur : elle suit l'écran affiché (/plateforme/{espace}/{écran}).
+     Précédent / Suivant rouvrent l'écran correspondant. Désactivé dans Storybook. */
+  const adresseAppliquee = useRef(false);
+  const depuisHistorique = useRef(false);
+  useEffect(() => {
+    if (!synchroniserAdresse) return;
+    const url = adressePlateforme({ screen, espace, profil: signupProfile });
+    const actuelle = window.location.pathname + window.location.search;
+    if (url !== actuelle) {
+      // Première adresse, ou correction après Précédent / Suivant : on remplace ; sinon nouvelle entrée d'historique.
+      if (!adresseAppliquee.current || depuisHistorique.current) window.history.replaceState(null, "", url);
+      else window.history.pushState(null, "", url);
+    }
+    adresseAppliquee.current = true;
+    depuisHistorique.current = false;
+  }, [synchroniserAdresse, screen, espace, signupProfile]);
+  useEffect(() => {
+    if (!synchroniserAdresse) return undefined;
+    const surHistorique = () => {
+      const demande = lireAdresseNavigateur();
+      depuisHistorique.current = true;
+      if (!demande) { setScreen("login"); return; }
+      if (demande.type === "auth") {
+        if (demande.profil) setSignupProfile(demande.profil);
+        setScreen(demande.screen);
+        return;
+      }
+      setEspace(demande.espace);
+      setScreen(demande.screen && ecranValide(demande.espace, demande.screen) ? demande.screen : "dashboard");
+    };
+    window.addEventListener("popstate", surHistorique);
+    return () => window.removeEventListener("popstate", surHistorique);
+  }, [synchroniserAdresse]);
   const [signupInscription, setSignupInscription] = useState(null);
   const [presetMentorId, setPresetMentorId] = useState(null);
   const [presetMentoreId, setPresetMentoreId] = useState(null);
   const [presetFormationsTab, setPresetFormationsTab] = useState("toutes");
+  const [presetOnglet, setPresetOnglet] = useState(null);
+  const [presetCreer, setPresetCreer] = useState(0); // horodatage : chaque raccourci « créer » rouvre le formulaire
   const [offresEntreprise, setOffresEntreprise] = useState(saved?.offresEntreprise || OFFRES_ENTREPRISE_INITIAL);
   const [plans, setPlans] = useState(saved?.plans || PLANS_INITIAL);
   const [subs, setSubs] = useState(saved?.subs || SUBS_INITIAL);
@@ -9403,6 +11913,8 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     if (next === "mentors") setPresetMentorId(data?.mentorId || null);
     if (next === "mentores") setPresetMentoreId(data?.mentoreId || null);
     if (next === "formations") setPresetFormationsTab(data?.tab || "toutes");
+    if (next === "communication") setPresetOnglet(data?.onglet || null);
+    if (next === "offres" || next === "services") setPresetCreer(data?.creer ? Date.now() : 0);
     if (next === "login") setEspace("chercheur");
     setScreen(next);
   }
@@ -9411,6 +11923,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   const navItems = NAV_ITEMS_BY_ESPACE[espace];
   const planApi = buildPlanApi({ espace, user: currentUser, plans, setPlans, subs, setSubs, usage, setUsage, transactions, setTransactions, setUpgrade, setPayment });
   planApi.regulSteps = espace === "prestataire" ? regulSteps : null;
+  planApi.regulChoix = readStore(storeData, "regul-choix", null);
 
   /* Fil d'Ariane et entrée active du menu, déduits du menu lui-même */
   const subPage = SUB_PAGES[screen];
@@ -9426,8 +11939,10 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   const regulAutres = readStore(storeData, "regul-autres", REGUL_DEMANDES_AUTRES);
   const pointsSuivi = JALONS.filter((j) => jalonStatut(EMBAUCHE_CHERCHEUR.dateIso, j, suiviChercheur.reponses[j.id]) === "À compléter");
   const prochainCoaching = (coachingsChercheur[MENTORS[0].id] || defaultCoachings(MENTORS[0])).upcoming[0];
-  const regulRefusees = regulSteps.filter((st) => st.statut === "Refusé");
-  const regulACompleter = regulSteps.filter((st) => st.obligatoire && st.statut === "À compléter");
+  const regulChoix = readStore(storeData, "regul-choix", null);
+  const regulActif = regulEngage(regulSteps, regulChoix);
+  const regulRefusees = regulActif ? regulSteps.filter((st) => st.statut === "Refusé") : [];
+  const regulACompleter = regulActif ? regulSteps.filter((st) => st.obligatoire && st.statut === "À compléter") : [];
   const missionsEnAttente = missionsData.filter((m) => m.statut === "En attente").length;
   const evaluationsAFaire = recrues.reduce((n, r) => n + JALONS.filter((j) => jalonStatut(r.dateIso, j, r.evaluations[j.id]) === "À compléter").length, 0);
   const recruesARisque = recrues.filter((r) => r.statut === "À risque").length;
@@ -9435,7 +11950,13 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   const regulAVerifier = regulSteps.filter((st) => st.statut === "En vérification").length + regulAutres.filter((d) => d.statut === "En vérification").length;
   const signalementsOuverts = signalements.filter((x) => x.statut === "Ouvert").length;
   const paiementsEchoues = transactions.filter((t) => t.statut === "Échoué").length;
+  const conversations = readStore(storeData, "conversations", CONVERSATIONS_INITIAL);
+  const messagesAdminNonLus = conversations.reduce((n, c) => n + (c.nonLu || 0), 0);
+  const messagesProfilNonLus = conversations.find((c) => c.espace === espace)?.nonLuProfil || 0;
+  const offresAVerifier = offresEntreprise.filter((o) => o.statut === "En vérification").length;
+  const offresRefusees = offresEntreprise.filter((o) => o.statut === "Refusée");
   const pl = (n, one, many) => `${n} ${n > 1 ? many : one}`;
+  const tacheMessages = messagesProfilNonLus > 0 && { label: `Lire ${pl(messagesProfilNonLus, "message", "messages")} de l'équipe LIGGEEY`, to: "messages", icon: MessageCircle };
 
   /* Cap Métier et mentorat */
   const jeunesCap = readStore(storeData, "cap-jeunes", JEUNES_CAP_INITIAL);
@@ -9452,28 +11973,36 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
 
   const TODOS = {
     chercheur: [
+      tacheMessages,
       ...pointsSuivi.map((j) => ({ label: `Répondre au point de suivi « ${j.label} »`, to: "suivi", icon: HeartHandshake })),
       prochainCoaching && { label: `Coaching avec ${MENTORS[0].nom} : ${prochainCoaching.date}`, to: "mentors", data: { mentorId: MENTORS[0].id }, icon: Calendar },
     ],
     prestataire: [
+      tacheMessages,
       ...regulRefusees.map((st) => ({ label: `Renvoyer le justificatif « ${st.titre} », refusé par LIGGEEY`, to: "regularisation", icon: Landmark, urgent: true })),
       regulACompleter.length > 0 && { label: `Compléter ${pl(regulACompleter.length, "étape", "étapes")} de régularisation`, to: "regularisation", icon: Landmark },
       missionsEnAttente > 0 && { label: `Répondre à ${pl(missionsEnAttente, "demande de mission", "demandes de mission")}`, to: "missions", icon: ClipboardList },
     ],
     entreprise: [
+      tacheMessages,
+      ...offresRefusees.map((o) => ({ label: `Corriger l'offre « ${o.titre} », refusée par LIGGEEY`, to: "offres", icon: Briefcase, urgent: true })),
       recruesARisque > 0 && { label: `Accompagner ${pl(recruesARisque, "recrue à risque", "recrues à risque")}`, to: "suivi", icon: AlertCircle, urgent: true },
       evaluationsAFaire > 0 && { label: `Évaluer vos recrues (${pl(evaluationsAFaire, "point de suivi", "points de suivi")})`, to: "suivi", icon: HeartHandshake },
       nouvellesCandidatures > 0 && { label: `Traiter ${pl(nouvellesCandidatures, "nouvelle candidature", "nouvelles candidatures")}`, to: "candidatures", icon: ClipboardList },
     ],
     jeune: [
+      tacheMessages,
       jeuneConnecte && !jeuneConnecte.piste && { label: "Faire votre bilan d'orientation", to: "orientation", icon: Compass },
       seanceJeune && mentorJeune && { label: `Séance avec ${mentorJeune.nom} : ${dateLongue(seanceJeune.date)} à ${seanceJeune.heure}`, to: "mentor", icon: Calendar },
     ],
     mentor: [
+      tacheMessages,
       demandesSeance > 0 && { label: `Répondre à ${pl(demandesSeance, "demande de séance", "demandes de séance")}`, to: "seances", icon: CalendarDays },
       seanceMentor && { label: `Séance avec ${nomMentore(seanceMentor.mentoreId, jeunesCap)} : ${dateLongue(seanceMentor.date)} à ${seanceMentor.heure}`, to: "mentores", data: { mentoreId: seanceMentor.mentoreId }, icon: Calendar },
     ],
     admin: [
+      messagesAdminNonLus > 0 && { label: `Répondre à ${pl(messagesAdminNonLus, "message", "messages")} des utilisateurs`, to: "communication", data: { onglet: "Messagerie" }, icon: MessageCircle },
+      offresAVerifier > 0 && { label: `Vérifier ${pl(offresAVerifier, "offre d'emploi", "offres d'emploi")} avant publication`, to: "offres", icon: Briefcase, urgent: true },
       capAccords > 0 && { label: `Relancer ${pl(capAccords, "parent", "parents")} pour l'accord parental (Cap Métier)`, to: "cap-metier", icon: Phone },
       capAAttribuer > 0 && { label: `Attribuer un mentor à ${pl(capAAttribuer, "jeune", "jeunes")} (Cap Métier)`, to: "cap-metier", icon: Compass },
       signalementsOuverts > 0 && { label: `Traiter ${pl(signalementsOuverts, "signalement post-embauche", "signalements post-embauche")}`, to: "suivi", icon: Flag, urgent: true },
@@ -9483,18 +12012,19 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   };
   const todos = (TODOS[espace] || []).filter(Boolean);
   const BADGES = {
-    chercheur: { suivi: pointsSuivi.length },
-    prestataire: { regularisation: regulRefusees.length + regulACompleter.length, missions: missionsEnAttente },
-    entreprise: { candidatures: nouvellesCandidatures, suivi: evaluationsAFaire + recruesARisque },
-    jeune: {},
-    mentor: { seances: demandesSeance },
-    admin: { suivi: signalementsOuverts, regularisations: regulAVerifier, abonnements: paiementsEchoues, "cap-metier": capAAttribuer + capAccords },
+    chercheur: { messages: messagesProfilNonLus, suivi: pointsSuivi.length },
+    prestataire: { messages: messagesProfilNonLus, regularisation: regulRefusees.length + regulACompleter.length, missions: missionsEnAttente },
+    entreprise: { messages: messagesProfilNonLus, offres: offresRefusees.length, candidatures: nouvellesCandidatures, suivi: evaluationsAFaire + recruesARisque },
+    jeune: { messages: messagesProfilNonLus },
+    mentor: { messages: messagesProfilNonLus, seances: demandesSeance },
+    admin: { communication: messagesAdminNonLus, offres: offresAVerifier, suivi: signalementsOuverts, regularisations: regulAVerifier, abonnements: paiementsEchoues, "cap-metier": capAAttribuer + capAccords },
   };
 
   /* Les offres actives publiées par l'entreprise apparaissent aussi côté chercheur */
   const offresPubliees = offresEntreprise.filter((o) => o.statut === "Active").map((o) => ({
-    titre: o.titre, contrat: o.contrat || "CDI", entreprise: "Senegal Construction SARL", secteur: "BTP & Construction",
+    titre: o.titre, contrat: o.contrat || "CDI", entreprise: ENTREPRISE_DEMO_NOM, secteur: "BTP & Construction",
     localisation: o.localisation, description: o.description || "", competences: o.competences || [o.categorie], sponsorisee: o.sponsorisee,
+    experience: o.experience, salaire: o.salaire, dateLimite: o.dateLimite,
   }));
 
   function renderContent() {
@@ -9507,19 +12037,19 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
       if (screen === "orientation") return <CapOrientationScreen onNavigate={navigate} />;
       if (screen === "ateliers") return <CapAteliersScreen />;
       if (screen === "mentor") return <CapMentorScreen />;
-      if (screen === "profil") return <CapProfilScreen />;
+      if (screen === "profil") return <CapProfilScreen onNavigate={navigate} />;
     }
     if (espace === "mentor") {
       if (screen === "dashboard") return <MentorDashboardScreen onNavigate={navigate} todos={todos} />;
       if (screen === "mentores") return <MentoresScreen key={presetMentoreId || "liste"} initialId={presetMentoreId} />;
       if (screen === "seances") return <SeancesMentorScreen />;
-      if (screen === "profil") return <MentorProfilScreen />;
+      if (screen === "profil") return <MentorProfilScreen onNavigate={navigate} />;
     }
     if (screen === "cap-metier" && espace === "admin") return <CapMetierAdminScreen />;
     if (screen === "chercheurs" && espace === "admin") return <ChercheursAdminScreen />;
     if (screen === "prestataires" && espace === "admin") return <PrestatairesAdminScreen />;
     if (screen === "entreprises" && espace === "admin") return <EntreprisesAdminScreen />;
-    if (screen === "offres" && espace === "admin") return <OffresAdminScreen />;
+    if (screen === "offres" && espace === "admin") return <OffresAdminScreen offresEntreprise={offresEntreprise} setOffresEntreprise={setOffresEntreprise} />;
     if (screen === "candidatures" && espace === "admin") return <CandidaturesAdminScreen />;
     if (screen === "formations" && espace === "admin") return <FormationsAdminScreen />;
     if (screen === "mentorat" && espace === "admin") return <MentoratAdminScreen />;
@@ -9527,7 +12057,8 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     if (screen === "missions" && espace === "admin") return <MissionsAdminScreen />;
     if (screen === "verifications" && espace === "admin") return <VerificationCVScreen />;
     if (screen === "planning" && espace === "admin") return <PlanningScreen />;
-    if (screen === "communication" && espace === "admin") return <CommunicationScreen onNavigate={navigate} />;
+    if (screen === "communication" && espace === "admin") return <CommunicationScreen key={presetOnglet || "notifications"} onNavigate={navigate} ongletInitial={presetOnglet} />;
+    if (screen === "messages" && espace !== "admin") return <MessagesScreen espace={espace} user={currentUser} />;
     if (screen === "parametres" && espace === "admin") return <ParametresScreen />;
     if (screen === "abonnements" && espace === "admin") return <AbonnementsAdminScreen />;
     if (screen === "abonnement" && espace !== "admin") return <AbonnementScreen />;
@@ -9536,9 +12067,9 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     if (screen === "suivi" && espace === "admin") return <SuiviPostEmbaucheAdminScreen signalements={signalements} setSignalements={setSignalements} recrues={recrues} />;
     if (screen === "regularisation" && espace === "prestataire") return <RegularisationScreen steps={regulSteps} setSteps={setRegulSteps} />;
     if (screen === "regularisations" && espace === "admin") return <RegularisationsAdminScreen steps={regulSteps} setSteps={setRegulSteps} />;
-    if (screen === "offres" && espace === "entreprise") return <MesOffresScreen offres={offresEntreprise} setOffres={setOffresEntreprise} />;
-    if (screen === "offres") return <OffresScreen extraOffres={offresPubliees} />;
-    if (screen === "services") return <ServicesScreen />;
+    if (screen === "offres" && espace === "entreprise") return <MesOffresScreen key={presetCreer || "liste"} creer={!!presetCreer} offres={offresEntreprise} setOffres={setOffresEntreprise} />;
+    if (screen === "offres") return <OffresScreen extraOffres={offresPubliees} onNavigate={navigate} />;
+    if (screen === "services") return <ServicesScreen key={presetCreer || "liste"} creer={!!presetCreer} />;
     if (screen === "missions") return <MissionsScreen />;
     if (screen === "candidatures" && espace === "chercheur") return <CandidaturesScreen onNavigate={navigate} />;
     if (screen === "candidatures" && espace === "entreprise") return <CandidaturesEntrepriseScreen />;
@@ -9564,6 +12095,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
       <StoreContext.Provider value={storeApi}>
       <PlanContext.Provider value={planApi}>
         <AppShell
+          espace={espace}
           navItems={navItems}
           active={activeNav}
           onNavigate={navigate}
@@ -9623,5 +12155,5 @@ export {
   // Données
   Row, InfoField, BorderedField, LockedRow, AdminInfoCard, AdminSubListCard, SafeImg, ProfileTierCard,
   // Retours et fenêtres
-  Toaster, ModalFrame, ArchiveConfirm, OfferModal, UpgradeModal, PaymentModal, ProfilInfoModal,
+  Toaster, ModalFrame, ArchiveConfirm, OffreDetail, FormationDetail, MentorDetail, defaultCoachings, UpgradeModal, PaymentModal, ProfilInfoModal,
 };

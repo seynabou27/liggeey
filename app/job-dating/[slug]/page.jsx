@@ -31,7 +31,7 @@ export default async function PageEvenement({ params }) {
 
   return (
     <>
-      <EnTetePage surtitre={t.hero.surtitre} titre={evenement.titre} texte={t.hero.texte} />
+      <EnTetePage surtitre={t.hero.surtitre} titre={evenement.titre} texte={t.hero.texte} image={t.hero.image} />
 
       <Section>
         <CarteEvenement evenement={evenement} />

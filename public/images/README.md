@@ -15,6 +15,8 @@ Privilégiez des photos réelles de personnes sénégalaises au travail.
 | `formations-hero.jpg`           | Haut de la page Formations           | 2400 × 1000 px          |
 | `job-dating-hero.jpg`           | Haut de la page Job Dating           | 2400 × 1000 px          |
 | `a-propos-hero.jpg`             | Haut de la page À propos             | 2400 × 1000 px          |
+| `tarifs-hero.jpg`               | Haut de la page Tarifs               | 2400 × 1000 px          |
+| `contact-hero.jpg`              | Haut de la page Contact              | 2400 × 1000 px          |
 | `equipe/salimata-marena.jpg`    | Équipe (À propos)                    | 400 × 400 px, carré     |
 | `equipe/seynabou-ka.jpg`        | Équipe                               | 400 × 400 px            |
 | `equipe/wagui-diankha.jpg`      | Équipe                               | 400 × 400 px            |
@@ -37,6 +39,8 @@ Photos réelles prises au Sénégal, gratuites sous licence Unsplash (usage comm
 | `formations-hero.jpg` | Trois femmes échangent autour d'un ordinateur | Iwaria Inc. · https://unsplash.com/@iwaria |
 | `job-dating-hero.jpg` | Entretien en face à face | Iwaria Inc. · https://unsplash.com/@iwaria |
 | `a-propos-hero.jpg` | Femme au travail sur un ordinateur | Daniel Thomas · https://unsplash.com/@soy_danielthomas |
+| `tarifs-hero.jpg` | Jeune femme souriante qui montre son téléphone, fond jaune (recadrée) | Ahmed Nasiru · https://unsplash.com/@ahmed_nasiru · https://unsplash.com/photos/_ooDzeJjIEg |
+| `contact-hero.jpg` | Jeune femme souriante, Enugu (Nigeria) (recadrée et retournée) | Blessing Olarewaju · https://unsplash.com/@olarewajub · https://unsplash.com/photos/fyXYdqzlZP4 |
 
 Aucune de ces photos n'a été prise au Sénégal. Elles viennent d'autres pays d'Afrique ou des États-Unis. Remplacez-les en priorité par vos propres photos.
 

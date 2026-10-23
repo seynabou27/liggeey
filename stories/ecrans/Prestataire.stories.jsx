@@ -25,3 +25,5 @@ export const Abonnement = { name: "Abonnement", render: () => <Ecran ecran="abon
 export const Evaluations = { name: 'Mes évaluations et avis', render: () => <Ecran ecran="evaluations" espace="prestataire" /> };
 
 export const Realisations = { name: 'Mes réalisations', render: () => <Ecran ecran="realisations" espace="prestataire" /> };
+
+export const Messages = { name: "Messages", render: () => <Ecran ecran="messages" espace="prestataire" /> };

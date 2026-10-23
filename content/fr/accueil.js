@@ -40,8 +40,8 @@ export const accueil = {
   offres: {
     titre: 'Des offres vérifiées, en ce moment',
     texte: "Chaque offre est contrôlée par notre équipe avant d'être publiée.",
-    badge: 'Vérifiée',
-    voir: 'Voir',
+    badge: 'Entreprise vérifiée',
+    voir: "Voir l'offre",
     partager: 'Partager sur WhatsApp',
     messagePartage: 'Offre vérifiée sur LIGGEEY : {titre} chez {entreprise}, {ville}.',
     toutes: 'Se connecter pour voir toutes les offres',
@@ -113,7 +113,7 @@ export const accueil = {
     titre: 'LIGGEEY en vidéo',
     texte: 'Découvrez comment LIGGEEY vous accompagne, de la création du profil à l’embauche.',
     image: '/images/bande-constat.jpg',
-    // Lien YouTube (ou fichier .mp4 dans /public/videos) de la vidéo de présentation. Vide : « Vidéo bientôt disponible ».
+    // Lien YouTube (ou fichier .mp4 dans /public/videos) de la vidéo de présentation. Vide : la bande vidéo n’est pas affichée.
     src: '',
     lire: 'Lire la vidéo de présentation',
     bientot: 'Vidéo bientôt disponible',

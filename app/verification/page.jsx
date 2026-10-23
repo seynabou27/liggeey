@@ -6,6 +6,7 @@ import Bouton from '@/components/ui/Bouton';
 import Icone from '@/components/ui/Icone';
 import EnTetePage from '@/components/blocs/EnTetePage';
 import { AppelFinal } from '@/components/blocs/Blocs';
+import BandeNewsletter from '@/components/blocs/BandeNewsletter';
 
 export const metadata = { title: verification.meta.titre, description: verification.meta.description, alternates: { canonical: '/verification' } };
 
@@ -59,6 +60,8 @@ export default function PageVerification() {
           Demander une démo
         </Bouton>
       </AppelFinal>
+      {/* La bande orange sépare la bande sombre du pied de page, comme sur les autres pages */}
+      <BandeNewsletter />
     </>
   );
 }

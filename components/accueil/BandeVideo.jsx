@@ -71,7 +71,7 @@ export default function BandeVideo({ avecPhoto }) {
         >
           <X className="h-5 w-5" aria-hidden="true" />
         </button>
-        <div className="relative aspect-video overflow-hidden rounded-lg bg-black shadow-carte">
+        <div className="relative aspect-video overflow-hidden rounded-lg bg-sombre shadow-carte">
           {lecture && youtube && (
             <iframe src={youtube} title={t.titre} allow="autoplay; encrypted-media; picture-in-picture" allowFullScreen className="absolute inset-0 h-full w-full" />
           )}

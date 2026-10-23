@@ -1,5 +1,5 @@
 import { fn } from 'storybook/test';
-import { Toaster, notify, ModalFrame, ArchiveConfirm, OfferModal, UpgradeModal, PaymentModal, ProfilInfoModal, OFFRES_DATA, UPGRADE_REASONS, COLORS } from '../../../components/plateforme/LiggeeyPrototype';
+import { Toaster, notify, ModalFrame, ArchiveConfirm, OffreDetail, FormationDetail, MentorDetail, defaultCoachings, FORMATIONS_ALL, MENTORS, UpgradeModal, PaymentModal, ProfilInfoModal, OFFRES_DATA, UPGRADE_REASONS, COLORS } from '../../../components/plateforme/LiggeeyPrototype';
 import { AvecPlateforme, policeApp } from './_outils';
 
 const grand = { docs: { story: { inline: false, height: '680px' } } };
@@ -38,13 +38,46 @@ export const Cadre = {
 export const Archivage = { name: 'ArchiveConfirm', render: (a) => <ArchiveConfirm {...a} />, args: { onCancel: fn(), onConfirm: fn() }, parameters: grand };
 
 export const DetailOffre = {
-  name: 'OfferModal (postuler)',
+  name: 'OffreDetail (postuler)',
   render: (a) => (
     <AvecPlateforme espace="chercheur">
-      <OfferModal {...a} />
+      <OffreDetail {...a} />
     </AvecPlateforme>
   ),
-  args: { offre: OFFRES_DATA[0], onClose: fn() },
+  args: { offre: OFFRES_DATA[0], similaires: [OFFRES_DATA[4]], saved: false, onToggleSave: fn(), onOpen: fn(), onBack: fn(), onNavigate: fn() },
+  parameters: grand,
+};
+
+export const FicheFormation = {
+  name: 'FormationDetail (inscrit, en cours)',
+  render: (a) => (
+    <AvecPlateforme espace="chercheur">
+      <FormationDetail {...a} />
+    </AvecPlateforme>
+  ),
+  args: { formation: FORMATIONS_ALL[0], enrolled: true, progressCount: 6, premium: false, locked: false, similaires: [FORMATIONS_ALL[1]], onToggleEnroll: fn(), onAdvanceModule: fn(), onViewCertificate: fn(), onBack: fn(), onOpen: fn() },
+  parameters: grand,
+};
+
+export const FicheFormationNonInscrit = {
+  name: 'FormationDetail (Premium, verrouillée)',
+  render: (a) => (
+    <AvecPlateforme espace="chercheur">
+      <FormationDetail {...a} />
+    </AvecPlateforme>
+  ),
+  args: { formation: FORMATIONS_ALL[1], enrolled: false, progressCount: 0, premium: true, locked: true, onToggleEnroll: fn(), onAdvanceModule: fn(), onViewCertificate: fn(), onBack: fn(), onOpen: fn() },
+  parameters: grand,
+};
+
+export const FicheMentor = {
+  name: 'MentorDetail',
+  render: (a) => (
+    <AvecPlateforme espace="chercheur">
+      <MentorDetail {...a} coachings={defaultCoachings(a.mentor)} />
+    </AvecPlateforme>
+  ),
+  args: { mentor: MENTORS[0], onUpdate: fn(), onBack: fn() },
   parameters: grand,
 };
 

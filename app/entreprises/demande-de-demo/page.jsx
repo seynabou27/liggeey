@@ -1,5 +1,5 @@
 import { MessageCircle } from 'lucide-react';
-import { demo } from '@/content/fr/entreprises';
+import { demo, entreprises } from '@/content/fr/entreprises';
 import { site } from '@/lib/site';
 import { lienWhatsApp } from '@/lib/liens';
 import Bouton from '@/components/ui/Bouton';
@@ -13,7 +13,7 @@ export default async function PageDemo({ searchParams }) {
   const { service = '' } = await searchParams;
   return (
     <>
-      <EnTetePage surtitre="Entreprises" titre={demo.titre} texte={demo.texte.replace('{delai}', site.delais.demo)} />
+      <EnTetePage surtitre="Entreprises" titre={demo.titre} texte={demo.texte.replace('{delai}', site.delais.demo)} image={entreprises.hero.image} />
       <div className="container grid gap-12 py-16 lg:grid-cols-[1fr_340px]">
         <FormulaireDemo service={service} />
         <aside className="flex h-fit flex-col gap-4 rounded-lg bg-marque-doux p-6">

@@ -8,7 +8,7 @@ const groupe = (nom) => Object.fromEntries(Object.keys(semantiques[nom]).map((t)
 /** @type {import('tailwindcss').Config} */
 export default {
   content: ['./app/**/*.{js,jsx}', './components/**/*.{js,jsx}', './content/**/*.js', './stories/**/*.{js,jsx,mdx}'],
-  // Thème sombre prêt mais inactif : il s'active avec <html data-theme="sombre">.
+  // Thème sombre : il s'active avec <html data-theme="sombre"> (plateforme, voir components/app/Theme.jsx).
   darkMode: ['selector', '[data-theme="sombre"]'],
   theme: {
     container: {

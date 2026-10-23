@@ -10,7 +10,7 @@ export function BoutonIcone({ icone: Icone, label, onClick, pastille = false, va
   const styles = {
     contour: 'border border-base bg-surface text-secondaire hover:text-principal hover:border-forte',
     fantome: 'text-discret hover:bg-doux hover:text-principal',
-    doux: 'bg-marque-doux text-marque hover:bg-primaire-150',
+    doux: 'bg-marque-doux text-marque hover:bg-marque-doux-survol',
     'sur-sombre': 'text-sur-sombre-secondaire hover:bg-sombre-doux hover:text-sur-sombre',
   }[variante];
   return (
@@ -160,7 +160,7 @@ export function Interrupteur({ actif, onChange, label, description }) {
       </span>
       <span className="relative mt-0.5 inline-flex shrink-0">
         <input type="checkbox" role="switch" checked={actif} onChange={(e) => onChange?.(e.target.checked)} className="peer sr-only" />
-        <span className="h-6 w-11 rounded-full bg-neutre-250 transition-colors peer-checked:bg-marque peer-focus-visible:ring-2 peer-focus-visible:ring-focus peer-focus-visible:ring-offset-2" />
+        <span className="h-6 w-11 rounded-full bg-piste transition-colors peer-checked:bg-marque peer-focus-visible:ring-2 peer-focus-visible:ring-focus peer-focus-visible:ring-offset-2" />
         <span className="absolute left-0.5 top-0.5 h-5 w-5 rounded-full bg-surface shadow transition-transform peer-checked:translate-x-5" />
       </span>
     </label>

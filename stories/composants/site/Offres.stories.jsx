@@ -1,6 +1,6 @@
 import { fn } from 'storybook/test';
 import { CarteOffre, GrilleOffres } from '../../../components/accueil/CarteOffre';
-import DetailOffre from '../../../components/accueil/DetailOffre';
+import DetailOffre, { PastilleSecteur } from '../../../components/accueil/DetailOffre';
 import VitrineOffres from '../../../components/accueil/VitrineOffres';
 import CarteRecherche from '../../../components/accueil/CarteRecherche';
 import offres from '../../../content/offres-demo.json';
@@ -25,6 +25,17 @@ export const CarteSansCompetences = {
     </div>
   ),
   args: { offre: { ...offres[1], competences: [] }, onVoir: fn() },
+};
+
+export const Pastille = {
+  name: 'PastilleSecteur · secteur connu et repli (initiales)',
+  render: () => (
+    <div className="flex items-center gap-3">
+      <PastilleSecteur offre={offres[0]} />
+      <PastilleSecteur offre={offres[2]} className="h-14 w-14" />
+      <PastilleSecteur offre={{ ...offres[0], secteur: 'inconnu' }} />
+    </div>
+  ),
 };
 
 export const Grille = {

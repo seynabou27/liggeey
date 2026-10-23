@@ -49,7 +49,8 @@ export default async function Accueil() {
       <GrilleSecteurs />
       <CommentCaMarche avecCapture={imageExiste(accueil.etapes.capture)} />
       <BandeConstat />
-      <BandeVideo avecPhoto={imageExiste(accueil.video.image)} />
+      {/* Bande vidéo masquée tant que la vidéo de présentation n'existe pas (accueil.video.src) */}
+      {accueil.video.src && <BandeVideo avecPhoto={imageExiste(accueil.video.image)} />}
       <Engagements />
       <AVenir evenement={evenement} />
       <BandeNewsletter />

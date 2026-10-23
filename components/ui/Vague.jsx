@@ -11,7 +11,7 @@ export function VagueAccueil() {
         preserveAspectRatio="none"
         aria-hidden="true"
         focusable="false"
-        className="pointer-events-none absolute inset-x-0 top-0 hidden h-[calc(100%+2px)] w-full lg:block"
+        className="pointer-events-none absolute inset-x-0 top-0 hidden h-[calc(100%+2px)] w-full xl:block"
       >
         <path d="M0 601 C40 640 100 660 200 657 C420 650 700 520 1200 238 L1200 672 L0 672 Z" style={{ fill: 'rgb(var(--fond-page))' }} />
       </svg>
@@ -21,7 +21,7 @@ export function VagueAccueil() {
         preserveAspectRatio="none"
         aria-hidden="true"
         focusable="false"
-        className="pointer-events-none absolute inset-x-0 -bottom-0.5 h-[202px] w-full lg:hidden"
+        className="pointer-events-none absolute inset-x-0 -bottom-0.5 h-[202px] w-full xl:hidden"
       >
         <path d="M0 160 C12 180 30 188 70 187 C160 184 250 150 360 80 L360 200 L0 200 Z" style={{ fill: 'rgb(var(--fond-page))' }} />
       </svg>

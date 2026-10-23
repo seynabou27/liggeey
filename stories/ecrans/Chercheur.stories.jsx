@@ -21,3 +21,5 @@ export const Suivi = { name: "Suivi post-embauche", render: () => <Ecran ecran="
 export const Profil = { name: "Mon profil", render: () => <Ecran ecran="profil" espace="chercheur" /> };
 
 export const Abonnement = { name: "Abonnement", render: () => <Ecran ecran="abonnement" espace="chercheur" /> };
+
+export const Messages = { name: "Messages", render: () => <Ecran ecran="messages" espace="chercheur" /> };

@@ -92,6 +92,16 @@ export const MenuMobileInteractif = {
 
 export const PiedDePageComplet = { name: 'Pied de page', render: () => <PiedDePage /> };
 
+/* Adresses d'exemple, pour voir les icônes avant que les vrais comptes soient renseignés dans lib/site.js. */
+export const PiedDePageReseaux = {
+  name: 'Pied de page · avec réseaux',
+  render: () => (
+    <PiedDePage
+      reseaux={['LinkedIn', 'Facebook', 'Instagram', 'TikTok', 'YouTube', 'X'].map((nom) => ({ nom, url: 'https://example.com' }))}
+    />
+  ),
+};
+
 export const CadreSite = {
   name: 'Cadre · page du site',
   render: () => (

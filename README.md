@@ -58,7 +58,7 @@ Le prototype de l'application est intégré au site, sur `/plateforme`. Les bout
 
 Ces valeurs ont été choisies pour avancer. Elles sont fictives, ou déduites du mémoire et du prototype.
 
-- **Coordonnées** (`lib/site.js`) : le WhatsApp `+221 77 000 00 00`, l'adresse `contact@liggeey.sn`, les horaires et les réseaux sociaux. Les réseaux sont vides et ne s'affichent donc pas.
+- **Coordonnées** (`lib/site.js`) : le WhatsApp `+221 77 000 00 00`, l'adresse `contact@liggeey.sn`, les horaires et les réseaux sociaux. Les adresses des réseaux sont vides : les icônes s'affichent dans le pied de page, mais sans lien.
 - **Adresse** : Hann Maristes 1, Îlot J, Villa n° 63. C'est le siège prévu dans le mémoire, à confirmer comme adresse du bureau d'accueil.
 - **Délais annoncés** : 48 h pour une demande de démo, 24 h pour le contact, 48 h pour vérifier un profil (repris du prototype).
 - **Unités des prix** : abonnement Entreprise par mois, mentorat par séance, formations à l'unité, suivi par recrue, Job Dating par participant, formalisation par dossier.

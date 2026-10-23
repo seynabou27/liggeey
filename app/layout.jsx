@@ -30,7 +30,8 @@ export const viewport = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="fr" className={jakarta.variable}>
+    // data-theme peut être posé avant l'hydratation par le script de thème de /plateforme.
+    <html lang="fr" className={jakarta.variable} suppressHydrationWarning>
       <body id="haut" className="font-sans">
         <a href="#contenu" className="sr-only z-[70] rounded bg-marque px-4 py-3 font-semibold text-sur-marque focus:not-sr-only focus:fixed focus:left-4 focus:top-4">
           Aller au contenu

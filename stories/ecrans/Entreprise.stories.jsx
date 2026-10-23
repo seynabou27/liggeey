@@ -19,3 +19,5 @@ export const Prestataires = { name: "Trouver un prestataire", render: () => <Ecr
 export const Profil = { name: "Profil entreprise", render: () => <Ecran ecran="profil" espace="entreprise" /> };
 
 export const Abonnement = { name: "Abonnement", render: () => <Ecran ecran="abonnement" espace="entreprise" /> };
+
+export const Messages = { name: "Messages", render: () => <Ecran ecran="messages" espace="entreprise" /> };

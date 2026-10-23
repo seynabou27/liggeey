@@ -32,10 +32,10 @@ export function ElementConversation({ nom, apercu, heure, nonLus = 0, presence =
 }
 
 /** Bulle de message. moi : bulle orange à droite ; sinon bulle claire à gauche avec avatar. */
-export function BulleMessage({ texte, heure, moi = false, nom, montrerAvatar = true }) {
+export function BulleMessage({ texte, heure, moi = false, nom, photo, montrerAvatar = true }) {
   return (
     <div className={`flex items-end gap-2.5 ${moi ? 'flex-row-reverse' : ''}`}>
-      {montrerAvatar ? <Avatar nom={nom} taille="xs" ton={moi ? 'plein' : 'marque'} /> : <span className="w-7 shrink-0" />}
+      {montrerAvatar ? <Avatar nom={nom} src={photo} taille="xs" ton={moi ? 'plein' : 'marque'} /> : <span className="w-7 shrink-0" />}
       <div className={`flex max-w-[75%] flex-col ${moi ? 'items-end' : 'items-start'}`}>
         <p className={`rounded-xl px-4 py-2.5 text-sm leading-relaxed ${moi ? 'rounded-br-sm bg-marque text-sur-marque' : 'rounded-bl-sm border border-base bg-surface text-principal'}`}>{texte}</p>
         {heure && <span className="mt-1 text-[11px] text-discret">{heure}</span>}

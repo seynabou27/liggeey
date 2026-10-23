@@ -19,7 +19,8 @@ const liggeey = [
 ];
 
 export const commun = {
-  nav: [{ href: '/', label: 'Accueil' }, ...parcours, ...services],
+  // Pas de lien « Accueil » dans l'en-tête : le logo y ramène (le menu mobile garde « Accueil »)
+  nav: [...parcours, ...services, { href: '/contact', label: 'Contact' }],
   groupes: [
     { titre: 'Parcours', liens: parcours },
     { titre: 'Services', liens: services },
@@ -33,14 +34,16 @@ export const commun = {
   connexion: 'Connexion',
   inscription: 'Inscription',
   whatsapp: { libelle: 'Une question ?', aria: 'Écrire à LIGGEEY sur WhatsApp' },
-  aide: { titre: "Besoin d'aide ?", whatsapp: ['Écrivez-nous', 'WhatsApp'], bureau: ['Venez nous voir', "Bureau d'accueil"] },
-  paiement: 'Paiement',
+  pied: {
+    inscription: 'Créer mon compte',
+    reseaux: { titre: 'Suivez-nous', nouvelOnglet: 'nouvel onglet' },
+    contact: { titre: 'Nous contacter', whatsapp: 'WhatsApp', email: 'E-mail', bureau: "Bureau d'accueil", horaires: 'Horaires' },
+  },
   newsletter: {
     titre: 'Recevez nos nouveaux articles',
     texte: 'Conseils emploi, compétences et recrutement, et les dates des prochains Job Dating.',
     champ: 'Votre adresse e-mail',
     bouton: "Je m'abonne",
-    mention: 'Désabonnement en un clic.',
     succes: "C'est fait ! Vous recevrez notre prochain envoi.",
   },
 };

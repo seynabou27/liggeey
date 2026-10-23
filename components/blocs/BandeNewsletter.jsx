@@ -15,7 +15,8 @@ export default function BandeNewsletter() {
         <h2 id="titre-newsletter" className="text-[22px] font-semibold leading-[1.27] md:text-[32px] md:leading-[1.2]">
           {t.titre}
         </h2>
-        <p className="max-w-xl text-[15px] leading-[1.7]">{t.texte}</p>
+        {/* Une seule ligne à partir de 768 px ; sur téléphone, le texte passe à la ligne */}
+        <p className="max-w-xl text-balance text-[15px] leading-[1.7] md:max-w-none">{t.texte}</p>
         {etat === 'succes' ? (
           <p role="status" className="mt-2 rounded-lg bg-surface px-6 py-4 font-semibold">
             {t.succes}
@@ -47,7 +48,6 @@ export default function BandeNewsletter() {
               </p>
             )}
             {etat === 'erreur' && <p className="mt-2 font-medium">L'inscription n'a pas abouti. Réessayez dans un instant.</p>}
-            <p className="mt-3 text-sm">{t.mention}</p>
           </form>
         )}
       </div>

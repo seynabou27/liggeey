@@ -4,7 +4,14 @@
  */
 export const tarifs = {
   meta: { titre: 'Tarifs', description: 'Pack Essentiel 1 500 FCFA/mois, Premium 3 000 FCFA/mois, abonnement Entreprise 40 000 FCFA/mois. Paiement Wave et Orange Money.' },
-  hero: { surtitre: 'Tarifs', titre: 'Des tarifs clairs, pour chacun', texte: 'Tous nos prix au même endroit. Paiement par Wave ou Orange Money, depuis votre téléphone.' },
+  hero: {
+    surtitre: 'Tarifs',
+    titre: 'Des tarifs clairs, pour chacun',
+    texte: 'Tous nos prix au même endroit. Paiement par Wave ou Orange Money, depuis votre téléphone.',
+    image: '/images/tarifs-hero.jpg',
+    inscription: 'Créer mon compte',
+    demo: 'Vous recrutez ? Demander une démo',
+  },
   formules: [
     {
       id: 'essentiel',
@@ -45,7 +52,12 @@ export const tarifs = {
       { nom: 'Publicité pour les marques affiliées', prix: '25 000 FCFA', unite: '/ campagne', texte: 'Faites connaître votre marque auprès des utilisateurs de la plateforme.' },
     ],
   },
-  paiement: { titre: 'Payer simplement', texte: 'Wave et Orange Money, directement depuis votre téléphone.' },
+  paiement: {
+    titre: 'Payer simplement',
+    texte: 'Wave et Orange Money, directement depuis votre téléphone.',
+    // Repris des réponses de la FAQ ci-dessous
+    points: ['Paiement depuis votre espace LIGGEEY', 'Sans engagement : changez ou arrêtez quand vous voulez', 'Votre formule reste active jusqu’à la fin du mois payé'],
+  },
   guide: {
     titre: 'Quelle formule pour moi ?',
     q1: 'Vous êtes…',

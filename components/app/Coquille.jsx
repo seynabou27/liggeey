@@ -5,11 +5,12 @@ import { Bell, ChevronRight, Menu, X } from 'lucide-react';
 import { Avatar } from './Avatar';
 import { Compteur } from './Badge';
 import { BoutonIcone, ChampRecherche } from './Controles';
+import { BoutonTheme } from './Theme';
 
 /* =====================================================================
    COQUILLE DE L'APPLICATION
    Barre latérale claire (groupes titrés, élément actif teinté), barre du haut
-   (salutation, recherche, notifications, compte), en-tête de page (titre et
+   (salutation, recherche, thème clair ou sombre, notifications, compte), en-tête de page (titre et
    fil d'Ariane), pied de page. Sur mobile, le menu s'ouvre en tiroir.
    ===================================================================== */
 
@@ -157,32 +158,59 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
 
 /* ---------- Barre d'icônes ---------- */
 
+function ElementRail({ icone: Icone, label, actif, compteur = 0, onClick, href, externe }) {
+  const nom = `${label}${compteur > 0 ? ` (${compteur})` : ''}${externe ? ', nouvel onglet' : ''}`;
+  const classes = `group relative inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
+    actif ? 'bg-marque/15 text-marque-vif' : 'text-sur-sombre-discret hover:bg-white/[0.06] hover:text-sur-sombre'
+  }`;
+  const contenu = (
+    <>
+      <Icone size={16} aria-hidden="true" />
+      {compteur > 0 && (
+        <span className="absolute -right-1.5 -top-1.5 inline-flex h-4 min-w-4 items-center justify-center rounded-full bg-marque px-1 text-[9px] font-semibold leading-none text-sur-marque" aria-hidden="true">
+          {compteur > 9 ? '9+' : compteur}
+        </span>
+      )}
+      {/* Info-bulle à droite, au survol et au focus clavier */}
+      <span
+        className="pointer-events-none absolute left-full top-1/2 z-50 ml-3 -translate-y-1/2 whitespace-nowrap rounded bg-sombre px-2.5 py-1.5 text-xs font-medium text-sur-sombre opacity-0 shadow-carte transition-opacity group-hover:opacity-100 group-focus-visible:opacity-100"
+        aria-hidden="true"
+      >
+        {label}
+      </span>
+    </>
+  );
+  if (href) {
+    return (
+      <a href={href} aria-label={nom} className={classes} {...(externe ? { target: '_blank', rel: 'noopener noreferrer' } : {})}>
+        {contenu}
+      </a>
+    );
+  }
+  return (
+    <button type="button" onClick={onClick} aria-label={nom} aria-current={actif ? 'page' : undefined} className={classes}>
+      {contenu}
+    </button>
+  );
+}
+
 /**
  * Colonne étroite en bleu le plus foncé (neutre-900), placée avant la barre latérale (ordinateur seulement).
- * Rôle à définir : pour l'instant décorative (masquée aux lecteurs d'écran), sauf si les
- * éléments reçoivent un onClick, auquel cas ils deviennent des boutons avec leur libellé.
- * - elements : [{ icone, label, actif?, onClick? }]
+ * Mise en page d'origine (icônes empilées en haut) ; chaque icône est un raccourci, avec une info-bulle
+ * au survol et au focus.
+ * - elements : [{ icone, label, onClick | href, externe?, actif?, compteur? }]
  */
-export function BarreIcones({ elements = [] }) {
-  const interactive = elements.some((e) => e.onClick);
+export function BarreIcones({ elements = [], label = 'Raccourcis' }) {
   return (
-    <div className="flex h-full w-14 flex-col items-center gap-3 bg-sombre-profond py-4" aria-hidden={interactive ? undefined : 'true'}>
-      {elements.map((el, i) => {
-        const Icone = el.icone;
-        const classes = `inline-flex h-8 w-8 items-center justify-center rounded-md transition-colors ${
-          el.actif ? 'bg-marque/15 text-marque-vif' : 'text-sur-sombre-discret hover:bg-white/[0.06] hover:text-sur-sombre'
-        }`;
-        return el.onClick ? (
-          <button key={el.label || i} type="button" onClick={el.onClick} aria-label={el.label} title={el.label} className={classes}>
-            <Icone size={16} aria-hidden="true" />
-          </button>
-        ) : (
-          <span key={el.label || i} className={classes}>
-            <Icone size={16} />
-          </span>
-        );
-      })}
-    </div>
+    <nav className="relative z-20 flex h-full w-14 flex-col items-center bg-sombre-profond py-4" aria-label={label}>
+      <ul className="flex flex-col items-center gap-3">
+        {elements.map((el) => (
+          <li key={el.label}>
+            <ElementRail {...el} />
+          </li>
+        ))}
+      </ul>
+    </nav>
   );
 }
 
@@ -359,6 +387,7 @@ export function BarreHaut({ salutation, onMenu, menuOuvert, elements = [], onNav
       <div className="ml-auto flex items-center gap-2 sm:gap-3">
         <RechercheMenu elements={elements} onNaviguer={onNaviguer} />
         {actions}
+        <BoutonTheme />
         <MenuNotifications notifications={notifications} />
         {utilisateur && <MenuCompte utilisateur={utilisateur} elements={menuUtilisateur} />}
       </div>

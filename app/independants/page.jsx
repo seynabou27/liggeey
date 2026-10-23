@@ -21,6 +21,8 @@ function Lettre({ children }) {
 
 export default function PageIndependants() {
   const t = independants;
+  // Seules les vidéos déjà produites s'affichent ; sans vidéo, la section et son lien sont masqués
+  const videos = t.wolof.videos.filter((v) => v.src);
   return (
     <>
       <EnTetePage surtitre={t.hero.surtitre} titre={t.hero.titre} texte={t.hero.texte} image={t.hero.image}>
@@ -28,9 +30,11 @@ export default function PageIndependants() {
         <Bouton href="#emploi" variante="clair">
           {t.hero.choixB}
         </Bouton>
-        <Link href="#wolof" className="inline-flex min-h-[44px] items-center font-semibold underline decoration-primaire-500 decoration-2 underline-offset-4">
-          {t.hero.audio}
-        </Link>
+        {videos.length > 0 && (
+          <Link href="#wolof" className="inline-flex min-h-[44px] items-center font-semibold underline decoration-primaire-500 decoration-2 underline-offset-4">
+            {t.hero.audio}
+          </Link>
+        )}
       </EnTetePage>
 
       <Section fond="clair">
@@ -82,16 +86,18 @@ export default function PageIndependants() {
         </div>
       </Section>
 
-      <Section id="wolof">
-        <TitreSection titre={t.wolof.titre} texte={t.wolof.texte} />
-        <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {t.wolof.videos.map((v) => (
-            <li key={v.id}>
-              <VideoWolof video={v} />
-            </li>
-          ))}
-        </ul>
-      </Section>
+      {videos.length > 0 && (
+        <Section id="wolof">
+          <TitreSection titre={t.wolof.titre} texte={t.wolof.texte} />
+          <ul className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {videos.map((v) => (
+              <li key={v.id}>
+                <VideoWolof video={v} />
+              </li>
+            ))}
+          </ul>
+        </Section>
+      )}
 
       <BlocAide titre={t.aide.titre} texte={t.aide.texte} />
 

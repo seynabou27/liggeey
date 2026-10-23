@@ -49,7 +49,7 @@ export const independants = {
   wolof: {
     titre: 'Expliqué en wolof',
     texte: 'De courtes vidéos pour tout comprendre, sans avoir à lire.',
-    // ⚠️ Vidéos à produire : renseigner « src » (fichier dans /public/videos ou lien YouTube) quand elles existent.
+    // ⚠️ Vidéos à produire : renseigner « src » (fichier dans /public/videos ou lien YouTube) quand elles existent. Sans « src », la vidéo n’est pas affichée (et la section disparaît s’il n’y en a aucune).
     videos: [
       { id: 'presentation', titre: 'C’est quoi LIGGEEY ?', duree: '1 min', src: '' },
       { id: 'formalisation', titre: 'Formaliser mon activité', duree: '2 min', src: '' },

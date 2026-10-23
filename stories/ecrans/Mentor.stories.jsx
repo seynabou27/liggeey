@@ -13,3 +13,5 @@ export const Mentores = { name: 'Mes mentorés', render: () => <Ecran ecran="men
 export const Seances = { name: 'Séances', render: () => <Ecran ecran="seances" espace="mentor" /> };
 
 export const Profil = { name: 'Mon profil mentor', render: () => <Ecran ecran="profil" espace="mentor" /> };
+
+export const Messages = { name: "Messages", render: () => <Ecran ecran="messages" espace="mentor" /> };

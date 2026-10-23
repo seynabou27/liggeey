@@ -6,6 +6,7 @@ import { accueil } from '@/content/fr/accueil';
 import { experiences, niveaux, secteurs } from '@/content/referentiels';
 import { lienAbsolu, lienConnexion, lienInscription, lienOffre, lienPartageWhatsApp } from '@/lib/liens';
 import Bouton from '@/components/ui/Bouton';
+import Icone from '@/components/ui/Icone';
 
 const nomDe = (liste, id) => liste.find((e) => e.id === id)?.nom ?? id;
 
@@ -16,6 +17,16 @@ export const initiales = (nom) =>
     .join('')
     .slice(0, 2)
     .toUpperCase();
+
+/** Icône du secteur de l'offre sur fond orange doux (initiales de l'entreprise si le secteur est inconnu). */
+export function PastilleSecteur({ offre, className = 'h-12 w-12' }) {
+  const secteur = secteurs.find((s) => s.id === offre.secteur);
+  return (
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque ${className}`} aria-hidden="true">
+      {secteur ? <Icone nom={secteur.icone} className="h-1/2 w-1/2" /> : <span className="text-sm font-semibold">{initiales(offre.entreprise)}</span>}
+    </span>
+  );
+}
 
 export function messagePartage(offre) {
   const t = accueil.offres;
@@ -62,9 +73,7 @@ export default function DetailOffre({ offre, onFermer }) {
         <div className="flex flex-col gap-6 p-6 sm:p-8">
           <div className="flex items-start justify-between gap-4">
             <div className="flex items-center gap-4">
-              <div className="grid h-14 w-14 shrink-0 place-items-center rounded-xl bg-sombre text-lg font-semibold text-sur-sombre" aria-hidden="true">
-                {initiales(offre.entreprise)}
-              </div>
+              <PastilleSecteur offre={offre} className="h-14 w-14" />
               <div>
                 <h2 id="detail-offre-titre" className="text-xl font-semibold leading-snug sm:text-2xl">
                   {offre.titre}

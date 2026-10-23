@@ -16,11 +16,11 @@ export default function PageFaq() {
 
       <Section>
         <div className="grid gap-10 lg:grid-cols-[220px_1fr]">
-          {/* Sommaire des rubriques : défilement horizontal sur mobile, colonne sur ordinateur */}
-          <nav aria-label="Rubriques" className="-mx-4 overflow-x-auto px-4 lg:mx-0 lg:overflow-visible lg:px-0">
-            <ul className="flex gap-2 lg:sticky lg:top-24 lg:flex-col">
+          {/* Sommaire des rubriques : pastilles qui passent à la ligne sur mobile (toutes visibles), colonne sur ordinateur */}
+          <nav aria-label="Rubriques">
+            <ul className="flex flex-wrap gap-2 lg:sticky lg:top-24 lg:flex-col">
               {t.rubriques.map((r) => (
-                <li key={r.id} className="shrink-0">
+                <li key={r.id}>
                   <a href={`#${r.id}`} className="inline-flex min-h-[44px] items-center rounded-full border-2 border-base px-4 text-sm font-semibold hover:border-principal lg:w-full lg:rounded-lg">
                     {r.titre}
                   </a>

@@ -1,7 +1,7 @@
 'use client';
 
 import dynamic from 'next/dynamic';
-import { useEffect } from 'react';
+import { useThemeApplique } from '../app/Theme';
 
 // Le prototype garde ses données dans le navigateur (localStorage) : il n'est rendu que côté client.
 const LiggeeyPrototype = dynamic(() => import('./LiggeeyPrototype'), {
@@ -13,13 +13,8 @@ const LiggeeyPrototype = dynamic(() => import('./LiggeeyPrototype'), {
   ),
 });
 
-export default function Plateforme({ ecranInitial = null, espaceInitial = null, profilInitial = null }) {
-  // L'écran demandé est ouvert : l'adresse redevient /plateforme, pour qu'un rechargement reprenne la session de test.
-  useEffect(() => {
-    if (window.location.pathname !== '/plateforme' || window.location.search) {
-      window.history.replaceState(null, '', '/plateforme');
-    }
-  }, []);
-
-  return <LiggeeyPrototype ecranInitial={ecranInitial} espaceInitial={espaceInitial} profilInitial={profilInitial} />;
+/** chemin : segments après /plateforme ; profil : ?profil= de l'inscription. L'adresse suit ensuite chaque écran. */
+export default function Plateforme({ chemin = [], profil = null }) {
+  useThemeApplique(); // thème clair ou sombre choisi dans l'application (components/app/Theme.jsx)
+  return <LiggeeyPrototype cheminInitial={chemin} profilAdresse={profil} synchroniserAdresse />;
 }

@@ -21,7 +21,14 @@ export const MenuPrestataire = { name: 'Sidebar · prestataire', ...BarreLateral
 export const MenuEntreprise = { name: 'Sidebar · entreprise', ...BarreLaterale('entreprise', { candidatures: 4, suivi: 2 }) };
 export const MenuAdmin = { name: 'Sidebar · admin', ...BarreLaterale('admin', { suivi: 1, regularisations: 2, abonnements: 1 }) };
 
-export const BarreIcones = { name: 'IconRail', render: () => <div className="flex h-[400px]"><IconRail /></div> };
+const Rail = (espace, badges = {}) => ({
+  render: (args) => <div className="flex h-[480px]"><IconRail espace={espace} active={args.active} onNavigate={args.onNavigate} badges={badges} /></div>,
+  args: { active: 'dashboard', onNavigate: fn() },
+});
+
+export const BarreIcones = { name: 'IconRail · chercheur', ...Rail('chercheur') };
+export const BarreIconesEntreprise = { name: 'IconRail · entreprise', ...Rail('entreprise', { candidatures: 4, suivi: 2 }) };
+export const BarreIconesAdmin = { name: 'IconRail · admin', ...Rail('admin', { offres: 2, communication: 3 }) };
 
 export const FilAriane = {
   name: 'Breadcrumb',
@@ -51,7 +58,7 @@ export const CoquilleApplication = {
   name: 'AppShell',
   render: (args) => (
     <AvecPlateforme espace="chercheur">
-      <AppShell navItems={NAV_ITEMS_BY_ESPACE.chercheur} active="offres" onNavigate={args.onNavigate} user={USER_BY_ESPACE.chercheur} breadcrumb={[{ label: 'Offres d’emploi' }]} badges={{ suivi: 1 }}>
+      <AppShell espace="chercheur" navItems={NAV_ITEMS_BY_ESPACE.chercheur} active="offres" onNavigate={args.onNavigate} user={USER_BY_ESPACE.chercheur} breadcrumb={[{ label: 'Offres d’emploi' }]} badges={{ suivi: 1 }}>
         <div className="rounded-lg border border-base bg-surface p-10 text-center text-secondaire">Contenu de l’écran</div>
       </AppShell>
     </AvecPlateforme>

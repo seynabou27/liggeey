@@ -5,6 +5,8 @@ export { Avatar, GroupeAvatars, initiales } from './Avatar';
 export { Carte, CarteStat, CarteProfil, PastilleIcone, LigneInfo, EtatVide } from './Carte';
 export { BoutonIcone, ChampRecherche, SelecteurPeriode, Onglets, Segments, PaginationApp, Interrupteur } from './Controles';
 export { Tableau, CelluleIdentite } from './Tableau';
+export { MenuExport } from './Export';
+export { useTheme, useThemeApplique, choisirTheme, BoutonTheme, ChoixTheme } from './Theme';
 export { BarreProgression, ListeClassee, Anneau } from './Progression';
 export { ElementConversation, BulleMessage, ZoneSaisie, SeparateurDate } from './Messagerie';
 export { Coquille, BarreIcones, BarreLaterale, BarreHaut, EnTetePage, PiedApp, grouperParSection } from './Coquille';

@@ -14,7 +14,15 @@ const ELEMENTS = [
   { id: 'abonnement', label: 'Abonnement', icone: Crown, section: 'Mon compte' },
 ];
 
-const RAIL = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell].map((icone, i) => ({ icone, actif: i === 0 }));
+const RAIL = [
+  { icone: Flame, label: 'Mes priorités', compteur: 3 },
+  { icone: Grid3x3, label: 'Parcourir les offres', actif: true },
+  { icone: Zap, label: 'Booster mon profil' },
+  { icone: Triangle, label: 'Points de suivi à compléter', compteur: 1 },
+  { icone: AlignJustify, label: 'Mes candidatures' },
+  { icone: Layers, label: 'Me former' },
+  { icone: Bell, label: 'Messages', compteur: 2 },
+].map((el) => ({ ...el, onClick: fn() }));
 
 const Logo = () => <img src="/logo/liggeey-blanc.svg" alt="LIGGEEY" className="h-6" />;
 const LogoArdoise = () => <img src="/logo/liggeey-ardoise.svg" alt="LIGGEEY" className="h-6" />;
@@ -83,6 +91,7 @@ export const Mobile = {
 export const Rail = {
   name: 'Barre d’icônes',
   render: () => <BarreIcones elements={RAIL} />,
+  parameters: { docs: { description: { story: 'Icônes et mise en page d’origine ; chaque icône est un raccourci de l’espace (info-bulle au survol et au focus, compteur repris du menu).' } } },
   decorators: [(Story) => <div className="flex h-[420px]"><Story /></div>],
 };
 
