@@ -19,7 +19,7 @@ function Colonne({ id, groupe, visible }) {
               <Icone nom={etape.icone} />
             </span>
             <div>
-              <h3 className="text-[15px] font-semibold uppercase">{etape.titre}</h3>
+              <h3 className="text-[15px] font-semibold">{etape.titre}</h3>
               <p className="mt-1 text-sm leading-[1.7] text-secondaire">{etape.texte}</p>
             </div>
           </li>

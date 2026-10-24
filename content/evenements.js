@@ -6,7 +6,7 @@
 export const evenements = [
   {
     slug: 'job-dating-decembre-2026',
-    titre: 'Job Dating LIGGEEY · Décembre 2026',
+    titre: 'Job Dating LIGGEEY\u00a0· Décembre 2026', // espace insécable : le point médian ne commence jamais une ligne
     date: '2026-12-12',
     debut: '09:00',
     fin: '14:00',

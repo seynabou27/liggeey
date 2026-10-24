@@ -238,13 +238,14 @@ const AUTH_PANNEAU = {
   },
   inscription: {
     surtitre: "Créer votre compte",
-    titre: "Un profil,",
-    accent: "trois parcours.",
+    titre: "Un compte,",
+    accent: "un parcours pour chacun.",
     texte: "Choisissez le vôtre : LIGGEEY vous accompagne avant, pendant et après l'embauche.",
     liste: [
       { icon: Briefcase, titre: "Talents", texte: "Valorisez vos compétences et postulez à des offres vérifiées." },
       { icon: Wrench, titre: "Indépendants", texte: "Formalisez votre activité et trouvez des missions." },
       { icon: Building2, titre: "Entreprises", texte: "Recrutez avec un suivi de vos recrues pendant 90 jours." },
+      { icon: Compass, titre: "Jeunes et mentors", texte: "Cap Métier dès 15 ans pour trouver sa voie, avec des mentors du métier." },
     ],
   },
 };
@@ -1451,7 +1452,7 @@ function EncartFormule({ onNavigate }) {
       <span className="mx-auto mb-3 inline-flex h-11 w-11 items-center justify-center rounded-full bg-marque text-sur-marque" aria-hidden="true">
         <Crown size={20} />
       </span>
-      <p className="text-sm font-semibold text-sur-sombre">Profil {currentPlan.nom}</p>
+      <p className="text-sm font-semibold text-sur-sombre">Formule {currentPlan.nom}</p>
       <p className="mb-3 mt-1 text-xs text-sur-sombre-secondaire">
         {upgradeTo ? `Passez ${upgradeTo.nom} pour être vu en priorité par les recruteurs.` : "Toutes les fonctions sont ouvertes."}
       </p>
@@ -1604,7 +1605,6 @@ const STATUT_TONS = {
   "Inactif": "neutre",
   "Annulée": "danger",
   "Annulé": "danger",
-  "En révision": "alerte",
   "En cours d'apprentissage": "marque",
   "Apprenant": "marque",
   "Mentoré": "marque",
@@ -2286,8 +2286,8 @@ function OffreDetail({ offre, similaires = [], onOpen, onBack, onNavigate, saved
                 {restantes !== UNLIMITED && (
                   <p className={`text-sm ${restantes > 0 ? "text-discret" : "text-statut-danger"}`}>
                     {restantes > 0
-                      ? `Il vous reste ${restantes} candidature${restantes > 1 ? "s" : ""} ce mois-ci avec le profil ${planApi.plan.nom}.`
-                      : `Vous avez utilisé toutes vos candidatures du mois avec le profil ${planApi.plan.nom}.`}
+                      ? `Il vous reste ${restantes} candidature${restantes > 1 ? "s" : ""} ce mois-ci avec la formule ${planApi.plan.nom}.`
+                      : `Vous avez utilisé toutes vos candidatures du mois avec la formule ${planApi.plan.nom}.`}
                   </p>
                 )}
                 <App.Bouton pleineLargeur onClick={postuler}>
@@ -2551,7 +2551,7 @@ function CandidatureCard({ c, onNavigate }) {
       )}
       {c.embauche && (
         <div className="mt-4 flex flex-wrap items-center justify-between gap-3 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
-          <span>Vous avez été recrutée. LIGGEEY vous accompagne pendant vos six premiers mois.</span>
+          <span>Vous avez été recrutée. LIGGEEY vous accompagne pendant vos 90 premiers jours.</span>
           {onNavigate && (
             <button type="button" onClick={(e) => { e.stopPropagation(); onNavigate("suivi"); }} className="inline-flex min-h-[44px] items-center font-semibold underline">
               Voir mon suivi post-embauche
@@ -2827,7 +2827,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
               { icone: Clock, libelle: "Volume horaire", valeur: `${formation.heures} h` },
               { icone: CalendarDays, libelle: "Durée", valeur: dureeFromHeures(formation.heures) },
               { icone: UserCircle2, libelle: "Formateur", valeur: nomDepuisEmail(formation.coach) },
-              { icone: Crown, libelle: "Accès", valeur: premium ? "Profil Premium" : "Inclus dans votre profil" },
+              { icone: Crown, libelle: "Accès", valeur: premium ? "Formule Premium" : "Inclus dans votre formule" },
             ]}
           />
 
@@ -2847,7 +2847,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
             ) : (
               <div className="space-y-4">
                 <p className="text-sm text-secondaire">
-                  {locked ? "Cette formation fait partie du profil Premium." : "Inscrivez-vous pour suivre les modules à votre rythme et obtenir un certificat LIGGEEY."}
+                  {locked ? "Cette formation fait partie de la formule Premium." : "Inscrivez-vous pour suivre les modules à votre rythme et obtenir un certificat LIGGEEY."}
                 </p>
                 <App.Bouton pleineLargeur onClick={onToggleEnroll}>
                   {locked ? <Lock size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />} S'inscrire
@@ -4163,7 +4163,7 @@ function ServicesScreen({ creer = false }) {
     <div className="space-y-6">
       <p className="text-sm text-secondaire">
         Gérez les prestations que vous proposez à vos clients.
-        {serviceLimit !== UNLIMITED && <span> {services.length} / {serviceLimit} services utilisés avec le profil {planApi.plan.nom}.</span>}
+        {serviceLimit !== UNLIMITED && <span> {services.length} / {serviceLimit} services utilisés avec la formule {planApi.plan.nom}.</span>}
       </p>
 
       <BarreFiltres label="Rechercher et filtrer mes services">
@@ -4776,7 +4776,7 @@ const OFFRES_ENTREPRISE_INITIAL = [
 
 function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
   const [candidaturesRecues] = useStore("candidatures-entreprise", CANDIDATURES_ENTREPRISE_INITIAL);
-  const actives = offres.filter((o) => o.statut !== "Clôturée");
+  const actives = offres.filter((o) => o.statut === "Active");
   const COMPLETION = useCompletionEntreprise().valeur;
   const maxCand = Math.max(...actives.map((o) => o.nbCandidatures || 0), 1);
   return (
@@ -4784,7 +4784,7 @@ function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
       <p className="text-sm text-secondaire">Voici un aperçu de vos recrutements chez Senegal Construction SARL.</p>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
-        <StatCard icon={Briefcase} value={offres.filter((o) => o.statut === "Active").length} label="Offres actives" detail="Visibles par les talents" onClick={() => onNavigate("offres")} />
+        <StatCard icon={Briefcase} value={actives.length} label="Offres actives" detail="Visibles par les talents" onClick={() => onNavigate("offres")} />
         <StatCard icon={FileText} value={offres.reduce((t, o) => t + (o.nbCandidatures || 0), 0)} label="Candidatures reçues" detail="Toutes offres confondues" tone="info" onClick={() => onNavigate("candidatures")} />
         <StatCard icon={Users2} value={8} label="Prestataires engagés" detail="Missions confiées" tone="succes" />
         <App.CarteStat
@@ -5268,7 +5268,7 @@ function CandidatureEntrepriseDetail({ candidat, onDecide, onBack }) {
   const premium = PREMIUM_CANDIDATS.has(candidat.id);
   const verrou = (
     <button type="button" onClick={unlock} className="inline-flex min-h-[32px] items-center gap-1.5 font-semibold text-marque">
-      <Lock size={13} aria-hidden="true" /> Débloquer avec le profil Premium
+      <Lock size={13} aria-hidden="true" /> Débloquer avec la formule Premium
     </button>
   );
   return (
@@ -6233,7 +6233,7 @@ function ChercheursAdminDetail(row, { onBack, update, remove }) {
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.metier} · {row.ville}</p>
           </div>
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
-          <Row label="Email" value={row.email} /><div className="h-2" />
+          <Row label="E-mail" value={row.email} /><div className="h-2" />
           <Row label="Date de naissance" value={row.naissance} /><div className="h-2" />
           <Row label="Genre" value={row.genre} /><div className="h-2" />
           <Row label="Expérience" value={row.experience} />
@@ -6266,11 +6266,11 @@ function ChercheursAdminScreen() {
       searchKeys={["nom", "metier", "ville"]}
       filters={[
         { key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v },
-        { key: "profil", label: "Tous les profils", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "chercheur") === v },
+        { key: "profil", label: "Toutes les formules", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "chercheur") === v },
       ]}
       columns={[
         { key: "nom", label: "Utilisateur", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
-        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "chercheur") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "chercheur") },
+        { key: "profil", label: "Formule", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "chercheur") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "chercheur") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "date", label: "Date d'inscription", flex: 1 },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
@@ -6310,7 +6310,7 @@ function PrestatairesAdminDetail(row, { onBack, update, remove }) {
             <Stars note={Math.round(row.note)} size={13} />
           </div>
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
-          <Row label="Email" value={row.email} /><div className="h-2" />
+          <Row label="E-mail" value={row.email} /><div className="h-2" />
           <Row label="NINEA" value={row.ninea} /><div className="h-2" />
           <Row label="Années d'activité" value={row.anneesActivite} />
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Compétences clés</p>
@@ -6340,10 +6340,10 @@ function PrestatairesAdminScreen() {
       subtitle="Gérez et suivez les prestataires de services inscrits sur LIGGEEY"
       initialData={PRESTATAIRES_ADMIN_INITIAL}
       searchKeys={["nom", "metier", "ville"]}
-      filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Tous les profils", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "prestataire") === v }]}
+      filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Toutes les formules", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "prestataire") === v }]}
       columns={[
         { key: "nom", label: "Prestataire", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
-        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "prestataire") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "prestataire") },
+        { key: "profil", label: "Formule", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "prestataire") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "prestataire") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "missions", label: "Missions", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.missions} missions</span> },
         { key: "note", label: "Note", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>★ {r.note}</span> },
@@ -6386,7 +6386,7 @@ function EntreprisesAdminDetail(row, { onBack, update, remove }) {
           <Row label="RCCM" value={row.rccm} /><div className="h-2" />
           <Row label="Taille" value={row.employes} /><div className="h-2" />
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
-          <Row label="Email" value={row.email} />
+          <Row label="E-mail" value={row.email} />
           {row.siteWeb && <><div className="h-2" /><Row label="Site web" value={row.siteWeb} /></>}
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Secteurs d'activité</p>
           <div className="flex flex-wrap gap-1.5">
@@ -6415,10 +6415,10 @@ function EntreprisesAdminScreen() {
       subtitle="Gérez et suivez les entreprises et recruteurs inscrits sur LIGGEEY"
       initialData={ENTREPRISES_ADMIN_INITIAL}
       searchKeys={["nom", "secteur", "ville"]}
-      filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Tous les profils", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "entreprise") === v }]}
+      filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Toutes les formules", options: ["Sans formule", "Entreprise"], matcher: (r, v) => adminTier(r.nom, "entreprise") === v }]}
       columns={[
         { key: "nom", label: "Entreprise", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.secteur} />, exportSub: { label: "Secteur", key: "secteur" } },
-        { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "entreprise") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "entreprise") },
+        { key: "profil", label: "Formule", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "entreprise") === "Entreprise"} label={adminTier(r.nom, "entreprise")} size="sm" />, exportValue: (r) => adminTier(r.nom, "entreprise") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "offresActives", label: "Offres actives", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.offresActives} offres</span> },
         { key: "employes", label: "Employés", flex: 1 },
@@ -6436,7 +6436,7 @@ const OFFRES_ADMIN_INITIAL = [
   { id: "oa1", titre: "Chef d'équipe électricité", entreprise: "Senegal Construction SARL", secteur: "BTP & Construction", candidatures: 5, date: "15/07/2026", statut: "Active", localisation: "Dakar, Plateau", contrat: "CDI", experience: "5+ ans", salaire: "350 000 - 450 000 FCFA/mois", description: "Nous recherchons un Chef d'équipe électricité expérimenté pour superviser nos chantiers de construction résidentiels et tertiaires à Dakar. Vous serez responsable de la gestion d'une équipe d'électriciens, de la planification des travaux et du respect rigoureux des consignes de sécurité sur le terrain.", competences: ["Normes NF C 15-100", "Management d'équipe", "Lecture de plans", "Câblage industriel"], publieeLe: "15/07/2026", expireLe: "15/09/2026", candidatsRecents: [{ title: "Moussa Diop", sub: "Électricien bâtiment", badge: "En cours" }, { title: "Fatou Sarr", sub: "Plombière sanitaire", badge: "Retenu" }, { title: "Ibrahima Diallo", sub: "Soudeur industriel", badge: "Rejeté" }] },
   { id: "oa2", titre: "Plombier qualifié", entreprise: "Diallo & Fils", secteur: "Plomberie", candidatures: 8, date: "10/07/2026", statut: "Active", localisation: "Saint-Louis", contrat: "CDD", experience: "2-5 ans", salaire: "200 000 - 250 000 FCFA/mois", description: "Poste de plombier qualifié pour l'entretien et l'installation de systèmes sanitaires.", competences: ["Plomberie sanitaire"], publieeLe: "10/07/2026", expireLe: "10/09/2026", candidatsRecents: [] },
   { id: "oa3", titre: "Menuisier ébéniste", entreprise: "Ndiaye Menuiserie", secteur: "Menuiserie", candidatures: 12, date: "05/07/2026", statut: "Active", localisation: "Kaolack", contrat: "CDI", experience: "5+ ans", salaire: "280 000 - 320 000 FCFA/mois", description: "Fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], publieeLe: "05/07/2026", expireLe: "05/09/2026", candidatsRecents: [] },
-  { id: "oa4", titre: "Technicien maintenance", entreprise: "Dakar Services Pro", secteur: "Multi-services", candidatures: 3, date: "01/07/2026", statut: "En révision", localisation: "Dakar", contrat: "CDI", experience: "3-5 ans", salaire: "250 000 FCFA/mois", description: "Maintenance générale de bâtiments tertiaires.", competences: ["Maintenance générale"], publieeLe: "01/07/2026", expireLe: "01/09/2026", candidatsRecents: [] },
+  { id: "oa4", titre: "Technicien maintenance", entreprise: "Dakar Services Pro", secteur: "Multi-services", candidatures: 3, date: "01/07/2026", statut: "En vérification", localisation: "Dakar", contrat: "CDI", experience: "3-5 ans", salaire: "250 000 FCFA/mois", description: "Maintenance générale de bâtiments tertiaires.", competences: ["Maintenance générale"], publieeLe: "01/07/2026", expireLe: "01/09/2026", candidatsRecents: [] },
   { id: "oa5", titre: "Maçon qualifié", entreprise: "Mbour Construction", secteur: "BTP", candidatures: 15, date: "25/06/2026", statut: "Active", localisation: "Mbour", contrat: "CDD", experience: "3-8 ans", salaire: "250 000 - 300 000 FCFA/mois", description: "Travaux de maçonnerie générale sur chantiers résidentiels.", competences: ["Maçonnerie", "Fondations"], publieeLe: "25/06/2026", expireLe: "25/08/2026", candidatsRecents: [] },
   { id: "oa6", titre: "Électricien chantier", entreprise: "Thiès Électrique", secteur: "Électricité", candidatures: 0, date: "20/06/2026", statut: "Expirée", localisation: "Thiès", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 FCFA/mois", description: "Installation électrique sur chantier.", competences: ["Électricité de base"], publieeLe: "20/06/2026", expireLe: "20/08/2026", candidatsRecents: [] },
   { id: "oa7", titre: "Peintre bâtiment", entreprise: "Rufisque Bâtiment", secteur: "BTP", candidatures: 7, date: "15/06/2026", statut: "Suspendue", localisation: "Rufisque", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 - 220 000 FCFA/mois", description: "Travaux de peinture sur chantiers résidentiels.", competences: ["Peinture", "Enduits"], publieeLe: "15/06/2026", expireLe: "15/08/2026", candidatsRecents: [] },
@@ -6640,7 +6640,7 @@ function OffresAdminScreen({ offresEntreprise, setOffresEntreprise }) {
       initialData={OFFRES_ADMIN_INITIAL}
       searchKeys={["titre", "entreprise", "secteur"]}
       filters={[
-        { key: "statut", label: "Tous les statuts", options: ["Active", "En révision", "Expirée", "Suspendue"], matcher: (r, v) => r.statut === v },
+        { key: "statut", label: "Tous les statuts", options: ["Active", "En vérification", "Expirée", "Suspendue"], matcher: (r, v) => r.statut === v },
         { key: "secteur", label: "Tous les secteurs", options: Array.from(new Set(OFFRES_ADMIN_INITIAL.map((o) => o.secteur))), matcher: (r, v) => r.secteur === v },
       ]}
       columns={[
@@ -6764,7 +6764,7 @@ function MentoratAdminDetail(row, { onBack, update, remove }) {
             {row.note > 0 && <Stars note={Math.round(row.note)} size={13} />}
           </div>
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
-          <Row label="Email" value={row.email} /><div className="h-2" />
+          <Row label="E-mail" value={row.email} /><div className="h-2" />
           <Row label="Expérience professionnelle" value={row.experience} /><div className="h-2" />
           <Row label="NINEA" value={row.ninea} />
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Compétences</p>
@@ -6922,7 +6922,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
             </div>
           </div>
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
-          <Row label="Email" value={row.email} /><div className="h-2" />
+          <Row label="E-mail" value={row.email} /><div className="h-2" />
           <Row label="Expérience" value={row.experience} />
           <p className="text-xs font-semibold mt-4 mb-1.5" style={{ color: COLORS.slateLight }}>Compétences clés</p>
           <div className="flex flex-wrap gap-1.5">
@@ -7565,18 +7565,18 @@ function ArchivesTab() {
 const EVENT_TYPE_COLORS = {
   Formation: { bg: COLORS.infoSoft, color: COLORS.info },
   Mission: { bg: COLORS.orangeSoft, color: COLORS.orangeStrong },
-  Deadline: { bg: COLORS.dangerSoft, color: COLORS.danger },
+  "Date limite": { bg: COLORS.dangerSoft, color: COLORS.danger },
   Événement: { bg: COLORS.successSoft, color: COLORS.success },
 };
 
 const PLANNING_EVENTS_INITIAL = [
   { id: "e1", titre: "Formation Électricité Pro", type: "Formation", debut: "2026-10-03", fin: "2026-10-05", meta: "15 inscrits" },
   { id: "e2", titre: "Atelier Couture Pikine", type: "Mission", debut: "2026-10-10", fin: "2026-10-10", meta: "28 places" },
-  { id: "e3", titre: "Limite Candidatures Offres BTP", type: "Deadline", debut: "2026-10-15", fin: "2026-10-15", meta: "Alerte système" },
+  { id: "e3", titre: "Limite Candidatures Offres BTP", type: "Date limite", debut: "2026-10-15", fin: "2026-10-15", meta: "Alerte système" },
   { id: "e4", titre: "Session Mentorat Individuel", type: "Événement", debut: "2026-10-18", fin: "2026-10-19", meta: "12 sessions" },
   { id: "e5", titre: "Forum Emploi Artisanat", type: "Événement", debut: "2026-10-25", fin: "2026-10-25", meta: "500 attendus" },
   { id: "e6", titre: "Formation Plomberie sanitaire", type: "Formation", debut: "2026-11-07", fin: "2026-11-09", meta: "12 inscrits" },
-  { id: "e7", titre: "Clôture offres Hôtellerie", type: "Deadline", debut: "2026-11-21", fin: "2026-11-21", meta: "Alerte système" },
+  { id: "e7", titre: "Clôture offres Hôtellerie", type: "Date limite", debut: "2026-11-21", fin: "2026-11-21", meta: "Alerte système" },
   { id: "e8", titre: "Journée portes ouvertes LIGGEEY", type: "Événement", debut: "2026-10-10", fin: "2026-10-10", meta: "Guédiawaye" },
 ];
 
@@ -7976,7 +7976,7 @@ function ParametresScreen() {
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Compte administrateur</h3>
           <Row label="Nom" value="Admin LIGGEEY" /><div className="h-2" />
           <Row label="Rôle" value="Super Admin" /><div className="h-2" />
-          <Row label="Email" value="admin@liggeey.sn" />
+          <Row label="E-mail" value="admin@liggeey.sn" />
         </div>
         <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Sécurité</h3>
@@ -8042,11 +8042,11 @@ function todayFr(offsetMonths = 0) {
 const PLANS_INITIAL = {
   chercheur: [
     { id: "essentiel", nom: "Essentiel", prixMensuel: 1500, description: "Les fonctionnalités essentielles pour démarrer votre recherche.", limits: { candidatures: 5 }, features: {}, avantages: ["Profil complet et badge « Profil vérifié »", "Offres vérifiées", "5 candidatures par mois", "Suivi des candidatures", "Formations gratuites avec certificat"] },
-    { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { candidatures: UNLIMITED }, features: { formationsPremium: true, mentorat: true, miseEnAvant: true }, avantages: ["Tout le profil Essentiel", "Candidatures illimitées", "Profil mis en avant auprès des recruteurs", "Sessions de mentorat collectives", "Formations premium incluses", "Voir qui a consulté votre profil"] },
+    { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { candidatures: UNLIMITED }, features: { formationsPremium: true, mentorat: true, miseEnAvant: true }, avantages: ["Tout le Pack Essentiel", "Candidatures illimitées", "Profil mis en avant auprès des recruteurs", "Sessions de mentorat collectives", "Formations premium incluses", "Voir qui a consulté votre profil"] },
   ],
   prestataire: [
     { id: "essentiel", nom: "Essentiel", prixMensuel: 1500, description: "Les fonctionnalités essentielles pour proposer vos services.", limits: { services: 10 }, features: {}, avantages: ["Profil complet et badge « Profil vérifié »", "Jusqu'à 10 services publiés", "Formations gratuites avec certificat", "Guide de formalisation en ligne"] },
-    { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { services: UNLIMITED }, features: { formationsPremium: true, mentorat: true, contreOffre: true, badgePro: true, accompagnementRegularisation: true }, avantages: ["Tout le profil Essentiel", "Services illimités", "Profil prioritaire et badge Premium", "Contre-propositions de tarif aux clients", "Sessions de mentorat collectives", "Formations premium incluses"] },
+    { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { services: UNLIMITED }, features: { formationsPremium: true, mentorat: true, contreOffre: true, badgePro: true, accompagnementRegularisation: true }, avantages: ["Tout le Pack Essentiel", "Services illimités", "Profil prioritaire et badge Premium", "Contre-propositions de tarif aux clients", "Sessions de mentorat collectives", "Formations premium incluses"] },
   ],
   entreprise: [
     { id: "premium", nom: "Entreprise", prixMensuel: 40000, description: "Publication d'offres, sélection et short-list des profils par LIGGEEY.", limits: { offres: UNLIMITED }, features: { coordonnees: true, contactPrestataires: true, sponsoring: true }, avantages: ["Offres illimitées", "Sélection et short-list des profils par LIGGEEY", "Coordonnées et CV des candidats", "Contact direct et missions aux prestataires", "Offres sponsorisées en tête de liste"] },
@@ -8062,23 +8062,23 @@ const LIMIT_LABELS = {
 };
 
 const UPGRADE_REASONS = {
-  candidatures: { titre: "Vous avez utilisé toutes vos candidatures du mois", texte: "Avec le profil Premium, postulez sans limite aux offres qui vous intéressent.", limit: "candidatures" },
-  formationsPremium: { titre: "Cette formation est réservée au profil Premium", texte: "Débloquez toutes les formations et obtenez les certificats associés.", feature: "formationsPremium" },
-  mentorat: { titre: "Le mentorat est réservé au profil Premium", texte: "Profitez des sessions de mentorat collectives avec des professionnels de votre secteur.", feature: "mentorat" },
-  services: { titre: "Vous avez atteint le nombre maximum de services", texte: "Publiez autant de services que vous le souhaitez avec le profil Premium.", limit: "services" },
-  contreOffre: { titre: "Les contre-propositions sont réservées au profil Premium", texte: "Négociez le tarif d'une mission directement avec le client.", feature: "contreOffre" },
+  candidatures: { titre: "Vous avez utilisé toutes vos candidatures du mois", texte: "Avec la formule Premium, postulez sans limite aux offres qui vous intéressent.", limit: "candidatures" },
+  formationsPremium: { titre: "Cette formation est réservée à la formule Premium", texte: "Débloquez toutes les formations et obtenez les certificats associés.", feature: "formationsPremium" },
+  mentorat: { titre: "Le mentorat est réservé à la formule Premium", texte: "Profitez des sessions de mentorat collectives avec des professionnels de votre secteur.", feature: "mentorat" },
+  services: { titre: "Vous avez atteint le nombre maximum de services", texte: "Publiez autant de services que vous le souhaitez avec la formule Premium.", limit: "services" },
+  contreOffre: { titre: "Les contre-propositions sont réservées à la formule Premium", texte: "Négociez le tarif d'une mission directement avec le client.", feature: "contreOffre" },
   offres: { titre: "Vous avez publié toutes vos offres du mois", texte: "Publiez davantage d'offres et touchez plus de candidats.", limit: "offres" },
-  coordonnees: { titre: "Coordonnées et CV réservés au profil Premium", texte: "Contactez directement les candidats et téléchargez leurs documents.", feature: "coordonnees" },
-  contactPrestataires: { titre: "Le contact direct avec les prestataires est réservé au profil Premium", texte: "Échangez avec les artisans et proposez-leur des missions.", feature: "contactPrestataires" },
+  coordonnees: { titre: "Coordonnées et CV réservés à la formule Premium", texte: "Contactez directement les candidats et téléchargez leurs documents.", feature: "coordonnees" },
+  contactPrestataires: { titre: "Le contact direct avec les prestataires est réservé à la formule Premium", texte: "Échangez avec les artisans et proposez-leur des missions.", feature: "contactPrestataires" },
   accompagnementRegularisation: { titre: "L'accompagnement par un conseiller est inclus dans Premium", texte: "Un conseiller LIGGEEY prépare vos dossiers avec vous et vous oriente vers les bons guichets.", feature: "accompagnementRegularisation" },
-  sponsoring: { titre: "Les offres sponsorisées sont réservées au profil Premium", texte: "Placez votre offre en tête des résultats pendant 7 jours.", feature: "sponsoring" },
+  sponsoring: { titre: "Les offres sponsorisées sont réservées à la formule Premium", texte: "Placez votre offre en tête des résultats pendant 7 jours.", feature: "sponsoring" },
 };
 
 const PREMIUM_FORMATIONS = new Set(["devweb", "excel", "leadership", "entrepreneuriat", "peinture-moderne", "soudure-tech", "solaire-pv"]);
 
 const SUBS_INITIAL = {
   chercheur: { planId: "essentiel", cycle: "mensuel", moyen: "Wave", depuis: "01/09/2026", prochain: "01/11/2026" },
-  prestataire: { planId: "essentiel", cycle: "mensuel", moyen: "Orange Money", depuis: "15/08/2026", prochain: "15/11/2026" },
+  prestataire: { planId: "essentiel", cycle: "mensuel", moyen: "Orange Money", depuis: "15/08/2026", prochain: "15/10/2026" },
   entreprise: { planId: "premium", cycle: "mensuel", moyen: "Wave", depuis: "03/09/2026", prochain: "03/11/2026" },
 };
 
@@ -8093,17 +8093,28 @@ const PAYMENT_METHODS = [
   { id: "om", nom: "Orange Money", couleur: "#FF7900", type: "mobile" },
 ];
 
+/* Titulaire d’un paiement : la personne, ou l’entreprise pour l’espace entreprise. */
+function clientPaiement(espace, user) {
+  return espace === "entreprise" ? user.role : user.name;
+}
+
 const TRANSACTIONS_INITIAL = [
   { id: "t1", ref: "LIG-26-10-0418", date: "07/10/2026", client: "Sonatel SA", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
   { id: "t2", ref: "LIG-26-10-0417", date: "06/10/2026", client: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
   { id: "t3", ref: "LIG-26-10-0415", date: "05/10/2026", client: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
   { id: "t4", ref: "LIG-26-10-0411", date: "04/10/2026", client: "Kirène", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Échoué" },
+  { id: "t11", ref: "LIG-26-10-0410", date: "03/10/2026", client: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
   { id: "t5", ref: "LIG-26-10-0409", date: "03/10/2026", client: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
   { id: "t6", ref: "LIG-26-10-0402", date: "02/10/2026", client: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t12", ref: "LIG-26-10-0398", date: "01/10/2026", client: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Wave", statut: "Payé" },
   { id: "t7", ref: "LIG-26-10-0397", date: "01/10/2026", client: "Teranga Capital", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
   { id: "t8", ref: "LIG-26-09-0388", date: "29/09/2026", client: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Remboursé" },
   { id: "t9", ref: "LIG-26-09-0381", date: "27/09/2026", client: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Échoué" },
   { id: "t10", ref: "LIG-26-09-0376", date: "25/09/2026", client: "Dakar Bâtiment", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t13", ref: "LIG-26-09-0367", date: "15/09/2026", client: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Orange Money", statut: "Payé" },
+  { id: "t14", ref: "LIG-26-09-0352", date: "03/09/2026", client: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
+  { id: "t15", ref: "LIG-26-09-0348", date: "01/09/2026", client: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Wave", statut: "Payé" },
+  { id: "t16", ref: "LIG-26-08-0331", date: "15/08/2026", client: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Orange Money", statut: "Payé" },
 ];
 
 const ABONNES_ADMIN_INITIAL = [
@@ -8117,15 +8128,21 @@ const ABONNES_ADMIN_INITIAL = [
   { id: "ab8", nom: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "05/10/2026", prochain: "05/11/2026", statut: "Actif" },
   { id: "ab9", nom: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "02/08/2026", prochain: "02/11/2026", statut: "Actif" },
   { id: "ab10", nom: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "27/07/2026", prochain: "27/09/2026", statut: "Échec de paiement" },
+  // Comptes de démonstration (même formule que dans leur espace, voir SUBS_INITIAL)
+  { id: "ab11", nom: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "03/09/2026", prochain: "03/11/2026", statut: "Actif" },
+  { id: "ab12", nom: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, depuis: "15/08/2026", prochain: "15/10/2026", statut: "Actif" },
+  { id: "ab13", nom: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, depuis: "01/09/2026", prochain: "01/11/2026", statut: "Actif" },
 ];
 
+/* Revenus mensuels des abonnements. Le mois en cours reprend le revenu mensuel récurrent
+   calculé sur les abonnés actifs, pour que le graphique et la carte affichent le même montant. */
 const REVENUS_MOIS = [
-  { mois: "Mai", montant: 612000 },
-  { mois: "Juin", montant: 748000 },
-  { mois: "Juil.", montant: 803000 },
-  { mois: "Août", montant: 921000 },
-  { mois: "Sept.", montant: 1086000 },
-  { mois: "Oct.", montant: 1204000 },
+  { mois: "Mai", montant: 92000 },
+  { mois: "Juin", montant: 107000 },
+  { mois: "Juil.", montant: 121500 },
+  { mois: "Août", montant: 138000 },
+  { mois: "Sept.", montant: 156500 },
+  { mois: "Oct.", montant: 175000 },
 ];
 
 /* ----- API exposée à tous les écrans via le contexte ----- */
@@ -8166,14 +8183,14 @@ function buildPlanApi({ espace, user, plans, setPlans, subs, setSubs, usage, set
       const montant = target.prixMensuel;
       const ref = `LIG-26-10-${String(Math.floor(1000 + Math.random() * 8999))}`;
       setSubs((s) => ({ ...s, [espace]: { planId, cycle, moyen, depuis: todayFr(), prochain: todayFr(1) } }));
-      setTransactions((t) => [{ id: `t${Date.now()}`, ref, date: todayFr(), client: user.name, espace, offre: target.nom, cycle: "Mensuel", montant, moyen, statut: "Payé" }, ...t]);
+      setTransactions((t) => [{ id: `t${Date.now()}`, ref, date: todayFr(), client: clientPaiement(espace, user), espace, offre: target.nom, cycle: "Mensuel", montant, moyen, statut: "Payé" }, ...t]);
       return { ref, montant, prochain: todayFr(1) };
     },
     downgrade: () => {
       const base = espacePlans[0];
       if (!base || base.id === plan?.id) return;
       setSubs((s) => ({ ...s, [espace]: { ...s[espace], planId: base.id, cycle: "mensuel" } }));
-      notify(`Vous êtes revenu(e) au profil ${base.nom}.`, "info");
+      notify(`Vous êtes revenu(e) à la formule ${base.nom}.`, "info");
     },
   };
   return api;
@@ -8317,7 +8334,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
         <form onSubmit={(e) => { e.preventDefault(); pay(); }} noValidate className="p-6">
           <div className="mb-6 flex items-start justify-between gap-4">
             <div>
-              <h3 id="pay-title" className="text-lg font-semibold text-principal">Passer au profil {target.nom}</h3>
+              <h3 id="pay-title" className="text-lg font-semibold text-principal">Passer à la formule {target.nom}</h3>
               <p className="mt-0.5 text-sm text-secondaire">{target.description}</p>
             </div>
             <App.BoutonIcone icone={X} label="Fermer" onClick={onClose} />
@@ -8395,7 +8412,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
           </div>
           <h3 id="pay-title" className="text-lg font-bold mb-1" style={{ color: COLORS.slate }}>Paiement confirmé</h3>
           <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>
-            Votre profil {target.nom} est actif. Prochain renouvellement le {receipt.prochain}.
+            Votre formule {target.nom} est active. Prochain renouvellement le {receipt.prochain}.
           </p>
           <div className="rounded-md px-4 py-3 mb-6 text-left text-sm flex flex-col gap-1.5" style={{ background: COLORS.soft }}>
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Référence</span><span className="font-semibold" style={{ color: COLORS.slate }}>{receipt.ref}</span></div>
@@ -8415,18 +8432,18 @@ function AbonnementScreen() {
   const api = usePlan();
   const { plan, sub, espacePlans } = api;
   const [confirmDowngrade, setConfirmDowngrade] = useState(false);
-  const history = api.transactions.filter((t) => t.espace === api.espace && t.client === api.user.name);
+  const history = api.transactions.filter((t) => t.espace === api.espace && t.client === clientPaiement(api.espace, api.user));
   const base = espacePlans[0];
   const canDowngrade = espacePlans.length > 1 && plan.id !== base.id;
   const limitKeys = Object.keys(plan.limits);
 
   return (
     <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Choisissez le profil adapté à votre activité. Vous pouvez changer ou résilier à tout moment.</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Choisissez la formule adaptée à votre activité. Vous pouvez changer ou résilier à tout moment.</p>
 
       <div className="rounded-lg p-6 mb-8 grid grid-cols-1 md:grid-cols-[1fr,1fr] gap-6" style={{ background: COLORS.dark }}>
         <div>
-          <p className="text-sm mb-1" style={{ color: COLORS.onDarkMuted }}>Profil actuel</p>
+          <p className="text-sm mb-1" style={{ color: COLORS.onDarkMuted }}>Formule actuelle</p>
           <p className="text-2xl font-bold text-sur-sombre flex items-center gap-2">
             {plan.nom} {plan.id !== "essentiel" && <Crown size={20} color={COLORS.orange} />}
           </p>
@@ -8447,7 +8464,7 @@ function AbonnementScreen() {
       </div>
 
       <div className="flex items-center justify-between flex-wrap gap-3 mb-4">
-        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Choisir votre profil</h2>
+        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Choisir votre formule</h2>
         <p className="text-sm" style={{ color: COLORS.slateLight }}>Paiement mensuel par Wave ou Orange Money</p>
       </div>
 
@@ -8456,7 +8473,7 @@ function AbonnementScreen() {
           const isCurrent = p.id === plan.id;
           const isBase = p.id === base.id;
           let cta;
-          if (isCurrent) cta = { label: "Profil actuel", disabled: true };
+          if (isCurrent) cta = { label: "Formule actuelle", disabled: true };
           else if (isBase) cta = { label: `Revenir à ${p.nom}`, onClick: () => setConfirmDowngrade(true), secondary: true };
           else cta = { label: p.prixMensuel > plan.prixMensuel ? `Passer à ${p.nom}` : `Choisir ${p.nom}`, onClick: () => api.startPayment(p.id, "mensuel") };
           return (
@@ -8464,7 +8481,7 @@ function AbonnementScreen() {
               <div className="flex items-center justify-between mb-1 min-h-[24px]">
                 <p className="font-bold text-lg" style={{ color: COLORS.slate }}>{p.nom}</p>
                 {p.recommande && !isCurrent && <PremiumChip label="Recommandé" />}
-                {isCurrent && <span className="text-xs font-semibold" style={{ color: COLORS.orangeText }}>Votre profil</span>}
+                {isCurrent && <span className="text-xs font-semibold" style={{ color: COLORS.orangeText }}>Votre formule</span>}
               </div>
               <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>{p.description}</p>
               <p className="mb-5">
@@ -8527,8 +8544,8 @@ function AbonnementScreen() {
       {confirmDowngrade && (
         <ModalFrame onClose={() => setConfirmDowngrade(false)} labelledBy="downgrade-title">
           <div className="p-6">
-            <h3 id="downgrade-title" className="text-lg font-bold mb-2" style={{ color: COLORS.slate }}>Résilier le profil {plan.nom} ?</h3>
-            <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Vous reviendrez au profil {base.nom} et perdrez l'accès à :</p>
+            <h3 id="downgrade-title" className="text-lg font-bold mb-2" style={{ color: COLORS.slate }}>Résilier la formule {plan.nom} ?</h3>
+            <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Vous reviendrez à la formule {base.nom} et perdrez l'accès à :</p>
             <ul className="flex flex-col gap-1.5 mb-6">
               {plan.avantages.slice(0, 3).map((a) => (
                 <li key={a} className="flex items-start gap-2 text-sm" style={{ color: COLORS.slate }}><X size={14} color={COLORS.danger} className="mt-0.5 shrink-0" /> {a}</li>
@@ -8559,6 +8576,7 @@ function AbonnementsAdminScreen() {
   const mensuel = (a) => (a.cycle === "Annuel" ? a.montant / 12 : a.montant);
   const actifs = abonnes.filter((a) => a.statut === "Actif");
   const mrr = actifs.reduce((s, a) => s + mensuel(a), 0);
+  const revenusMois = REVENUS_MOIS.map((r, i) => (i === REVENUS_MOIS.length - 1 ? { ...r, montant: mrr } : r));
   const echecs = api.transactions.filter((t) => t.statut === "Échoué").length;
   const payes = api.transactions.filter((t) => t.statut === "Payé");
   const parMoyen = PAYMENT_METHODS.map((pm) => ({ name: pm.nom, value: payes.filter((t) => t.moyen === pm.nom).reduce((s, t) => s + t.montant, 0), color: pm.couleur })).filter((x) => x.value > 0);
@@ -8573,16 +8591,16 @@ function AbonnementsAdminScreen() {
   }
   const dirty = JSON.stringify(draft, (k, v) => (v === Infinity ? "inf" : v)) !== JSON.stringify(api.plans, (k, v) => (v === Infinity ? "inf" : v));
 
-  const tabs = [{ id: "abonnes", label: "Abonnés" }, { id: "transactions", label: "Transactions" }, { id: "tarifs", label: "Profils et tarifs" }];
+  const tabs = [{ id: "abonnes", label: "Abonnés" }, { id: "transactions", label: "Transactions" }, { id: "tarifs", label: "Formules et tarifs" }];
 
   return (
     <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les revenus, gérez les abonnés et ajustez les profils de chaque espace.</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les revenus, gérez les abonnés et ajustez les formules de chaque espace.</p>
 
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard icon={CreditCard} value={fcfa(mrr)} label="Revenu mensuel récurrent" />
         <StatCard icon={Crown} value={actifs.length} label="Abonnés payants actifs" />
-        <StatCard icon={Sparkles} value="6,8 %" label="Conversion gratuit → payant" />
+        <StatCard icon={Sparkles} value="6,8 %" label="Passage Essentiel → Premium" />
         <StatCard icon={AlertCircle} value={echecs} label="Paiements échoués" />
       </div>
 
@@ -8591,9 +8609,9 @@ function AbonnementsAdminScreen() {
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Revenus des abonnements (6 derniers mois)</h3>
           <div style={{ height: 220 }}>
             <ResponsiveContainer width="100%" height="100%">
-              <BarChart data={REVENUS_MOIS}>
+              <BarChart data={revenusMois}>
                 <XAxis dataKey="mois" tick={{ fontSize: 12, fill: COLORS.slateLight }} axisLine={false} tickLine={false} />
-                <YAxis tick={{ fontSize: 11, fill: COLORS.slateLight }} axisLine={false} tickLine={false} tickFormatter={(v) => `${Math.round(v / 1000)}k`} width={40} />
+                <YAxis tick={{ fontSize: 11, fill: COLORS.slateLight }} axisLine={false} tickLine={false} tickFormatter={(v) => v.toLocaleString("fr-FR")} width={60} />
                 <Tooltip formatter={(v) => fcfa(v)} cursor={{ fill: COLORS.soft }} />
                 <Bar dataKey="montant" fill={COLORS.orange} radius={[4, 4, 0, 0]} />
               </BarChart>
@@ -8809,15 +8827,15 @@ function isPremiumPlan(plan) {
   return !!plan && plan.id !== "essentiel";
 }
 
-function TierBadge({ premium, size = "md" }) {
+function TierBadge({ premium, label, size = "md" }) {
   const cls = size === "sm" ? "text-[11px] px-2 py-0.5" : "text-xs px-3 py-1";
   return premium ? (
     <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.dark, color: COLORS.brandPale }}>
-      <Crown size={size === "sm" ? 10 : 12} color={COLORS.orange} /> Premium
+      <Crown size={size === "sm" ? 10 : 12} color={COLORS.orange} /> {label || "Premium"}
     </span>
   ) : (
     <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.softStrong, color: COLORS.slateLight }}>
-      Essentiel
+      {label || "Essentiel"}
     </span>
   );
 }
@@ -8825,7 +8843,7 @@ function TierBadge({ premium, size = "md" }) {
 function ProfileTierBadge() {
   const api = usePlan();
   if (!api || api.isAdmin) return null;
-  return <TierBadge premium={isPremiumPlan(api.plan)} />;
+  return <TierBadge premium={isPremiumPlan(api.plan)} label={api.plan.nom} />;
 }
 
 function ProfileTierCard() {
@@ -8840,15 +8858,15 @@ function ProfileTierCard() {
       <div className="px-6 py-4 flex items-center justify-between flex-wrap gap-3" style={{ background: premium ? COLORS.dark : COLORS.soft }}>
         <div>
           <p className="font-semibold" style={{ color: premium ? COLORS.onDark : COLORS.slate }}>
-            {`Votre profil est ${api.plan.nom}`}
+            {`Votre formule : ${api.plan.nom}`}
           </p>
           <p className="text-sm" style={{ color: premium ? COLORS.onDarkMuted : COLORS.slateLight }}>
-            {premium ? `Actif jusqu'au ${api.sub.prochain || "prochain renouvellement"}.` : "Passez au profil Premium pour être vu en priorité."}
+            {premium ? `Actif jusqu'au ${api.sub.prochain || "prochain renouvellement"}.` : "Passez à la formule Premium pour être vu en priorité."}
           </p>
         </div>
         {!premium && premiumPlan && (
           <button type="button" onClick={() => api.startPayment(premiumPlan.id, "mensuel")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
-            <Crown size={14} /> Passer au profil Premium · {fcfa(premiumPlan.prixMensuel)}/mois
+            <Crown size={14} /> Passer à la formule Premium · {fcfa(premiumPlan.prixMensuel)}/mois
           </button>
         )}
       </div>
@@ -8873,7 +8891,7 @@ function ProfileTierCard() {
         <div className="px-6 py-4 flex items-center gap-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
           <TrendingUp size={18} color={COLORS.success} />
           <p className="text-sm" style={{ color: COLORS.slate }}>
-            {api.espace === "prestataire" ? "Votre profil s'affiche en priorité : 3,2 fois plus de vues que le mois dernier." : "Vos offres portent le badge Recruteur Premium et remontent dans les résultats."}
+            {api.espace === "prestataire" ? "Votre profil s'affiche en priorité : 3,2 fois plus de vues que le mois dernier." : "Vos offres peuvent être sponsorisées et remonter en tête des résultats."}
           </p>
         </div>
       )}
@@ -8910,7 +8928,10 @@ const PREMIUM_PRESTATAIRES = new Set(["p1", "p3", "p5"]);
 const PRESTATAIRES_REGULARISES = new Set(["p1", "p3", "p4", "p5"]);
 
 function adminTier(nom, espace) {
-  return ABONNES_ADMIN_INITIAL.some((a) => a.nom === nom && a.espace === espace && a.statut !== "Suspendu") ? "Premium" : "Essentiel";
+  const abonnement = ABONNES_ADMIN_INITIAL.find((a) => a.nom === nom && a.espace === espace && a.statut !== "Suspendu");
+  // Les entreprises ont une formule unique (Entreprise) : abonnée ou sans formule.
+  if (espace === "entreprise") return abonnement ? "Entreprise" : "Sans formule";
+  return abonnement?.offre === "Premium" ? "Premium" : "Essentiel";
 }
 
 function premiumFirst(isPremium) {
@@ -9288,11 +9309,10 @@ function joursDepuis(iso) {
 }
 
 const JALONS = [
-  { id: "j7", jour: 7, label: "Point d'étape de la première semaine" },
+  { id: "j7", jour: 7, label: "Point de la première semaine" },
   { id: "j30", jour: 30, label: "Bilan du premier mois" },
   { id: "j60", jour: 60, label: "Point à mi-parcours" },
   { id: "j90", jour: 90, label: "Fin de la période d'essai" },
-  { id: "j180", jour: 180, label: "Bilan à six mois" },
 ];
 const DUREE_ESSAI = 90;
 
@@ -9475,7 +9495,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
 
   return (
     <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>LIGGEEY reste à vos côtés pendant les six premiers mois de votre nouveau poste.</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>LIGGEEY reste à vos côtés pendant les 90 premiers jours de votre nouveau poste.</p>
 
       <div className="rounded-lg p-6 mb-6" style={{ background: COLORS.dark }}>
         <div className="flex items-start justify-between flex-wrap gap-4 mb-5">
@@ -10471,7 +10491,7 @@ const NOTES_MENTORAT_INITIAL = {
 };
 
 const SEANCES_INITIAL = [
-  { id: "se1", mentoreId: "absatou-diallo", date: "2026-10-15", heure: "15h00", format: "Visio", statut: "Confirmée" },
+  { id: "se1", mentoreId: "absatou-diallo", date: "2026-10-16", heure: "16h00", format: "Visio", statut: "Confirmée" }, // même créneau que le « prochain coaching » vu par Absatou (nextSlots)
   { id: "se2", mentoreId: "mame-diarra-sene", date: "2026-10-17", heure: "10h00", format: "En groupe, au bureau de Dakar", statut: "Confirmée" },
   { id: "se3", mentoreId: "serigne-mbaye", date: "2026-10-20", heure: "18h00", format: "Visio", statut: "Demandée", message: "Je voudrais qu'on travaille mon CV ensemble." },
   { id: "se4", mentoreId: "pape-ndiaye", date: "2026-10-22", heure: "16h00", format: "Téléphone", statut: "Demandée", message: "Préparer mon entretien au cabinet Diop & Associés." },
@@ -11747,7 +11767,7 @@ function CapMetierAdminScreen() {
    ===================================================================== */
 
 // v3 : régularisation facultative (question Oui / Non) ; les sessions de démo plus anciennes repartent de zéro.
-const TEST_STORAGE_KEY = "liggeey-test-v3";
+const TEST_STORAGE_KEY = "liggeey-test-v4"; // v4 : harmonisation des libellés et des données de démo (octobre 2026)
 const TEST_SCENARIOS_KEY = "liggeey-test-scenarios-v1";
 
 function encodeState(value) {
@@ -11788,7 +11808,7 @@ const TEST_SCENARIOS = [
   { id: "c5", espace: "chercheur", to: "profil", label: "Modifier ses informations de profil" },
   { id: "p1", espace: "prestataire", to: "regularisation", label: "Répondre à la question sur la régularisation, puis envoyer un justificatif" },
   { id: "p2", espace: "prestataire", to: "missions", label: "Accepter une demande de mission" },
-  { id: "p3", espace: "prestataire", to: "services", label: "Ajouter des services jusqu'à la limite du profil Essentiel" },
+  { id: "p3", espace: "prestataire", to: "services", label: "Ajouter des services jusqu'à la limite de la formule Essentiel" },
   { id: "e1", espace: "entreprise", to: "offres", label: "Publier une offre, puis la retrouver dans l'espace chercheur" },
   { id: "e2", espace: "entreprise", to: "candidatures", label: "Ouvrir une candidature et débloquer les coordonnées" },
   { id: "e3", espace: "entreprise", to: "suivi", label: "Évaluer une recrue et confirmer son embauche" },

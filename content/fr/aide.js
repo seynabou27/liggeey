@@ -5,7 +5,7 @@ import { tarifs } from './tarifs';
 
 export const ressources = {
   meta: { titre: 'Ressources', description: 'Conseils pratiques pour trouver un emploi, développer votre activité et mieux recruter au Sénégal.' },
-  hero: { surtitre: 'Ressources', titre: 'Ressources', texte: 'Des conseils pratiques pour trouver un emploi, développer votre activité et mieux recruter. Deux nouveaux articles chaque mois.' },
+  hero: { surtitre: 'Ressources', titre: 'Ressources', texte: 'Des conseils pratiques pour trouver un emploi, développer votre activité et mieux recruter.' },
   filtres: [
     { id: 'tous', label: 'Tous' },
     { id: 'talents', label: 'Talents' },
