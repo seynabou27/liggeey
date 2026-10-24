@@ -8504,7 +8504,7 @@ function AbonnementScreen() {
               </div>
               <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>{p.description}</p>
               <p className="mb-5">
-                <span className="text-3xl font-semibold" style={{ color: COLORS.slate }}>{fcfa(p.prixMensuel).replace(" FCFA", "")}</span>
+                <span className="text-3xl font-semibold" style={{ color: COLORS.slate }}>{fcfa(p.prixMensuel).replace(/\s*FCFA$/, "")}</span>
                 <span className="text-sm ml-1" style={{ color: COLORS.slateLight }}>FCFA / mois</span>
               </p>
               <ul className="flex flex-col gap-2.5 mb-6 flex-1">
