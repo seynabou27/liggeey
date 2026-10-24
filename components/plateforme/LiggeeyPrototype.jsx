@@ -318,31 +318,53 @@ function AuthPanneau({ mode }) {
 
 // Écran partagé par la connexion et l'inscription
 function AuthShell({ children, mode = "connexion" }) {
+  const t = AUTH_PANNEAU[mode] || AUTH_PANNEAU.connexion;
   return (
     <div className="min-h-screen w-full grid grid-cols-1 md:grid-cols-[minmax(0,5fr)_minmax(0,6fr)] font-sans">
       <AuthPanneau mode={mode} />
 
       <div className="relative flex flex-col bg-surface">
         <App.BoutonTheme className="absolute right-6 top-6 hidden md:inline-flex" />
-        {/* Mobile : bandeau ardoise compact à la place du panneau */}
-        <div className="md:hidden flex items-center justify-between gap-4 px-6 py-4 text-sur-sombre" style={{ background: "linear-gradient(120deg, rgb(var(--neutre-750)), rgb(var(--neutre-900)))" }}>
-          <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex">
-            <Logo color="rgb(var(--texte-sur-sombre))" iconColor={COLORS.orange} height={22} />
-          </a>
-          <div className="flex items-center gap-1">
-            <App.BoutonTheme variante="sur-sombre" />
-            <a href={SITE_URL} className="inline-flex min-h-[44px] items-center gap-1.5 text-sm font-semibold">
-              <ArrowLeft size={15} aria-hidden="true" /> Retour au site
+        {/* Mobile : bandeau ardoise avec le message du panneau, le formulaire remonte dessus en feuille arrondie */}
+        <div className="md:hidden relative overflow-hidden px-5 pt-2 pb-10 text-sur-sombre" style={{ background: "linear-gradient(155deg, rgb(var(--neutre-750)) 0%, rgb(var(--neutre-800)) 45%, rgb(var(--neutre-900)) 100%)" }}>
+          <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full blur-3xl" style={{ background: "rgb(var(--primaire-500) / 0.14)" }} aria-hidden="true" />
+          <div className="relative flex items-center justify-between gap-2">
+            <a href={SITE_URL} aria-label="LIGGEEY, retour au site" className="inline-flex min-h-[44px] items-center">
+              <Logo color="rgb(var(--texte-sur-sombre))" iconColor={COLORS.orange} height={22} />
             </a>
+            <div className="flex items-center">
+              <App.BoutonTheme variante="sur-sombre" />
+              <a href={SITE_URL} className="inline-flex min-h-[44px] items-center gap-1.5 pl-2 text-sm font-medium text-white/85">
+                <ArrowLeft size={15} aria-hidden="true" /> Retour au site
+              </a>
+            </div>
           </div>
+          <p className="relative mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-marque-vif">
+            <span className="h-0.5 w-6 bg-marque" aria-hidden="true" />
+            {t.surtitre}
+          </p>
+          <p className="relative mt-2 max-w-xs text-balance text-[22px] font-semibold leading-tight">
+            {t.titre} <span className="text-marque-vif">{t.accent}</span>
+          </p>
         </div>
 
-        <div className="flex flex-1 items-center justify-center px-6 py-10 md:py-16">
+        <div className="relative z-10 -mt-5 flex flex-1 items-start justify-center rounded-t-xl bg-surface px-5 pt-7 pb-8 md:mt-0 md:items-center md:rounded-none md:px-6 md:py-16">
           <div className="w-full max-w-md">
             <a href={SITE_URL} className="hidden md:inline-flex items-center gap-1.5 min-h-[44px] mb-4 text-sm font-medium hover:underline" style={{ color: COLORS.slateLight }}>
               <ArrowLeft size={15} aria-hidden="true" /> Retour au site
             </a>
             {children}
+
+            {/* Mobile : l'aide du panneau, en bas du formulaire */}
+            <div className="md:hidden mt-8 flex items-center justify-between gap-3 rounded-lg border border-base bg-doux px-4 py-3">
+              <span>
+                <span className="block text-sm font-semibold text-principal">Besoin d'aide ?</span>
+                <span className="block text-xs text-secondaire">Sur WhatsApp ou au bureau de {site.bureau.ville}.</span>
+              </span>
+              <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded border border-forte bg-surface px-4 text-sm font-semibold text-principal transition-colors hover:border-whatsapp">
+                <MessageCircle size={16} aria-hidden="true" /> WhatsApp
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -469,11 +491,12 @@ function FilePickerButton({ accept, onPick, className, style, children }) {
    liens en text-marque (orange lisible sur blanc), sélection en fond orange léger. */
 
 const AUTH = {
-  titre: "text-3xl font-semibold text-principal mb-2",
+  titre: "text-2xl md:text-3xl font-semibold text-principal mb-2",
   intro: "text-sm text-secondaire",
   libelle: "block text-sm font-semibold text-principal mb-1.5",
+  // 16 px sur mobile : en dessous, Safari sur iPhone zoome sur le champ touché.
   champ: (erreur) =>
-    `h-12 w-full rounded-md border bg-surface px-4 text-[15px] text-principal placeholder:text-discret outline-none transition-colors focus:border-marque focus:ring-2 focus:ring-focus/40 ${
+    `h-12 w-full rounded-md border bg-surface px-4 text-base md:text-[15px] text-principal placeholder:text-discret outline-none transition-colors focus:border-marque focus:ring-2 focus:ring-focus/40 ${
       erreur ? "border-statut-danger" : "border-base hover:border-forte"
     }`,
   aide: (erreur) => `mt-1.5 text-xs ${erreur ? "text-statut-danger" : "text-discret"}`,
@@ -697,9 +720,9 @@ function ConnexionScreen({ onNavigate }) {
       </p>
 
       {avecDemo && (
-      <fieldset className="mb-6">
+      <fieldset className="mb-5 md:mb-6">
         <legend className="mb-2 text-xs font-semibold uppercase tracking-[0.08em] text-discret">{serveur ? "Compte de démonstration" : "Espace à ouvrir (démo)"}</legend>
-        <div className="grid grid-cols-2 gap-2 sm:grid-cols-3">
+        <div className="grid grid-cols-3 gap-2">
           {ESPACES_DEMO.map((o) => {
             const actif = espace === o.id;
             return (
