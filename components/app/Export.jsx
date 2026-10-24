@@ -76,7 +76,7 @@ export function MenuExport({ titre, colonnes, lignes, sousTitre, onTermine, onEr
         aria-expanded={ouvert}
         onClick={() => setOuvert((o) => !o)}
         title={vide ? 'Aucune ligne à exporter' : undefined}
-        className="inline-flex h-11 items-center gap-2 rounded-md border border-base bg-surface px-4 text-sm font-medium text-principal transition-colors hover:border-forte hover:bg-doux focus:outline-none focus-visible:ring-2 focus-visible:ring-focus/40 disabled:cursor-not-allowed disabled:opacity-60"
+        className="inline-flex h-11 items-center gap-2 rounded border border-base bg-surface px-4 text-sm font-medium text-principal transition-colors hover:border-forte hover:bg-doux focus:outline-none focus-visible:ring-2 focus-visible:ring-focus/40 disabled:cursor-not-allowed disabled:opacity-60"
       >
         {enCours ? <Loader2 size={16} className="animate-spin" aria-hidden="true" /> : <Download size={16} aria-hidden="true" />}
         {enCours ? 'Export en cours…' : 'Exporter'}

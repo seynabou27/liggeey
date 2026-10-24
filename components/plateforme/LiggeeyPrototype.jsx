@@ -518,9 +518,9 @@ const AUTH = {
   aide: (erreur) => `mt-1.5 text-xs ${erreur ? "text-statut-danger" : "text-discret"}`,
   lien: "font-semibold text-marque underline-offset-4 hover:underline",
   principal:
-    "inline-flex min-h-[48px] w-full items-center justify-center rounded-md bg-marque px-6 text-[15px] font-semibold text-sur-marque transition-colors hover:bg-marque-survol active:bg-marque-actif",
+    "inline-flex min-h-[48px] w-full items-center justify-center rounded bg-marque px-6 text-[15px] font-semibold text-sur-marque transition-colors hover:bg-marque-survol active:bg-marque-actif",
   secondaire:
-    "inline-flex min-h-[48px] w-full items-center justify-center rounded-md border border-forte bg-surface px-6 text-[15px] font-semibold text-principal transition-colors hover:bg-doux",
+    "inline-flex min-h-[48px] w-full items-center justify-center rounded border border-forte bg-surface px-6 text-[15px] font-semibold text-principal transition-colors hover:bg-doux",
   case: "h-5 w-5 shrink-0 rounded accent-primaire-500",
   oeil: "absolute right-1.5 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-md text-discret hover:bg-doux hover:text-secondaire",
 };
@@ -3216,7 +3216,7 @@ function MentorAttitreCard({ m, coachings, onOpen }) {
         </div>
         <div className="grid shrink-0 grid-cols-2 gap-3 lg:w-72 lg:grid-cols-1">
           <div className="rounded-md bg-marque-doux px-4 py-3">
-            <p className="flex items-center gap-1.5 text-xs font-semibold text-marque"><Calendar size={14} aria-hidden="true" /> Prochain coaching</p>
+            <p className="flex items-center gap-1.5 text-xs font-semibold text-marque-fort"><Calendar size={14} aria-hidden="true" /> Prochain coaching</p>
             <p className="mt-0.5 text-sm font-semibold text-principal">{prochain ? prochain.date : "Aucun coaching prévu"}</p>
             {prochain && <p className="text-xs text-secondaire">{prochain.theme} · {prochain.format}</p>}
           </div>
@@ -3452,7 +3452,7 @@ function ChecklistItem({ label, done }) {
       >
         {done && <Check size={11} color={COLORS.onStatus} />}
       </span>
-      <span className="text-sm" style={{ color: done ? COLORS.slate : COLORS.orange, fontWeight: done ? 400 : 600 }}>{label}</span>
+      <span className="text-sm" style={{ color: done ? COLORS.slate : COLORS.orangeText, fontWeight: done ? 400 : 600 }}>{label}</span>
       {!done && <span className="text-xs" style={{ color: COLORS.slateLight }}> - à compléter</span>}
     </div>
   );
@@ -7888,7 +7888,7 @@ function CommunicationScreen({ onNavigate, ongletInitial }) {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{n.titre}</p>
-                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: n.badge === "Système" ? COLORS.orangeSoft : COLORS.infoSoft, color: n.badge === "Système" ? COLORS.orange : COLORS.info }}>{n.badge}</span>
+                      <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: n.badge === "Système" ? COLORS.orangeSoft : COLORS.infoSoft, color: n.badge === "Système" ? COLORS.orangeStrong : COLORS.info }}>{n.badge}</span>
                     </div>
                     <p className="text-sm" style={{ color: COLORS.slateLight }}>{n.description}</p>
                   </div>
@@ -8518,7 +8518,7 @@ function AbonnementScreen() {
                 type="button"
                 disabled={cta.disabled}
                 onClick={cta.onClick}
-                className="w-full rounded-md px-4 py-2.5 text-sm font-semibold"
+                className="w-full rounded px-4 py-2.5 text-sm font-semibold"
                 style={cta.disabled ? { background: COLORS.softStrong, color: COLORS.slateLight, cursor: "default" } : cta.secondary ? { border: `1px solid ${COLORS.border}`, color: COLORS.slate } : { background: COLORS.orange, color: COLORS.onOrange }}
               >
                 {cta.label}
@@ -11911,7 +11911,7 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
           <div className="p-4 flex flex-col gap-4">
             {Object.keys(groups).map((esp) => (
               <div key={esp}>
-                <p className="text-xs font-semibold mb-1.5" style={{ color: esp === espace ? COLORS.orange : COLORS.slateLight }}>
+                <p className="text-xs font-semibold mb-1.5" style={{ color: esp === espace ? COLORS.orangeText : COLORS.slateLight }}>
                   {TEST_ESPACE_LABELS[esp]}{esp === espace ? " · espace actuel" : ""}
                 </p>
                 {groups[esp].map((s) => (
