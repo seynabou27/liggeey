@@ -1,6 +1,6 @@
 import { Ecran, parametresEcran } from './_ecran';
 
-/* Une story par entrée du menu de l'espace « Mentor » (NAV_ITEMS_BY_ESPACE.mentor). */
+/* Une story par entrée du menu de l’espace « Mentor » (NAV_ITEMS_BY_ESPACE.mentor). */
 export default {
   title: 'Écrans/Mentor',
   parameters: parametresEcran,

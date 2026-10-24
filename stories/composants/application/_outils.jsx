@@ -15,8 +15,8 @@ import {
 } from '../../../components/plateforme/LiggeeyPrototype';
 
 /**
- * Reproduit, pour une story, l'environnement que le composant racine de la plateforme fournit :
- * mémoire partagée (StoreContext), abonnement (PlanContext), fenêtres d'abonnement et notifications.
+ * Reproduit, pour une story, l’environnement que le composant racine de la plateforme fournit :
+ * mémoire partagée (StoreContext), abonnement (PlanContext), fenêtres d’abonnement et notifications.
  *
  * - espace : chercheur | prestataire | entreprise | admin
  * - formule : essentiel | premium
@@ -65,14 +65,14 @@ export const avecPlateforme = (Story, { parameters }) => (
   </AvecPlateforme>
 );
 
-/** Police de l'application : Plus Jakarta Sans, comme le site (font-sans). */
+/** Police de l’application : Plus Jakarta Sans, comme le site (font-sans). */
 export const policeApp = (Story) => (
   <div className="font-sans">
     <Story />
   </div>
 );
 
-/** Fond gris de l'application, derrière les cartes. */
+/** Fond gris de l’application, derrière les cartes. */
 export const fondApp = (Story) => (
   <div className="rounded-lg bg-doux p-6 font-sans">
     <Story />
@@ -81,9 +81,9 @@ export const fondApp = (Story) => (
 
 /** Statuts connus de StatusBadge (copiés de LiggeeyPrototype.jsx, à tenir à jour). */
 export const STATUTS = [
-  'Entretien programmé', 'Vue par le recruteur', 'Réponse négative', 'Candidature reçue', 'Candidature Retenue', 'En attente', 'Payé',
+  'Entretien programmé', 'Vue par le recruteur', 'Réponse négative', 'Candidature reçue', 'Candidature retenue', 'En attente', 'Payé',
   'Refusé', 'Refusée', 'Acceptée', 'En cours', 'Terminée', 'Nouveau', 'Retenu', 'Rejeté', 'Disponible', 'Occupé', 'Vérifié', 'Validé',
   'Suspendu', 'Suspendue', 'Actif', 'Active', 'En pause', 'Complète', 'Brouillon', 'Expirée', 'Inactif', 'Annulée', 'Annulé', 'En révision',
-  "En cours d'apprentissage", 'Apprenant', 'Mentoré', 'Remboursé', 'Fait', 'À compléter', 'À venir', "En période d'essai", 'À risque',
+  "En cours d’apprentissage", 'Apprenant', 'Mentoré', 'Remboursé', 'Fait', 'À compléter', 'À venir', "En période d’essai", 'À risque',
   'Confirmé', 'Ouvert', 'Traité', 'En vérification', 'Échoué', 'Échec de paiement',
 ];

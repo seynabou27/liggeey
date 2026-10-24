@@ -4,7 +4,7 @@ import { commun } from '@/content/fr/commun';
 import { useEnvoi } from '@/components/formulaires/useEnvoi';
 import { PotDeMiel } from '@/components/formulaires/Champs';
 
-/** Bande orange d'inscription à la newsletter (comme la bande verte du modèle). */
+/** Bande orange d’inscription à la newsletter (comme la bande verte du modèle). */
 export default function BandeNewsletter() {
   const t = commun.newsletter;
   const { etat, erreurs, envoyer } = useEnvoi('newsletter', ['email']);
@@ -47,7 +47,7 @@ export default function BandeNewsletter() {
                 {erreurs.email}
               </p>
             )}
-            {etat === 'erreur' && <p className="mt-2 font-medium">L'inscription n'a pas abouti. Réessayez dans un instant.</p>}
+            {etat === 'erreur' && <p className="mt-2 font-medium">L’inscription n’a pas abouti. Réessayez dans un instant.</p>}
           </form>
         )}
       </div>

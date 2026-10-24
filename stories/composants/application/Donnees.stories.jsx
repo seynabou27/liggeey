@@ -31,7 +31,7 @@ export const FicheListe = {
   args: {
     title: 'Candidatures',
     items: [
-      { title: 'Chargée de clientèle', sub: 'Dakar · 28 juillet 2026', badge: 'Candidature Retenue' },
+      { title: 'Chargée de clientèle', sub: 'Dakar · 28 juillet 2026', badge: 'Candidature retenue' },
       { title: 'Assistante RH', sub: 'Dakar · 1 août 2026', badge: 'Candidature reçue' },
       { title: 'Formations suivies', value: '3' },
     ],

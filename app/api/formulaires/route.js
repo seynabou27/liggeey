@@ -28,7 +28,7 @@ export async function POST(requete) {
 
   const { type, site_web: potDeMiel, ...champs } = donnees ?? {};
 
-  // Pot de miel rempli : c'est un robot. On répond « ok » sans rien transmettre.
+  // Pot de miel rempli : c’est un robot. On répond « ok » sans rien transmettre.
   if (potDeMiel) return reponse({ ok: true });
 
   const requis = REQUIS[type];

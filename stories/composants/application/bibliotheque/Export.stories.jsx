@@ -11,7 +11,7 @@ const COLONNES = [
   { titre: 'Nom', valeur: (l) => l.nom },
   { titre: 'Métier', valeur: (l) => l.metier },
   { titre: 'Ville', valeur: (l) => l.ville },
-  { titre: "Date d'inscription", valeur: (l) => l.date },
+  { titre: "Date d’inscription", valeur: (l) => l.date },
   { titre: 'Statut', valeur: (l) => l.statut },
 ];
 
@@ -32,15 +32,15 @@ export default {
 export const Standard = {
   name: 'Menu d’export',
   render: (args) => (
-    <Carte titre="Chercheurs d'emploi" actions={<MenuExport {...args} />}>
+    <Carte titre="Chercheurs d’emploi" actions={<MenuExport {...args} />}>
       <p className="pb-48 text-sm text-secondaire">Ouvrez le menu pour télécharger les {LIGNES.length} lignes.</p>
     </Carte>
   ),
-  args: { titre: "Chercheurs d'emploi", colonnes: COLONNES, lignes: LIGNES, sousTitre: 'Filtres : Dakar' },
+  args: { titre: "Chercheurs d’emploi", colonnes: COLONNES, lignes: LIGNES, sousTitre: 'Filtres : Dakar' },
 };
 
 export const Vide = {
   name: 'Menu d’export · aucune ligne',
   render: (args) => <MenuExport {...args} />,
-  args: { titre: "Chercheurs d'emploi", colonnes: COLONNES, lignes: [] },
+  args: { titre: "Chercheurs d’emploi", colonnes: COLONNES, lignes: [] },
 };

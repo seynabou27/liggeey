@@ -32,9 +32,9 @@ function Liste({ nom, label, options, defaut, className = '' }) {
 }
 
 /**
- * Carte de recherche du bandeau d'accueil.
- * Elle filtre les offres en vitrine (paramètres d'URL lus par VitrineOffres)
- * puis fait défiler jusqu'à la section #offres. Sur mobile : mot-clé, secteur, ville.
+ * Carte de recherche du bandeau d’accueil.
+ * Elle filtre les offres en vitrine (paramètres d’URL lus par VitrineOffres)
+ * puis fait défiler jusqu’à la section #offres. Sur mobile : mot-clé, secteur, ville.
  */
 export default function CarteRecherche() {
   const router = useRouter();

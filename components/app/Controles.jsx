@@ -2,9 +2,9 @@
 
 import { CalendarDays, ChevronDown, ChevronLeft, ChevronRight, Search } from 'lucide-react';
 
-/* Contrôles de l'application : boutons ronds, recherche, sélecteur de période, onglets, pagination, interrupteur. */
+/* Contrôles de l’application : boutons ronds, recherche, sélecteur de période, onglets, pagination, interrupteur. */
 
-/** Bouton rond à icône seule (barre du haut, actions de ligne). Le libellé est lu par les lecteurs d'écran. */
+/** Bouton rond à icône seule (barre du haut, actions de ligne). Le libellé est lu par les lecteurs d’écran. */
 export function BoutonIcone({ icone: Icone, label, onClick, pastille = false, variante = 'contour', taille = 'md', className = '', ...props }) {
   const dims = taille === 'sm' ? 'h-8 w-8' : 'h-11 w-11';
   const styles = {
@@ -21,7 +21,7 @@ export function BoutonIcone({ icone: Icone, label, onClick, pastille = false, va
   );
 }
 
-/** Champ de recherche. variante : pilule (barre du haut) | carre (au-dessus d'un tableau). */
+/** Champ de recherche. variante : pilule (barre du haut) | carre (au-dessus d’un tableau). */
 export function ChampRecherche({ valeur, onChange, placeholder = 'Rechercher…', label = 'Rechercher', variante = 'pilule', className = '', ...props }) {
   const forme = variante === 'pilule' ? 'h-11 rounded-full pl-11 pr-4 border-base' : 'h-10 rounded-md pl-10 pr-3 border-base';
   return (

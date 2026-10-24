@@ -18,7 +18,7 @@ export const initiales = (nom) =>
     .slice(0, 2)
     .toUpperCase();
 
-/** Icône du secteur de l'offre sur fond orange doux (initiales de l'entreprise si le secteur est inconnu). */
+/** Icône du secteur de l’offre sur fond orange doux (initiales de l’entreprise si le secteur est inconnu). */
 export function PastilleSecteur({ offre, className = 'h-12 w-12' }) {
   const secteur = secteurs.find((s) => s.id === offre.secteur);
   return (
@@ -34,8 +34,8 @@ export function messagePartage(offre) {
 }
 
 /**
- * Détail d'une offre en fenêtre (balise <dialog> native : Échap, focus gardé dans la fenêtre, fond inerte).
- * L'offre complète et la candidature restent dans la plateforme : la fenêtre invite à se connecter.
+ * Détail d’une offre en fenêtre (balise <dialog> native : Échap, focus gardé dans la fenêtre, fond inerte).
+ * L’offre complète et la candidature restent dans la plateforme : la fenêtre invite à se connecter.
  * @param {{ offre: object | null, onFermer: () => void }} props
  */
 export default function DetailOffre({ offre, onFermer }) {

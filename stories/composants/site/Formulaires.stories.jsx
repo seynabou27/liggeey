@@ -5,7 +5,7 @@ import FormulaireJobDating from '../../../components/formulaires/FormulaireJobDa
 import BandeNewsletter from '../../../components/blocs/BandeNewsletter';
 import { evenements } from '../../../content/evenements';
 
-/* Formulaires complets. L'envoi est simulé (preview.jsx, parameters.formulaire) : succès, erreur ou attente.
+/* Formulaires complets. L’envoi est simulé (preview.jsx, parameters.formulaire) : succès, erreur ou attente.
    Les états « erreurs », « envoi », « succès » et « échec » sont joués automatiquement (onglet Interactions). */
 
 const remplir = async (canvas, champs) => {
@@ -164,7 +164,7 @@ export const NewsletterErreur = {
   play: async ({ canvasElement }) => {
     const c = within(canvasElement);
     await userEvent.type(c.getByPlaceholderText('Votre adresse e-mail'), 'awa@');
-    await envoyer(c, "Je m'abonne");
+    await envoyer(c, "Je m’abonne");
   },
 };
 
@@ -175,7 +175,7 @@ export const NewsletterSucces = {
   play: async ({ canvasElement }) => {
     const c = within(canvasElement);
     await userEvent.type(c.getByPlaceholderText('Votre adresse e-mail'), 'awa@exemple.sn');
-    await envoyer(c, "Je m'abonne");
+    await envoyer(c, "Je m’abonne");
     await expect(await c.findByRole('status')).toBeInTheDocument();
   },
 };
@@ -187,7 +187,7 @@ export const NewsletterEchec = {
   play: async ({ canvasElement }) => {
     const c = within(canvasElement);
     await userEvent.type(c.getByPlaceholderText('Votre adresse e-mail'), 'awa@exemple.sn');
-    await envoyer(c, "Je m'abonne");
+    await envoyer(c, "Je m’abonne");
   },
 };
 

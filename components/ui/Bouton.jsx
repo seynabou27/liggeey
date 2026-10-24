@@ -6,7 +6,7 @@ const VARIANTES = {
   clair: 'border-2 border-white text-sur-sombre hover:bg-surface hover:text-principal',
   sombre: 'bg-sombre text-sur-sombre hover:bg-sombre-doux',
   whatsapp: 'bg-whatsapp text-sur-marque hover:brightness-95',
-  doux: 'bg-marque-doux text-marque-fort hover:bg-marque-doux-survol', // action secondaire de l'application (Filtrer, Exporter…)
+  doux: 'bg-marque-doux text-marque-fort hover:bg-marque-doux-survol', // action secondaire de l’application (Filtrer, Exporter…)
   neutre: 'bg-doux text-principal hover:bg-doux-fort', // action tertiaire (Annuler, Plus tard)
 };
 

@@ -1,7 +1,7 @@
 import { BoutonTheme, ChoixTheme, useTheme, useThemeApplique } from '../../../../components/app';
 
 /* Dans ces stories, le choix est appliqué à la page (comme dans Plateforme.jsx) :
-   il prend le pas sur le bouton « Thème » de la barre d'outils de Storybook. */
+   il prend le pas sur le bouton « Thème » de la barre d’outils de Storybook. */
 function AvecTheme({ children }) {
   useThemeApplique();
   const { preference, theme } = useTheme();

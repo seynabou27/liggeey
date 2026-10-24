@@ -5,7 +5,7 @@ import MenuMobile from '../../../components/layout/MenuMobile';
 import PiedDePage from '../../../components/layout/PiedDePage';
 import Cadre from '../../../components/layout/Cadre';
 
-/* Faux contenu de page sous l'en-tête fixe : une photo sombre, puis de quoi faire défiler. */
+/* Faux contenu de page sous l’en-tête fixe : une photo sombre, puis de quoi faire défiler. */
 function PageFictive({ children }) {
   return (
     <div className="[transform:translateZ(0)]">
@@ -92,7 +92,7 @@ export const MenuMobileInteractif = {
 
 export const PiedDePageComplet = { name: 'Pied de page', render: () => <PiedDePage /> };
 
-/* Adresses d'exemple, pour voir les icônes avant que les vrais comptes soient renseignés dans lib/site.js. */
+/* Adresses d’exemple, pour voir les icônes avant que les vrais comptes soient renseignés dans lib/site.js. */
 export const PiedDePageReseaux = {
   name: 'Pied de page · avec réseaux',
   render: () => (

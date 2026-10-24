@@ -1,7 +1,7 @@
 import { useEffect, useRef, useState } from 'react';
 import { ICONES } from '../../components/ui/Icone';
 
-/* Blocs d'affichage des pages « Fondations » (typographie, espacements, formes, icônes, logos).
+/* Blocs d’affichage des pages « Fondations » (typographie, espacements, formes, icônes, logos).
    Les valeurs viennent de la charte (CLAUDE.md) et de tailwind.config.mjs. */
 
 /* ---------- Typographie ---------- */

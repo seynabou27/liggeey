@@ -4,7 +4,7 @@ import { useEffect, useRef, useState } from 'react';
 import { ChevronDown, Download, FileSpreadsheet, FileText, Loader2, Table2 } from 'lucide-react';
 import { exporterListe, FORMATS_EXPORT } from '@/lib/export';
 
-/* Bouton « Exporter » au-dessus d'un tableau : menu PDF, Excel ou CSV.
+/* Bouton « Exporter » au-dessus d’un tableau : menu PDF, Excel ou CSV.
    Exporte toutes les lignes reçues (la liste filtrée), pas seulement la page affichée. */
 
 const ICONES = { pdf: FileText, xlsx: FileSpreadsheet, csv: Table2 };

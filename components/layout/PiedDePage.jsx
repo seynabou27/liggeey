@@ -138,7 +138,7 @@ export default function PiedDePage({ reseaux: listeReseaux = site.contact.reseau
             ))}
           </p>
           <span className="md:order-1">© {annee} LIGGEEY</span>
-          {/* Le bouton WhatsApp flottant s'efface quand le pied de page est visible : la flèche peut rester au bord droit */}
+          {/* Le bouton WhatsApp flottant s’efface quand le pied de page est visible : la flèche peut rester au bord droit */}
           <a href="#haut" aria-label="Revenir en haut de la page" className="grid h-11 w-11 shrink-0 place-items-center rounded bg-marque text-sur-marque hover:bg-marque-survol md:order-3 md:ml-auto">
             <ArrowUp className="h-5 w-5" aria-hidden="true" />
           </a>

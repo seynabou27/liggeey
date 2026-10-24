@@ -1,16 +1,16 @@
-/** Page d'accueil. Les noms d'icônes correspondent à components/ui/Icone.jsx. */
+/** Page d’accueil. Les noms d’icônes correspondent à components/ui/Icone.jsx. */
 export const accueil = {
   meta: {
-    titre: "LIGGEEY · Rendons l'insertion plus facile et plus juste",
+    titre: "LIGGEEY · Rendons l’insertion plus facile et plus juste",
     description:
       'Offres d’emploi vérifiées, valorisation des compétences et accompagnement humain au Sénégal. Pour les talents, les indépendants et les entreprises.',
   },
   hero: {
     surtitre: 'Emploi, compétences et accompagnement au Sénégal',
-    titre: "Rendons l'insertion plus facile et plus juste.",
+    titre: "Rendons l’insertion plus facile et plus juste.",
     texte: 'Des offres vérifiées, un profil qui montre ce que vous savez faire, et une équipe qui vous accompagne.',
     reperes: [
-      { valeur: '90', unite: 'j', libelle: "de suivi après l'embauche" },
+      { valeur: '90', unite: 'j', libelle: "de suivi après l’embauche" },
       { valeur: '48', unite: 'h', libelle: 'pour vérifier un profil' },
       { valeur: '100', unite: '%', libelle: 'des offres vérifiées avant publication' },
     ],
@@ -24,7 +24,7 @@ export const accueil = {
     contrat: 'Type de contrat',
     ville: 'Ville',
     experience: 'Expérience',
-    niveau: "Niveau d'études",
+    niveau: "Niveau d’études",
     tous: 'Tous',
     tousNiveaux: 'Tous niveaux, avec ou sans diplôme',
     bouton: 'Rechercher',
@@ -39,13 +39,13 @@ export const accueil = {
   },
   offres: {
     titre: 'Des offres vérifiées, en ce moment',
-    texte: "Chaque offre est contrôlée par notre équipe avant d'être publiée.",
+    texte: "Chaque offre est contrôlée par notre équipe avant d’être publiée.",
     badge: 'Entreprise vérifiée',
-    voir: "Voir l'offre",
+    voir: "Voir l’offre",
     partager: 'Partager sur WhatsApp',
     messagePartage: 'Offre vérifiée sur LIGGEEY : {titre} chez {entreprise}, {ville}.',
     toutes: 'Se connecter pour voir toutes les offres',
-    sansResultat: "Pas d'offre en vitrine pour cette recherche. Créez votre compte pour voir toutes les offres.",
+    sansResultat: "Pas d’offre en vitrine pour cette recherche. Créez votre compte pour voir toutes les offres.",
     aucune: 'Les premières offres vérifiées arrivent. Créez votre compte pour être prévenu.',
     effacer: 'Effacer la recherche',
     glisser: 'Faites glisser pour voir les autres offres.',
@@ -55,11 +55,11 @@ export const accueil = {
       contrat: 'Contrat',
       secteur: 'Secteur',
       experience: 'Expérience',
-      niveau: "Niveau d'études",
+      niveau: "Niveau d’études",
       competences: 'Compétences recherchées',
-      verifiee: "Cette offre a été vérifiée par l'équipe LIGGEEY avant sa publication.",
+      verifiee: "Cette offre a été vérifiée par l’équipe LIGGEEY avant sa publication.",
       connexionTitre: 'Connectez-vous pour postuler',
-      connexionTexte: "Pour voir l'offre complète et envoyer votre candidature, connectez-vous à votre espace LIGGEEY.",
+      connexionTexte: "Pour voir l’offre complète et envoyer votre candidature, connectez-vous à votre espace LIGGEEY.",
       connexion: 'Se connecter',
       inscription: 'Créer un compte',
       pasDeCompte: 'Pas encore de compte ?',
@@ -89,7 +89,7 @@ export const accueil = {
         { icone: 'Target', titre: 'Analyse du besoin', texte: 'Nous définissons avec vous le poste, les compétences et le profil recherché.' },
         { icone: 'ShieldCheck', titre: 'Préqualification', texte: 'Identité, diplômes, références et compétences sont vérifiés.' },
         { icone: 'ListChecks', titre: 'Short-list', texte: 'Vous recevez une sélection de profils conformes à vos critères.' },
-        { icone: 'HeartHandshake', titre: 'Suivi pendant 90 jours', texte: "Nous accompagnons l'intégration de votre recrue." },
+        { icone: 'HeartHandshake', titre: 'Suivi pendant 90 jours', texte: "Nous accompagnons l’intégration de votre recrue." },
       ],
     },
   },
@@ -97,16 +97,16 @@ export const accueil = {
     surtitre: 'Pourquoi LIGGEEY',
     titre: 'Trouver un emploi ne devrait pas dépendre de qui vous connaissez.',
     texte:
-      "Nous avons interrogé 200 personnes en 2026. Leurs réponses montrent ce qui freine l'accès à l'emploi, et ce que LIGGEEY veut changer.",
+      "Nous avons interrogé 200 personnes en 2026. Leurs réponses montrent ce qui freine l’accès à l’emploi, et ce que LIGGEEY veut changer.",
     chiffres: [
       { valeur: '78,5', unite: '%', texte: 'citent le manque de réseau parmi leurs difficultés.' },
-      { valeur: '33,5', unite: '%', texte: "ont déjà été victimes d'une fausse offre d'emploi ou d'une arnaque." },
+      { valeur: '33,5', unite: '%', texte: "ont déjà été victimes d’une fausse offre d’emploi ou d’une arnaque." },
       { valeur: '81,5', unite: '%', texte: 'ne se sentent pas assez accompagnés dans leur parcours.' },
       { valeur: '22,9', unite: '%', texte: 'taux de chômage élargi au Sénégal, 1er trimestre 2026.' },
     ],
     // ⚠️ Chiffre ANSD à revérifier à la source avant publication.
     sources:
-      "Sources : enquête LIGGEEY auprès de 200 personnes (2026) ; ANSD, Enquête nationale sur l'emploi au Sénégal, 1er trimestre 2026.",
+      "Sources : enquête LIGGEEY auprès de 200 personnes (2026) ; ANSD, Enquête nationale sur l’emploi au Sénégal, 1er trimestre 2026.",
     lien: { href: '/a-propos', label: 'Pourquoi LIGGEEY existe' },
   },
   video: {
@@ -124,9 +124,9 @@ export const accueil = {
     texte: 'Ce sur quoi vous pouvez compter, à chaque étape.',
     items: [
       { icone: 'BadgeCheck', titre: 'Des offres vérifiées', texte: 'Chaque entreprise et chaque offre sont contrôlées avant publication.' },
-      { icone: 'Lock', titre: 'Vos données protégées', texte: "Vos documents servent à vérifier votre profil, rien d'autre." },
+      { icone: 'Lock', titre: 'Vos données protégées', texte: "Vos documents servent à vérifier votre profil, rien d’autre." },
       { icone: 'Eye', titre: 'Un suivi transparent', texte: 'Vous voyez où en est chaque candidature.' },
-      { icone: 'Headphones', titre: 'Une équipe joignable', texte: "Sur WhatsApp ou à notre bureau de Dakar, quelqu'un vous répond." },
+      { icone: 'Headphones', titre: 'Une équipe joignable', texte: "Sur WhatsApp ou à notre bureau de Dakar, quelqu’un vous répond." },
       { icone: 'Smartphone', titre: 'Un paiement simple', texte: 'Wave et Orange Money, directement depuis votre téléphone.' },
     ],
     lien: { href: '/verification', label: 'Comment nous vérifions' },
@@ -135,7 +135,7 @@ export const accueil = {
     jobDating: {
       titre: 'Prochain Job Dating',
       texte: 'Rencontrez des recruteurs en face à face.',
-      bouton: "Je m'inscris",
+      bouton: "Je m’inscris",
       vide: 'Le prochain Job Dating sera annoncé ici. Abonnez-vous à la newsletter pour être prévenu.',
     },
     formations: {

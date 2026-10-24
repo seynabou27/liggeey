@@ -1,5 +1,5 @@
-/* Appels à l'API des comptes (app/api/auth/…), depuis le prototype.
-   Chaque fonction renvoie { ok, compte?, erreur?, erreurs? } et ne lève jamais d'exception :
+/* Appels à l’API des comptes (app/api/auth/…), depuis le prototype.
+   Chaque fonction renvoie { ok, compte?, erreur?, erreurs? } et ne lève jamais d’exception :
    une coupure réseau (fréquente en 4G) donne un message lisible. */
 
 const HORS_LIGNE = 'Connexion au serveur impossible. Vérifiez votre connexion Internet, puis réessayez.';

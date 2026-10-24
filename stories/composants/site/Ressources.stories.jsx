@@ -1,7 +1,7 @@
 import { userEvent, within } from 'storybook/test';
 import ListeArticles from '../../../components/ressources/ListeArticles';
 
-/* Articles d'exemple (le site les lit dans content/ressources/, côté serveur). */
+/* Articles d’exemple (le site les lit dans content/ressources/, côté serveur). */
 const ARTICLES = [
   { slug: 'exemple-entretien', titre: 'Préparer son premier entretien', resume: 'Article d’exemple pour Storybook.', public: 'talents', minutes: 4, auteur: 'L’équipe LIGGEEY' },
   { slug: 'exemple-formalisation', titre: 'Formaliser son activité, étape par étape', resume: 'Article d’exemple pour Storybook.', public: 'independants', minutes: 5, auteur: 'L’équipe LIGGEEY' },

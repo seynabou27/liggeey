@@ -1,25 +1,25 @@
 'use client';
 
-/* Intégration Next.js : prototype de la plateforme repris tel quel (fichier d'origine : liggeey-app (3).jsx).
-   Changements faits à l'original :
+/* Intégration Next.js : prototype de la plateforme repris tel quel (fichier d’origine : liggeey-app (3).jsx).
+   Changements faits à l’original :
    - la directive 'use client' ci-dessus ;
    - les props ecranInitial / espaceInitial / profilInitial (Storybook) et cheminInitial / profilAdresse /
      synchroniserAdresse du composant racine (en bas du fichier) : chaque écran a son adresse
      (/plateforme/{espace}/{écran}, voir lib/routesPlateforme.js) ;
-   - la barre « Mode test » n'est plus affichée (la sauvegarde locale de la démo est conservée) ;
+   - la barre « Mode test » n’est plus affichée (la sauvegarde locale de la démo est conservée) ;
    - liens de retour vers le site public (constante SITE_URL) : logo, « Retour au site » sur la
-     connexion et l'inscription, et en bas du menu de l'application ;
+     connexion et l’inscription, et en bas du menu de l’application ;
    - comptes réels (props compte / comptesDemo, ServeurContext) : connexion, inscription et déconnexion
-     par l'API app/api/auth/… (components/plateforme/apiComptes.js). Sans ces props (Storybook), tout reste simulé.
+     par l’API app/api/auth/… (components/plateforme/apiComptes.js). Sans ces props (Storybook), tout reste simulé.
    Monté par components/plateforme/Plateforme.jsx sur /plateforme. */
 
 /* =====================================================================
    LIGGEEY — PROTOTYPE INTERACTIF
-   Sommaire du fichier (dans l'ordre) :
+   Sommaire du fichier (dans l’ordre) :
      1. Fondations : couleurs, date de démo, mémoire partagée (useStore)
      2. Composants réutilisables : logo, notifications, images, fichiers
-     3. Connexion et inscription (date de naissance et règles d'âge)
-     4. Coquille de l'application : menu groupé, fil d'Ariane, bloc « À faire »
+     3. Connexion et inscription (date de naissance et règles d’âge)
+     4. Coquille de l’application : menu groupé, fil d’Ariane, bloc « À faire »
      5. Espace chercheur : tableau de bord, offres, candidatures, formations, mentors, profil
      6. Espace prestataire : tableau de bord, services, missions, profil, évaluations
      7. Espace entreprise : tableau de bord, offres, candidatures, prestataires, profil
@@ -112,7 +112,7 @@ import {
   LogOut,
 } from "lucide-react";
 import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, PieChart, Pie, Cell, Tooltip, AreaChart, Area, CartesianGrid } from "recharts";
-// Bibliothèque de l'application (components/app) : coquille, cartes, badges, tableaux… sur les tokens LIGGEEY.
+// Bibliothèque de l’application (components/app) : coquille, cartes, badges, tableaux… sur les tokens LIGGEEY.
 import * as App from "../app";
 import { site } from "@/lib/site";
 import { lienPartageWhatsApp, lienWhatsApp } from "@/lib/liens";
@@ -123,7 +123,7 @@ import { COMPTES_DEMO, MOT_DE_PASSE_DEMO } from "@/lib/comptesDemo.mjs";
 import { apiConnexion, apiInscription, apiDeconnexion } from "./apiComptes";
 
 // Couleurs : tokens LIGGEEY (lib/tokens/couleurs.mjs), lus via les variables CSS du site.
-// Les noms d'origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
+// Les noms d’origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
 const COLORS = {
   orange: "rgb(var(--fond-marque))", // couleur de marque (primaire-500)
   orangeSoft: "rgb(var(--fond-marque-doux))",
@@ -164,13 +164,20 @@ const COLORS = {
 /* =====================================================================
    FONDATIONS DU PROTOTYPE
    - DEMO_TODAY : la « date du jour » de la démo, pour que toutes les dates
-     (rendez-vous, échéances, périodes d'essai) restent cohérentes entre elles.
+     (rendez-vous, échéances, périodes d’essai) restent cohérentes entre elles.
    - useStore : mémoire partagée entre les écrans. Les données modifiées
      (services, missions, candidatures, inscriptions…) sont conservées quand
-     on change de page ou d'espace.
+     on change de page ou d’espace.
    ===================================================================== */
 
 const DEMO_TODAY = new Date(2026, 9, 14); // mercredi 14 octobre 2026
+
+/* Dates affichées : toujours en toutes lettres, « 1er août 2026 », « 28 juillet 2026 ». */
+const MOIS_LONGS = ["janvier", "février", "mars", "avril", "mai", "juin", "juillet", "août", "septembre", "octobre", "novembre", "décembre"];
+function dateFr(d) {
+  const j = d.getDate();
+  return `${j === 1 ? "1er" : j} ${MOIS_LONGS[d.getMonth()]} ${d.getFullYear()}`;
+}
 function demoNow() {
   return new Date(DEMO_TODAY.getTime());
 }
@@ -178,7 +185,7 @@ function demoNow() {
 const StoreContext = React.createContext(null);
 
 /* Comptes réels : fourni par le composant racine quand la plateforme tourne avec le serveur (/plateforme).
-   null dans Storybook : la connexion et l'inscription restent simulées, comme dans le prototype d'origine.
+   null dans Storybook : la connexion et l’inscription restent simulées, comme dans le prototype d’origine.
    { compte, comptesDemo, onConnecte(compte), onDeconnexion() } */
 const ServeurContext = React.createContext(null);
 
@@ -198,8 +205,8 @@ function readStore(data, key, initial) {
 
 /* ---------- Reusable pieces ---------- */
 
-/* Adresse du site public. La plateforme est servie par le site (/plateforme) : « / » ramène à l'accueil.
-   Si la plateforme est un jour déployée à part, mettre ici l'adresse complète du site. */
+/* Adresse du site public. La plateforme est servie par le site (/plateforme) : « / » ramène à l’accueil.
+   Si la plateforme est un jour déployée à part, mettre ici l’adresse complète du site. */
 const SITE_URL = "/";
 
 function Logo({ color = COLORS.brandPale, iconColor, height = 24, iconOnly = false }) {
@@ -219,7 +226,7 @@ function Logo({ color = COLORS.brandPale, iconColor, height = 24, iconOnly = fal
   );
 }
 
-/* ---------- Coquille des écrans de connexion et d'inscription ----------
+/* ---------- Coquille des écrans de connexion et d’inscription ----------
    Écran partagé : panneau de marque à gauche (dégradé bleu ardoise, accents orange),
    formulaire à droite. Le panneau change de message selon le mode : connexion ou inscription.
    Sur mobile, le panneau est remplacé par un bandeau ardoise compact au-dessus du formulaire. */
@@ -227,12 +234,12 @@ function Logo({ color = COLORS.brandPale, iconColor, height = 24, iconOnly = fal
 const AUTH_PANNEAU = {
   connexion: {
     surtitre: "Espace LIGGEEY",
-    titre: "Rendons l'insertion",
+    titre: "Rendons l’insertion",
     accent: "plus facile et plus juste.",
     texte: "Retrouvez vos candidatures, vos missions et votre accompagnement là où vous les avez laissés.",
     liste: [
       { icon: ShieldCheck, titre: "Offres et profils vérifiés", texte: "Chaque entreprise et chaque offre sont contrôlées avant publication." },
-      { icon: HeartHandshake, titre: "Un accompagnement humain", texte: "Sur WhatsApp et au bureau d'accueil de Dakar." },
+      { icon: HeartHandshake, titre: "Un accompagnement humain", texte: "Sur WhatsApp et au bureau d’accueil de Dakar." },
       { icon: Smartphone, titre: "Pensé pour votre téléphone", texte: "Paiement par Wave ou Orange Money." },
     ],
   },
@@ -240,7 +247,7 @@ const AUTH_PANNEAU = {
     surtitre: "Créer votre compte",
     titre: "Un compte,",
     accent: "un parcours pour chacun.",
-    texte: "Choisissez le vôtre : LIGGEEY vous accompagne avant, pendant et après l'embauche.",
+    texte: "Choisissez le vôtre : LIGGEEY vous accompagne avant, pendant et après l’embauche.",
     liste: [
       { icon: Briefcase, titre: "Talents", texte: "Valorisez vos compétences et postulez à des offres vérifiées." },
       { icon: Wrench, titre: "Indépendants", texte: "Formalisez votre activité et trouvez des missions." },
@@ -306,7 +313,7 @@ function AuthPanneau({ mode }) {
       <div className="relative flex flex-col gap-4">
         <div className="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 pt-5">
           <span>
-            <span className="block text-sm font-semibold">Besoin d'aide pour vous inscrire ?</span>
+            <span className="block text-sm font-semibold">Besoin d’aide pour vous inscrire ?</span>
             <span className="flex items-center gap-1.5 text-xs text-white/65">
               <MapPin size={12} aria-hidden="true" /> {site.bureau.adresse}, {site.bureau.ville}
             </span>
@@ -321,7 +328,7 @@ function AuthPanneau({ mode }) {
   );
 }
 
-// Écran partagé par la connexion et l'inscription
+// Écran partagé par la connexion et l’inscription
 function AuthShell({ children, mode = "connexion" }) {
   const t = AUTH_PANNEAU[mode] || AUTH_PANNEAU.connexion;
   return (
@@ -363,10 +370,10 @@ function AuthShell({ children, mode = "connexion" }) {
             </a>
             {children}
 
-            {/* Mobile : l'aide du panneau, en bas du formulaire */}
+            {/* Mobile : l’aide du panneau, en bas du formulaire */}
             <div className="md:hidden mt-8 flex items-center justify-between gap-3 rounded-lg border border-base bg-doux px-4 py-3">
               <span>
-                <span className="block text-sm font-semibold text-principal">Besoin d'aide ?</span>
+                <span className="block text-sm font-semibold text-principal">Besoin d’aide ?</span>
                 <span className="block text-xs text-secondaire">Sur WhatsApp ou au bureau de {site.bureau.ville}.</span>
               </span>
               <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] shrink-0 items-center gap-2 rounded border border-forte bg-surface px-4 text-sm font-semibold text-principal transition-colors hover:border-whatsapp">
@@ -387,7 +394,7 @@ function Stepper({ step }) {
     { n: 3, label: "Confirmation" },
   ];
   return (
-    <ol className="flex items-center mb-10" aria-label="Étapes de l'inscription">
+    <ol className="flex items-center mb-10" aria-label="Étapes de l’inscription">
       {steps.map((s, i) => {
         const state = s.n < step ? "done" : s.n === step ? "current" : "upcoming";
         return (
@@ -400,7 +407,7 @@ function Stepper({ step }) {
               >
                 {state === "done" ? <Check size={14} aria-hidden="true" /> : s.n}
               </span>
-              {/* Sur mobile, seul le libellé de l'étape en cours s'affiche ; les autres restent annoncés aux lecteurs d'écran. */}
+              {/* Sur mobile, seul le libellé de l’étape en cours s’affiche ; les autres restent annoncés aux lecteurs d’écran. */}
               <span className={`whitespace-nowrap text-sm ${state === "current" ? "" : "sr-only sm:not-sr-only"} ${state === "upcoming" ? "text-discret" : state === "current" ? "font-semibold text-principal" : "text-secondaire"}`}>
                 {s.label}
               </span>
@@ -494,7 +501,7 @@ function FilePickerButton({ accept, onPick, className, style, children }) {
   );
 }
 
-/* ---------- Styles partagés des écrans de connexion et d'inscription ----------
+/* ---------- Styles partagés des écrans de connexion et d’inscription ----------
    Mêmes règles que la bibliothèque components/app : champs de 48 px, focus orange,
    liens en text-marque (orange lisible sur blanc), sélection en fond orange léger. */
 
@@ -517,7 +524,7 @@ const AUTH = {
   oeil: "absolute right-1.5 top-1/2 -translate-y-1/2 grid h-10 w-10 place-items-center rounded-md text-discret hover:bg-doux hover:text-secondaire",
 };
 
-/* ---------- Champs de formulaire de l'application ----------
+/* ---------- Champs de formulaire de l’application ----------
    Mêmes styles que AUTH, pour tous les formulaires des espaces (services, offres,
    profils, événements…). Champ : libellé relié, contrôle, aide ou erreur. */
 
@@ -550,7 +557,7 @@ function Champ({ id, label, requis, aide, erreur, children, large }) {
 }
 
 /**
- * État d'un formulaire : valeurs, erreurs (affichées après un premier essai d'envoi)
+ * État d’un formulaire : valeurs, erreurs (affichées après un premier essai d’envoi)
  * et attributs des champs. `verifier(v)` renvoie { clé: message | false }.
  */
 function useFormulaire(initial, verifier = () => ({})) {
@@ -582,7 +589,7 @@ function AlerteFormulaire({ visible, children = "Complétez les champs signalés
   return <p role="alert" className="mt-5 text-sm text-statut-danger">{children}</p>;
 }
 
-/** Action destructrice (refuser, archiver…), au gabarit des boutons de l'application. */
+/** Action destructrice (refuser, archiver…), au gabarit des boutons de l’application. */
 function BoutonDanger({ className = "", children, ...props }) {
   return (
     <button type="button" className={`inline-flex min-h-[48px] items-center justify-center gap-2 rounded bg-statut-danger px-6 text-[15px] font-semibold text-sur-statut transition-colors hover:brightness-95 disabled:cursor-not-allowed disabled:opacity-60 ${className}`} {...props}>
@@ -604,7 +611,7 @@ function ListeChamp({ erreur, className = "", children, ...props }) {
 /* ---------- Screen 1 : Connexion ---------- */
 
 const ESPACES_DEMO = [
-  { id: "chercheur", label: "Chercheur d'emploi" },
+  { id: "chercheur", label: "Chercheur d’emploi" },
   { id: "prestataire", label: "Prestataire" },
   { id: "entreprise", label: "Entreprise" },
   { id: "jeune", label: "Cap Métier" },
@@ -612,11 +619,11 @@ const ESPACES_DEMO = [
   { id: "admin", label: "Admin" },
 ];
 
-/* Compte de démonstration d'un espace (lib/comptesDemo.mjs, créés par npm run db:amorcer). */
+/* Compte de démonstration d’un espace (lib/comptesDemo.mjs, créés par npm run db:amorcer). */
 const compteDemo = (espace) => COMPTES_DEMO.find((c) => c.profil === espace);
 
 function ConnexionScreen({ onNavigate }) {
-  /* Avec le serveur : vrai compte (e-mail ou téléphone), vérifié par l'API. Le choix d'espace ne sert qu'à
+  /* Avec le serveur : vrai compte (e-mail ou téléphone), vérifié par l’API. Le choix d’espace ne sert qu’à
      préremplir un compte de démonstration (NEXT_PUBLIC_COMPTES_DEMO). Sans serveur (Storybook) : simulation. */
   const serveur = React.useContext(ServeurContext);
   const avecDemo = !serveur || serveur.comptesDemo;
@@ -704,7 +711,7 @@ function ConnexionScreen({ onNavigate }) {
               className={AUTH.champ(erreur)}
             />
             <p id="reset-email-aide" className={`${AUTH.aide(erreur)} mb-6`}>
-              {erreur ? "Veuillez saisir une adresse e-mail valide." : "Utilisez l'adresse associée à votre compte LIGGEEY"}
+              {erreur ? "Veuillez saisir une adresse e-mail valide." : "Utilisez l’adresse associée à votre compte LIGGEEY"}
             </p>
             <button type="submit" className={AUTH.principal}>Envoyer le lien</button>
           </>
@@ -768,8 +775,8 @@ function ConnexionScreen({ onNavigate }) {
         />
         <p id="connexion-email-aide" className={AUTH.aide(emailErreur)}>
           {serveur
-            ? emailErreur ? "Saisissez une adresse e-mail ou un numéro sénégalais valide." : "L'adresse e-mail ou le numéro utilisé lors de votre inscription"
-            : emailErreur ? "Veuillez saisir une adresse e-mail valide." : "Saisissez l'adresse e-mail utilisée lors de votre inscription"}
+            ? emailErreur ? "Saisissez une adresse e-mail ou un numéro sénégalais valide." : "L’adresse e-mail ou le numéro utilisé lors de votre inscription"
+            : emailErreur ? "Veuillez saisir une adresse e-mail valide." : "Saisissez l’adresse e-mail utilisée lors de votre inscription"}
         </p>
       </div>
 
@@ -895,16 +902,16 @@ const PROFILE_META = {
   mentor: { badge: "Profil : Je veux devenir mentor", tagline: "mentor" },
 };
 
-/* Âges d'accès, d'après le droit sénégalais (à faire valider par un juriste) :
+/* Âges d’accès, d’après le droit sénégalais (à faire valider par un juriste) :
    - moins de 18 ans = enfant ; majorité civile à 18 ans (Code de la famille) ;
    - travail et apprentissage dès 15 ans révolus, travaux dangereux interdits avant 18 ans
      (Code du travail, art. L.145 ; arrêté n° 3748 du 6 juin 2003) ;
    - un mineur non émancipé ne peut pas être commerçant (Acte uniforme OHADA sur le droit commercial général).
-   Les 15-17 ans passent donc par Cap Métier, avec l'accord d'un parent ou tuteur.
+   Les 15-17 ans passent donc par Cap Métier, avec l’accord d’un parent ou tuteur.
    AGE_MAJORITE, AGE_MIN_CAP_METIER, AGE_MIN_PAR_PROFIL et LIENS_PARENT viennent de lib/comptes.mjs,
-   partagé avec l'API, qui revérifie ces règles à l'inscription. */
+   partagé avec l’API, qui revérifie ces règles à l’inscription. */
 
-/* Âge révolu à la date de démo, à partir d'une date « AAAA-MM-JJ » (null si la date est vide ou invalide) */
+/* Âge révolu à la date de démo, à partir d’une date « AAAA-MM-JJ » (null si la date est vide ou invalide) */
 function ageAu(dateIso, ref = demoNow()) {
   const m = /^(\d{4})-(\d{2})-(\d{2})$/.exec(dateIso || "");
   if (!m) return null;
@@ -922,53 +929,53 @@ const CHAMP_NAISSANCE = (help) => ({ name: "naissance", label: "Date de naissanc
 
 const FIELD_CONFIG = {
   chercheur: [
-    { name: "nom", label: "Nom complet", placeholder: "Ex: Moussa Diop", help: "Saisissez votre prénom et votre nom" },
-    CHAMP_NAISSANCE("L'espace emploi est ouvert à partir de 18 ans"),
+    { name: "nom", label: "Nom complet", placeholder: "Ex. : Moussa Diop", help: "Saisissez votre prénom et votre nom" },
+    CHAMP_NAISSANCE("L’espace emploi est ouvert à partir de 18 ans"),
     { name: "email", label: "Adresse e-mail", type: "email", placeholder: "moussa.diop@exemple.sn", help: "Saisissez une adresse e-mail valide pour la validation" },
     { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Exemple de format valide au Sénégal" },
   ],
   entreprise: [
-    { name: "entreprise", label: "Nom de l'entreprise", placeholder: "Ex: Sonatel SA", help: "Saisissez le nom officiel de votre entreprise" },
-    { name: "responsable", label: "Nom du responsable", placeholder: "Ex: Amadou Ba", help: "Prénom et Nom de la personne en charge des recrutements" },
+    { name: "entreprise", label: "Nom de l’entreprise", placeholder: "Ex. : Sonatel SA", help: "Saisissez le nom officiel de votre entreprise" },
+    { name: "responsable", label: "Nom du responsable", placeholder: "Ex. : Amadou Ba", help: "Prénom et nom de la personne en charge des recrutements" },
     { name: "email", label: "Adresse e-mail professionnelle", type: "email", placeholder: "contact@entreprise.sn", help: "Utilisez une adresse e-mail professionnelle" },
-    { name: "telephone", label: "Téléphone", placeholder: "+221 33 000 00 00", help: "Numéro de contact de l'entreprise ou du recruteur" },
-    { name: "secteur", label: "Secteur d'activité", placeholder: "Ex: Télécommunications", help: "Sélectionnez ou saisissez votre domaine principal" },
+    { name: "telephone", label: "Téléphone", placeholder: "+221 33 000 00 00", help: "Numéro de contact de l’entreprise ou du recruteur" },
+    { name: "secteur", label: "Secteur d’activité", placeholder: "Ex. : Télécommunications", help: "Sélectionnez ou saisissez votre domaine principal" },
   ],
   prestataire: [
-    { name: "nom", label: "Nom complet", placeholder: "Ex: Fatou Ndiaye", help: "Saisissez votre prénom et votre nom" },
-    CHAMP_NAISSANCE("L'espace prestataire est réservé aux personnes de 18 ans et plus"),
+    { name: "nom", label: "Nom complet", placeholder: "Ex. : Fatou Ndiaye", help: "Saisissez votre prénom et votre nom" },
+    CHAMP_NAISSANCE("L’espace prestataire est réservé aux personnes de 18 ans et plus"),
     { name: "email", label: "Adresse e-mail", type: "email", placeholder: "fatou.ndiaye@exemple.sn", help: "Saisissez une adresse e-mail valide pour la validation" },
     { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Exemple de format valide au Sénégal" },
-    { name: "competences", label: "Domaine de compétence", placeholder: "Ex: Restauration, Nettoyage, Maintenance", help: "Saisissez vos compétences clés (séparées par des virgules)" },
-    { name: "ville", label: "Ville", placeholder: "Ex: Dakar", help: "Votre ville de résidence principale au Sénégal" },
+    { name: "competences", label: "Domaine de compétence", placeholder: "Ex. : restauration, nettoyage, maintenance", help: "Saisissez vos compétences clés (séparées par des virgules)" },
+    { name: "ville", label: "Ville", placeholder: "Ex. : Dakar", help: "Votre ville de résidence principale au Sénégal" },
   ],
   jeune: [
-    { name: "nom", label: "Nom complet", placeholder: "Ex: Awa Sarr", help: "Saisissez votre prénom et votre nom" },
-    CHAMP_NAISSANCE("Cap Métier est ouvert dès 15 ans. Avant 18 ans, nous demandons l'accord d'un parent ou tuteur"),
+    { name: "nom", label: "Nom complet", placeholder: "Ex. : Awa Sarr", help: "Saisissez votre prénom et votre nom" },
+    CHAMP_NAISSANCE("Cap Métier est ouvert dès 15 ans. Avant 18 ans, nous demandons l’accord d’un parent ou tuteur"),
     { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Nous vous écrirons surtout par SMS ou WhatsApp" },
     { name: "email", label: "Adresse e-mail", type: "email", optional: true, placeholder: "awa.sarr@exemple.sn", help: "Facultatif" },
-    { name: "ville", label: "Ville ou quartier", placeholder: "Ex: Pikine", help: "Pour vous proposer des ateliers près de chez vous" },
+    { name: "ville", label: "Ville ou quartier", placeholder: "Ex. : Pikine", help: "Pour vous proposer des ateliers près de chez vous" },
   ],
   mentor: [
-    { name: "nom", label: "Nom complet", placeholder: "Ex: Mariama Ba", help: "Saisissez votre prénom et votre nom" },
+    { name: "nom", label: "Nom complet", placeholder: "Ex. : Mariama Ba", help: "Saisissez votre prénom et votre nom" },
     CHAMP_NAISSANCE("Les mentors doivent avoir 18 ans ou plus"),
     { name: "email", label: "Adresse e-mail", type: "email", placeholder: "mariama.ba@exemple.sn", help: "Saisissez une adresse e-mail valide pour la validation" },
     { name: "telephone", label: "Téléphone", placeholder: "+221 77 000 00 00", help: "Exemple de format valide au Sénégal" },
-    { name: "metier", label: "Métier ou domaine d'expertise", placeholder: "Ex: Couturière, Responsable RH, Électricien", help: "Le domaine dans lequel vous accompagnerez les jeunes" },
-    { name: "experience", label: "Années d'expérience", type: "number", placeholder: "Ex: 10", help: "Dans ce métier ou ce domaine" },
+    { name: "metier", label: "Métier ou domaine d’expertise", placeholder: "Ex. : couturière, responsable RH, électricien", help: "Le domaine dans lequel vous accompagnerez les jeunes" },
+    { name: "experience", label: "Années d’expérience", type: "number", placeholder: "Ex. : 10", help: "Dans ce métier ou ce domaine" },
   ],
 };
 
-/* Message affiché quand l'âge ne permet pas d'ouvrir l'espace choisi */
+/* Message affiché quand l’âge ne permet pas d’ouvrir l’espace choisi */
 function AgeRefus({ profil, age, onCapMetier }) {
   if (age < AGE_MIN_CAP_METIER) {
     return (
       <div role="alert" className="mt-2 rounded-md border border-statut-alerte bg-statut-alerte-doux p-4 text-sm text-principal">
         <p className="mb-1 font-semibold">LIGGEEY accueille les jeunes à partir de 15 ans.</p>
         <p className="mb-3 text-secondaire">
-          Avant cet âge, la loi sénégalaise interdit le travail, et l'école reste la priorité. Avec vos parents, vous pouvez nous écrire sur WhatsApp ou passer au bureau de Dakar : nous vous orienterons.
+          Avant cet âge, la loi sénégalaise interdit le travail, et l’école reste la priorité. Avec vos parents, vous pouvez nous écrire sur WhatsApp ou passer au bureau de Dakar : nous vous orienterons.
         </p>
-        <a href={lienWhatsApp("Bonjour LIGGEEY, je voudrais des conseils d'orientation pour mon enfant.")} target="_blank" rel="noopener noreferrer" className={AUTH.lien}>
+        <a href={lienWhatsApp("Bonjour LIGGEEY, je voudrais des conseils d’orientation pour mon enfant.")} target="_blank" rel="noopener noreferrer" className={AUTH.lien}>
           Écrire à LIGGEEY sur WhatsApp
         </a>
       </div>
@@ -984,11 +991,11 @@ function AgeRefus({ profil, age, onCapMetier }) {
   return (
     <div role="alert" className="mt-2 rounded-md border border-statut-alerte bg-statut-alerte-doux p-4 text-sm text-principal">
       <p className="mb-1 font-semibold">
-        {profil === "prestataire" ? "L'espace prestataire est réservé aux personnes de 18 ans et plus." : "L'espace emploi est réservé aux personnes de 18 ans et plus."}
+        {profil === "prestataire" ? "L’espace prestataire est réservé aux personnes de 18 ans et plus." : "L’espace emploi est réservé aux personnes de 18 ans et plus."}
       </p>
       <p className="mb-3 text-secondaire">
         {profil === "prestataire"
-          ? "Avant 18 ans, la loi ne permet pas d'exercer une activité à son compte. "
+          ? "Avant 18 ans, la loi ne permet pas d’exercer une activité à son compte. "
           : "Avant 18 ans, la loi protège les jeunes de certains travaux. "}
         Le parcours Cap Métier vous aide à choisir un métier, à vous former et à trouver un apprentissage, avec un mentor.
       </p>
@@ -1000,8 +1007,8 @@ function AgeRefus({ profil, age, onCapMetier }) {
 }
 
 function SignupInfoScreen({ profile, onNavigate }) {
-  /* Le profil peut basculer vers Cap Métier si l'âge saisi l'exige (les champs déjà remplis sont gardés).
-     Avec le serveur, le compte est créé par l'API, qui revérifie tout (âge, doublons…) et renvoie ses erreurs par champ. */
+  /* Le profil peut basculer vers Cap Métier si l’âge saisi l’exige (les champs déjà remplis sont gardés).
+     Avec le serveur, le compte est créé par l’API, qui revérifie tout (âge, doublons…) et renvoie ses erreurs par champ. */
   const serveur = React.useContext(ServeurContext);
   const [envoi, setEnvoi] = useState(false);
   const [erreursServeur, setErreursServeur] = useState({});
@@ -1056,7 +1063,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
       return;
     }
     setErreursServeur(r.erreurs || {});
-    setErreurServeur(r.erreur || "L'inscription est impossible pour le moment.");
+    setErreurServeur(r.erreur || "L’inscription est impossible pour le moment.");
   }
 
   function passerCapMetier() {
@@ -1113,10 +1120,10 @@ function SignupInfoScreen({ profile, onNavigate }) {
         <fieldset className="mb-4 rounded-lg border border-base bg-doux p-4">
           <legend className="px-1 text-sm font-semibold text-principal">Votre parent ou tuteur</legend>
           <p className="mb-4 text-sm text-secondaire">
-            Vous avez {age} ans. Avant 18 ans, la loi demande l'accord d'un parent ou d'un tuteur. Il recevra un SMS pour confirmer, et il sera prévenu de vos séances.
+            Vous avez {age} ans. Avant 18 ans, la loi demande l’accord d’un parent ou d’un tuteur. Il recevra un SMS pour confirmer, et il sera prévenu de vos séances.
           </p>
           {[
-            { name: "parentNom", label: "Nom du parent ou tuteur", placeholder: "Ex: Ndèye Sarr" },
+            { name: "parentNom", label: "Nom du parent ou tuteur", placeholder: "Ex. : Ndèye Sarr" },
             { name: "parentTelephone", label: "Téléphone du parent ou tuteur", placeholder: "+221 77 000 00 00" },
           ].map((f) => {
             const invalid = touched && !(values[f.name] || "").trim();
@@ -1144,7 +1151,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
             <input type="checkbox" checked={!!values.parentInforme} onChange={(e) => setField("parentInforme", e.target.checked)} className={`${AUTH.case} mt-0.5`} />
             <span className="text-sm text-principal">Mon parent ou tuteur est au courant de mon inscription à Cap Métier.</span>
           </label>
-          {touched && !values.parentInforme && <p role="alert" className="mt-2 text-xs text-statut-danger">Parlez-en d'abord à votre parent ou tuteur, puis cochez cette case.</p>}
+          {touched && !values.parentInforme && <p role="alert" className="mt-2 text-xs text-statut-danger">Parlez-en d’abord à votre parent ou tuteur, puis cochez cette case.</p>}
         </fieldset>
       )}
 
@@ -1177,13 +1184,13 @@ function SignupInfoScreen({ profile, onNavigate }) {
       <label className="flex items-start gap-3 mb-6 cursor-pointer select-none">
         <input type="checkbox" checked={accepted} onChange={(e) => setAccepted(e.target.checked)} className={`${AUTH.case} mt-0.5`} />
         <span className="text-sm text-principal">
-          J'accepte les{" "}
-          <a href="/cgu" className={AUTH.lien}>conditions d'utilisation</a> et la{" "}
+          J’accepte les{" "}
+          <a href="/cgu" className={AUTH.lien}>conditions d’utilisation</a> et la{" "}
           <a href="/confidentialite" className={AUTH.lien}>politique de confidentialité</a> de LIGGEEY.
         </span>
       </label>
       {touched && !accepted && (
-        <p role="alert" className="text-xs mb-4 -mt-4 text-statut-danger">Merci d'accepter les conditions pour continuer.</p>
+        <p role="alert" className="text-xs mb-4 -mt-4 text-statut-danger">Merci d’accepter les conditions pour continuer.</p>
       )}
 
       {erreurServeur && (
@@ -1219,7 +1226,7 @@ function SignupInfoScreen({ profile, onNavigate }) {
 function ConfirmationScreen({ profile, inscription, onNavigate }) {
   const meta = PROFILE_META[profile] || PROFILE_META.chercheur;
   const estMentor = profile === "mentor";
-  // Avec le serveur, aucun SMS ni e-mail n'est encore envoyé automatiquement : l'équipe prend contact.
+  // Avec le serveur, aucun SMS ni e-mail n’est encore envoyé automatiquement : l’équipe prend contact.
   const serveur = React.useContext(ServeurContext);
   return (
     <div>
@@ -1230,7 +1237,7 @@ function ConfirmationScreen({ profile, inscription, onNavigate }) {
       <h2 className={AUTH.titre}>{estMentor ? "Candidature envoyée" : "Compte créé avec succès"}</h2>
       {estMentor ? (
         <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
-          Merci de vouloir accompagner des jeunes ! L'équipe LIGGEEY vérifie votre identité, votre expérience et vos références, puis vous propose de signer la charte du mentor. {serveur ? "Nous vous contacterons dès que votre compte sera validé." : "Vous recevrez un e-mail dès que votre compte sera validé."}
+          Merci de vouloir accompagner des jeunes ! L’équipe LIGGEEY vérifie votre identité, votre expérience et vos références, puis vous propose de signer la charte du mentor. {serveur ? "Nous vous contacterons dès que votre compte sera validé." : "Vous recevrez un e-mail dès que votre compte sera validé."}
         </p>
       ) : (
         <p className={`${AUTH.intro} mb-8 leading-relaxed`}>
@@ -1244,7 +1251,7 @@ function ConfirmationScreen({ profile, inscription, onNavigate }) {
       )}
       <div className="flex flex-col gap-3">
         <button type="button" onClick={() => onNavigate("dashboard", { espace: profile })} className={AUTH.principal}>
-          {estMentor ? "Découvrir l'espace mentor (démo)" : profile === "jeune" ? "Voir mon parcours" : "Accéder à mon tableau de bord"}
+          {estMentor ? "Découvrir l’espace mentor (démo)" : profile === "jeune" ? "Voir mon parcours" : "Accéder à mon tableau de bord"}
         </button>
         <button type="button" onClick={() => onNavigate("login")} className={AUTH.secondaire}>
           Retour à la connexion
@@ -1255,12 +1262,12 @@ function ConfirmationScreen({ profile, inscription, onNavigate }) {
   );
 }
 
-/* ---------- Coquille de l'application : menu groupé, fil d'Ariane, « À faire » ---------- */
+/* ---------- Coquille de l’application : menu groupé, fil d’Ariane, « À faire » ---------- */
 
 const NAV_ITEMS_BY_ESPACE = {
   chercheur: [
     { id: "dashboard", label: "Tableau de bord", icon: LayoutDashboard, section: "Ma recherche" },
-    { id: "offres", label: "Offres d'emploi", icon: Briefcase, section: "Ma recherche" },
+    { id: "offres", label: "Offres d’emploi", icon: Briefcase, section: "Ma recherche" },
     { id: "candidatures", label: "Mes candidatures", icon: ClipboardList, section: "Ma recherche" },
     { id: "formations", label: "Formations", icon: GraduationCap, section: "Progresser" },
     { id: "mentors", label: "Mentors", icon: UsersRound, section: "Progresser" },
@@ -1292,7 +1299,7 @@ const NAV_ITEMS_BY_ESPACE = {
   ],
   jeune: [
     { id: "dashboard", label: "Mon parcours", icon: LayoutDashboard, section: "Cap Métier" },
-    { id: "orientation", label: "Bilan d'orientation", icon: Compass, section: "Cap Métier" },
+    { id: "orientation", label: "Bilan d’orientation", icon: Compass, section: "Cap Métier" },
     { id: "ateliers", label: "Ateliers découverte", icon: GraduationCap, section: "Cap Métier" },
     { id: "mentor", label: "Mon mentor", icon: UsersRound, section: "Être accompagné" },
     { id: "messages", label: "Messages", icon: MessageCircle, section: "Mon compte" },
@@ -1327,14 +1334,14 @@ const NAV_ITEMS_BY_ESPACE = {
   ],
 };
 
-/* Pages secondaires : rattachées à une entrée du menu, avec leur fil d'Ariane */
+/* Pages secondaires : rattachées à une entrée du menu, avec leur fil d’Ariane */
 const SUB_PAGES = {
   evaluations: { parent: "profil", label: "Mes évaluations et avis" },
   realisations: { parent: "profil", label: "Mes réalisations" },
 };
 
 const USER_BY_ESPACE = {
-  chercheur: { name: "Absatou Diallo", role: "Chercheuse d'emploi", initials: "AD" },
+  chercheur: { name: "Absatou Diallo", role: "Chercheuse d’emploi", initials: "AD" },
   prestataire: { name: "Mamadou Ndiaye", role: "Électricien · prestataire", initials: "MN" },
   entreprise: { name: "Awa Diallo", role: "Senegal Construction SARL", initials: "AD" },
   jeune: { name: "Mame Diarra Sène", role: "Cap Métier · 16 ans", initials: "MS" },
@@ -1342,15 +1349,15 @@ const USER_BY_ESPACE = {
   admin: { name: "Admin LIGGEEY", role: "Super admin", initials: "AL" },
 };
 
-/* La coquille vient de la bibliothèque de l'application (components/app/Coquille.jsx) :
-   barre latérale claire, barre du haut, en-tête de page avec fil d'Ariane, pied de page.
-   Sidebar, Breadcrumb et AppShell gardent leur nom et leurs props d'origine. */
+/* La coquille vient de la bibliothèque de l’application (components/app/Coquille.jsx) :
+   barre latérale claire, barre du haut, en-tête de page avec fil d’Ariane, pied de page.
+   Sidebar, Breadcrumb et AppShell gardent leur nom et leurs props d’origine. */
 
-/* Barre d'icônes, en première position avant le menu (bleu le plus foncé, neutre-900).
-   Elle garde les icônes d'origine du prototype, dans le même ordre ; chacune a un rôle fixe, adapté à chaque espace :
+/* Barre d’icônes, en première position avant le menu (bleu le plus foncé, neutre-900).
+   Elle garde les icônes d’origine du prototype, dans le même ordre ; chacune a un rôle fixe, adapté à chaque espace :
    Flame = priorités (tableau de bord et « À faire »), Grid3x3 = explorer, Zap = action rapide,
    Triangle = à surveiller, AlignJustify = mes suivis, Layers = progresser, Bell = messages.
-   Une icône sans équivalent dans l'espace n'est pas affichée. « creer » ouvre directement le formulaire de création ;
+   Une icône sans équivalent dans l’espace n’est pas affichée. « creer » ouvre directement le formulaire de création ;
    le compteur reprend celui du menu. */
 const RAIL_ICONS = [Flame, Grid3x3, Zap, Triangle, AlignJustify, Layers, Bell];
 
@@ -1385,7 +1392,7 @@ const RACCOURCIS_PAR_ESPACE = {
   jeune: [
     { to: "dashboard", label: "Mon parcours" },
     { to: "ateliers", label: "Ateliers découverte" },
-    { to: "orientation", label: "Faire mon bilan d'orientation" },
+    { to: "orientation", label: "Faire mon bilan d’orientation" },
     null,
     { to: "mentor", label: "Mon mentor" },
     null,
@@ -1419,7 +1426,7 @@ function IconRail({ espace, active, onNavigate = () => {}, badges = {}, taches =
     return {
       icone,
       label: r.label,
-      // Une seule icône active par écran : celle de la vue (pas l'action « créer »).
+      // Une seule icône active par écran : celle de la vue (pas l’action « créer »).
       actif: !r.creer && r.to === active && !(RACCOURCIS_PAR_ESPACE[espace] || []).slice(0, i).some((p) => p && !p.creer && p.to === active),
       compteur,
       onClick: () => onNavigate(r.to, r.creer ? { creer: true } : r.data),
@@ -1484,7 +1491,7 @@ function Breadcrumb({ items, onNavigate, title }) {
 
 function AppShell({ espace, navItems, active, onNavigate, user, breadcrumb, badges, todos = [], children }) {
   const mainRef = useRef(null);
-  // Remonte en haut de page dès que l'écran (ou une vue détail) change.
+  // Remonte en haut de page dès que l’écran (ou une vue détail) change.
   useEffect(() => {
     const el = mainRef.current;
     if (!el || typeof MutationObserver === "undefined") return undefined;
@@ -1510,7 +1517,7 @@ function AppShell({ espace, navItems, active, onNavigate, user, breadcrumb, badg
     estAdmin && { label: "Paramètres", icone: Settings, onClick: () => onNavigate("parametres") },
     serveur
       ? { label: "Se déconnecter", icone: LogOut, onClick: serveur.onDeconnexion }
-      : { label: "Changer d'espace", icone: ArrowLeft, onClick: () => onNavigate("login") },
+      : { label: "Changer d’espace", icone: ArrowLeft, onClick: () => onNavigate("login") },
     { label: "Retour au site", icone: Home, href: SITE_URL },
   ].filter(Boolean);
   const notifications = todos.map((t, i) => ({
@@ -1567,7 +1574,7 @@ function TodoPanel({ items, onNavigate }) {
   );
 }
 
-/* ---------- Screen 5 : Dashboard (Chercheur d'emploi) ---------- */
+/* ---------- Screen 5 : Dashboard (Chercheur d’emploi) ---------- */
 
 function StatCard({ icon, value, label, detail, tone = "marque", onClick }) {
   return <App.CarteStat icone={icon} ton={tone} titre={label} detail={detail} valeur={value} onClick={onClick} />;
@@ -1579,7 +1586,7 @@ const STATUT_TONS = {
   "Vue par le recruteur": "alerte",
   "Réponse négative": "danger",
   "Candidature reçue": "alerte",
-  "Candidature Retenue": "succes",
+  "Candidature retenue": "succes",
   "En attente": "alerte",
   "Payé": "succes",
   "Refusé": "danger",
@@ -1605,14 +1612,14 @@ const STATUT_TONS = {
   "Inactif": "neutre",
   "Annulée": "danger",
   "Annulé": "danger",
-  "En cours d'apprentissage": "marque",
+  "En cours d’apprentissage": "marque",
   "Apprenant": "marque",
   "Mentoré": "marque",
   "Remboursé": "neutre",
   "Fait": "succes",
   "À compléter": "alerte",
   "À venir": "neutre",
-  "En période d'essai": "marque",
+  "En période d’essai": "marque",
   "À risque": "danger",
   "Confirmé": "succes",
   "Ouvert": "info",
@@ -1659,7 +1666,7 @@ function DashboardScreen({ user, onNavigate, todos }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-secondaire">Voici un aperçu de votre recherche d'emploi et de votre nouveau poste.</p>
+      <p className="text-sm text-secondaire">Voici un aperçu de votre recherche d’emploi et de votre nouveau poste.</p>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={FileText} value={candidatures.length} label="Candidatures envoyées" detail="Depuis votre inscription" onClick={() => onNavigate("candidatures")} />
@@ -1725,11 +1732,11 @@ function DashboardScreen({ user, onNavigate, todos }) {
   );
 }
 
-/* ---------- Screen 6 : Offres d'emploi ---------- */
+/* ---------- Screen 6 : Offres d’emploi ---------- */
 
 const OFFRES_DATA = [
   {
-    titre: "Développeur Full Stack",
+    titre: "Développeur full stack",
     contrat: "CDI",
     entreprise: "Sonatel",
     secteur: "Télécommunications",
@@ -1738,10 +1745,10 @@ const OFFRES_DATA = [
     publieeLe: "2026-10-13",
     dateLimite: "15 novembre 2026",
     description:
-      "Vous serez en charge du développement des applications web de l'entreprise, en utilisant des technologies modernes telles que React, Node.js et MongoDB. Vous travaillerez en équipe pour concevoir des interfaces utilisateur fluides et des backends robustes.",
+      "Vous serez en charge du développement des applications web de l’entreprise, en utilisant des technologies modernes telles que React, Node.js et MongoDB. Vous travaillerez en équipe pour concevoir des interfaces utilisateur fluides et des backends robustes.",
     missions: [
-      "Développer de nouvelles fonctionnalités, de l'interface jusqu'à l'API.",
-      "Relire le code de l'équipe et écrire des tests.",
+      "Développer de nouvelles fonctionnalités, de l’interface jusqu’à l’API.",
+      "Relire le code de l’équipe et écrire des tests.",
       "Participer aux choix techniques avec le responsable produit.",
     ],
     competences: ["React", "Node.js", "MongoDB"],
@@ -1750,15 +1757,15 @@ const OFFRES_DATA = [
     titre: "Chargée de clientèle",
     contrat: "CDD",
     entreprise: "Banque Atlantique",
-    secteur: "Finance & Banque",
+    secteur: "Finance et banque",
     localisation: "Dakar",
     experience: "1-2 ans",
     publieeLe: "2026-10-12",
     dateLimite: "31 octobre 2026",
     description:
-      "Vous accueillez, conseillez et fidélisez un portefeuille de clients particuliers, en veillant à la qualité de service et à l'atteinte des objectifs commerciaux de l'agence.",
+      "Vous accueillez, conseillez et fidélisez un portefeuille de clients particuliers, en veillant à la qualité de service et à l’atteinte des objectifs commerciaux de l’agence.",
     missions: [
-      "Accueillir et conseiller les clients de l'agence.",
+      "Accueillir et conseiller les clients de l’agence.",
       "Présenter les produits adaptés à chaque besoin.",
       "Suivre votre portefeuille et vos objectifs commerciaux.",
     ],
@@ -1792,9 +1799,9 @@ const OFFRES_DATA = [
     publieeLe: "2026-10-07",
     dateLimite: "7 novembre 2026",
     description:
-      "Vous définissez et pilotez la stratégie d'acquisition digitale (SEO, SEA, réseaux sociaux) et analysez la performance des campagnes pour optimiser le coût d'acquisition.",
+      "Vous définissez et pilotez la stratégie d’acquisition digitale (SEO, SEA, réseaux sociaux) et analysez la performance des campagnes pour optimiser le coût d’acquisition.",
     missions: [
-      "Construire le plan d'acquisition digitale.",
+      "Construire le plan d’acquisition digitale.",
       "Piloter les campagnes et le budget associé.",
       "Mesurer les résultats et proposer des améliorations.",
     ],
@@ -1810,11 +1817,11 @@ const OFFRES_DATA = [
     publieeLe: "2026-10-05",
     dateLimite: "30 octobre 2026",
     description:
-      "Vous participez à la supervision et à l'optimisation de l'infrastructure réseau, sous l'encadrement de l'équipe technique.",
+      "Vous participez à la supervision et à l’optimisation de l’infrastructure réseau, sous l’encadrement de l’équipe technique.",
     missions: [
-      "Surveiller l'état du réseau et signaler les incidents.",
+      "Surveiller l’état du réseau et signaler les incidents.",
       "Participer aux interventions de maintenance.",
-      "Documenter les procédures avec l'équipe technique.",
+      "Documenter les procédures avec l’équipe technique.",
     ],
     competences: ["Réseaux", "Supervision", "Dépannage"],
   },
@@ -1828,16 +1835,16 @@ const OFFRES_DATA = [
     publieeLe: "2026-10-01",
     dateLimite: "1er novembre 2026",
     description:
-      "Vous pilotez des projets d'intégration IT pour des clients grands comptes, de la phase de cadrage jusqu'à la mise en production.",
+      "Vous pilotez des projets d’intégration IT pour des clients grands comptes, de la phase de cadrage jusqu’à la mise en production.",
     missions: [
       "Cadrer les besoins avec le client.",
-      "Planifier le projet et coordonner l'équipe.",
+      "Planifier le projet et coordonner l’équipe.",
       "Suivre les délais, le budget et la mise en production.",
     ],
     competences: ["Gestion de projet", "Agile", "Relation client"],
   },
   {
-    titre: "Community Manager",
+    titre: "Community manager",
     contrat: "CDD",
     entreprise: "Jumia Sénégal",
     secteur: "E-commerce",
@@ -1856,8 +1863,8 @@ const OFFRES_DATA = [
   },
 ];
 
-/* Offres d'emploi (modèle JobStock) : liste en cartes horizontales, filtres, offres sauvegardées,
-   et fiche détail en page (en-tête, description, aperçu de l'offre, candidature, offres similaires). */
+/* Offres d’emploi (modèle JobStock) : liste en cartes horizontales, filtres, offres sauvegardées,
+   et fiche détail en page (en-tête, description, aperçu de l’offre, candidature, offres similaires). */
 
 const sansAccents = (t) => String(t ?? "").toLowerCase().normalize("NFD").replace(/[\u0300-\u036f]/g, "");
 const cleOffre = (o) => `${o.titre}|${o.entreprise}`;
@@ -1866,7 +1873,7 @@ const initialesEntreprise = (nom) => nom.split(/\s+/).map((m) => m[0]).join("").
 function publieeIlYa(iso) {
   if (!iso) return null;
   const j = joursDepuis(iso);
-  if (j === 0) return "Publiée aujourd'hui";
+  if (j === 0) return "Publiée aujourd’hui";
   if (j === 1) return "Publiée hier";
   return `Publiée il y a ${j} jours`;
 }
@@ -2163,10 +2170,10 @@ function OfferCard({ offre, onOpen, applied, saved, onToggleSave }) {
           petit
           variante={applied ? "neutre" : "principal"}
           onClick={(e) => { e.stopPropagation(); onOpen(offre); }}
-          aria-label={`Voir l'offre : ${offre.titre}`}
+          aria-label={`Voir l’offre : ${offre.titre}`}
           className={applied ? "" : "ml-auto sm:ml-0"}
         >
-          Voir l'offre
+          Voir l’offre
         </App.Bouton>
       </div>
     </article>
@@ -2248,7 +2255,7 @@ function OffreDetail({ offre, similaires = [], onOpen, onBack, onNavigate, saved
       />
 
       <div className="grid grid-cols-1 gap-6 lg:grid-cols-[minmax(0,1fr)_340px]">
-        {/* Contenu de l'offre */}
+        {/* Contenu de l’offre */}
         <div className="space-y-6">
           <App.Carte titre="Description du poste">
             <p className="text-[15px] leading-[1.7] text-secondaire">{offre.description}</p>
@@ -2269,7 +2276,7 @@ function OffreDetail({ offre, similaires = [], onOpen, onBack, onNavigate, saved
 
         {/* Colonne latérale */}
         <aside className="space-y-6">
-          <ApercuFiche titre="Aperçu de l'offre" items={apercu} />
+          <ApercuFiche titre="Aperçu de l’offre" items={apercu} />
 
           <App.Carte titre="Votre candidature">
             {existing ? (
@@ -2297,7 +2304,7 @@ function OffreDetail({ offre, similaires = [], onOpen, onBack, onNavigate, saved
             )}
           </App.Carte>
 
-          <App.Carte titre="L'entreprise">
+          <App.Carte titre="L’entreprise">
             <div className="flex items-center gap-3">
               <LogoEntreprise nom={offre.entreprise} />
               <div className="min-w-0">
@@ -2307,7 +2314,7 @@ function OffreDetail({ offre, similaires = [], onOpen, onBack, onNavigate, saved
             </div>
             <p className="mt-4 flex items-start gap-2 rounded-md bg-marque-doux px-3 py-2.5 text-sm text-principal">
               <ShieldCheck size={16} className="mt-0.5 shrink-0 text-marque" aria-hidden="true" />
-              Entreprise et offre vérifiées par l'équipe LIGGEEY.
+              Entreprise et offre vérifiées par l’équipe LIGGEEY.
             </p>
           </App.Carte>
         </aside>
@@ -2368,7 +2375,7 @@ function OffresScreen({ extraOffres = [], onNavigate }) {
       (secteur === "tous" || o.secteur === secteur) &&
       (contrat === "tous" || o.contrat === contrat) &&
       (vue === "toutes" || estSauvegardee(o)))
-    // Sponsorisées en tête, puis les plus récentes (les offres publiées par l'entreprise n'ont pas de date : en tête)
+    // Sponsorisées en tête, puis les plus récentes (les offres publiées par l’entreprise n’ont pas de date : en tête)
     .sort((a, b) => (b.sponsorisee ? 1 : 0) - (a.sponsorisee ? 1 : 0) || (b.publieeLe || "9999").localeCompare(a.publieeLe || "9999"));
   const pages = Math.max(1, Math.ceil(filtered.length / OFFRES_PAR_PAGE));
   const pageCourante = Math.min(page, pages);
@@ -2400,7 +2407,7 @@ function OffresScreen({ extraOffres = [], onNavigate }) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-secondaire">
-        Toutes les offres sont vérifiées par l'équipe LIGGEEY. Chaque candidature reçoit un statut réel, mis à jour à chaque étape.
+        Toutes les offres sont vérifiées par l’équipe LIGGEEY. Chaque candidature reçoit un statut réel, mis à jour à chaque étape.
       </p>
 
       {/* Barre de recherche et filtres */}
@@ -2410,7 +2417,7 @@ function OffresScreen({ extraOffres = [], onNavigate }) {
             valeur={query}
             onChange={(v) => { setQuery(v); setPage(1); }}
             placeholder="Poste, entreprise, compétence ou ville…"
-            label="Rechercher une offre d'emploi"
+            label="Rechercher une offre d’emploi"
             className="w-full lg:flex-1"
           />
           <div className="flex flex-wrap items-center gap-2">
@@ -2456,7 +2463,7 @@ function OffresScreen({ extraOffres = [], onNavigate }) {
           <App.EtatVide
             icone={vue === "sauvegardees" && !q ? Bookmark : Search}
             titre={vue === "sauvegardees" && !q ? "Aucune offre sauvegardée" : "Aucune offre ne correspond à votre recherche"}
-            texte={vue === "sauvegardees" && !q ? "Touchez l'icône de signet sur une offre pour la retrouver ici." : "Essayez d'autres mots-clés ou retirez un filtre."}
+            texte={vue === "sauvegardees" && !q ? "Touchez l’icône de signet sur une offre pour la retrouver ici." : "Essayez d’autres mots-clés ou retirez un filtre."}
             action={filtresActifs && <App.Bouton petit variante="neutre" onClick={reinitialiser}>Effacer les filtres</App.Bouton>}
           />
         </div>
@@ -2472,7 +2479,7 @@ function OffresScreen({ extraOffres = [], onNavigate }) {
 /* ---------- Screen 7 : Mes candidatures ---------- */
 
 const CANDIDATURES = [
-  { id: "cand-sonatel", poste: "Chargée de clientèle", entreprise: "Sonatel", ville: "Dakar", date: "28 juillet 2026", statut: "Candidature Retenue", step: 4, embauche: true },
+  { id: "cand-sonatel", poste: "Chargée de clientèle", entreprise: "Sonatel", ville: "Dakar", date: "28 juillet 2026", statut: "Candidature retenue", step: 4, embauche: true },
   { poste: "Assistante comptable", entreprise: "Teranga Capital", ville: "Dakar", date: "22 juillet 2026", statut: "Vue par le recruteur", step: 2 },
   {
     poste: "Chargée de communication",
@@ -2484,7 +2491,7 @@ const CANDIDATURES = [
     negative: true,
     motif: "Poste pourvu en interne. Votre profil a été conservé pour de prochaines offres similaires.",
   },
-  { poste: "Assistante RH", entreprise: "Auchan Sénégal", ville: "Dakar", date: "1 août 2026", statut: "Candidature reçue", step: 1 },
+  { poste: "Assistante RH", entreprise: "Auchan Sénégal", ville: "Dakar", date: "1er août 2026", statut: "Candidature reçue", step: 1 },
 ];
 
 const STEP_LABELS = ["Reçue", "Vue", "Entretien", "Réponse"];
@@ -2524,7 +2531,7 @@ function CandidatureStepper({ step, negative }) {
 const GROUPES_CANDIDATURE = [
   { id: "toutes", label: "Toutes", test: () => true },
   { id: "cours", label: "En cours", test: (c) => ["Candidature reçue", "Vue par le recruteur", "Entretien programmé"].includes(c.statut) },
-  { id: "retenues", label: "Retenues", test: (c) => c.statut === "Candidature Retenue" },
+  { id: "retenues", label: "Retenues", test: (c) => c.statut === "Candidature retenue" },
   { id: "refusees", label: "Réponses négatives", test: (c) => !!c.negative || c.statut === "Réponse négative" },
 ];
 
@@ -2576,7 +2583,7 @@ function CandidaturesScreen({ onNavigate }) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-secondaire">
-        Suivez en temps réel l'avancement de vos candidatures. Chaque étape est mise à jour : jamais de silence indéfini.
+        Suivez en temps réel l’avancement de vos candidatures. Chaque étape est mise à jour : jamais de silence indéfini.
       </p>
 
       <BarreFiltres label="Rechercher dans mes candidatures">
@@ -2612,14 +2619,14 @@ function CandidaturesScreen({ onNavigate }) {
       ) : candidatures.length === 0 ? (
         <ListeVide
           icone={ClipboardList}
-          titre="Vous n'avez pas encore postulé"
+          titre="Vous n’avez pas encore postulé"
           texte="Parcourez les offres vérifiées et envoyez votre première candidature."
           action={onNavigate && <App.Bouton petit onClick={() => onNavigate("offres")}>Parcourir les offres</App.Bouton>}
         />
       ) : (
         <ListeVide
           titre="Aucune candidature ne correspond"
-          texte="Essayez d'autres mots-clés ou un autre filtre."
+          texte="Essayez d’autres mots-clés ou un autre filtre."
           action={filtresActifs && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setGroupe("toutes"); }}>Effacer les filtres</App.Bouton>}
         />
       )}
@@ -2647,7 +2654,7 @@ function buildModules(formation) {
   const list = [];
   for (let i = 0; i < total; i++) {
     const titre = GENERIC_MODULE_TEMPLATES[i % GENERIC_MODULE_TEMPLATES.length];
-    const duree = `${Math.max(1, Math.round((formation.heures / total) * 2) / 2)}h`;
+    const duree = `${Math.max(1, Math.round((formation.heures / total) * 2) / 2).toLocaleString("fr-FR")} h`;
     list.push({ n: i + 1, titre, duree });
   }
   return list;
@@ -2667,19 +2674,19 @@ const MODULE_BADGE_STYLE = {
 };
 
 const FORMATIONS_ALL = [
-  { id: "marketing", nom: "Marketing Digital", modules: 12, heures: 28, enrolled: true, progressCount: 6, coach: "aissatou.fall@email.com", tagline: "Élaborer une stratégie marketing digitale efficace.", description: "Vous apprendrez à construire une stratégie de contenu, à piloter des campagnes publicitaires en ligne et à mesurer la performance de vos actions marketing." },
-  { id: "devweb", nom: "Développement Web", modules: 10, heures: 24, enrolled: false, coach: "ibrahima.diouf@email.com", tagline: "Concevoir des sites web modernes et responsives.", description: "Une introduction complète au développement web, du HTML/CSS aux bases de JavaScript, pour construire vos premiers sites." },
-  { id: "compta", nom: "Comptabilité & Finance", modules: 15, heures: 40, enrolled: true, progressCount: 8, coach: "khadija.sy@email.com", tagline: "Gérer la comptabilité et les finances d'une entreprise.", description: "Les bases de la comptabilité générale et de la gestion financière, pour tenir les comptes d'une petite structure." },
-  { id: "comdigitale", nom: "Communication Digitale", modules: 8, heures: 18, enrolled: true, progressCount: 5, coach: "jean-pierre.dupont@email.com", tagline: "Maîtriser les règles et usages de la communication digitale.", description: "Cette formation vise à transmettre les fondamentaux opérationnels de l'écosystème numérique. Vous apprendrez à concevoir des campagnes sur les réseaux sociaux, structurer votre SEO, rédiger pour le web et utiliser les leviers d'acquisition digitaux indispensables pour piloter la visibilité de votre entreprise.", linkedCandidature: { poste: "Chargée de clientèle", date: "28 juillet 2026", ville: "Dakar", step: 4, statut: "Candidature Retenue" } },
-  { id: "gestionprojet", nom: "Gestion de Projet", modules: 12, heures: 32, enrolled: true, progressCount: 7, coach: "moussa.ndao@email.com", tagline: "Piloter un projet de bout en bout.", description: "Les méthodologies agiles et classiques pour cadrer, planifier et livrer un projet dans les temps." },
-  { id: "anglais", nom: "Anglais Professionnel", modules: 14, heures: 36, enrolled: true, progressCount: 9, coach: "sarah.johnson@email.com", tagline: "Communiquer avec aisance en anglais professionnel.", description: "Un entraînement à l'oral et à l'écrit pour gagner en aisance dans un contexte professionnel anglophone." },
-  { id: "excel", nom: "Excel Avancé", modules: 6, heures: 12, enrolled: false, coach: "oumar.ba@email.com", tagline: "Exploiter les fonctions avancées d'Excel.", description: "Tableaux croisés dynamiques, macros et modélisation pour aller au-delà des bases d'Excel." },
-  { id: "leadership", nom: "Leadership & Management", modules: 10, heures: 20, enrolled: false, coach: "fatima.sarr@email.com", tagline: "Manager et motiver une équipe.", description: "Déléguer, motiver et prendre des décisions : les fondamentaux du management d'équipe." },
-  { id: "rh", nom: "Ressources Humaines", modules: 8, heures: 16, enrolled: false, coach: "cheikh.gueye@email.com", tagline: "Maîtriser les fondamentaux des ressources humaines.", description: "Recrutement, gestion de la paie et droit du travail sénégalais : les bases RH essentielles." },
-  { id: "entrepreneuriat", nom: "Entrepreneuriat", modules: 20, heures: 50, enrolled: false, coach: "awa.diagne@email.com", tagline: "Structurer et lancer votre projet entrepreneurial.", description: "De l'idée au business plan : structurez votre projet entrepreneurial étape par étape." },
+  { id: "marketing", nom: "Marketing digital", modules: 12, heures: 28, enrolled: true, progressCount: 6, coach: "aissatou.fall@email.com", tagline: "Élaborer une stratégie marketing digitale efficace.", description: "Vous apprendrez à construire une stratégie de contenu, à piloter des campagnes publicitaires en ligne et à mesurer la performance de vos actions marketing." },
+  { id: "devweb", nom: "Développement web", modules: 10, heures: 24, enrolled: false, coach: "ibrahima.diouf@email.com", tagline: "Concevoir des sites web modernes et responsives.", description: "Une introduction complète au développement web, du HTML/CSS aux bases de JavaScript, pour construire vos premiers sites." },
+  { id: "compta", nom: "Comptabilité et finance", modules: 15, heures: 40, enrolled: true, progressCount: 8, coach: "khadija.sy@email.com", tagline: "Gérer la comptabilité et les finances d’une entreprise.", description: "Les bases de la comptabilité générale et de la gestion financière, pour tenir les comptes d’une petite structure." },
+  { id: "comdigitale", nom: "Communication digitale", modules: 8, heures: 18, enrolled: true, progressCount: 5, coach: "jean-pierre.dupont@email.com", tagline: "Maîtriser les règles et usages de la communication digitale.", description: "Cette formation vise à transmettre les fondamentaux opérationnels de l’écosystème numérique. Vous apprendrez à concevoir des campagnes sur les réseaux sociaux, structurer votre SEO, rédiger pour le web et utiliser les leviers d’acquisition digitaux indispensables pour piloter la visibilité de votre entreprise.", linkedCandidature: { poste: "Chargée de clientèle", date: "28 juillet 2026", ville: "Dakar", step: 4, statut: "Candidature retenue" } },
+  { id: "gestionprojet", nom: "Gestion de projet", modules: 12, heures: 32, enrolled: true, progressCount: 7, coach: "moussa.ndao@email.com", tagline: "Piloter un projet de bout en bout.", description: "Les méthodologies agiles et classiques pour cadrer, planifier et livrer un projet dans les temps." },
+  { id: "anglais", nom: "Anglais professionnel", modules: 14, heures: 36, enrolled: true, progressCount: 9, coach: "sarah.johnson@email.com", tagline: "Communiquer avec aisance en anglais professionnel.", description: "Un entraînement à l’oral et à l’écrit pour gagner en aisance dans un contexte professionnel anglophone." },
+  { id: "excel", nom: "Excel avancé", modules: 6, heures: 12, enrolled: false, coach: "oumar.ba@email.com", tagline: "Exploiter les fonctions avancées d’Excel.", description: "Tableaux croisés dynamiques, macros et modélisation pour aller au-delà des bases d’Excel." },
+  { id: "leadership", nom: "Leadership et management", modules: 10, heures: 20, enrolled: false, coach: "fatima.sarr@email.com", tagline: "Manager et motiver une équipe.", description: "Déléguer, motiver et prendre des décisions : les fondamentaux du management d’équipe." },
+  { id: "rh", nom: "Ressources humaines", modules: 8, heures: 16, enrolled: false, coach: "cheikh.gueye@email.com", tagline: "Maîtriser les fondamentaux des ressources humaines.", description: "Recrutement, gestion de la paie et droit du travail sénégalais : les bases RH essentielles." },
+  { id: "entrepreneuriat", nom: "Entrepreneuriat", modules: 20, heures: 50, enrolled: false, coach: "awa.diagne@email.com", tagline: "Structurer et lancer votre projet entrepreneurial.", description: "De l’idée au business plan : structurez votre projet entrepreneurial étape par étape." },
 ];
 
-/* Nom lisible à partir de l'adresse du formateur (aissatou.fall@… → Aissatou Fall). */
+/* Nom lisible à partir de l’adresse du formateur (aissatou.fall@… → Aissatou Fall). */
 function nomDepuisEmail(email) {
   return email.split("@")[0].split(/[.-]/).map((m) => m.charAt(0).toUpperCase() + m.slice(1)).join(" ");
 }
@@ -2764,13 +2771,13 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
         sousTitre={formation.tagline}
         meta={<>
           <MetaOffre icone={Layers}>{total} modules</MetaOffre>
-          <MetaOffre icone={Clock}>{formation.heures} h d'apprentissage</MetaOffre>
+          <MetaOffre icone={Clock}>{formation.heures} h d’apprentissage</MetaOffre>
           <MetaOffre icone={CalendarDays}>{dureeFromHeures(formation.heures)}</MetaOffre>
         </>}
         actions={
           !enrolled ? (
             <App.Bouton onClick={onToggleEnroll}>
-              {locked ? <Lock size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />} S'inscrire à cette formation
+              {locked ? <Lock size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />} S’inscrire à cette formation
             </App.Bouton>
           ) : isComplete ? (
             <App.Bouton onClick={onViewCertificate}>
@@ -2850,7 +2857,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
                   {locked ? "Cette formation fait partie de la formule Premium." : "Inscrivez-vous pour suivre les modules à votre rythme et obtenir un certificat LIGGEEY."}
                 </p>
                 <App.Bouton pleineLargeur onClick={onToggleEnroll}>
-                  {locked ? <Lock size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />} S'inscrire
+                  {locked ? <Lock size={16} aria-hidden="true" /> : <Plus size={16} aria-hidden="true" />} S’inscrire
                 </App.Bouton>
               </div>
             )}
@@ -2887,14 +2894,14 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
           <ShieldCheck size={28} color={COLORS.orange} />
         </div>
         <h2 className="text-2xl font-semibold mb-1" style={{ color: COLORS.slate }}>CERTIFICAT DE RÉUSSITE</h2>
-        <p className="text-xs mb-5" style={{ color: COLORS.slateLight }}>Délivré par la plateforme nationale LIGGEEY pour l'insertion des professionnels</p>
+        <p className="text-xs mb-5" style={{ color: COLORS.slateLight }}>Délivré par la plateforme nationale LIGGEEY pour l’insertion des professionnels</p>
         <p className="text-sm" style={{ color: COLORS.slateLight }}>Ce document atteste que</p>
         <p className="text-xl font-bold mb-3" style={{ color: COLORS.slate }}>{userName}</p>
-        <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>a suivi et validé avec succès l'ensemble des modules obligatoires requis pour la formation :</p>
+        <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>a suivi et validé avec succès l’ensemble des modules obligatoires requis pour la formation :</p>
         <p className="text-lg font-bold mb-6" style={{ color: COLORS.orangeText }}>{formation.nom}</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4" style={{ borderTop: `1px solid ${COLORS.border}` }}>
-          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>DATE D'OBTENTION</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>30 octobre 2026</p></div>
-          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>VOLUME HORAIRE</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{formation.modules} Modules · {formation.heures}h</p></div>
+          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>DATE D’OBTENTION</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>30 octobre 2026</p></div>
+          <div><p className="text-xs" style={{ color: COLORS.slateLight }}>VOLUME HORAIRE</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{formation.modules} modules · {formation.heures}h</p></div>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>MENTION</p><p className="text-sm font-semibold" style={{ color: COLORS.success }}>Très bien (87/100)</p></div>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>ID UNIQUE</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>CERT-{formation.id.slice(0, 2).toUpperCase()}-2026-0042</p></div>
         </div>
@@ -2912,7 +2919,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
           <div key={f.id} className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>Recommandé</span>
             <p className="font-semibold text-sm mt-2" style={{ color: COLORS.slate }}>{f.nom}</p>
-            <p className="text-xs" style={{ color: COLORS.slateLight }}>{f.modules} Modules · {f.heures}h</p>
+            <p className="text-xs" style={{ color: COLORS.slateLight }}>{f.modules} modules · {f.heures} h</p>
           </div>
         ))}
       </div>
@@ -2921,29 +2928,29 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
 }
 
 const FORMATIONS_PRESTATAIRE_ALL = [
-  { id: "securite-elec", domaines: ["electricite"], nom: "Sécurité Électrique", modules: 8, heures: 24, enrolled: true, progressCount: 4, coach: "cheikh.fall@cneap.sn", tagline: "Maîtriser les normes de sécurité sur chantier électrique.", description: "Formation qualifiante couvrant l'ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d'urgence sur chantier.", moduleNames: [
-    { titre: "Introduction aux normes NF C 15-100", duree: "2h30" },
-    { titre: "Protection des personnes et des biens", duree: "3h00" },
-    { titre: "Dimensionnement des circuits", duree: "4h00" },
-    { titre: "Lecture de schémas électriques", duree: "2h30" },
-    { titre: "Gestes de sécurité essentiels", duree: "3h30" },
-    { titre: "Procédures de contrôle", duree: "3h00" },
-    { titre: "Mise en pratique — TP sur site", duree: "3h00" },
-    { titre: "Évaluation finale", duree: "3h00" },
+  { id: "securite-elec", domaines: ["electricite"], nom: "Sécurité électrique", modules: 8, heures: 24, enrolled: true, progressCount: 4, coach: "cheikh.fall@cneap.sn", tagline: "Maîtriser les normes de sécurité sur chantier électrique.", description: "Formation qualifiante couvrant l’ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d’urgence sur chantier.", moduleNames: [
+    { titre: "Introduction aux normes NF C 15-100", duree: "2 h 30" },
+    { titre: "Protection des personnes et des biens", duree: "3 h" },
+    { titre: "Dimensionnement des circuits", duree: "4 h" },
+    { titre: "Lecture de schémas électriques", duree: "2 h 30" },
+    { titre: "Gestes de sécurité essentiels", duree: "3 h 30" },
+    { titre: "Procédures de contrôle", duree: "3 h" },
+    { titre: "Mise en pratique — TP sur site", duree: "3 h" },
+    { titre: "Évaluation finale", duree: "3 h" },
   ] },
-  { id: "peinture-moderne", domaines: ["btp"], nom: "Peinture Moderne", modules: 8, heures: 24, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques modernes de peinture décorative et finitions.", description: "Apprenez les techniques actuelles de peinture décorative, enduits et finitions haut de gamme recherchées par les clients particuliers." },
-  { id: "gestion-micro", domaines: ["tous"], nom: "Gestion Micro-Entreprise", modules: 12, heures: 32, enrolled: true, progressCount: 5, coach: "fatou.ba@cneap.sn", tagline: "Gérer et développer sa petite activité indépendante.", description: "Comptabilité de base, fixation des tarifs, gestion des devis et développement de la clientèle pour les travailleurs indépendants." },
-  { id: "soudure-tech", domaines: ["metallerie"], nom: "Techniques de Soudure", modules: 14, heures: 48, enrolled: false, coach: "moussa.diagne@cneap.sn", tagline: "Perfectionner ses techniques de soudure TIG et MIG.", description: "Formation avancée en soudure industrielle pour les professionnels souhaitant élargir leur champ de compétences." },
-  { id: "maconnerie-fond", domaines: ["btp"], nom: "Maçonnerie & Fondations", modules: 16, heures: 44, enrolled: false, coach: "ibrahima.sy@institutbtp.sn", tagline: "Construire des fondations solides et durables.", description: "Techniques de fondations, dosage du béton et lecture de plans pour les maçons professionnels." },
-  { id: "normes-btp", domaines: ["btp", "electricite", "plomberie", "menuiserie", "metallerie"], nom: "Normes BTP & Sécurité", modules: 10, heures: 28, enrolled: true, progressCount: 6, coach: "khadija.ndoye@institutbtp.sn", tagline: "Connaître et appliquer les normes de sécurité BTP.", description: "Les règles de sécurité incontournables sur un chantier de construction, port des équipements et prévention des accidents." },
-  { id: "coiffure-esthetique", domaines: ["coiffure"], nom: "Coiffure & Esthétique", modules: 10, heures: 26, enrolled: false, coach: "aissatou.fall@centreartisanat.sn", tagline: "Techniques de coiffure et de soins esthétiques.", description: "Tresses, soins capillaires et techniques esthétiques recherchées par une clientèle exigeante." },
-  { id: "relation-client", domaines: ["tous"], nom: "Relation Client", modules: 6, heures: 16, enrolled: true, progressCount: 6, coach: "omar.gueye@cneap.sn", tagline: "Fidéliser sa clientèle et gérer les réclamations.", description: "Communiquer efficacement avec ses clients, gérer les insatisfactions et construire une réputation solide." },
-  { id: "mecanique-auto", domaines: ["mecanique"], nom: "Mécanique Auto", modules: 18, heures: 50, enrolled: false, coach: "papa.diouf@institutbtp.sn", tagline: "Diagnostiquer et réparer les pannes mécaniques courantes.", description: "Bases de la mécanique automobile : diagnostic de panne, entretien courant et réparations essentielles." },
-  { id: "couture-confection", domaines: ["couture"], nom: "Couture & Confection", modules: 12, heures: 30, enrolled: false, coach: "ndeye.diop@centreartisanat.sn", tagline: "Perfectionner ses techniques de couture sur mesure.", description: "Techniques avancées de couture, patronage et confection sur mesure pour les professionnels du textile." },
-  { id: "installation-sanitaire", domaines: ["plomberie"], nom: "Installation Sanitaire", modules: 12, heures: 34, enrolled: false, coach: "modou.diagne@institutbtp.sn", tagline: "Installer et entretenir des systèmes sanitaires complets.", description: "Installation de sanitaires, raccordements et mise aux normes des systèmes de plomberie résidentiels." },
-  { id: "peinture-batiment", domaines: ["btp"], nom: "Peinture Bâtiment", modules: 8, heures: 20, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques de peinture pour le bâtiment.", description: "Préparation des surfaces, application et finitions pour des chantiers de peinture en bâtiment." },
-  { id: "solaire-pv", domaines: ["electricite"], nom: "Installation Solaire Photovoltaïque", modules: 10, heures: 30, enrolled: false, coach: "ousmane.diop@cneap.sn", tagline: "Dimensionner et poser une installation solaire domestique.", description: "Calcul des besoins, choix des panneaux et des batteries, pose et raccordement d'un kit solaire en toute sécurité." },
-  { id: "domotique-maison", domaines: ["electricite"], nom: "Domotique & Maison Connectée", modules: 8, heures: 20, enrolled: false, coach: "aminata.fall@cneap.sn", tagline: "Installer des équipements pilotés à distance.", description: "Éclairage, volets et climatisation pilotés depuis un téléphone : installation, paramétrage et dépannage." },
+  { id: "peinture-moderne", domaines: ["btp"], nom: "Peinture moderne", modules: 8, heures: 24, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques modernes de peinture décorative et finitions.", description: "Apprenez les techniques actuelles de peinture décorative, enduits et finitions haut de gamme recherchées par les clients particuliers." },
+  { id: "gestion-micro", domaines: ["tous"], nom: "Gestion de micro-entreprise", modules: 12, heures: 32, enrolled: true, progressCount: 5, coach: "fatou.ba@cneap.sn", tagline: "Gérer et développer sa petite activité indépendante.", description: "Comptabilité de base, fixation des tarifs, gestion des devis et développement de la clientèle pour les travailleurs indépendants." },
+  { id: "soudure-tech", domaines: ["metallerie"], nom: "Techniques de soudure", modules: 14, heures: 48, enrolled: false, coach: "moussa.diagne@cneap.sn", tagline: "Perfectionner ses techniques de soudure TIG et MIG.", description: "Formation avancée en soudure industrielle pour les professionnels souhaitant élargir leur champ de compétences." },
+  { id: "maconnerie-fond", domaines: ["btp"], nom: "Maçonnerie et fondations", modules: 16, heures: 44, enrolled: false, coach: "ibrahima.sy@institutbtp.sn", tagline: "Construire des fondations solides et durables.", description: "Techniques de fondations, dosage du béton et lecture de plans pour les maçons professionnels." },
+  { id: "normes-btp", domaines: ["btp", "electricite", "plomberie", "menuiserie", "metallerie"], nom: "Normes BTP et sécurité", modules: 10, heures: 28, enrolled: true, progressCount: 6, coach: "khadija.ndoye@institutbtp.sn", tagline: "Connaître et appliquer les normes de sécurité BTP.", description: "Les règles de sécurité incontournables sur un chantier de construction, port des équipements et prévention des accidents." },
+  { id: "coiffure-esthetique", domaines: ["coiffure"], nom: "Coiffure et esthétique", modules: 10, heures: 26, enrolled: false, coach: "aissatou.fall@centreartisanat.sn", tagline: "Techniques de coiffure et de soins esthétiques.", description: "Tresses, soins capillaires et techniques esthétiques recherchées par une clientèle exigeante." },
+  { id: "relation-client", domaines: ["tous"], nom: "Relation client", modules: 6, heures: 16, enrolled: true, progressCount: 6, coach: "omar.gueye@cneap.sn", tagline: "Fidéliser sa clientèle et gérer les réclamations.", description: "Communiquer efficacement avec ses clients, gérer les insatisfactions et construire une réputation solide." },
+  { id: "mecanique-auto", domaines: ["mecanique"], nom: "Mécanique auto", modules: 18, heures: 50, enrolled: false, coach: "papa.diouf@institutbtp.sn", tagline: "Diagnostiquer et réparer les pannes mécaniques courantes.", description: "Bases de la mécanique automobile : diagnostic de panne, entretien courant et réparations essentielles." },
+  { id: "couture-confection", domaines: ["couture"], nom: "Couture et confection", modules: 12, heures: 30, enrolled: false, coach: "ndeye.diop@centreartisanat.sn", tagline: "Perfectionner ses techniques de couture sur mesure.", description: "Techniques avancées de couture, patronage et confection sur mesure pour les professionnels du textile." },
+  { id: "installation-sanitaire", domaines: ["plomberie"], nom: "Installation sanitaire", modules: 12, heures: 34, enrolled: false, coach: "modou.diagne@institutbtp.sn", tagline: "Installer et entretenir des systèmes sanitaires complets.", description: "Installation de sanitaires, raccordements et mise aux normes des systèmes de plomberie résidentiels." },
+  { id: "peinture-batiment", domaines: ["btp"], nom: "Peinture bâtiment", modules: 8, heures: 20, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques de peinture pour le bâtiment.", description: "Préparation des surfaces, application et finitions pour des chantiers de peinture en bâtiment." },
+  { id: "solaire-pv", domaines: ["electricite"], nom: "Installation solaire photovoltaïque", modules: 10, heures: 30, enrolled: false, coach: "ousmane.diop@cneap.sn", tagline: "Dimensionner et poser une installation solaire domestique.", description: "Calcul des besoins, choix des panneaux et des batteries, pose et raccordement d’un kit solaire en toute sécurité." },
+  { id: "domotique-maison", domaines: ["electricite"], nom: "Domotique et maison connectée", modules: 8, heures: 20, enrolled: false, coach: "aminata.fall@cneap.sn", tagline: "Installer des équipements pilotés à distance.", description: "Éclairage, volets et climatisation pilotés depuis un téléphone : installation, paramétrage et dépannage." },
 ];
 
 const FORMATIONS_PAR_PAGE = 5;
@@ -3069,7 +3076,7 @@ function FormationsScreen({ initialTab, dataset, userName }) {
           <App.EtatVide
             icone={tab === "mes" && !filtresActifs ? GraduationCap : Search}
             titre={tab === "mes" && !filtresActifs ? "Vous ne suivez aucune formation" : "Aucune formation ne correspond à votre recherche"}
-            texte={tab === "mes" && !filtresActifs ? "Parcourez le catalogue et inscrivez-vous à une première formation." : "Essayez d'autres mots-clés ou retirez un filtre."}
+            texte={tab === "mes" && !filtresActifs ? "Parcourez le catalogue et inscrivez-vous à une première formation." : "Essayez d’autres mots-clés ou retirez un filtre."}
             action={
               tab === "mes" && !filtresActifs
                 ? <App.Bouton petit onClick={() => setTab("toutes")}>Voir toutes les formations</App.Bouton>
@@ -3089,22 +3096,22 @@ function FormationsScreen({ initialTab, dataset, userName }) {
 /* ---------- Screen 9 : Mentors ---------- */
 
 const MENTORS = [
-  { id: "cheikh-fall", nom: "Cheikh Fall", role: "Responsable RH", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall-cadre.jpg", tagline: "Accompagne des jeunes diplômés depuis 8 ans sur la préparation aux entretiens et la construction de parcours.", competences: ["Préparation entretien", "Rédaction CV", "Orientation professionnelle", "Négociation salariale", "Personal branding", "Réseautage", "Gestion du stress", "Prise de parole"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
-      { date: "30 juillet 2026", note: "Simulation d'entretien pour le poste de Chargée de clientèle chez Sonatel. Point à travailler : structurer les réponses avec la méthode STAR." },
+  { id: "cheikh-fall", nom: "Cheikh Fall", role: "Responsable RH", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall-cadre.jpg", tagline: "Accompagne des jeunes diplômés depuis 8 ans sur la préparation aux entretiens et la construction de parcours.", competences: ["Préparation entretien", "Rédaction CV", "Orientation professionnelle", "Négociation salariale", "Personal branding", "Réseautage", "Gestion du stress", "Prise de parole"], stats: { mentores: 24, note: "4,8/5", anciennete: "3 ans", heures: 156 }, historique: [
+      { date: "30 juillet 2026", note: "Simulation d’entretien pour le poste de Chargée de clientèle chez Sonatel. Point à travailler : structurer les réponses avec la méthode STAR." },
       { date: "18 juillet 2026", note: "Relecture du CV : mise en avant des compétences Excel et suppression des expériences non pertinentes." },
       { date: "2 juillet 2026", note: "Premier échange : définition des secteurs ciblés (banque, télécoms) et du rythme de candidatures." },
     ], documents: [
       { nom: "Guide de préparation aux entretiens.pdf", meta: "PDF · 15 mars 2026" },
       { nom: "Template CV professionnel.docx", meta: "DOCX · 2 avril 2026" },
       { nom: "Liste des entreprises qui recrutent.xlsx", meta: "XLSX · 20 juin 2026" },
-    ], prochainRdv: "Jeudi 11 août 2026 · 15h00 – 16h00" },
-  { id: "aminata-ndiaye", nom: "Aminata Ndiaye", role: "Directrice Marketing", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye-cadre.jpg" },
-  { id: "moussa-diop", nom: "Moussa Diop", role: "Ingénieur Logiciel", exp: 10, photo: "/images/plateforme/portraits/moussa-diop-cadre.jpg" },
-  { id: "fatou-sarr", nom: "Fatou Sarr", role: "Consultante Finance", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr-cadre.jpg" },
-  { id: "ousmane-ba", nom: "Ousmane Ba", role: "Chef de Projet", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba-cadre.jpg" },
-  { id: "mariama-sow", nom: "Mariama Sow", role: "Avocate d'affaires", exp: 14, photo: "/images/plateforme/portraits/mariama-sow-cadre.jpg" },
+    ], prochainRdv: "Jeudi 11 août 2026 · 15 h – 16 h" },
+  { id: "aminata-ndiaye", nom: "Aminata Ndiaye", role: "Directrice marketing", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye-cadre.jpg" },
+  { id: "moussa-diop", nom: "Moussa Diop", role: "Ingénieur logiciel", exp: 10, photo: "/images/plateforme/portraits/moussa-diop-cadre.jpg" },
+  { id: "fatou-sarr", nom: "Fatou Sarr", role: "Consultante finance", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr-cadre.jpg" },
+  { id: "ousmane-ba", nom: "Ousmane Ba", role: "Chef de projet", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba-cadre.jpg" },
+  { id: "mariama-sow", nom: "Mariama Sow", role: "Avocate d’affaires", exp: 14, photo: "/images/plateforme/portraits/mariama-sow-cadre.jpg" },
   { id: "ibrahima-diallo", nom: "Ibrahima Diallo", role: "Architecte", exp: 20, photo: "/images/plateforme/portraits/ibrahima-diallo-cadre.jpg" },
-  { id: "aissatou-dia", nom: "Aissatou Dia", role: "Data Scientist", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia-cadre.jpg" },
+  { id: "aissatou-dia", nom: "Aissatou Dia", role: "Data scientist", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia-cadre.jpg" },
   { id: "papa-seck", nom: "Papa Seck", role: "Entrepreneur", exp: 16, photo: "/images/plateforme/portraits/papa-seck-cadre.jpg" },
   { id: "khady-toure", nom: "Khady Touré", role: "Journaliste", exp: 11, photo: "/images/plateforme/portraits/khady-toure-cadre.jpg" },
   { id: "babacar-niang", nom: "Babacar Niang", role: "Médecin", exp: 22, photo: "/images/plateforme/portraits/babacar-niang-cadre.jpg" },
@@ -3130,7 +3137,7 @@ function MentorCard({ m, onOpen }) {
             <h3 className="text-base font-semibold text-principal group-hover:text-marque">{m.nom}</h3>
             {m.historique && <App.Badge ton="succes" point taille="moyen">Votre mentor</App.Badge>}
           </div>
-          <p className="mt-0.5 text-sm text-secondaire">{m.role} · {m.exp} ans d'expérience</p>
+          <p className="mt-0.5 text-sm text-secondaire">{m.role} · {m.exp} ans d’expérience</p>
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
             <MetaOffre icone={Star}>{profil.stats.note}</MetaOffre>
             <MetaOffre icone={UsersRound}>{profil.stats.mentores} mentorés</MetaOffre>
@@ -3165,32 +3172,32 @@ function StatMini({ value, label }) {
 }
 
 const MENTORS_PRESTATAIRE = [
-  { id: "cheikh-fall-artisan", domaines: ["electricite"], nom: "Cheikh Fall", role: "Maître Électricien", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall.jpg", tagline: "Accompagne les électriciens et techniciens depuis 8 ans sur les normes de sécurité, la gestion de chantier et le développement de leur activité.", competences: ["Normes électriques", "Devis & Facturation", "Relation client", "Installation solaire", "Gestion de chantier", "Domotique"], stats: { mentores: 24, note: "4.8/5", anciennete: "3 ans", heures: 156 }, historique: [
-      { date: "30 juillet 2026", note: "Revue des procédures de sécurité électrique : mise en conformité NF C 15-100, check-list d'intervention et documentation des travaux. Point à travailler : devis détaillés avec schémas." },
-      { date: "18 juillet 2026", note: "Stratégie de spécialisation : positionnement sur l'installation de panneaux solaires et la domotique, deux marchés en forte croissance au Sénégal." },
+  { id: "cheikh-fall-artisan", domaines: ["electricite"], nom: "Cheikh Fall", role: "Maître électricien", exp: 12, photo: "/images/plateforme/portraits/cheikh-fall.jpg", tagline: "Accompagne les électriciens et techniciens depuis 8 ans sur les normes de sécurité, la gestion de chantier et le développement de leur activité.", competences: ["Normes électriques", "Devis & Facturation", "Relation client", "Installation solaire", "Gestion de chantier", "Domotique"], stats: { mentores: 24, note: "4,8/5", anciennete: "3 ans", heures: 156 }, historique: [
+      { date: "30 juillet 2026", note: "Revue des procédures de sécurité électrique : mise en conformité NF C 15-100, check-list d’intervention et documentation des travaux. Point à travailler : devis détaillés avec schémas." },
+      { date: "18 juillet 2026", note: "Stratégie de spécialisation : positionnement sur l’installation de panneaux solaires et la domotique, deux marchés en forte croissance au Sénégal." },
       { date: "2 juillet 2026", note: "Premier échange : évaluation des compétences techniques, identification des certifications à obtenir et plan de développement." },
     ], documents: [
       { nom: "Guide des normes NF C 15-100.pdf", meta: "PDF · 15 mars 2026" },
       { nom: "Modèle de devis professionnel.docx", meta: "DOCX · 2 avril 2026" },
       { nom: "Liste des clients qui recrutent.xlsx", meta: "XLSX · 20 juin 2026" },
-    ], prochainRdv: "Jeudi 11 août 2026 · 15h00 – 16h00" },
-  { id: "aminata-ndiaye-couture", domaines: ["couture"], competences: ["Couture sur mesure", "Patronage", "Gestion d'atelier", "Tarifs et devis"], nom: "Aminata Ndiaye", role: "Couturière & Styliste", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
-  { id: "moussa-diop-menuisier", domaines: ["menuiserie"], competences: ["Mobilier sur mesure", "Lecture de plans", "Devis", "Sécurité en atelier"], nom: "Moussa Diop", role: "Maître Menuisier", exp: 10, photo: "/images/plateforme/portraits/moussa-diop.jpg" },
-  { id: "fatou-sarr-elec", domaines: ["electricite"], competences: ["Normes NF C 15-100", "Installation résidentielle", "Sécurité sur chantier", "Devis & Facturation"], nom: "Fatou Sarr", role: "Électricienne Bâtiment", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
-  { id: "ousmane-ba-macon", domaines: ["btp"], competences: ["Maçonnerie", "Lecture de plans", "Gestion de chantier", "Devis"], nom: "Ousmane Ba", role: "Chef Maçon BTP", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
-  { id: "mariama-sow-plomberie", domaines: ["plomberie"], competences: ["Installation sanitaire", "Recherche de fuite", "Relation client", "Devis"], nom: "Mariama Sow", role: "Plombière Sanitaire", exp: 14, photo: "/images/plateforme/portraits/mariama-sow.jpg" },
-  { id: "ibrahima-diallo-soudeur", domaines: ["metallerie"], competences: ["Soudure TIG/MIG", "Portails et grilles", "Sécurité", "Devis"], nom: "Ibrahima Diallo", role: "Soudeur Industriel", exp: 20, photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
-  { id: "aissatou-dia-patisserie", domaines: ["cuisine"], competences: ["Pâtisserie", "Hygiène alimentaire", "Prix de revient", "Vente"], nom: "Aissatou Dia", role: "Pâtissière & Restauratrice", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia.jpg" },
-  { id: "papa-seck-btp", domaines: ["btp", "electricite", "plomberie", "menuiserie", "metallerie"], competences: ["Créer son entreprise", "Répondre aux appels d'offres", "Gestion de chantier", "Constituer une équipe"], nom: "Papa Seck", role: "Entrepreneur BTP", exp: 16, photo: "/images/plateforme/portraits/papa-seck.jpg" },
-  { id: "khady-toure-teinture", domaines: ["couture"], competences: ["Teinture", "Création de motifs", "Vente en ligne", "Gestion de stock"], nom: "Khady Touré", role: "Teinturière & Formatrice", exp: 11, photo: "/images/plateforme/portraits/khady-toure.jpg" },
-  { id: "babacar-niang-carrelage", domaines: ["btp"], competences: ["Carrelage", "Finitions", "Métrés", "Devis"], nom: "Babacar Niang", role: "Carreleur & Décorateur", exp: 22, photo: "/images/plateforme/portraits/babacar-niang.jpg" },
-  { id: "ndeye-mbaye-coiffure", domaines: ["coiffure"], competences: ["Coiffure", "Tresses", "Gestion de salon", "Fidélisation"], nom: "Ndèye Mbaye", role: "Coiffeuse & Gérante de Salon", exp: 9, photo: "/images/plateforme/portraits/ndeye-mbaye.jpg" },
+    ], prochainRdv: "Jeudi 11 août 2026 · 15 h – 16 h" },
+  { id: "aminata-ndiaye-couture", domaines: ["couture"], competences: ["Couture sur mesure", "Patronage", "Gestion d’atelier", "Tarifs et devis"], nom: "Aminata Ndiaye", role: "Couturière et styliste", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
+  { id: "moussa-diop-menuisier", domaines: ["menuiserie"], competences: ["Mobilier sur mesure", "Lecture de plans", "Devis", "Sécurité en atelier"], nom: "Moussa Diop", role: "Maître menuisier", exp: 10, photo: "/images/plateforme/portraits/moussa-diop.jpg" },
+  { id: "fatou-sarr-elec", domaines: ["electricite"], competences: ["Normes NF C 15-100", "Installation résidentielle", "Sécurité sur chantier", "Devis & Facturation"], nom: "Fatou Sarr", role: "Électricienne bâtiment", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
+  { id: "ousmane-ba-macon", domaines: ["btp"], competences: ["Maçonnerie", "Lecture de plans", "Gestion de chantier", "Devis"], nom: "Ousmane Ba", role: "Chef maçon BTP", exp: 8, photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
+  { id: "mariama-sow-plomberie", domaines: ["plomberie"], competences: ["Installation sanitaire", "Recherche de fuite", "Relation client", "Devis"], nom: "Mariama Sow", role: "Plombière sanitaire", exp: 14, photo: "/images/plateforme/portraits/mariama-sow.jpg" },
+  { id: "ibrahima-diallo-soudeur", domaines: ["metallerie"], competences: ["Soudure TIG/MIG", "Portails et grilles", "Sécurité", "Devis"], nom: "Ibrahima Diallo", role: "Soudeur industriel", exp: 20, photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
+  { id: "aissatou-dia-patisserie", domaines: ["cuisine"], competences: ["Pâtisserie", "Hygiène alimentaire", "Prix de revient", "Vente"], nom: "Aissatou Dia", role: "Pâtissière et restauratrice", exp: 7, photo: "/images/plateforme/portraits/aissatou-dia.jpg" },
+  { id: "papa-seck-btp", domaines: ["btp", "electricite", "plomberie", "menuiserie", "metallerie"], competences: ["Créer son entreprise", "Répondre aux appels d’offres", "Gestion de chantier", "Constituer une équipe"], nom: "Papa Seck", role: "Entrepreneur BTP", exp: 16, photo: "/images/plateforme/portraits/papa-seck.jpg" },
+  { id: "khady-toure-teinture", domaines: ["couture"], competences: ["Teinture", "Création de motifs", "Vente en ligne", "Gestion de stock"], nom: "Khady Touré", role: "Teinturière et formatrice", exp: 11, photo: "/images/plateforme/portraits/khady-toure.jpg" },
+  { id: "babacar-niang-carrelage", domaines: ["btp"], competences: ["Carrelage", "Finitions", "Métrés", "Devis"], nom: "Babacar Niang", role: "Carreleur et décorateur", exp: 22, photo: "/images/plateforme/portraits/babacar-niang.jpg" },
+  { id: "ndeye-mbaye-coiffure", domaines: ["coiffure"], competences: ["Coiffure", "Tresses", "Gestion de salon", "Fidélisation"], nom: "Ndèye Mbaye", role: "Coiffeuse et gérante de salon", exp: 9, photo: "/images/plateforme/portraits/ndeye-mbaye.jpg" },
 ];
 
 const MENTORS_PAR_PAGE = 5;
 
-/* Encart « Votre mentor » en tête de l'écran Mentors : le mentor attitré (celui qui a un historique de séances),
-   son prochain coaching et l'accès direct à son profil. */
+/* Encart « Votre mentor » en tête de l’écran Mentors : le mentor attitré (celui qui a un historique de séances),
+   son prochain coaching et l’accès direct à son profil. */
 function MentorAttitreCard({ m, coachings, onOpen }) {
   const profil = mentorProfile(m);
   const prochain = coachings.upcoming[0];
@@ -3202,7 +3209,7 @@ function MentorAttitreCard({ m, coachings, onOpen }) {
           <div className="min-w-0">
             <App.Badge ton="marque" point taille="moyen">Votre mentor</App.Badge>
             <h2 id="mentor-attitre" className="mt-2 text-xl font-semibold text-principal">{m.nom}</h2>
-            <p className="text-sm text-secondaire">{m.role} · {m.exp} ans d'expérience</p>
+            <p className="text-sm text-secondaire">{m.role} · {m.exp} ans d’expérience</p>
             <p className="mt-2 text-sm leading-[1.7] text-secondaire">{profil.bio}</p>
           </div>
         </div>
@@ -3280,10 +3287,10 @@ function MentorsScreen({ initialMentorId, dataset }) {
       {attitre && <MentorAttitreCard m={attitre} coachings={coachings[attitre.id] || defaultCoachings(attitre)} onOpen={ouvrir} />}
 
       <div>
-        <h2 className="text-lg font-semibold text-principal">{attitre ? "Découvrir d'autres mentors" : "Choisir un mentor"}</h2>
+        <h2 className="text-lg font-semibold text-principal">{attitre ? "Découvrir d’autres mentors" : "Choisir un mentor"}</h2>
         <p className="mt-1 text-sm text-secondaire">
           {attitre
-            ? `Besoin d'un autre regard ? Consultez leurs profils et réservez un coaching avec le mentor de votre choix, en plus de ${attitre.nom.split(" ")[0]}.`
+            ? `Besoin d’un autre regard ? Consultez leurs profils et réservez un coaching avec le mentor de votre choix, en plus de ${attitre.nom.split(" ")[0]}.`
             : "Consultez les profils et réservez un premier coaching avec le mentor de votre choix."}
         </p>
       </div>
@@ -3319,7 +3326,7 @@ function MentorsScreen({ initialMentorId, dataset }) {
           <App.EtatVide
             icone={Search}
             titre="Aucun mentor ne correspond à votre recherche"
-            texte="Essayez d'autres mots-clés ou retirez un filtre."
+            texte="Essayez d’autres mots-clés ou retirez un filtre."
             action={filtresActifs && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setFormat("tous"); setPage(1); }}>Effacer les filtres</App.Bouton>}
           />
         </div>
@@ -3366,9 +3373,9 @@ function ChiffresProfil({ items }) {
   );
 }
 
-/* ---------- Chercheur d'emploi ---------- */
+/* ---------- Chercheur d’emploi ---------- */
 
-const CV_CHERCHEUR_INITIAL = { nom: "CV_Absatou_Diallo.pdf", date: "28/07/2026" };
+const CV_CHERCHEUR_INITIAL = { nom: "CV_Absatou_Diallo.pdf", date: "28 juillet 2026" };
 const LANGUES_CHERCHEUR = [{ l: "Français", n: "Courant" }, { l: "Wolof", n: "Langue maternelle" }, { l: "Anglais", n: "Intermédiaire" }];
 const COMPETENCES_CHERCHEUR = ["Relation client", "Communication", "Excel", "Comptabilité de base", "Anglais professionnel"];
 const VERIF_CHERCHEUR = {
@@ -3385,7 +3392,7 @@ function useCompletionChercheur() {
     { label: "Informations personnelles", fait: ["email", "telephone", "ville", "profession"].every((k) => String(info[k] || "").trim()) },
     { label: "CV", fait: !!cv },
     { label: "Compétences et langues", fait: COMPETENCES_CHERCHEUR.length > 0 && LANGUES_CHERCHEUR.length > 0 },
-    { label: "Vérification d'identité", fait: verif === "verifie" },
+    { label: "Vérification d’identité", fait: verif === "verifie" },
   ];
   return { items, valeur: pourcentageFait(items) };
 }
@@ -3416,7 +3423,7 @@ function useCompletionPrestataire() {
 /* ---------- Entreprise ---------- */
 
 const CHAMPS_PROFIL_ENTREPRISE = [
-  ["nom", "Nom de l'entreprise"], ["secteurPrincipal", "Secteur"], ["ninea", "NINEA"], ["rccm", "RCCM"],
+  ["nom", "Nom de l’entreprise"], ["secteurPrincipal", "Secteur"], ["ninea", "NINEA"], ["rccm", "RCCM"],
   ["telephone", "Téléphone"], ["email", "E-mail"], ["siteWeb", "Site web"], ["adresse", "Adresse"], ["description", "Présentation"], ["logo", "Logo"],
 ];
 const RECRUTEUR_ENTREPRISE = { fonction: "Responsable du recrutement", telephone: "+221 77 845 21 10", email: "awa.diallo@senegalconstruct.sn" };
@@ -3511,7 +3518,7 @@ function ProfilScreen({ onNavigate }) {
       <MiseEnPageFiche
         principal={<>
           {embauche && (
-            <App.Carte titre="Mon emploi" actions={<StatusBadge status="Candidature Retenue" />}>
+            <App.Carte titre="Mon emploi" actions={<StatusBadge status="Candidature retenue" />}>
               <div className="flex flex-wrap items-center justify-between gap-4">
                 <div className="flex min-w-0 items-center gap-3">
                   <LogoEntreprise nom={embauche.entreprise} />
@@ -3540,7 +3547,7 @@ function ProfilScreen({ onNavigate }) {
               </div>
               <FilePickerButton
                 accept=".pdf,.doc,.docx"
-                onPick={(f) => { setCv({ nom: f.name, date: demoNow().toLocaleDateString("fr-FR") }); notify("CV remplacé."); }}
+                onPick={(f) => { setCv({ nom: f.name, date: dateFr(demoNow()) }); notify("CV remplacé."); }}
                 className="inline-flex min-h-[44px] shrink-0 items-center rounded bg-marque-doux px-4 text-sm font-semibold text-marque-fort hover:bg-marque-doux-survol"
               >
                 {cv ? "Remplacer" : "Ajouter"}
@@ -3548,9 +3555,9 @@ function ProfilScreen({ onNavigate }) {
             </div>
           </App.Carte>
 
-          <App.Carte titre="Vérification d'identité" sousTitre="Obtenez le badge « profil vérifié »" actions={<App.Badge ton={etatVerif.ton} taille="moyen">{etatVerif.label}</App.Badge>}>
+          <App.Carte titre="Vérification d’identité" sousTitre="Obtenez le badge « profil vérifié »" actions={<App.Badge ton={etatVerif.ton} taille="moyen">{etatVerif.label}</App.Badge>}>
             {verif === "verifie" ? (
-              <p className="text-sm text-secondaire">Votre pièce d'identité et vos diplômes ont été vérifiés par l'équipe LIGGEEY.</p>
+              <p className="text-sm text-secondaire">Votre pièce d’identité et vos diplômes ont été vérifiés par l’équipe LIGGEEY.</p>
             ) : verif === "en-cours" ? (
               <p className="inline-flex items-center gap-2 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
                 <CheckCircle2 size={16} aria-hidden="true" /> Documents transmis : vérification sous 48 h ouvrées.
@@ -3558,7 +3565,7 @@ function ProfilScreen({ onNavigate }) {
             ) : (
               <>
                 <p className="mb-4 text-sm text-secondaire">
-                  Pour rassurer les employeurs, transmettez une pièce d'identité en cours de validité et vos diplômes.
+                  Pour rassurer les employeurs, transmettez une pièce d’identité en cours de validité et vos diplômes.
                 </p>
                 <div className="flex flex-wrap gap-3">
                   <App.Bouton petit onClick={() => { setVerif("en-cours"); notify("Documents transmis. Vérification sous 48 h ouvrées."); }}>Transmettre mes documents</App.Bouton>
@@ -3568,7 +3575,7 @@ function ProfilScreen({ onNavigate }) {
                 </div>
                 {showVerifInfo && (
                   <p className="mt-4 max-w-2xl text-sm leading-relaxed text-secondaire">
-                    L'équipe LIGGEEY contrôle votre pièce d'identité et vos diplômes sous 48&nbsp;h ouvrées. Un profil vérifié affiche un badge auprès des recruteurs et remonte en priorité dans leurs recherches. Vos documents ne sont jamais partagés sans votre accord.
+                    L’équipe LIGGEEY contrôle votre pièce d’identité et vos diplômes sous 48&nbsp;h ouvrées. Un profil vérifié affiche un badge auprès des recruteurs et remonte en priorité dans leurs recherches. Vos documents ne sont jamais partagés sans votre accord.
                   </p>
                 )}
               </>
@@ -3582,7 +3589,7 @@ function ProfilScreen({ onNavigate }) {
                   <AvatarListe nom={mentor.nom} photo={mentor.photo} />
                   <div className="min-w-0">
                     <p className="font-semibold text-principal">{mentor.nom}</p>
-                    <p className="text-sm text-discret">{mentor.role} · {mentor.exp} ans d'expérience</p>
+                    <p className="text-sm text-discret">{mentor.role} · {mentor.exp} ans d’expérience</p>
                   </div>
                 </div>
                 <App.Bouton petit variante="neutre" onClick={() => onNavigate("mentors", { mentorId: mentor.id })}>Voir mon mentor</App.Bouton>
@@ -3621,10 +3628,10 @@ function ProfilScreen({ onNavigate }) {
 /* ---------- Screen 11 : Dashboard Prestataire ---------- */
 
 const DEMANDES_RECENTES = [
-  { titre: "Installation électrique", client: "Fatou Sarr", ville: "Dakar Plateau", prix: "85 000 FCFA", priorite: "Urgent", date: "Aujourd'hui, 10:30" },
-  { titre: "Remplacement de disjoncteur", client: "Ousmane Ba", ville: "Médina", prix: "35 000 FCFA", priorite: "Normal", date: "Hier, 18:15" },
-  { titre: "Câblage réseau bureau", client: "Aminata Diop", ville: "Almadies", prix: "120 000 FCFA", priorite: "Normal", date: "Aujourd'hui, 09:10" },
-  { titre: "Dépannage compteur", client: "Cheikh Fall", ville: "Parcelles Assainies", prix: "25 000 FCFA", priorite: "Urgent", date: "Aujourd'hui, 08:45" },
+  { titre: "Installation électrique", client: "Fatou Sarr", ville: "Dakar Plateau", prix: "85 000 FCFA", priorite: "Urgent", date: "Aujourd’hui, 10 h 30" },
+  { titre: "Remplacement de disjoncteur", client: "Ousmane Ba", ville: "Médina", prix: "35 000 FCFA", priorite: "Normal", date: "Hier, 18 h 15" },
+  { titre: "Câblage réseau bureau", client: "Aminata Diop", ville: "Almadies", prix: "120 000 FCFA", priorite: "Normal", date: "Aujourd’hui, 9 h 10" },
+  { titre: "Dépannage compteur", client: "Cheikh Fall", ville: "Parcelles Assainies", prix: "25 000 FCFA", priorite: "Urgent", date: "Aujourd’hui, 8 h 45" },
 ];
 
 function DemandeCard({ d }) {
@@ -3660,7 +3667,7 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={ClipboardList} value={missionsEnCours} label="Missions en cours" detail="Acceptées ou en cours" onClick={() => onNavigate("missions")} />
         <StatCard icon={ClipboardCheck} value={missionsTerminees} label="Missions terminées" detail="Voir mes missions" tone="succes" onClick={() => onNavigate("missions")} />
-        <StatCard icon={Star} value={`${AVG_NOTE}/5`} label="Note moyenne" detail={`${REVIEWS_DATA.length} avis de vos clients`} tone="alerte" onClick={() => onNavigate("evaluations")} />
+        <StatCard icon={Star} value={`${noteFr(AVG_NOTE)}/5`} label="Note moyenne" detail={`${REVIEWS_DATA.length} avis de vos clients`} tone="alerte" onClick={() => onNavigate("evaluations")} />
         <App.CarteStat
           icone={UserCircle2}
           ton="info"
@@ -3717,7 +3724,7 @@ function PrestataireDashboardScreen({ user, onNavigate, todos }) {
 /* ---------- Screen 12 : Services (Prestataire) ---------- */
 
 /* ---------- Domaines de métier des prestataires ----------
-   Le domaine est déduit du métier inscrit sur le profil du prestataire connecté. Il décide de ce qu'on
+   Le domaine est déduit du métier inscrit sur le profil du prestataire connecté. Il décide de ce qu’on
    lui propose : catégories et modèles de services, formations et mentors. Les formations et mentors
    marqués « tous » (gestion, relation client) sont proposés à tous les métiers. */
 
@@ -3731,7 +3738,7 @@ const DOMAINES_METIER = [
       { nom: "Dépannage urgent", tag: "Dépannage" },
       { nom: "Pose de climatiseur", tag: "Installation" },
       { nom: "Kit solaire domestique", tag: "Énergie solaire" },
-      { nom: "Contrôle annuel de l'installation", tag: "Maintenance" },
+      { nom: "Contrôle annuel de l’installation", tag: "Maintenance" },
     ],
   },
   {
@@ -3815,14 +3822,14 @@ function domaineDuMetier(metier) {
   return DOMAINES_METIER.find((d) => d.mots.some((m) => t.includes(m))) || null;
 }
 
-/* Domaine du prestataire connecté (d'après le métier de son profil). */
+/* Domaine du prestataire connecté (d’après le métier de son profil). */
 function useDomainePrestataire() {
   const [info] = useStore("profil-prestataire", PROFIL_PRESTATAIRE_INITIAL);
   const metier = (info && info.metier) || PROFIL_PRESTATAIRE_INITIAL.metier;
   return { metier, domaine: domaineDuMetier(metier) };
 }
 
-/* Un élément (formation, mentor) concerne le domaine s'il le cite, ou s'il est marqué « tous ». */
+/* Un élément (formation, mentor) concerne le domaine s’il le cite, ou s’il est marqué « tous ». */
 function dansDomaine(item, domaine) {
   if (!domaine || !item.domaines) return true;
   return item.domaines.includes("tous") || item.domaines.includes(domaine.id);
@@ -3839,14 +3846,14 @@ function NoteDomaine({ metier, domaine, texte }) {
 }
 
 const SERVICES_INITIAL = [
-  { id: "elec-bat", nom: "Électricité bâtiment", tag: "Installation", tarifBase: "25 000 FCFA", note: 4.5, missions: 15, disponible: true, description: "Installation, réparation et mise aux normes de systèmes électriques résidentiels et commerciaux. Câblage complet, pose de tableaux électriques, installation de prises et éclairage, dépannage urgent.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine, Guédiawaye, Rufisque", disponibilite: "Lundi-Samedi, 8h-18h | Urgences 24h/7", avis: [{ auteur: "Fatou Sarr", note: 5, commentaire: "Excellent travail, rapide et soigné" }, { auteur: "Ousmane Ba", note: 4, commentaire: "Bon prestataire, ponctuel" }] },
-  { id: "cablage", nom: "Câblage réseau", tag: "Câblage réseau", tarifBase: "50 000 FCFA", note: 4.8, missions: 8, disponible: true, description: "Installation et maintenance de réseaux informatiques et de télécommunication pour bureaux et résidences.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 60 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8h-18h", avis: [{ auteur: "Aminata Diop", note: 5, commentaire: "Très satisfaite du câblage de mon bureau" }] },
-  { id: "depannage", nom: "Dépannage électrique", tag: "Dépannage", tarifBase: "15 000 FCFA", note: 4.6, missions: 32, disponible: false, description: "Intervention rapide en cas de panne électrique, urgences comprises, 24h/24 et 7j/7.", tarifDeplacement: "5 000 FCFA", tarifSimple: "10 000 - 20 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Guédiawaye", disponibilite: "Urgences 24h/7", avis: [{ auteur: "Cheikh Fall", note: 5, commentaire: "Intervention rapide en urgence" }] },
-  { id: "solaire", nom: "Installation solaire", tag: "Énergie solaire", tarifBase: "150 000 FCFA", note: 4.4, missions: 5, disponible: true, description: "Pose et raccordement de panneaux solaires domestiques.", tarifDeplacement: "10 000 FCFA", tarifSimple: "120 000 - 180 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Vendredi, 8h-17h", avis: [] },
-  { id: "maintenance", nom: "Maintenance préventive", tag: "Maintenance", tarifBase: "20 000 FCFA", note: 4.7, missions: 12, disponible: false, description: "Contrôle et entretien périodique des installations électriques.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
-  { id: "domotique", nom: "Installation domotique", tag: "Domotique", tarifBase: "60 000 FCFA", note: 4.9, missions: 22, disponible: true, description: "Pilotage de l'éclairage, des volets et de la climatisation depuis un téléphone ou un interrupteur central.", tarifDeplacement: "5 000 FCFA", tarifSimple: "60 000 - 90 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
-  { id: "eclairage", nom: "Éclairage LED", tag: "Éclairage", tarifBase: "20 000 FCFA", note: 4.3, missions: 18, disponible: true, description: "Remplacement de l'éclairage par des LED basse consommation, à l'intérieur comme à l'extérieur.", tarifDeplacement: "5 000 FCFA", tarifSimple: "20 000 - 45 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Samedi, 8h-18h", avis: [] },
-  { id: "normes", nom: "Mise aux normes électriques", tag: "Mise aux normes", tarifBase: "40 000 FCFA", note: 4.6, missions: 9, disponible: true, description: "Diagnostic de l'installation et mise en conformité avec la norme NF C 15-100, avec un rapport remis au client.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 65 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Vendredi, 8h-17h", avis: [] },
+  { id: "elec-bat", nom: "Électricité bâtiment", tag: "Installation", tarifBase: "25 000 FCFA", note: 4.5, missions: 15, disponible: true, description: "Installation, réparation et mise aux normes de systèmes électriques résidentiels et commerciaux. Câblage complet, pose de tableaux électriques, installation de prises et éclairage, dépannage urgent.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine, Guédiawaye, Rufisque", disponibilite: "Lundi-Samedi, 8 h-18 h | Urgences 24 h/7", avis: [{ auteur: "Fatou Sarr", note: 5, commentaire: "Excellent travail, rapide et soigné" }, { auteur: "Ousmane Ba", note: 4, commentaire: "Bon prestataire, ponctuel" }] },
+  { id: "cablage", nom: "Câblage réseau", tag: "Câblage réseau", tarifBase: "50 000 FCFA", note: 4.8, missions: 8, disponible: true, description: "Installation et maintenance de réseaux informatiques et de télécommunication pour bureaux et résidences.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 60 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [{ auteur: "Aminata Diop", note: 5, commentaire: "Très satisfaite du câblage de mon bureau" }] },
+  { id: "depannage", nom: "Dépannage électrique", tag: "Dépannage", tarifBase: "15 000 FCFA", note: 4.6, missions: 32, disponible: false, description: "Intervention rapide en cas de panne électrique, urgences comprises, 24 h/24 et 7j/7.", tarifDeplacement: "5 000 FCFA", tarifSimple: "10 000 - 20 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Guédiawaye", disponibilite: "Urgences 24 h/7", avis: [{ auteur: "Cheikh Fall", note: 5, commentaire: "Intervention rapide en urgence" }] },
+  { id: "solaire", nom: "Installation solaire", tag: "Énergie solaire", tarifBase: "150 000 FCFA", note: 4.4, missions: 5, disponible: true, description: "Pose et raccordement de panneaux solaires domestiques.", tarifDeplacement: "10 000 FCFA", tarifSimple: "120 000 - 180 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Vendredi, 8 h-17 h", avis: [] },
+  { id: "maintenance", nom: "Maintenance préventive", tag: "Maintenance", tarifBase: "20 000 FCFA", note: 4.7, missions: 12, disponible: false, description: "Contrôle et entretien périodique des installations électriques.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [] },
+  { id: "domotique", nom: "Installation domotique", tag: "Domotique", tarifBase: "60 000 FCFA", note: 4.9, missions: 22, disponible: true, description: "Pilotage de l’éclairage, des volets et de la climatisation depuis un téléphone ou un interrupteur central.", tarifDeplacement: "5 000 FCFA", tarifSimple: "60 000 - 90 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [] },
+  { id: "eclairage", nom: "Éclairage LED", tag: "Éclairage", tarifBase: "20 000 FCFA", note: 4.3, missions: 18, disponible: true, description: "Remplacement de l’éclairage par des LED basse consommation, à l’intérieur comme à l’extérieur.", tarifDeplacement: "5 000 FCFA", tarifSimple: "20 000 - 45 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [] },
+  { id: "normes", nom: "Mise aux normes électriques", tag: "Mise aux normes", tarifBase: "40 000 FCFA", note: 4.6, missions: 9, disponible: true, description: "Diagnostic de l’installation et mise en conformité avec la norme NF C 15-100, avec un rapport remis au client.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 65 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Vendredi, 8 h-17 h", avis: [] },
   { id: "formation-elec", nom: "Formation électricité", tag: "Formation", tarifBase: "75 000 FCFA", note: 5.0, missions: 2, disponible: true, description: "Initiation aux normes électriques et aux gestes de sécurité pour particuliers et professionnels.", tarifDeplacement: "—", tarifSimple: "75 000 FCFA / session", tarifComplete: "Sur devis (groupe)", zone: "Dakar", disponibilite: "Sur rendez-vous", avis: [] },
 ];
 
@@ -3860,7 +3867,7 @@ function ServiceCard({ s, onOpen, onEdit, onArchive }) {
       sousTitre={s.tag}
       meta={<>
         <MetaOffre icone={Wallet}>À partir de {s.tarifBase}</MetaOffre>
-        <MetaOffre icone={Star}>{Number(s.note || 0).toFixed(1)}/5</MetaOffre>
+        <MetaOffre icone={Star}>{noteFr(s.note)}/5</MetaOffre>
         <MetaOffre icone={ClipboardCheck}>{s.missions} missions</MetaOffre>
         {s.zone && <MetaOffre icone={MapPin}>{s.zone}</MetaOffre>}
       </>}
@@ -3913,7 +3920,7 @@ function ServiceForm({ initial, onSave, onCancel }) {
       onSubmit={enregistrer}
       noValidate
       titre={initial ? "Modifier un service" : "Ajouter un service"}
-      sousTitre="Les champs marqués d'un * sont obligatoires."
+      sousTitre="Les champs marqués d’un * sont obligatoires."
     >
       {!initial && domaine && (
         <fieldset className="mb-6 rounded-lg bg-doux p-4">
@@ -3942,7 +3949,7 @@ function ServiceForm({ initial, onSave, onCancel }) {
       <h3 className={FORM.section}>Le service</h3>
       <div className={`${FORM.grille} mb-8`}>
         <Champ id="service-nom" label="Nom du service" requis erreur={err("nom")} large>
-          <input {...attrs("service-nom", "nom", true)} placeholder="Ex : Installation électrique" className={AUTH.champ(err("nom"))} />
+          <input {...attrs("service-nom", "nom", true)} placeholder="Ex. : Installation électrique" className={AUTH.champ(err("nom"))} />
         </Champ>
         <Champ id="service-categorie" label="Catégorie" requis erreur={err("tag")}>
           {domaine ? (
@@ -3951,11 +3958,11 @@ function ServiceForm({ initial, onSave, onCancel }) {
               {[...domaine.categories, ...(values.tag && !domaine.categories.includes(values.tag) ? [values.tag] : [])].map((c) => <option key={c}>{c}</option>)}
             </ListeChamp>
           ) : (
-            <input {...attrs("service-categorie", "tag", true)} placeholder="Ex : Électricité" className={AUTH.champ(err("tag"))} />
+            <input {...attrs("service-categorie", "tag", true)} placeholder="Ex. : Électricité" className={AUTH.champ(err("tag"))} />
           )}
         </Champ>
-        <Champ id="service-zone" label="Zone d'intervention" aide="Quartiers ou villes où vous vous déplacez.">
-          <input {...attrs("service-zone", "zone", false, true)} placeholder="Ex : Dakar, Pikine" className={AUTH.champ()} />
+        <Champ id="service-zone" label="Zone d’intervention" aide="Quartiers ou villes où vous vous déplacez.">
+          <input {...attrs("service-zone", "zone", false, true)} placeholder="Ex. : Dakar, Pikine" className={AUTH.champ()} />
         </Champ>
         <Champ id="service-description" label="Description" requis erreur={err("description")} aide="Ce que vous faites, votre matériel, votre expérience." large>
           <textarea {...attrs("service-description", "description", true, true)} rows={4} className={FORM.zone(err("description"))} />
@@ -3965,10 +3972,10 @@ function ServiceForm({ initial, onSave, onCancel }) {
       <h3 className={FORM.section}>Tarif et disponibilité</h3>
       <div className={`${FORM.grille} mb-4`}>
         <Champ id="service-tarif" label="Tarif de base" requis erreur={err("tarifBase")} aide="Le prix de départ affiché aux clients.">
-          <input {...attrs("service-tarif", "tarifBase", true, true)} placeholder="Ex : 25 000 FCFA" className={AUTH.champ(err("tarifBase"))} />
+          <input {...attrs("service-tarif", "tarifBase", true, true)} placeholder="Ex. : 25 000 FCFA" className={AUTH.champ(err("tarifBase"))} />
         </Champ>
         <Champ id="service-disponibilite" label="Disponibilité">
-          <input {...attrs("service-disponibilite", "disponibilite")} placeholder="Ex : Lundi au samedi, 8 h à 18 h" className={AUTH.champ()} />
+          <input {...attrs("service-disponibilite", "disponibilite")} placeholder="Ex. : Lundi au samedi, 8 h à 18 h" className={AUTH.champ()} />
         </Champ>
       </div>
       <div className="rounded-lg border border-base px-4 py-2">
@@ -4009,7 +4016,7 @@ function ArchiveConfirm({ onCancel, onConfirm }) {
 }
 
 function ServiceDetail({ service, onEdit, onDelete, onBack }) {
-  const note = Number(service.note || 0).toFixed(1);
+  const note = noteFr(service.note);
   const tarifs = [
     ["Déplacement", service.tarifDeplacement],
     ["Intervention simple", service.tarifSimple],
@@ -4064,7 +4071,7 @@ function ServiceDetail({ service, onEdit, onDelete, onBack }) {
             titre="Aperçu du service"
             items={[
               { icone: Wallet, libelle: "Tarif de base", valeur: service.tarifBase },
-              { icone: MapPin, libelle: "Zone d'intervention", valeur: service.zone },
+              { icone: MapPin, libelle: "Zone d’intervention", valeur: service.zone },
               { icone: Clock, libelle: "Disponibilité", valeur: service.disponibilite },
               { icone: Star, libelle: "Note moyenne", valeur: `${note}/5` },
               { icone: ClipboardCheck, libelle: "Missions réalisées", valeur: service.missions },
@@ -4092,7 +4099,7 @@ function ServicesScreen({ creer = false }) {
     if (services.length >= serviceLimit) { planApi.requestUpgrade("services"); return; }
     setMode("create");
   }
-  // Ouvert depuis le raccourci « Ajouter un service » de la barre d'icônes.
+  // Ouvert depuis le raccourci « Ajouter un service » de la barre d’icônes.
   useEffect(() => { if (creer) openCreate(); }, []);
 
   const categories = Array.from(new Set(services.map((s) => s.tag))).sort();
@@ -4214,7 +4221,7 @@ function ServicesScreen({ creer = false }) {
       ) : (
         <ListeVide
           titre="Aucun service ne correspond"
-          texte="Essayez d'autres mots-clés ou retirez un filtre."
+          texte="Essayez d’autres mots-clés ou retirez un filtre."
           action={filtresActifs && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setCategorie("toutes"); setDispo("tous"); }}>Effacer les filtres</App.Bouton>}
         />
       )}
@@ -4228,14 +4235,14 @@ function ServicesScreen({ creer = false }) {
 /* ---------- Screen 13 : Missions & Clients (Prestataire) ---------- */
 
 const MISSIONS_INITIAL = [
-  { id: "m1", titre: "Installation électrique complète", client: "Fatou Sarr", ville: "Dakar Plateau", budget: "85 000 FCFA", dateDemande: "Aujourd'hui, 10:30", statut: "En attente", description: "Le client souhaite une installation électrique complète pour un appartement de 4 pièces. Travaux incluant le câblage, la pose du tableau électrique, l'installation des prises et interrupteurs, et la mise en conformité.", type: "Installation complète", lieu: "Rue 10, Dakar Plateau", dateSouhaitee: "1er septembre 2026", dureeEstimee: "3 jours", telephone: "+221 77 123 45 67", email: "fatou.sarr@email.sn", membreDepuis: "Mars 2025", missionsPrecedentes: 2 },
-  { id: "m2", titre: "Réparation prise défectueuse", client: "Ibrahima Diallo", ville: "Médina", budget: "15 000 FCFA", dateDemande: "Aujourd'hui, 05:15", statut: "En attente", description: "Une prise électrique dans la cuisine ne fonctionne plus et présente un léger échauffement. Intervention rapide souhaitée par sécurité.", type: "Dépannage", lieu: "Médina, Dakar", dateSouhaitee: "Dès que possible", dureeEstimee: "2 heures", telephone: "+221 77 456 78 90", email: "ibrahima.diallo@email.sn", membreDepuis: "Janvier 2024", missionsPrecedentes: 5 },
-  { id: "m3", titre: "Câblage bureau 3 pièces", client: "Aminata Diop", ville: "Almadies", budget: "120 000 FCFA", dateDemande: "Hier, 09:10", statut: "Acceptée", description: "Câblage réseau et électrique complet pour un bureau de 3 pièces destiné à une petite entreprise.", type: "Câblage réseau", lieu: "Almadies, Dakar", dateSouhaitee: "5 septembre 2026", dureeEstimee: "2 jours", telephone: "+221 76 234 56 78", email: "aminata.diop@email.sn", membreDepuis: "Juin 2024", missionsPrecedentes: 1 },
-  { id: "m4", titre: "Mise aux normes tableau", client: "Cheikh Fall", ville: "Parcelles Assainies", budget: "65 000 FCFA", dateDemande: "Aujourd'hui, 08:45", statut: "En cours", description: "Le tableau électrique doit être mis aux normes NF C 15-100 suite à un contrôle d'assurance.", type: "Mise aux normes", lieu: "Parcelles Assainies, Dakar", dateSouhaitee: "En cours", dureeEstimee: "1 jour", telephone: "+221 77 345 67 89", email: "cheikh.fall2@email.sn", membreDepuis: "Février 2023", missionsPrecedentes: 4 },
-  { id: "m5", titre: "Installation éclairage LED", client: "Mariama Sow", ville: "Ouakam", budget: "45 000 FCFA", dateDemande: "Il y a 1 semaine", statut: "Terminée", description: "Remplacement de l'éclairage traditionnel par des LED basse consommation dans toute la maison.", type: "Installation", lieu: "Ouakam, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "1 jour", telephone: "+221 76 567 89 01", email: "mariama.sow@email.sn", membreDepuis: "Mai 2022", missionsPrecedentes: 3 },
+  { id: "m1", titre: "Installation électrique complète", client: "Fatou Sarr", ville: "Dakar Plateau", budget: "85 000 FCFA", dateDemande: "Aujourd’hui, 10 h 30", statut: "En attente", description: "Le client souhaite une installation électrique complète pour un appartement de 4 pièces. Travaux incluant le câblage, la pose du tableau électrique, l’installation des prises et interrupteurs, et la mise en conformité.", type: "Installation complète", lieu: "Rue 10, Dakar Plateau", dateSouhaitee: "1er septembre 2026", dureeEstimee: "3 jours", telephone: "+221 77 123 45 67", email: "fatou.sarr@email.sn", membreDepuis: "Mars 2025", missionsPrecedentes: 2 },
+  { id: "m2", titre: "Réparation prise défectueuse", client: "Ibrahima Diallo", ville: "Médina", budget: "15 000 FCFA", dateDemande: "Aujourd’hui, 5 h 15", statut: "En attente", description: "Une prise électrique dans la cuisine ne fonctionne plus et présente un léger échauffement. Intervention rapide souhaitée par sécurité.", type: "Dépannage", lieu: "Médina, Dakar", dateSouhaitee: "Dès que possible", dureeEstimee: "2 heures", telephone: "+221 77 456 78 90", email: "ibrahima.diallo@email.sn", membreDepuis: "Janvier 2024", missionsPrecedentes: 5 },
+  { id: "m3", titre: "Câblage bureau 3 pièces", client: "Aminata Diop", ville: "Almadies", budget: "120 000 FCFA", dateDemande: "Hier, 9 h 10", statut: "Acceptée", description: "Câblage réseau et électrique complet pour un bureau de 3 pièces destiné à une petite entreprise.", type: "Câblage réseau", lieu: "Almadies, Dakar", dateSouhaitee: "5 septembre 2026", dureeEstimee: "2 jours", telephone: "+221 76 234 56 78", email: "aminata.diop@email.sn", membreDepuis: "Juin 2024", missionsPrecedentes: 1 },
+  { id: "m4", titre: "Mise aux normes tableau", client: "Cheikh Fall", ville: "Parcelles Assainies", budget: "65 000 FCFA", dateDemande: "Aujourd’hui, 8 h 45", statut: "En cours", description: "Le tableau électrique doit être mis aux normes NF C 15-100 suite à un contrôle d’assurance.", type: "Mise aux normes", lieu: "Parcelles Assainies, Dakar", dateSouhaitee: "En cours", dureeEstimee: "1 jour", telephone: "+221 77 345 67 89", email: "cheikh.fall2@email.sn", membreDepuis: "Février 2023", missionsPrecedentes: 4 },
+  { id: "m5", titre: "Installation éclairage LED", client: "Mariama Sow", ville: "Ouakam", budget: "45 000 FCFA", dateDemande: "Il y a 1 semaine", statut: "Terminée", description: "Remplacement de l’éclairage traditionnel par des LED basse consommation dans toute la maison.", type: "Installation", lieu: "Ouakam, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "1 jour", telephone: "+221 76 567 89 01", email: "mariama.sow@email.sn", membreDepuis: "Mai 2022", missionsPrecedentes: 3 },
   { id: "m6", titre: "Dépannage urgent tableau", client: "Ousmane Ba", ville: "Médina", budget: "20 000 FCFA", dateDemande: "Il y a 2 jours", statut: "En attente", description: "Coupure générale récurrente sur le tableau électrique, intervention urgente demandée.", type: "Dépannage urgent", lieu: "Médina, Dakar", dateSouhaitee: "Dès que possible", dureeEstimee: "3 heures", telephone: "+221 78 678 90 12", email: "ousmane.ba@email.sn", membreDepuis: "Août 2024", missionsPrecedentes: 0 },
-  { id: "m7", titre: "Maintenance annuelle installation", client: "Khady Touré", ville: "Liberté 6", budget: "30 000 FCFA", dateDemande: "Il y a 3 jours", statut: "Acceptée", description: "Contrôle et entretien annuel de l'installation électrique d'une villa.", type: "Maintenance", lieu: "Liberté 6, Dakar", dateSouhaitee: "10 septembre 2026", dureeEstimee: "1 jour", telephone: "+221 77 789 01 23", email: "khady.toure@email.sn", membreDepuis: "Mars 2021", missionsPrecedentes: 6 },
-  { id: "m8", titre: "Installation panneaux solaires", client: "Babacar Niang", ville: "Ngor", budget: "200 000 FCFA", dateDemande: "Il y a 2 semaines", statut: "Terminée", description: "Installation d'un kit solaire domestique avec raccordement au tableau existant.", type: "Installation", lieu: "Ngor, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "4 jours", telephone: "+221 76 890 12 34", email: "babacar.niang@email.sn", membreDepuis: "Octobre 2023", missionsPrecedentes: 2 },
+  { id: "m7", titre: "Maintenance annuelle installation", client: "Khady Touré", ville: "Liberté 6", budget: "30 000 FCFA", dateDemande: "Il y a 3 jours", statut: "Acceptée", description: "Contrôle et entretien annuel de l’installation électrique d’une villa.", type: "Maintenance", lieu: "Liberté 6, Dakar", dateSouhaitee: "10 septembre 2026", dureeEstimee: "1 jour", telephone: "+221 77 789 01 23", email: "khady.toure@email.sn", membreDepuis: "Mars 2021", missionsPrecedentes: 6 },
+  { id: "m8", titre: "Installation panneaux solaires", client: "Babacar Niang", ville: "Ngor", budget: "200 000 FCFA", dateDemande: "Il y a 2 semaines", statut: "Terminée", description: "Installation d’un kit solaire domestique avec raccordement au tableau existant.", type: "Installation", lieu: "Ngor, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "4 jours", telephone: "+221 76 890 12 34", email: "babacar.niang@email.sn", membreDepuis: "Octobre 2023", missionsPrecedentes: 2 },
 ];
 
 const MISSION_TABS = [
@@ -4319,7 +4326,7 @@ function MissionDetail({ mission, onBack, onAccept, onRefuse, onCounterOffer }) 
                 inputMode="numeric"
                 value={counterValue}
                 onChange={(e) => setCounterValue(e.target.value)}
-                placeholder="Ex : 70 000"
+                placeholder="Ex. : 70 000"
                 className={FORM.champ()}
               />
             </div>
@@ -4449,7 +4456,7 @@ function MissionsScreen() {
         <ListeVide
           icone={ClipboardList}
           titre="Aucune mission dans cette catégorie"
-          texte={q ? "Essayez d'autres mots-clés." : "Les nouvelles demandes de vos clients apparaîtront ici."}
+          texte={q ? "Essayez d’autres mots-clés." : "Les nouvelles demandes de vos clients apparaîtront ici."}
           action={(q || tab !== "toutes") && <App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setTab("toutes"); }}>Voir toutes les missions</App.Bouton>}
         />
       )}
@@ -4488,14 +4495,14 @@ function Stars({ note, size = 13 }) {
 }
 
 const PORTFOLIO_REALISATIONS = [
-  { id: "r1", titre: "Installation tableau électrique — Villa Almadies", photo: "/images/plateforme/realisations/realisation-1.jpg", date: "Juillet 2026", lieu: "Almadies, Dakar", description: "Installation complète d'un tableau électrique neuf pour une villa de 5 pièces, avec mise aux normes NF C 15-100." },
-  { id: "r2", titre: "Panneaux solaires — Résidence Ngor", photo: "/images/plateforme/realisations/realisation-2.jpg", date: "Juin 2026", lieu: "Ngor, Dakar", description: "Pose et raccordement d'un kit solaire domestique de 3kW avec onduleur." },
+  { id: "r1", titre: "Installation tableau électrique — Villa Almadies", photo: "/images/plateforme/realisations/realisation-1.jpg", date: "Juillet 2026", lieu: "Almadies, Dakar", description: "Installation complète d’un tableau électrique neuf pour une villa de 5 pièces, avec mise aux normes NF C 15-100." },
+  { id: "r2", titre: "Panneaux solaires — Résidence Ngor", photo: "/images/plateforme/realisations/realisation-2.jpg", date: "Juin 2026", lieu: "Ngor, Dakar", description: "Pose et raccordement d’un kit solaire domestique de 3kW avec onduleur." },
   { id: "r3", titre: "Câblage réseau — Bureau Plateau", photo: "/images/plateforme/realisations/realisation-3.jpg", date: "Mai 2026", lieu: "Plateau, Dakar", description: "Câblage réseau complet pour un open-space de 12 postes de travail." },
-  { id: "r4", titre: "Mise aux normes — Immeuble Médina", photo: "/images/plateforme/realisations/realisation-4.jpg", date: "Avril 2026", lieu: "Médina, Dakar", description: "Mise en conformité de l'installation électrique d'un immeuble de 4 étages suite à un contrôle d'assurance." },
-  { id: "r5", titre: "Dépannage urgence — Appartement Sacré-Cœur", photo: "/images/plateforme/realisations/realisation-5.jpg", date: "Mars 2026", lieu: "Sacré-Cœur, Dakar", description: "Intervention d'urgence suite à une coupure générale, remplacement du disjoncteur principal." },
-  { id: "r6", titre: "Éclairage extérieur — Villa Ouakam", photo: "/images/plateforme/realisations/realisation-6.jpg", date: "Février 2026", lieu: "Ouakam, Dakar", description: "Installation d'un éclairage extérieur basse consommation pour un jardin et une allée." },
-  { id: "r7", titre: "Installation domotique — Résidence Fann", photo: "/images/plateforme/realisations/realisation-7.jpg", date: "Janvier 2026", lieu: "Fann, Dakar", description: "Mise en place d'un système domotique pour la gestion de l'éclairage et des volets roulants." },
-  { id: "r8", titre: "Rénovation électrique complète — Maison Yoff", photo: "/images/plateforme/realisations/realisation-8.jpg", date: "Décembre 2025", lieu: "Yoff, Dakar", description: "Rénovation complète de l'installation électrique d'une maison ancienne, câblage neuf de bout en bout." },
+  { id: "r4", titre: "Mise aux normes — Immeuble Médina", photo: "/images/plateforme/realisations/realisation-4.jpg", date: "Avril 2026", lieu: "Médina, Dakar", description: "Mise en conformité de l’installation électrique d’un immeuble de 4 étages suite à un contrôle d’assurance." },
+  { id: "r5", titre: "Dépannage urgence — Appartement Sacré-Cœur", photo: "/images/plateforme/realisations/realisation-5.jpg", date: "Mars 2026", lieu: "Sacré-Cœur, Dakar", description: "Intervention d’urgence suite à une coupure générale, remplacement du disjoncteur principal." },
+  { id: "r6", titre: "Éclairage extérieur — Villa Ouakam", photo: "/images/plateforme/realisations/realisation-6.jpg", date: "Février 2026", lieu: "Ouakam, Dakar", description: "Installation d’un éclairage extérieur basse consommation pour un jardin et une allée." },
+  { id: "r7", titre: "Installation domotique — Résidence Fann", photo: "/images/plateforme/realisations/realisation-7.jpg", date: "Janvier 2026", lieu: "Fann, Dakar", description: "Mise en place d’un système domotique pour la gestion de l’éclairage et des volets roulants." },
+  { id: "r8", titre: "Rénovation électrique complète — Maison Yoff", photo: "/images/plateforme/realisations/realisation-8.jpg", date: "Décembre 2025", lieu: "Yoff, Dakar", description: "Rénovation complète de l’installation électrique d’une maison ancienne, câblage neuf de bout en bout." },
 ];
 
 function RealisationsScreen({ onBack }) {
@@ -4555,10 +4562,10 @@ function ProfilPrestataireScreen({ onNavigate }) {
           <App.Badge ton={actifs.length ? "succes" : "neutre"} point taille="moyen">{actifs.length ? "Disponible pour des missions" : "Aucun service actif"}</App.Badge>
         </>}
         titre={user.name}
-        sousTitre={`${info.metier} · ${PRESTATAIRE_DETAILS.experience} d'expérience`}
+        sousTitre={`${info.metier} · ${PRESTATAIRE_DETAILS.experience} d’expérience`}
         meta={<>
           <MetaOffre icone={MapPin}>{info.localisation}</MetaOffre>
-          <MetaOffre icone={Star}>{AVG_NOTE}/5 · {REVIEWS_DATA.length} avis</MetaOffre>
+          <MetaOffre icone={Star}>{noteFr(AVG_NOTE)}/5 · {REVIEWS_DATA.length} avis</MetaOffre>
           <MetaOffre icone={CalendarCheck}>Membre depuis {PRESTATAIRE_DETAILS.membreDepuis.toLowerCase()}</MetaOffre>
         </>}
         actions={<>
@@ -4570,7 +4577,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
         items={[
           { icone: ClipboardList, valeur: enCours, label: "Missions en cours", detail: `${enAttente} demande${enAttente > 1 ? "s" : ""} en attente`, onClick: () => onNavigate("missions") },
           { icone: Wrench, valeur: actifs.length, label: "Services actifs", detail: `${services.length} au total`, ton: "info", onClick: () => onNavigate("services") },
-          { icone: Star, valeur: `${AVG_NOTE}/5`, label: "Note moyenne", detail: "Voir mes évaluations", ton: "alerte", onClick: () => onNavigate("evaluations") },
+          { icone: Star, valeur: `${noteFr(AVG_NOTE)}/5`, label: "Note moyenne", detail: "Voir mes évaluations", ton: "alerte", onClick: () => onNavigate("evaluations") },
           { icone: UserCircle2, valeur: `${completion.valeur} %`, label: "Profil complété", detail: completion.valeur === 100 ? "Profil complet" : "Voir ce qui manque", ton: "succes", onClick: completion.valeur < 100 ? () => onNavigate("profil") : undefined },
         ]}
       />
@@ -4609,7 +4616,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
             </div>
           </App.Carte>
 
-          <App.Carte titre="Avis récents" sousTitre={`${REVIEWS_DATA.length} avis · ${AVG_NOTE}/5`} actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("evaluations")}>Mes évaluations</App.Bouton>}>
+          <App.Carte titre="Avis récents" sousTitre={`${REVIEWS_DATA.length} avis · ${noteFr(AVG_NOTE)}/5`} actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("evaluations")}>Mes évaluations</App.Bouton>}>
             <ListeAvis avis={REVIEWS_DATA.slice(0, 2)} />
           </App.Carte>
 
@@ -4629,7 +4636,7 @@ function ProfilPrestataireScreen({ onNavigate }) {
               { icone: Clock, libelle: "Disponibilité", valeur: PRESTATAIRE_DETAILS.disponibilite },
             ]}
           />
-          <App.Carte titre="Zone d'intervention" sousTitre="D'après vos services">
+          <App.Carte titre="Zone d’intervention" sousTitre="D’après vos services">
             <Etiquettes items={zones} />
           </App.Carte>
           <App.Carte titre="Langues">
@@ -4675,8 +4682,8 @@ function EvaluationsScreen({ onNavigate }) {
 
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-6 text-center" style={{ borderColor: COLORS.border }}>
-          <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>NOTE MOYENNE</p>
-          <p className="text-4xl font-bold mb-2" style={{ color: COLORS.orangeText }}>{AVG_NOTE}/5</p>
+          <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>Note moyenne</p>
+          <p className="text-4xl font-bold mb-2" style={{ color: COLORS.orangeText }}>{noteFr(AVG_NOTE)}/5</p>
           <Stars note={Math.round(AVG_NOTE)} size={16} />
           <p className="text-xs mt-2" style={{ color: COLORS.slateLight }}>{REVIEWS_DATA.length} avis au total</p>
         </div>
@@ -4745,33 +4752,33 @@ function EvaluationsScreen({ onNavigate }) {
 
 /* ---------- Screen 15 : Dashboard & Offres (Entreprise) ---------- */
 
-/* Entreprise connectée dans la démo : ses offres passent par la vérification de l'admin. */
+/* Entreprise connectée dans la démo : ses offres passent par la vérification de l’admin. */
 const ENTREPRISE_DEMO_NOM = "Senegal Construction SARL";
 
 const OFFRES_ENTREPRISE_INITIAL = [
-  { id: "off1", titre: "Chef d'équipe électricité", categorie: "BTP", contrat: "CDI", salaire: "350 000 FCFA/mois", localisation: "Dakar, Plateau", statut: "Active", nbCandidatures: 12, experience: "5-10 ans", dateLimite: "30 nov. 2026", description: "Nous recherchons un Chef d'équipe électricité expérimenté pour superviser nos chantiers résidentiels et tertiaires à Dakar. Vous serez garant de la conformité réglementaire (normes NF C 15-100) et animerez une équipe d'électriciens qualifiés.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe"], candidats: [
+  { id: "off1", titre: "Chef d’équipe électricité", categorie: "BTP", contrat: "CDI", salaire: "350 000 FCFA/mois", localisation: "Dakar, Plateau", statut: "Active", nbCandidatures: 12, experience: "5-10 ans", dateLimite: "30 novembre 2026", description: "Nous recherchons un Chef d’équipe électricité expérimenté pour superviser nos chantiers résidentiels et tertiaires à Dakar. Vous serez garant de la conformité réglementaire (normes NF C 15-100) et animerez une équipe d’électriciens qualifiés.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d’équipe"], candidats: [
     { nom: "Moussa Diop", metier: "Électricien bâtiment", date: "15/08", statut: "Nouveau", photo: "/images/plateforme/portraits/moussa-diop.jpg" },
     { nom: "Fatou Sarr", metier: "Plombière", date: "14/08", statut: "En cours", photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
     { nom: "Ibrahima Diallo", metier: "Soudeur", date: "12/08", statut: "Retenu", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
     { nom: "Aminata Ndiaye", metier: "Couturière", date: "10/08", statut: "Rejeté", photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
   ] },
-  { id: "off2", titre: "Technicienne plomberie", categorie: "Plomberie", contrat: "CDD", salaire: "250 000 FCFA/mois", localisation: "Dakar, Médina", statut: "Active", nbCandidatures: 8, experience: "2-5 ans", dateLimite: "15 nov. 2026", description: "Poste de technicienne plomberie pour l'entretien et l'installation de systèmes sanitaires sur nos chantiers.", competences: ["Plomberie sanitaire", "Diagnostic de panne"], candidats: [
+  { id: "off2", titre: "Technicienne plomberie", categorie: "Plomberie", contrat: "CDD", salaire: "250 000 FCFA/mois", localisation: "Dakar, Médina", statut: "Active", nbCandidatures: 8, experience: "2-5 ans", dateLimite: "15 novembre 2026", description: "Poste de technicienne plomberie pour l’entretien et l’installation de systèmes sanitaires sur nos chantiers.", competences: ["Plomberie sanitaire", "Diagnostic de panne"], candidats: [
     { nom: "Fatou Mbaye", metier: "Plombière sanitaire", date: "13/08", statut: "Nouveau", photo: "/images/plateforme/portraits/fatou-mbaye.jpg" },
   ] },
-  { id: "off3", titre: "Soudeur TIG/MIG", categorie: "Industrie", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Thiès", statut: "Active", nbCandidatures: 15, experience: "3-8 ans", dateLimite: "10 déc. 2026", description: "Soudeur qualifié TIG/MIG pour la fabrication et l'assemblage de structures métalliques industrielles.", competences: ["Soudure TIG", "Soudure MIG", "Lecture de plans"], candidats: [
+  { id: "off3", titre: "Soudeur TIG/MIG", categorie: "Industrie", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Thiès", statut: "Active", nbCandidatures: 15, experience: "3-8 ans", dateLimite: "10 décembre 2026", description: "Soudeur qualifié TIG/MIG pour la fabrication et l’assemblage de structures métalliques industrielles.", competences: ["Soudure TIG", "Soudure MIG", "Lecture de plans"], candidats: [
     { nom: "Ibrahima Diallo", metier: "Soudeur industriel", date: "11/08", statut: "Retenu", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
     { nom: "Ousmane Diaw", metier: "Soudeur TIG/MIG", date: "09/08", statut: "En cours", photo: "/images/plateforme/portraits/ousmane-diaw.jpg" },
   ] },
-  { id: "off4", titre: "Carreleur expérimenté", categorie: "BTP", contrat: "CDD", salaire: "280 000 FCFA/mois", localisation: "Dakar, Almadies", statut: "En pause", nbCandidatures: 6, experience: "3-6 ans", dateLimite: "5 nov. 2026", description: "Carreleur expérimenté pour la finition de villas haut standing aux Almadies.", competences: ["Pose de carrelage", "Finitions"], candidats: [
+  { id: "off4", titre: "Carreleur expérimenté", categorie: "BTP", contrat: "CDD", salaire: "280 000 FCFA/mois", localisation: "Dakar, Almadies", statut: "En pause", nbCandidatures: 6, experience: "3-6 ans", dateLimite: "5 novembre 2026", description: "Carreleur expérimenté pour la finition de villas haut standing aux Almadies.", competences: ["Pose de carrelage", "Finitions"], candidats: [
     { nom: "Mariama Tall", metier: "Carreleuse", date: "07/08", statut: "En cours", photo: "/images/plateforme/portraits/mariama-tall.jpg" },
   ] },
-  { id: "off5", titre: "Menuisier ébéniste", categorie: "Artisanat", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Saint-Louis", statut: "Clôturée", nbCandidatures: 5, experience: "5+ ans", dateLimite: "1 août 2026", description: "Menuisier ébéniste pour la fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], candidats: [
+  { id: "off5", titre: "Menuisier ébéniste", categorie: "Artisanat", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Saint-Louis", statut: "Clôturée", nbCandidatures: 5, experience: "5+ ans", dateLimite: "1er août 2026", description: "Menuisier ébéniste pour la fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], candidats: [
     { nom: "Ousmane Ba", metier: "Menuisier ébéniste", date: "28/07", statut: "Nouveau", photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
   ] },
-  { id: "off6", titre: "Peintre bâtiment", categorie: "BTP", contrat: "CDD", salaire: "220 000 FCFA/mois", localisation: "Dakar, Parcelles", statut: "Active", nbCandidatures: 9, experience: "1-3 ans", dateLimite: "20 nov. 2026", description: "Peintre bâtiment pour travaux de finition sur nos chantiers résidentiels.", competences: ["Peinture intérieure/extérieure", "Enduits"], candidats: [
+  { id: "off6", titre: "Peintre bâtiment", categorie: "BTP", contrat: "CDD", salaire: "220 000 FCFA/mois", localisation: "Dakar, Parcelles", statut: "Active", nbCandidatures: 9, experience: "1-3 ans", dateLimite: "20 novembre 2026", description: "Peintre bâtiment pour travaux de finition sur nos chantiers résidentiels.", competences: ["Peinture intérieure/extérieure", "Enduits"], candidats: [
     { nom: "Abdoulaye Sow", metier: "Peintre bâtiment", date: "18/08", statut: "Nouveau", photo: "/images/plateforme/portraits/abdoulaye-sow.jpg" },
   ] },
-  { id: "off7", titre: "Aide-électricien (apprenti)", categorie: "BTP", contrat: "CDD", salaire: "120 000 FCFA/mois", localisation: "Dakar, Pikine", statut: "En vérification", soumiseLe: "18/10/2026", nbCandidatures: 0, experience: "Débutant accepté", dateLimite: "15 déc. 2026", description: "Nous recherchons un aide-électricien pour accompagner nos chefs d'équipe sur des chantiers résidentiels. Formation assurée sur le terrain, encadrement par un électricien confirmé.", competences: ["Motivation", "Travail en équipe", "Bases en électricité"], candidats: [] },
+  { id: "off7", titre: "Aide-électricien (apprenti)", categorie: "BTP", contrat: "CDD", salaire: "120 000 FCFA/mois", localisation: "Dakar, Pikine", statut: "En vérification", soumiseLe: "18 octobre 2026", nbCandidatures: 0, experience: "Débutant accepté", dateLimite: "15 décembre 2026", description: "Nous recherchons un aide-électricien pour accompagner nos chefs d’équipe sur des chantiers résidentiels. Formation assurée sur le terrain, encadrement par un électricien confirmé.", competences: ["Motivation", "Travail en équipe", "Bases en électricité"], candidats: [] },
 ];
 
 function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
@@ -4854,7 +4861,7 @@ function OffreEntrepriseCard({ o, onOpen }) {
       meta={<>
         <App.Badge ton="info" taille="moyen">{o.contrat}</App.Badge>
         <MetaOffre icone={MapPin}>{o.localisation}</MetaOffre>
-        {o.dateLimite && <MetaOffre icone={Clock}>Jusqu'au {o.dateLimite}</MetaOffre>}
+        {o.dateLimite && <MetaOffre icone={Clock}>Jusqu’au {o.dateLimite}</MetaOffre>}
       </>}
       aside={
         <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded bg-marque-doux px-3 text-sm font-semibold text-marque-fort">
@@ -4895,9 +4902,9 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
     onSave({
       id: initial?.id || v.titre.toLowerCase().replace(/\s+/g, "-") + "-" + Date.now(),
       titre: v.titre, categorie: v.categorie, contrat: v.contrat, salaire: v.salaire, localisation: v.localisation,
-      // Nouvelle offre, ou offre refusée puis corrigée : elle repart en vérification chez l'admin.
+      // Nouvelle offre, ou offre refusée puis corrigée : elle repart en vérification chez l’admin.
       statut: !initial || initial.statut === "Refusée" ? "En vérification" : initial.statut,
-      soumiseLe: !initial || initial.statut === "Refusée" ? demoNow().toLocaleDateString("fr-FR") : initial.soumiseLe,
+      soumiseLe: !initial || initial.statut === "Refusée" ? dateFr(demoNow()) : initial.soumiseLe,
       motifRefus: null,
       nbCandidatures: initial?.nbCandidatures || 0, experience: v.experience,
       dateLimite: v.dateLimite, description: v.description,
@@ -4911,13 +4918,13 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
       as="form"
       onSubmit={envoyer}
       noValidate
-      titre={initial ? "Modifier l'offre" : "Créer une offre d'emploi"}
-      sousTitre="Les champs marqués d'un * sont obligatoires."
+      titre={initial ? "Modifier l’offre" : "Créer une offre d’emploi"}
+      sousTitre="Les champs marqués d’un * sont obligatoires."
     >
       {(!initial || initial.statut === "Refusée") && (
         <p className="mb-6 flex items-start gap-3 rounded-lg bg-doux p-4 text-sm text-secondaire">
           <ShieldCheck size={18} className="mt-0.5 shrink-0 text-marque" aria-hidden="true" />
-          L'équipe LIGGEEY vérifie chaque offre avant sa mise en ligne. Elle sera visible des candidats dès sa validation.
+          L’équipe LIGGEEY vérifie chaque offre avant sa mise en ligne. Elle sera visible des candidats dès sa validation.
         </p>
       )}
       {initial?.statut === "Refusée" && initial.motifRefus && (
@@ -4927,10 +4934,10 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
       <h3 className={FORM.section}>Le poste</h3>
       <div className={`${FORM.grille} mb-8`}>
         <Champ id="offre-titre" label="Titre du poste" requis erreur={err("titre")} large>
-          <input {...attrs("offre-titre", "titre", true)} placeholder="Ex : Électricien du bâtiment" className={FORM.champ(err("titre"))} />
+          <input {...attrs("offre-titre", "titre", true)} placeholder="Ex. : Électricien du bâtiment" className={FORM.champ(err("titre"))} />
         </Champ>
         <Champ id="offre-categorie" label="Catégorie" requis erreur={err("categorie")}>
-          <input {...attrs("offre-categorie", "categorie", true)} placeholder="Ex : BTP, plomberie" className={FORM.champ(err("categorie"))} />
+          <input {...attrs("offre-categorie", "categorie", true)} placeholder="Ex. : BTP, plomberie" className={FORM.champ(err("categorie"))} />
         </Champ>
         <Champ id="offre-contrat" label="Type de contrat" requis>
           <ListeChamp {...attrs("offre-contrat", "contrat", true)}>
@@ -4945,28 +4952,28 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
       <h3 className={FORM.section}>Conditions</h3>
       <div className={`${FORM.grille} mb-8`}>
         <Champ id="offre-localisation" label="Localisation" requis erreur={err("localisation")}>
-          <input {...attrs("offre-localisation", "localisation", true)} placeholder="Ex : Dakar, Plateau" className={FORM.champ(err("localisation"))} />
+          <input {...attrs("offre-localisation", "localisation", true)} placeholder="Ex. : Dakar, Plateau" className={FORM.champ(err("localisation"))} />
         </Champ>
         <Champ id="offre-salaire" label="Salaire mensuel" requis erreur={err("salaire")}>
-          <input {...attrs("offre-salaire", "salaire", true)} placeholder="Ex : 300 000 FCFA par mois" className={FORM.champ(err("salaire"))} />
+          <input {...attrs("offre-salaire", "salaire", true)} placeholder="Ex. : 300 000 FCFA par mois" className={FORM.champ(err("salaire"))} />
         </Champ>
         <Champ id="offre-experience" label="Expérience requise">
-          <input {...attrs("offre-experience", "experience")} placeholder="Ex : 3 à 5 ans" className={FORM.champ()} />
+          <input {...attrs("offre-experience", "experience")} placeholder="Ex. : 3 à 5 ans" className={FORM.champ()} />
         </Champ>
         <Champ id="offre-date-limite" label="Date limite de candidature">
-          <input {...attrs("offre-date-limite", "dateLimite")} placeholder="Ex : 30 nov. 2026" className={FORM.champ()} />
+          <input {...attrs("offre-date-limite", "dateLimite")} placeholder="Ex. : 30 novembre 2026" className={FORM.champ()} />
         </Champ>
       </div>
 
       <h3 className={FORM.section}>Profil recherché</h3>
       <div className={FORM.grille}>
         <Champ id="offre-competences" label="Compétences requises" aide="Séparez-les par des virgules." large>
-          <input {...attrs("offre-competences", "competencesTxt", false, true)} placeholder="Ex : lecture de plans, câblage, habilitation électrique" className={FORM.champ()} />
+          <input {...attrs("offre-competences", "competencesTxt", false, true)} placeholder="Ex. : lecture de plans, câblage, habilitation électrique" className={FORM.champ()} />
         </Champ>
       </div>
 
       {essai && Object.values(erreurs).some(Boolean) && (
-        <p role="alert" className="mt-5 text-sm text-statut-danger">Complétez les champs signalés pour envoyer l'offre.</p>
+        <p role="alert" className="mt-5 text-sm text-statut-danger">Complétez les champs signalés pour envoyer l’offre.</p>
       )}
       <div className={FORM.actions}>
         <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
@@ -5004,7 +5011,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
           <App.Badge ton="info" taille="moyen">{offre.contrat}</App.Badge>
           <MetaOffre icone={Wallet}>{offre.salaire}</MetaOffre>
           {offre.experience && <MetaOffre icone={TrendingUp}>{offre.experience}</MetaOffre>}
-          {offre.dateLimite && <MetaOffre icone={Clock}>Jusqu'au {offre.dateLimite}</MetaOffre>}
+          {offre.dateLimite && <MetaOffre icone={Clock}>Jusqu’au {offre.dateLimite}</MetaOffre>}
         </>}
         actions={<>
           {offre.statut === "Active" && onSponsor && (
@@ -5019,7 +5026,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
             )
           )}
           <App.Bouton variante="neutre" onClick={onEdit}><Pencil size={16} aria-hidden="true" /> Modifier</App.Bouton>
-          {offre.statut !== "Clôturée" && offre.statut !== "En vérification" && offre.statut !== "Refusée" && <App.Bouton onClick={onToggleStatut}>Clôturer l'offre</App.Bouton>}
+          {offre.statut !== "Clôturée" && offre.statut !== "En vérification" && offre.statut !== "Refusée" && <App.Bouton onClick={onToggleStatut}>Clôturer l’offre</App.Bouton>}
         </>}
       />
 
@@ -5027,8 +5034,8 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
         <div className="flex items-start gap-3 rounded-lg border border-base bg-statut-alerte-doux p-4" role="status">
           <ShieldCheck size={20} className="mt-0.5 shrink-0 text-principal" aria-hidden="true" />
           <div>
-            <p className="text-sm font-semibold text-principal">En cours de vérification par l'équipe LIGGEEY</p>
-            <p className="text-sm text-secondaire">Envoyée le {offre.soumiseLe || "—"}. L'offre n'est pas encore visible des candidats : elle sera publiée dès sa validation.</p>
+            <p className="text-sm font-semibold text-principal">En cours de vérification par l’équipe LIGGEEY</p>
+            <p className="text-sm text-secondaire">Envoyée le {offre.soumiseLe || "—"}. L’offre n’est pas encore visible des candidats : elle sera publiée dès sa validation.</p>
           </div>
         </div>
       )}
@@ -5037,8 +5044,8 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
           <div className="flex items-start gap-3">
             <AlertCircle size={20} className="mt-0.5 shrink-0 text-statut-danger" aria-hidden="true" />
             <div>
-              <p className="text-sm font-semibold text-principal">Offre refusée par l'équipe LIGGEEY</p>
-              <p className="text-sm text-secondaire">{offre.motifRefus ? `Motif : ${offre.motifRefus}` : "Corrigez l'offre puis renvoyez-la."}</p>
+              <p className="text-sm font-semibold text-principal">Offre refusée par l’équipe LIGGEEY</p>
+              <p className="text-sm text-secondaire">{offre.motifRefus ? `Motif : ${offre.motifRefus}` : "Corrigez l’offre puis renvoyez-la."}</p>
             </div>
           </div>
           <App.Bouton petit onClick={onEdit}><Pencil size={15} aria-hidden="true" /> Corriger et renvoyer</App.Bouton>
@@ -5078,7 +5085,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
         </>}
         cote={
           <ApercuFiche
-            titre="Aperçu de l'offre"
+            titre="Aperçu de l’offre"
             items={[
               { icone: Layers, libelle: "Catégorie", valeur: offre.categorie },
               { icone: FileText, libelle: "Type de contrat", valeur: offre.contrat },
@@ -5109,7 +5116,7 @@ function MesOffresScreen({ offres, setOffres, creer = false }) {
     if (offresRestantes <= 0) { planApi.requestUpgrade("offres"); return; }
     setMode("create");
   }
-  // Ouvert depuis le raccourci « Publier une offre » de la barre d'icônes.
+  // Ouvert depuis le raccourci « Publier une offre » de la barre d’icônes.
   useEffect(() => { if (creer) openCreate(); }, []);
   function sponsoriser(id) {
     setOffres((list) => list.map((o) => (o.id === id ? { ...o, sponsorisee: true } : o)));
@@ -5131,7 +5138,7 @@ function MesOffresScreen({ offres, setOffres, creer = false }) {
     });
     setSelectedId(values.id);
     setMode("view");
-    notify(values.statut === "En vérification" ? "Offre envoyée à l'équipe LIGGEEY. Elle sera publiée après vérification." : "Offre enregistrée.");
+    notify(values.statut === "En vérification" ? "Offre envoyée à l’équipe LIGGEEY. Elle sera publiée après vérification." : "Offre enregistrée.");
   }
   function cloturer(id) {
     setOffres((list) => list.map((o) => (o.id === id ? { ...o, statut: "Clôturée" } : o)));
@@ -5149,7 +5156,7 @@ function MesOffresScreen({ offres, setOffres, creer = false }) {
   if (selected && mode === "edit") {
     return (
       <div className="space-y-6">
-        <BoutonRetour onClick={() => setMode("view")}>Retour à l'offre</BoutonRetour>
+        <BoutonRetour onClick={() => setMode("view")}>Retour à l’offre</BoutonRetour>
         <OffreEntrepriseForm initial={selected} onSave={saveOffre} onCancel={() => setMode("view")} />
       </div>
     );
@@ -5169,7 +5176,7 @@ function MesOffresScreen({ offres, setOffres, creer = false }) {
   return (
     <div className="space-y-6">
       <p className="text-sm text-secondaire">
-        Gérez vos offres d'emploi et suivez les candidatures reçues.
+        Gérez vos offres d’emploi et suivez les candidatures reçues.
         {offresRestantes !== UNLIMITED && <span> {Math.max(0, offresRestantes)} nouvelle{offresRestantes > 1 ? "s" : ""} offre{offresRestantes > 1 ? "s" : ""} disponible{offresRestantes > 1 ? "s" : ""} ce mois-ci avec le profil {planApi.plan.nom}.</span>}
       </p>
 
@@ -5200,11 +5207,11 @@ function MesOffresScreen({ offres, setOffres, creer = false }) {
           {pagination.paged.map((o) => <OffreEntrepriseCard key={o.id} o={o} onOpen={(oo) => { setSelectedId(oo.id); window.scrollTo(0, 0); }} />)}
         </div>
       ) : offres.length === 0 ? (
-        <ListeVide icone={Briefcase} titre="Aucune offre publiée" texte="Publiez votre première offre : l'équipe LIGGEEY la vérifie avant sa mise en ligne." action={<App.Bouton petit onClick={openCreate}>Nouvelle offre</App.Bouton>} />
+        <ListeVide icone={Briefcase} titre="Aucune offre publiée" texte="Publiez votre première offre : l’équipe LIGGEEY la vérifie avant sa mise en ligne." action={<App.Bouton petit onClick={openCreate}>Nouvelle offre</App.Bouton>} />
       ) : (
         <ListeVide
           titre="Aucune offre ne correspond"
-          texte="Essayez d'autres mots-clés ou un autre statut."
+          texte="Essayez d’autres mots-clés ou un autre statut."
           action={<App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setStatutFilter("Tous"); }}>Effacer les filtres</App.Bouton>}
         />
       )}
@@ -5217,14 +5224,14 @@ function MesOffresScreen({ offres, setOffres, creer = false }) {
 /* ---------- Screen 16 : Candidatures & Recrutement (Entreprise) ---------- */
 
 const CANDIDATURES_ENTREPRISE_INITIAL = [
-  { id: "c1", nom: "Moussa Diop", metier: "Électricien bâtiment", localisation: "Dakar", offre: "Chef d'équipe électricité", date: "15/08/2026", statut: "Nouveau", experience: "8 ans d'expérience", telephone: "+221 77 123 45 67", email: "moussa.diop@email.sn", lettre: "Bonjour, je suis très intéressé par votre offre de Chef d'équipe électricité. Fort de mes 8 ans d'expérience sur divers chantiers à Dakar et Thiès, je maîtrise l'installation électrique complète, le câblage industriel et l'encadrement des équipes sur le terrain dans le respect strict des normes NF C 15-100. Motivé et rigoureux, je suis disponible immédiatement.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe", "Habilitation B2V"], documents: [{ nom: "CV_Moussa_Diop.pdf", taille: "1.2 Mo" }, { nom: "Certificat_Habilitation.pdf", taille: "850 Ko" }] },
-  { id: "c2", nom: "Fatou Sarr", metier: "Plombière sanitaire", localisation: "Dakar", offre: "Technicienne plomberie", date: "14/08/2026", statut: "En cours", experience: "5 ans d'expérience", telephone: "+221 76 234 56 78", email: "fatou.sarr@email.sn", lettre: "Madame, Monsieur, je souhaite postuler au poste de technicienne plomberie. J'ai travaillé 5 ans sur des chantiers résidentiels et je maîtrise le diagnostic de panne et l'installation sanitaire complète.", competences: ["Plomberie sanitaire", "Diagnostic de panne"], documents: [{ nom: "CV_Fatou_Sarr.pdf", taille: "1.0 Mo" }] },
-  { id: "c3", nom: "Ibrahima Diallo", metier: "Soudeur industriel", localisation: "Dakar", offre: "Soudeur TIG/MIG", date: "12/08/2026", statut: "Retenu", experience: "6 ans d'expérience", telephone: "+221 78 345 67 89", email: "ibrahima.diallo@email.sn", lettre: "Je suis soudeur industriel qualifié TIG et MIG, avec 6 ans d'expérience dans la fabrication de structures métalliques. Je souhaite mettre mon expertise au service de votre équipe.", competences: ["Soudure TIG", "Soudure MIG", "Lecture de plans"], documents: [{ nom: "CV_Ibrahima_Diallo.pdf", taille: "980 Ko" }, { nom: "Certificat_Soudure.pdf", taille: "620 Ko" }] },
-  { id: "c4", nom: "Aminata Ndiaye", metier: "Couturière", localisation: "Dakar", offre: "Responsable atelier couture", date: "10/08/2026", statut: "Rejeté", experience: "10 ans d'expérience", telephone: "+221 77 456 78 90", email: "aminata.ndiaye@email.sn", lettre: "Couturière expérimentée, je gère depuis 10 ans un petit atelier et souhaite rejoindre une structure plus importante pour développer mes compétences en gestion d'équipe.", competences: ["Couture sur mesure", "Gestion d'atelier"], documents: [{ nom: "CV_Aminata_Ndiaye.pdf", taille: "1.1 Mo" }] },
-  { id: "c5", nom: "Ousmane Ba", metier: "Menuisier ébéniste", localisation: "Saint-Louis", offre: "Menuisier ébéniste", date: "09/08/2026", statut: "Nouveau", experience: "12 ans d'expérience", telephone: "+221 76 567 89 01", email: "ousmane.ba@email.sn", lettre: "Menuisier ébéniste depuis 12 ans, spécialisé dans le mobilier sur mesure, je suis disponible pour rejoindre votre atelier à Saint-Louis.", competences: ["Menuiserie", "Ébénisterie"], documents: [{ nom: "CV_Ousmane_Ba.pdf", taille: "900 Ko" }] },
-  { id: "c6", nom: "Mariama Tall", metier: "Carreleur", localisation: "Dakar", offre: "Carreleur expérimenté", date: "08/08/2026", statut: "En cours", experience: "4 ans d'expérience", telephone: "+221 78 678 90 12", email: "mariama.tall@email.sn", lettre: "Carreleuse spécialisée dans les finitions haut de gamme, je souhaite intégrer votre équipe pour vos chantiers résidentiels aux Almadies.", competences: ["Pose de carrelage", "Finitions"], documents: [{ nom: "CV_Mariama_Tall.pdf", taille: "1.0 Mo" }] },
-  { id: "c7", nom: "Abdoulaye Sow", metier: "Peintre bâtiment", localisation: "Dakar", offre: "Peintre bâtiment", date: "07/08/2026", statut: "Nouveau", experience: "3 ans d'expérience", telephone: "+221 77 789 01 23", email: "abdoulaye.sow@email.sn", lettre: "Peintre en bâtiment depuis 3 ans, je maîtrise les enduits et les finitions intérieures/extérieures. Disponible rapidement.", competences: ["Peinture intérieure/extérieure", "Enduits"], documents: [{ nom: "CV_Abdoulaye_Sow.pdf", taille: "870 Ko" }] },
-  { id: "c8", nom: "Aissatou Gueye", metier: "Électricienne", localisation: "Dakar", offre: "Chef d'équipe électricité", date: "06/08/2026", statut: "Retenu", experience: "7 ans d'expérience", telephone: "+221 76 890 12 34", email: "aissatou.gueye@email.sn", lettre: "Électricienne qualifiée avec 7 ans d'expérience en encadrement de chantier, je suis particulièrement intéressée par un poste à responsabilités.", competences: ["Normes NF C 15-100", "Management d'équipe", "Habilitation B2V"], documents: [{ nom: "CV_Aissatou_Gueye.pdf", taille: "1.3 Mo" }] },
+  { id: "c1", nom: "Moussa Diop", metier: "Électricien bâtiment", localisation: "Dakar", offre: "Chef d’équipe électricité", date: "15 août 2026", statut: "Nouveau", experience: "8 ans d’expérience", telephone: "+221 77 123 45 67", email: "moussa.diop@email.sn", lettre: "Bonjour, je suis très intéressé par votre offre de Chef d’équipe électricité. Fort de mes 8 ans d’expérience sur divers chantiers à Dakar et Thiès, je maîtrise l’installation électrique complète, le câblage industriel et l’encadrement des équipes sur le terrain dans le respect strict des normes NF C 15-100. Motivé et rigoureux, je suis disponible immédiatement.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d’équipe", "Habilitation B2V"], documents: [{ nom: "CV_Moussa_Diop.pdf", taille: "1,2 Mo" }, { nom: "Certificat_Habilitation.pdf", taille: "850 Ko" }] },
+  { id: "c2", nom: "Fatou Sarr", metier: "Plombière sanitaire", localisation: "Dakar", offre: "Technicienne plomberie", date: "14 août 2026", statut: "En cours", experience: "5 ans d’expérience", telephone: "+221 76 234 56 78", email: "fatou.sarr@email.sn", lettre: "Madame, Monsieur, je souhaite postuler au poste de technicienne plomberie. J’ai travaillé 5 ans sur des chantiers résidentiels et je maîtrise le diagnostic de panne et l’installation sanitaire complète.", competences: ["Plomberie sanitaire", "Diagnostic de panne"], documents: [{ nom: "CV_Fatou_Sarr.pdf", taille: "1,0 Mo" }] },
+  { id: "c3", nom: "Ibrahima Diallo", metier: "Soudeur industriel", localisation: "Dakar", offre: "Soudeur TIG/MIG", date: "12 août 2026", statut: "Retenu", experience: "6 ans d’expérience", telephone: "+221 78 345 67 89", email: "ibrahima.diallo@email.sn", lettre: "Je suis soudeur industriel qualifié TIG et MIG, avec 6 ans d’expérience dans la fabrication de structures métalliques. Je souhaite mettre mon expertise au service de votre équipe.", competences: ["Soudure TIG", "Soudure MIG", "Lecture de plans"], documents: [{ nom: "CV_Ibrahima_Diallo.pdf", taille: "980 Ko" }, { nom: "Certificat_Soudure.pdf", taille: "620 Ko" }] },
+  { id: "c4", nom: "Aminata Ndiaye", metier: "Couturière", localisation: "Dakar", offre: "Responsable atelier couture", date: "10 août 2026", statut: "Rejeté", experience: "10 ans d’expérience", telephone: "+221 77 456 78 90", email: "aminata.ndiaye@email.sn", lettre: "Couturière expérimentée, je gère depuis 10 ans un petit atelier et souhaite rejoindre une structure plus importante pour développer mes compétences en gestion d’équipe.", competences: ["Couture sur mesure", "Gestion d’atelier"], documents: [{ nom: "CV_Aminata_Ndiaye.pdf", taille: "1,1 Mo" }] },
+  { id: "c5", nom: "Ousmane Ba", metier: "Menuisier ébéniste", localisation: "Saint-Louis", offre: "Menuisier ébéniste", date: "9 août 2026", statut: "Nouveau", experience: "12 ans d’expérience", telephone: "+221 76 567 89 01", email: "ousmane.ba@email.sn", lettre: "Menuisier ébéniste depuis 12 ans, spécialisé dans le mobilier sur mesure, je suis disponible pour rejoindre votre atelier à Saint-Louis.", competences: ["Menuiserie", "Ébénisterie"], documents: [{ nom: "CV_Ousmane_Ba.pdf", taille: "900 Ko" }] },
+  { id: "c6", nom: "Mariama Tall", metier: "Carreleur", localisation: "Dakar", offre: "Carreleur expérimenté", date: "8 août 2026", statut: "En cours", experience: "4 ans d’expérience", telephone: "+221 78 678 90 12", email: "mariama.tall@email.sn", lettre: "Carreleuse spécialisée dans les finitions haut de gamme, je souhaite intégrer votre équipe pour vos chantiers résidentiels aux Almadies.", competences: ["Pose de carrelage", "Finitions"], documents: [{ nom: "CV_Mariama_Tall.pdf", taille: "1,0 Mo" }] },
+  { id: "c7", nom: "Abdoulaye Sow", metier: "Peintre bâtiment", localisation: "Dakar", offre: "Peintre bâtiment", date: "7 août 2026", statut: "Nouveau", experience: "3 ans d’expérience", telephone: "+221 77 789 01 23", email: "abdoulaye.sow@email.sn", lettre: "Peintre en bâtiment depuis 3 ans, je maîtrise les enduits et les finitions intérieures/extérieures. Disponible rapidement.", competences: ["Peinture intérieure/extérieure", "Enduits"], documents: [{ nom: "CV_Abdoulaye_Sow.pdf", taille: "870 Ko" }] },
+  { id: "c8", nom: "Aissatou Gueye", metier: "Électricienne", localisation: "Dakar", offre: "Chef d’équipe électricité", date: "6 août 2026", statut: "Retenu", experience: "7 ans d’expérience", telephone: "+221 76 890 12 34", email: "aissatou.gueye@email.sn", lettre: "Électricienne qualifiée avec 7 ans d’expérience en encadrement de chantier, je suis particulièrement intéressée par un poste à responsabilités.", competences: ["Normes NF C 15-100", "Management d’équipe", "Habilitation B2V"], documents: [{ nom: "CV_Aissatou_Gueye.pdf", taille: "1,3 Mo" }] },
 ];
 
 function CandidatureEntrepriseRow({ c, onOpen }) {
@@ -5378,7 +5385,7 @@ function CandidaturesEntrepriseScreen() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-secondaire">Visualisez et gérez toutes les candidatures reçues pour vos offres d'emploi.</p>
+      <p className="text-sm text-secondaire">Visualisez et gérez toutes les candidatures reçues pour vos offres d’emploi.</p>
 
       <BarreFiltres label="Rechercher et filtrer les candidatures">
         <App.ChampRecherche
@@ -5416,7 +5423,7 @@ function CandidaturesEntrepriseScreen() {
         <ListeVide
           icone={ClipboardList}
           titre="Aucune candidature ne correspond"
-          texte="Essayez d'autres mots-clés ou retirez un filtre."
+          texte="Essayez d’autres mots-clés ou retirez un filtre."
           action={<App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setOffreFilter("toutes"); setStatutFilter("Tous"); }}>Effacer les filtres</App.Bouton>}
         />
       )}
@@ -5430,25 +5437,25 @@ function CandidaturesEntrepriseScreen() {
 
 const PRESTATAIRES_SEARCH = [
   {
-    id: "p1", nom: "Amadou Niang", metier: "Électricien bâtiment", localisation: "Dakar, Plateau", experience: "10 ans d'expérience", note: 4.8, disponible: true,
+    id: "p1", nom: "Amadou Niang", metier: "Électricien bâtiment", localisation: "Dakar, Plateau", experience: "10 ans d’expérience", note: 4.8, disponible: true,
     telephone: "+221 76 456 78 90", email: "amadou.niang@email.sn",
     timeline: [
-      { poste: "Chef d'équipe électricité", periode: "2020 – Présent", lieu: "Senegal Construction", description: "Supervision des chantiers de câblage résidentiels et gestion d'une équipe de 5 électriciens." },
+      { poste: "Chef d’équipe électricité", periode: "2020 – Présent", lieu: "Senegal Construction", description: "Supervision des chantiers de câblage résidentiels et gestion d’une équipe de 5 électriciens." },
       { poste: "Électricien senior", periode: "2016 – 2020", lieu: "BTP Dakar", description: "Diagnostic de pannes complexes et réalisation de plans électriques pour bâtiments tertiaires." },
-      { poste: "Électricien", periode: "2014 – 2016", lieu: "Artisan Elec", description: "Travaux d'installation courants forts et faibles en rénovation immobilière." },
+      { poste: "Électricien", periode: "2014 – 2016", lieu: "Artisan Elec", description: "Travaux d’installation courants forts et faibles en rénovation immobilière." },
     ],
     competences: ["Installation électrique", "Normes NF C 15-100", "Câblage industriel", "Domotique", "Lecture de plans", "Habilitation B2V"],
     avis: [
       { auteur: "Moussa Sy", date: "12 mai 2026", note: 5, commentaire: "Excellent travail sur mon chantier à Mermoz. Amadou est très professionnel et respecte les normes." },
-      { auteur: "Fatoumata Diop", date: "28 avr. 2026", note: 5, commentaire: "Disponible et compétent. A rapidement résolu un problème de court-circuit complexe." },
+      { auteur: "Fatoumata Diop", date: "28 avril 2026", note: 5, commentaire: "Disponible et compétent. A rapidement résolu un problème de court-circuit complexe." },
     ],
-    certifications: ["Habilitation électrique B2V / BR / BC", "CAP Électricien - Lycée Technique de Dakar", "Attestation de formation sécurité chantier BTP"],
+    certifications: ["Habilitation électrique B2V / BR / BC", "CAP électricien – Lycée technique de Dakar", "Attestation de formation sécurité chantier BTP"],
   },
-  { id: "p2", nom: "Fatou Mbaye", metier: "Plombière sanitaire", localisation: "Thiès", experience: "6 ans d'expérience", note: 4.5, disponible: true, telephone: "+221 77 567 89 01", email: "fatou.mbaye@email.sn", timeline: [{ poste: "Plombière sanitaire", periode: "2020 – Présent", lieu: "Indépendante", description: "Installation et dépannage sanitaire pour particuliers et professionnels." }], competences: ["Plomberie sanitaire", "Diagnostic de panne"], avis: [{ auteur: "Cheikh Ba", date: "3 mai 2026", note: 5, commentaire: "Très efficace et de bon conseil." }], certifications: ["CAP Plomberie sanitaire et thermique"] },
-  { id: "p3", nom: "Cheikh Fall", metier: "Électricien industriel", localisation: "Dakar, Plateau", experience: "12 ans d'expérience", note: 4.9, disponible: false, telephone: "+221 78 678 90 12", email: "cheikh.fall3@email.sn", timeline: [{ poste: "Électricien industriel", periode: "2018 – Présent", lieu: "Industries Sénégal", description: "Maintenance électrique de lignes de production industrielles." }], competences: ["Électricité industrielle", "Automatisme", "Normes NF C 15-100"], avis: [{ auteur: "Senegal Construction SARL", date: "20 avr. 2026", note: 5, commentaire: "Intervention rapide et de très haute qualité." }], certifications: ["BTS Électrotechnique", "Habilitation B2V/BR"] },
-  { id: "p4", nom: "Mariama Seck", metier: "Couturière", localisation: "Saint-Louis", experience: "8 ans d'expérience", note: 4.7, disponible: true, telephone: "+221 76 789 01 23", email: "mariama.seck@email.sn", timeline: [{ poste: "Couturière", periode: "2017 – Présent", lieu: "Atelier Seck", description: "Confection et retouche de vêtements sur mesure." }], competences: ["Couture sur mesure", "Retouches"], avis: [{ auteur: "Awa Diallo", date: "15 avr. 2026", note: 5, commentaire: "Travail soigné et délais respectés." }], certifications: ["Certificat de qualification professionnelle Couture"] },
-  { id: "p5", nom: "Ibrahima Gueye", metier: "Menuisier ébéniste", localisation: "Dakar, Plateau", experience: "15 ans d'expérience", note: 4.6, disponible: true, telephone: "+221 77 890 12 34", email: "ibrahima.gueye@email.sn", timeline: [{ poste: "Menuisier ébéniste", periode: "2015 – Présent", lieu: "Atelier Gueye", description: "Fabrication de mobilier sur mesure pour particuliers et entreprises." }], competences: ["Menuiserie", "Ébénisterie", "Finitions bois"], avis: [{ auteur: "Khady Touré", date: "2 avr. 2026", note: 5, commentaire: "Un vrai artisan, travail impeccable." }], certifications: ["CAP Menuiserie du bâtiment"] },
-  { id: "p6", nom: "Ousmane Diaw", metier: "Soudeur TIG/MIG", localisation: "Thiès", experience: "7 ans d'expérience", note: 4.4, disponible: false, telephone: "+221 78 901 23 45", email: "ousmane.diaw@email.sn", timeline: [{ poste: "Soudeur TIG/MIG", periode: "2019 – Présent", lieu: "Industries Sénégal", description: "Soudure de structures métalliques industrielles." }], competences: ["Soudure TIG", "Soudure MIG"], avis: [{ auteur: "Babacar Niang", date: "18 mars 2026", note: 4, commentaire: "Bon travail, quelques retards sur le planning." }], certifications: ["Certificat de soudage industriel"] },
+  { id: "p2", nom: "Fatou Mbaye", metier: "Plombière sanitaire", localisation: "Thiès", experience: "6 ans d’expérience", note: 4.5, disponible: true, telephone: "+221 77 567 89 01", email: "fatou.mbaye@email.sn", timeline: [{ poste: "Plombière sanitaire", periode: "2020 – Présent", lieu: "Indépendante", description: "Installation et dépannage sanitaire pour particuliers et professionnels." }], competences: ["Plomberie sanitaire", "Diagnostic de panne"], avis: [{ auteur: "Cheikh Ba", date: "3 mai 2026", note: 5, commentaire: "Très efficace et de bon conseil." }], certifications: ["CAP Plomberie sanitaire et thermique"] },
+  { id: "p3", nom: "Cheikh Fall", metier: "Électricien industriel", localisation: "Dakar, Plateau", experience: "12 ans d’expérience", note: 4.9, disponible: false, telephone: "+221 78 678 90 12", email: "cheikh.fall3@email.sn", timeline: [{ poste: "Électricien industriel", periode: "2018 – Présent", lieu: "Industries Sénégal", description: "Maintenance électrique de lignes de production industrielles." }], competences: ["Électricité industrielle", "Automatisme", "Normes NF C 15-100"], avis: [{ auteur: "Senegal Construction SARL", date: "20 avril 2026", note: 5, commentaire: "Intervention rapide et de très haute qualité." }], certifications: ["BTS électrotechnique", "Habilitation B2V/BR"] },
+  { id: "p4", nom: "Mariama Seck", metier: "Couturière", localisation: "Saint-Louis", experience: "8 ans d’expérience", note: 4.7, disponible: true, telephone: "+221 76 789 01 23", email: "mariama.seck@email.sn", timeline: [{ poste: "Couturière", periode: "2017 – Présent", lieu: "Atelier Seck", description: "Confection et retouche de vêtements sur mesure." }], competences: ["Couture sur mesure", "Retouches"], avis: [{ auteur: "Awa Diallo", date: "15 avril 2026", note: 5, commentaire: "Travail soigné et délais respectés." }], certifications: ["Certificat de qualification professionnelle en couture"] },
+  { id: "p5", nom: "Ibrahima Gueye", metier: "Menuisier ébéniste", localisation: "Dakar, Plateau", experience: "15 ans d’expérience", note: 4.6, disponible: true, telephone: "+221 77 890 12 34", email: "ibrahima.gueye@email.sn", timeline: [{ poste: "Menuisier ébéniste", periode: "2015 – Présent", lieu: "Atelier Gueye", description: "Fabrication de mobilier sur mesure pour particuliers et entreprises." }], competences: ["Menuiserie", "Ébénisterie", "Finitions bois"], avis: [{ auteur: "Khady Touré", date: "2 avril 2026", note: 5, commentaire: "Un vrai artisan, travail impeccable." }], certifications: ["CAP Menuiserie du bâtiment"] },
+  { id: "p6", nom: "Ousmane Diaw", metier: "Soudeur TIG/MIG", localisation: "Thiès", experience: "7 ans d’expérience", note: 4.4, disponible: false, telephone: "+221 78 901 23 45", email: "ousmane.diaw@email.sn", timeline: [{ poste: "Soudeur TIG/MIG", periode: "2019 – Présent", lieu: "Industries Sénégal", description: "Soudure de structures métalliques industrielles." }], competences: ["Soudure TIG", "Soudure MIG"], avis: [{ auteur: "Babacar Niang", date: "18 mars 2026", note: 4, commentaire: "Bon travail, quelques retards sur le planning." }], certifications: ["Certificat de soudage industriel"] },
 ];
 
 function BadgesPrestataire({ p }) {
@@ -5471,7 +5478,7 @@ function PrestataireSearchCard({ p, onOpen }) {
       sousTitre={`${p.metier} · ${p.experience}`}
       meta={<>
         <StatusBadge status={p.disponible ? "Disponible" : "Occupé"} />
-        <MetaOffre icone={Star}>{p.note.toFixed(1)}/5</MetaOffre>
+        <MetaOffre icone={Star}>{noteFr(p.note)}/5</MetaOffre>
         <MetaOffre icone={MapPin}>{p.localisation}</MetaOffre>
       </>}
       actions={<App.Bouton petit variante="neutre" onClick={() => onOpen(p)}>Voir le profil</App.Bouton>}
@@ -5503,7 +5510,7 @@ function PrestataireProfilDetail({ p, onBack }) {
         titre={p.nom}
         sousTitre={`${p.metier} · ${p.experience}`}
         meta={<>
-          <MetaOffre icone={Star}>{p.note.toFixed(1)}/5 · {p.avis.length} avis</MetaOffre>
+          <MetaOffre icone={Star}>{noteFr(p.note)}/5 · {p.avis.length} avis</MetaOffre>
           <MetaOffre icone={MapPin}>{p.localisation}</MetaOffre>
         </>}
         actions={proposed ? (
@@ -5538,7 +5545,7 @@ function PrestataireProfilDetail({ p, onBack }) {
           <App.Carte titre="Expérience professionnelle">
             <FriseParcours etapes={p.timeline.map((t) => ({ poste: t.poste, structure: t.lieu, periode: t.periode, description: t.description }))} />
           </App.Carte>
-          <App.Carte titre="Avis clients" sousTitre={`${p.avis.length} avis · note moyenne ${p.note.toFixed(1)}/5`}>
+          <App.Carte titre="Avis clients" sousTitre={`${p.avis.length} avis · note moyenne ${noteFr(p.note)}/5`}>
             <ListeAvis avis={p.avis} />
           </App.Carte>
         </>}
@@ -5549,7 +5556,7 @@ function PrestataireProfilDetail({ p, onBack }) {
               { icone: Wrench, libelle: "Métier", valeur: p.metier },
               { icone: TrendingUp, libelle: "Expérience", valeur: p.experience },
               { icone: MapPin, libelle: "Localisation", valeur: p.localisation },
-              { icone: Star, libelle: "Note moyenne", valeur: `${p.note.toFixed(1)}/5` },
+              { icone: Star, libelle: "Note moyenne", valeur: `${noteFr(p.note)}/5` },
               { icone: Phone, libelle: "Téléphone", valeur: p.telephone },
               { icone: Mail, libelle: "E-mail", valeur: p.email },
             ]}
@@ -5628,7 +5635,7 @@ function PrestatairesSearchScreen() {
       ) : (
         <ListeVide
           titre="Aucun prestataire ne correspond"
-          texte="Essayez d'autres mots-clés ou retirez un filtre."
+          texte="Essayez d’autres mots-clés ou retirez un filtre."
           action={<App.Bouton petit variante="neutre" onClick={() => { setQuery(""); setMetier("tous"); setDispo("tous"); }}>Effacer les filtres</App.Bouton>}
         />
       )}
@@ -5642,7 +5649,7 @@ function PrestatairesSearchScreen() {
 
 const PROFIL_ENTREPRISE_INITIAL = {
   nom: "Senegal Construction SARL",
-  secteurPrincipal: "BTP & Construction",
+  secteurPrincipal: "BTP et construction",
   ninea: "2938472 2G3",
   rccm: "SN-DKR-2008-B-1120",
   taille: "45-50 employés",
@@ -5653,7 +5660,7 @@ const PROFIL_ENTREPRISE_INITIAL = {
   adresse: "Avenue Cheikh Anta Diop, Dakar",
   fondee: "2008",
   ville: "Dakar, Sénégal",
-  description: "Senegal Construction SARL est un acteur leader du BTP au Sénégal depuis plus de 15 ans. Nous intervenons sur des projets d'envergure nationale, résidentiels et industriels, en garantissant des standards de qualité et de sécurité internationaux. Notre force réside dans nos équipes locales hautement qualifiées.",
+  description: "Senegal Construction SARL est un acteur leader du BTP au Sénégal depuis plus de 15 ans. Nous intervenons sur des projets d’envergure nationale, résidentiels et industriels, en garantissant des standards de qualité et de sécurité internationaux. Notre force réside dans nos équipes locales hautement qualifiées.",
   secteurs: ["BTP", "Électricité", "Plomberie", "Maçonnerie", "Métallerie"],
 };
 
@@ -5699,13 +5706,13 @@ const TAILLES_ENTREPRISE = ["1-10 employés", "11-45 employés", "45-50 employé
 function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
   const vide = (x) => !String(x || "").trim();
   const f = useFormulaire(profile, (v) => ({
-    nom: vide(v.nom) && "Indiquez le nom de l'entreprise.",
+    nom: vide(v.nom) && "Indiquez le nom de l’entreprise.",
     secteurPrincipal: vide(v.secteurPrincipal) && "Indiquez le secteur principal.",
     ninea: vide(v.ninea) && "Indiquez le NINEA.",
     rccm: vide(v.rccm) && "Indiquez le numéro RCCM.",
     telephone: vide(v.telephone) && "Indiquez un numéro de téléphone.",
     email: vide(v.email) ? "Indiquez une adresse e-mail." : !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v.email) && "Saisissez une adresse e-mail valide, par exemple nom@exemple.com.",
-    adresse: vide(v.adresse) && "Indiquez l'adresse de l'établissement.",
+    adresse: vide(v.adresse) && "Indiquez l’adresse de l’établissement.",
     description: vide(v.description) && "Présentez votre entreprise en quelques phrases.",
   }));
   const { v, set, err, attrs } = f;
@@ -5716,7 +5723,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
   );
 
   return (
-    <App.Carte as="form" onSubmit={f.soumettre(onSave)} noValidate titre="Modifier le profil" sousTitre="Les champs marqués d'un * sont obligatoires.">
+    <App.Carte as="form" onSubmit={f.soumettre(onSave)} noValidate titre="Modifier le profil" sousTitre="Les champs marqués d’un * sont obligatoires.">
       <div className="mb-8 flex flex-wrap items-center gap-4 rounded-lg bg-doux p-4">
         {v.logo ? (
           <img src={v.logo} alt={`Logo ${v.nom}`} className="h-16 w-16 rounded-lg object-cover" />
@@ -5726,7 +5733,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
           </div>
         )}
         <div className="min-w-0 flex-1">
-          <p className="text-sm font-semibold text-principal">Logo de l'entreprise</p>
+          <p className="text-sm font-semibold text-principal">Logo de l’entreprise</p>
           <p className="text-sm text-discret">Image carrée, au format JPG ou PNG.</p>
         </div>
         <FilePickerButton
@@ -5738,11 +5745,11 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
         </FilePickerButton>
       </div>
 
-      <h3 className={FORM.section}>L'entreprise</h3>
+      <h3 className={FORM.section}>L’entreprise</h3>
       <div className={`${FORM.grille} mb-8`}>
-        {texte("ent-nom", "nom", "Nom de l'entreprise", { requis: true, large: true })}
-        {texte("ent-secteur", "secteurPrincipal", "Secteur principal", { requis: true, placeholder: "Ex : BTP" })}
-        <Champ id="ent-taille" label="Taille de l'entreprise" requis>
+        {texte("ent-nom", "nom", "Nom de l’entreprise", { requis: true, large: true })}
+        {texte("ent-secteur", "secteurPrincipal", "Secteur principal", { requis: true, placeholder: "Ex. : BTP" })}
+        <Champ id="ent-taille" label="Taille de l’entreprise" requis>
           <ListeChamp {...attrs("ent-taille", "taille", { requis: true })}>
             {TAILLES_ENTREPRISE.map((t) => <option key={t}>{t}</option>)}
           </ListeChamp>
@@ -5751,7 +5758,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
           <textarea {...attrs("ent-description", "description", { requis: true, aide: true })} rows={4} className={FORM.zone(err("description"))} />
         </Champ>
         <div className="sm:col-span-2">
-          <p className={AUTH.libelle}>Secteurs d'activité associés</p>
+          <p className={AUTH.libelle}>Secteurs d’activité associés</p>
           <EditableTags tags={v.secteurs || []} onChange={(tags) => set("secteurs", tags)} />
         </div>
       </div>
@@ -5759,15 +5766,15 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
       <h3 className={FORM.section}>Informations légales</h3>
       <div className={`${FORM.grille} mb-8`}>
         {texte("ent-ninea", "ninea", "NINEA", { requis: true })}
-        {texte("ent-rccm", "rccm", "RCCM", { requis: true, placeholder: "Ex : SN-DKR-2020-B-1234" })}
+        {texte("ent-rccm", "rccm", "RCCM", { requis: true, placeholder: "Ex. : SN-DKR-2020-B-1234" })}
       </div>
 
       <h3 className={FORM.section}>Coordonnées</h3>
       <div className={FORM.grille}>
-        {texte("ent-telephone", "telephone", "Téléphone", { requis: true, type: "tel", placeholder: "Ex : 77 123 45 67" })}
+        {texte("ent-telephone", "telephone", "Téléphone", { requis: true, type: "tel", placeholder: "Ex. : 77 123 45 67" })}
         {texte("ent-email", "email", "E-mail de contact", { requis: true, type: "email", placeholder: "contact@entreprise.sn" })}
-        {texte("ent-site", "siteWeb", "Site web", { placeholder: "Ex : www.entreprise.sn" })}
-        {texte("ent-adresse", "adresse", "Adresse de l'établissement principal", { requis: true, placeholder: "Ex : Rue 10, Plateau, Dakar" })}
+        {texte("ent-site", "siteWeb", "Site web", { placeholder: "Ex. : www.entreprise.sn" })}
+        {texte("ent-adresse", "adresse", "Adresse de l’établissement principal", { requis: true, placeholder: "Ex. : Rue 10, Plateau, Dakar" })}
       </div>
 
       <AlerteFormulaire visible={f.essai && f.invalide}>Complétez les champs signalés pour enregistrer le profil.</AlerteFormulaire>
@@ -5793,7 +5800,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
         <ProfilEntrepriseEdit
           profile={profile}
           onCancel={() => setEditing(false)}
-          onSave={(v) => { setProfile(v); setEditing(false); notify("Profil de l'entreprise mis à jour."); }}
+          onSave={(v) => { setProfile(v); setEditing(false); notify("Profil de l’entreprise mis à jour."); }}
         />
       </div>
     );
@@ -5837,7 +5844,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
 
       <MiseEnPageFiche
         principal={<>
-          <App.Carte titre="À propos de l'entreprise">
+          <App.Carte titre="À propos de l’entreprise">
             <p className="text-[15px] leading-[1.7] text-secondaire">{profile.description}</p>
           </App.Carte>
           <App.Carte titre="Nos offres actives" sousTitre="Visibles par les talents sur LIGGEEY" actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("offres")}>Gérer les offres</App.Bouton>} flush>
@@ -5860,7 +5867,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
               </ul>
             )}
           </App.Carte>
-          <App.Carte titre="Secteurs d'activité">
+          <App.Carte titre="Secteurs d’activité">
             <Etiquettes items={profile.secteurs} />
           </App.Carte>
         </>}
@@ -5884,7 +5891,7 @@ function ProfilEntrepriseScreen({ offres, onNavigate }) {
               { icone: FileCheck2, libelle: "NINEA", valeur: profile.ninea },
               { icone: FileText, libelle: "RCCM", valeur: profile.rccm },
               { icone: Users2, libelle: "Taille", valeur: profile.taille },
-              { icone: Wallet, libelle: "Chiffre d'affaires", valeur: profile.chiffreAffaires },
+              { icone: Wallet, libelle: "Chiffre d’affaires", valeur: profile.chiffreAffaires },
               { icone: MapPin, libelle: "Adresse", valeur: profile.adresse },
               { icone: Phone, libelle: "Standard", valeur: profile.telephone },
               { icone: Mail, libelle: "E-mail", valeur: profile.email },
@@ -6050,7 +6057,7 @@ function ExportAdmin({ titre, colonnes, lignes, filtres = [], className }) {
       lignes={lignes}
       sousTitre={filtres.length ? `Filtres : ${filtres.join(", ")}` : undefined}
       onTermine={(nom) => notify(`Fichier « ${nom} » téléchargé.`)}
-      onErreur={() => notify("L'export n'a pas abouti. Réessayez dans un instant.", "info")}
+      onErreur={() => notify("L’export n’a pas abouti. Réessayez dans un instant.", "info")}
       className={className}
     />
   );
@@ -6079,11 +6086,11 @@ const REPARTITION_PROFILS = [
   { name: "Entreprises", value: 15, color: "rgb(var(--primaire-250))" },
 ];
 const DERNIERES_INSCRIPTIONS = [
-  { nom: "Amadou Diallo", type: "Chercheur d'emploi", ville: "Dakar", date: "12/07/2026", statut: "Nouveau" },
-  { nom: "Sokhna Fall", type: "Prestataire", ville: "Thiès", date: "11/07/2026", statut: "Vérifié" },
-  { nom: "Senegal Construction", type: "Entreprise", ville: "Dakar", date: "10/07/2026", statut: "Nouveau" },
-  { nom: "Marième Diop", type: "Chercheur d'emploi", ville: "Dakar", date: "09/07/2026", statut: "Vérifié" },
-  { nom: "Amadou Sow", type: "Prestataire", ville: "Thiès", date: "08/07/2026", statut: "Nouveau" },
+  { nom: "Amadou Diallo", type: "Chercheur d’emploi", ville: "Dakar", date: "12 juillet 2026", statut: "Nouveau" },
+  { nom: "Sokhna Fall", type: "Prestataire", ville: "Thiès", date: "11 juillet 2026", statut: "Vérifié" },
+  { nom: "Senegal Construction", type: "Entreprise", ville: "Dakar", date: "10 juillet 2026", statut: "Nouveau" },
+  { nom: "Marième Diop", type: "Chercheur d’emploi", ville: "Dakar", date: "9 juillet 2026", statut: "Vérifié" },
+  { nom: "Amadou Sow", type: "Prestataire", ville: "Thiès", date: "8 juillet 2026", statut: "Nouveau" },
 ];
 
 /* Infobulle des graphiques, aux couleurs de la bibliothèque */
@@ -6113,7 +6120,7 @@ function AdminDashboardScreen({ onNavigate, todos }) {
   ];
   return (
     <div className="space-y-6">
-      <p className="text-sm text-secondaire">Vue d'ensemble de la plateforme LIGGEEY et de ses utilisateurs.</p>
+      <p className="text-sm text-secondaire">Vue d’ensemble de la plateforme LIGGEEY et de ses utilisateurs.</p>
 
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         {kpis.map((k) => (
@@ -6208,14 +6215,14 @@ function AdminDashboardScreen({ onNavigate, todos }) {
 /* ---------- Chercheurs (Admin) ---------- */
 
 const CHERCHEURS_ADMIN_INITIAL = [
-  { id: "ch1", nom: "Moussa Diop", photo: "/images/plateforme/portraits/moussa-diop.jpg", metier: "Électricien bâtiment", ville: "Dakar", date: "12/06/2025", statut: "Actif", email: "moussa.diop@email.sn", telephone: "+221 77 123 45 67", naissance: "15/03/1992", genre: "Homme", experience: "8 ans d'expérience", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe", "Habilitation B2V"], inscritLe: "12/06/2025", derniereConnexion: "25/08/2026", candidatures: [{ title: "Chef d'équipe électricité", sub: "Senegal Construction", badge: "En cours" }, { title: "Technicien maintenance", sub: "Dakar Services", badge: "Retenu" }, { title: "Électricien chantier", sub: "Mbour Construction", badge: "Rejeté" }], formations: [{ title: "Sécurité Électrique", badge: "Certifié" }, { title: "Lecture de plans BTP", badge: "En cours d'apprentissage" }] },
-  { id: "ch2", nom: "Fatou Sarr", photo: "/images/plateforme/portraits/fatou-sarr.jpg", metier: "Plombière sanitaire", ville: "Thiès", date: "14/08/2025", statut: "En attente", email: "fatou.sarr@email.sn", telephone: "+221 76 234 56 78", naissance: "02/07/1995", genre: "Femme", experience: "5 ans d'expérience", competences: ["Plomberie sanitaire", "Diagnostic de panne"], inscritLe: "14/08/2025", derniereConnexion: "20/08/2026", candidatures: [{ title: "Plombier qualifié", sub: "Diallo & Fils", badge: "En cours" }], formations: [] },
-  { id: "ch3", nom: "Ibrahima Diallo", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg", metier: "Soudeur industriel", ville: "Saint-Louis", date: "20/09/2025", statut: "Actif", email: "ibrahima.diallo@email.sn", telephone: "+221 78 345 67 89", naissance: "22/11/1990", genre: "Homme", experience: "6 ans d'expérience", competences: ["Soudure TIG", "Soudure MIG"], inscritLe: "20/09/2025", derniereConnexion: "23/08/2026", candidatures: [{ title: "Technicien maintenance", sub: "Dakar Services Pro", badge: "Retenu" }], formations: [{ title: "Soudure TIG-MIG", badge: "Certifié" }] },
-  { id: "ch4", nom: "Aminata Ndiaye", photo: "/images/plateforme/portraits/aminata-ndiaye.jpg", metier: "Couturière", ville: "Dakar", date: "03/11/2025", statut: "Vérifié", email: "aminata.ndiaye@email.sn", telephone: "+221 77 456 78 90", naissance: "10/01/1988", genre: "Femme", experience: "10 ans d'expérience", competences: ["Couture sur mesure", "Gestion d'atelier"], inscritLe: "03/11/2025", derniereConnexion: "22/08/2026", candidatures: [{ title: "Couturière atelier", sub: "Atelier Couture", badge: "Rejeté" }], formations: [] },
-  { id: "ch5", nom: "Ousmane Ba", photo: "/images/plateforme/portraits/ousmane-ba.jpg", metier: "Menuisier ébéniste", ville: "Kaolack", date: "18/01/2026", statut: "Suspendu", email: "ousmane.ba@email.sn", telephone: "+221 76 567 89 01", naissance: "05/05/1993", genre: "Homme", experience: "4 ans d'expérience", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "18/01/2026", derniereConnexion: "10/06/2026", candidatures: [{ title: "Menuisier ébéniste", sub: "Ndiaye Menuiserie", badge: "En cours" }], formations: [] },
-  { id: "ch6", nom: "Mariama Tall", photo: "/images/plateforme/portraits/mariama-tall.jpg", metier: "Carreleur", ville: "Rufisque", date: "25/03/2026", statut: "Actif", email: "mariama.tall@email.sn", telephone: "+221 78 678 90 12", naissance: "18/09/1994", genre: "Femme", experience: "4 ans d'expérience", competences: ["Pose de carrelage", "Finitions"], inscritLe: "25/03/2026", derniereConnexion: "21/08/2026", candidatures: [{ title: "Carreleur intérieur", sub: "Senegal Construction", badge: "Nouveau" }], formations: [] },
-  { id: "ch7", nom: "Abdoulaye Sow", photo: "/images/plateforme/portraits/abdoulaye-sow.jpg", metier: "Peintre bâtiment", ville: "Ziguinchor", date: "10/05/2026", statut: "Nouveau", email: "abdoulaye.sow@email.sn", telephone: "+221 77 789 01 23", naissance: "30/12/1996", genre: "Homme", experience: "3 ans d'expérience", competences: ["Peinture intérieure/extérieure", "Enduits"], inscritLe: "10/05/2026", derniereConnexion: "19/08/2026", candidatures: [{ title: "Peintre bâtiment", sub: "Rufisque Bâtiment", badge: "En cours" }], formations: [] },
-  { id: "ch8", nom: "Aissatou Gueye", photo: "/images/plateforme/portraits/aissatou-gueye.jpg", metier: "Électricienne", ville: "Mbour", date: "02/07/2026", statut: "En attente", email: "aissatou.gueye@email.sn", telephone: "+221 76 890 12 34", naissance: "14/02/1991", genre: "Femme", experience: "7 ans d'expérience", competences: ["Normes NF C 15-100", "Management d'équipe", "Habilitation B2V"], inscritLe: "02/07/2026", derniereConnexion: "24/08/2026", candidatures: [{ title: "Électricien chantier", sub: "Thiès Électrique", badge: "Nouveau" }], formations: [] },
+  { id: "ch1", nom: "Moussa Diop", photo: "/images/plateforme/portraits/moussa-diop.jpg", metier: "Électricien bâtiment", ville: "Dakar", date: "12 juin 2025", statut: "Actif", email: "moussa.diop@email.sn", telephone: "+221 77 123 45 67", naissance: "15 mars 1992", genre: "Homme", experience: "8 ans d’expérience", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d’équipe", "Habilitation B2V"], inscritLe: "12 juin 2025", derniereConnexion: "25 août 2026", candidatures: [{ title: "Chef d’équipe électricité", sub: "Senegal Construction", badge: "En cours" }, { title: "Technicien maintenance", sub: "Dakar Services", badge: "Retenu" }, { title: "Électricien chantier", sub: "Mbour Construction", badge: "Rejeté" }], formations: [{ title: "Sécurité électrique", badge: "Certifié" }, { title: "Lecture de plans BTP", badge: "En cours d’apprentissage" }] },
+  { id: "ch2", nom: "Fatou Sarr", photo: "/images/plateforme/portraits/fatou-sarr.jpg", metier: "Plombière sanitaire", ville: "Thiès", date: "14 août 2025", statut: "En attente", email: "fatou.sarr@email.sn", telephone: "+221 76 234 56 78", naissance: "2 juillet 1995", genre: "Femme", experience: "5 ans d’expérience", competences: ["Plomberie sanitaire", "Diagnostic de panne"], inscritLe: "14 août 2025", derniereConnexion: "20 août 2026", candidatures: [{ title: "Plombier qualifié", sub: "Diallo & Fils", badge: "En cours" }], formations: [] },
+  { id: "ch3", nom: "Ibrahima Diallo", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg", metier: "Soudeur industriel", ville: "Saint-Louis", date: "20 septembre 2025", statut: "Actif", email: "ibrahima.diallo@email.sn", telephone: "+221 78 345 67 89", naissance: "22 novembre 1990", genre: "Homme", experience: "6 ans d’expérience", competences: ["Soudure TIG", "Soudure MIG"], inscritLe: "20 septembre 2025", derniereConnexion: "23 août 2026", candidatures: [{ title: "Technicien maintenance", sub: "Dakar Services Pro", badge: "Retenu" }], formations: [{ title: "Soudure TIG-MIG", badge: "Certifié" }] },
+  { id: "ch4", nom: "Aminata Ndiaye", photo: "/images/plateforme/portraits/aminata-ndiaye.jpg", metier: "Couturière", ville: "Dakar", date: "3 novembre 2025", statut: "Vérifié", email: "aminata.ndiaye@email.sn", telephone: "+221 77 456 78 90", naissance: "10 janvier 1988", genre: "Femme", experience: "10 ans d’expérience", competences: ["Couture sur mesure", "Gestion d’atelier"], inscritLe: "3 novembre 2025", derniereConnexion: "22 août 2026", candidatures: [{ title: "Couturière atelier", sub: "Atelier Couture", badge: "Rejeté" }], formations: [] },
+  { id: "ch5", nom: "Ousmane Ba", photo: "/images/plateforme/portraits/ousmane-ba.jpg", metier: "Menuisier ébéniste", ville: "Kaolack", date: "18 janvier 2026", statut: "Suspendu", email: "ousmane.ba@email.sn", telephone: "+221 76 567 89 01", naissance: "5 mai 1993", genre: "Homme", experience: "4 ans d’expérience", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "18 janvier 2026", derniereConnexion: "10 juin 2026", candidatures: [{ title: "Menuisier ébéniste", sub: "Ndiaye Menuiserie", badge: "En cours" }], formations: [] },
+  { id: "ch6", nom: "Mariama Tall", photo: "/images/plateforme/portraits/mariama-tall.jpg", metier: "Carreleur", ville: "Rufisque", date: "25 mars 2026", statut: "Actif", email: "mariama.tall@email.sn", telephone: "+221 78 678 90 12", naissance: "18 septembre 1994", genre: "Femme", experience: "4 ans d’expérience", competences: ["Pose de carrelage", "Finitions"], inscritLe: "25 mars 2026", derniereConnexion: "21 août 2026", candidatures: [{ title: "Carreleur intérieur", sub: "Senegal Construction", badge: "Nouveau" }], formations: [] },
+  { id: "ch7", nom: "Abdoulaye Sow", photo: "/images/plateforme/portraits/abdoulaye-sow.jpg", metier: "Peintre bâtiment", ville: "Ziguinchor", date: "10 mai 2026", statut: "Nouveau", email: "abdoulaye.sow@email.sn", telephone: "+221 77 789 01 23", naissance: "30 décembre 1996", genre: "Homme", experience: "3 ans d’expérience", competences: ["Peinture intérieure/extérieure", "Enduits"], inscritLe: "10 mai 2026", derniereConnexion: "19 août 2026", candidatures: [{ title: "Peintre bâtiment", sub: "Rufisque Bâtiment", badge: "En cours" }], formations: [] },
+  { id: "ch8", nom: "Aissatou Gueye", photo: "/images/plateforme/portraits/aissatou-gueye.jpg", metier: "Électricienne", ville: "Mbour", date: "2 juillet 2026", statut: "En attente", email: "aissatou.gueye@email.sn", telephone: "+221 76 890 12 34", naissance: "14 février 1991", genre: "Femme", experience: "7 ans d’expérience", competences: ["Normes NF C 15-100", "Management d’équipe", "Habilitation B2V"], inscritLe: "2 juillet 2026", derniereConnexion: "24 août 2026", candidatures: [{ title: "Électricien chantier", sub: "Thiès Électrique", badge: "Nouveau" }], formations: [] },
 ];
 
 function ChercheursAdminDetail(row, { onBack, update, remove }) {
@@ -6223,7 +6230,7 @@ function ChercheursAdminDetail(row, { onBack, update, remove }) {
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du profil</h2>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce chercheur d'emploi</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce chercheur d’emploi</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil du chercheur</h3>
@@ -6260,8 +6267,8 @@ function ChercheursAdminDetail(row, { onBack, update, remove }) {
 function ChercheursAdminScreen() {
   return (
     <AdminEntityModule
-      title="Chercheurs d'emploi"
-      subtitle="Gérez et suivez les profils des chercheurs d'emploi inscrits sur LIGGEEY"
+      title="Chercheurs d’emploi"
+      subtitle="Gérez et suivez les profils des chercheurs d’emploi inscrits sur LIGGEEY"
       initialData={CHERCHEURS_ADMIN_INITIAL}
       searchKeys={["nom", "metier", "ville"]}
       filters={[
@@ -6272,7 +6279,7 @@ function ChercheursAdminScreen() {
         { key: "nom", label: "Utilisateur", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
         { key: "profil", label: "Formule", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "chercheur") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "chercheur") },
         { key: "ville", label: "Localisation", flex: 1 },
-        { key: "date", label: "Date d'inscription", flex: 1 },
+        { key: "date", label: "Date d’inscription", flex: 1 },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
       exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
@@ -6284,14 +6291,14 @@ function ChercheursAdminScreen() {
 /* ---------- Prestataires (Admin) ---------- */
 
 const PRESTATAIRES_ADMIN_INITIAL = [
-  { id: "pa1", nom: "Cheikh Fall", photo: "/images/plateforme/portraits/cheikh-fall.jpg", metier: "Électricité générale", ville: "Dakar", missions: 47, note: 4.8, statut: "Vérifié", telephone: "+221 76 543 21 09", email: "cheikh.fall@email.sn", ninea: "12345678", anneesActivite: "12 ans", competences: ["Installation électrique", "Dépannage", "Câblage industriel"], inscritLe: "18/02/2026", derniereConnexion: "24/08/2026", missionsRecentes: [{ title: "Installation de tableau de bord", sub: "Senegal Construction", badge: "Terminée" }, { title: "Dépannage réseau triphasé", sub: "Particulier (Plateau)", badge: "En cours" }, { title: "Rénovation électrique complète", sub: "Thiès Électrique", badge: "Terminée" }], avis: [{ title: "Alassane Diop", sub: "Travail très soigné, ponctuel et respectueux des normes.", value: "★ 5.0" }, { title: "Mariama Ndiaye", sub: "Installation rapide et efficace de nos nouveaux luminaires.", value: "★ 4.5" }] },
-  { id: "pa2", nom: "Awa Diallo", photo: "/images/plateforme/portraits/awa-diallo.jpg", metier: "Plomberie", ville: "Thiès", missions: 32, note: 4.6, statut: "Actif", telephone: "+221 77 123 98 76", email: "awa.diallo@email.sn", ninea: "23456789", anneesActivite: "6 ans", competences: ["Plomberie sanitaire"], inscritLe: "10/03/2026", derniereConnexion: "20/08/2026", missionsRecentes: [{ title: "Installation sanitaire", sub: "Particulier", badge: "Terminée" }], avis: [{ title: "Cheikh Ba", sub: "Très efficace.", value: "★ 5.0" }] },
-  { id: "pa3", nom: "Mamadou Sy", photo: "/images/plateforme/portraits/mamadou-sy.jpg", metier: "Maçonnerie", ville: "Dakar", missions: 65, note: 4.9, statut: "Vérifié", telephone: "+221 78 234 56 78", email: "mamadou.sy@email.sn", ninea: "34567890", anneesActivite: "15 ans", competences: ["Maçonnerie générale", "Fondations"], inscritLe: "05/01/2026", derniereConnexion: "25/08/2026", missionsRecentes: [{ title: "Construction villa", sub: "Modou Fall", badge: "En cours" }], avis: [{ title: "Awa Ndiaye", sub: "Excellent maçon.", value: "★ 5.0" }] },
-  { id: "pa4", nom: "Ndèye Fatou Mbaye", photo: "/images/plateforme/portraits/ndeye-fatou-mbaye.jpg", metier: "Couture/Textile", ville: "Kaolack", missions: 28, note: 4.7, statut: "Actif", telephone: "+221 76 345 67 89", email: "ndeye.mbaye@email.sn", ninea: "45678901", anneesActivite: "9 ans", competences: ["Couture sur mesure"], inscritLe: "12/02/2026", derniereConnexion: "18/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa5", nom: "Alioune Ndiaye", photo: "/images/plateforme/portraits/alioune-ndiaye.jpg", metier: "Menuiserie", ville: "Saint-Louis", missions: 41, note: 4.5, statut: "En attente", telephone: "+221 77 456 78 90", email: "alioune.ndiaye@email.sn", ninea: "56789012", anneesActivite: "10 ans", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "20/04/2026", derniereConnexion: "15/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa6", nom: "Sokhna Dieng", photo: "/images/plateforme/portraits/sokhna-dieng.jpg", metier: "Peinture", ville: "Dakar", missions: 19, note: 4.3, statut: "Nouveau", telephone: "+221 78 567 89 01", email: "sokhna.dieng@email.sn", ninea: "67890123", anneesActivite: "3 ans", competences: ["Peinture intérieure"], inscritLe: "01/07/2026", derniereConnexion: "22/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa7", nom: "Babacar Faye", photo: "/images/plateforme/portraits/babacar-faye.jpg", metier: "Carrelage", ville: "Rufisque", missions: 53, note: 4.8, statut: "Vérifié", telephone: "+221 76 678 90 12", email: "babacar.faye@email.sn", ninea: "78901234", anneesActivite: "11 ans", competences: ["Pose de carrelage"], inscritLe: "15/01/2026", derniereConnexion: "23/08/2026", missionsRecentes: [], avis: [] },
-  { id: "pa8", nom: "Khady Thiam", photo: "/images/plateforme/portraits/khady-thiam.jpg", metier: "Électricité", ville: "Mbour", missions: 22, note: 4.4, statut: "Suspendu", telephone: "+221 77 789 01 23", email: "khady.thiam@email.sn", ninea: "89012345", anneesActivite: "5 ans", competences: ["Électricité domestique"], inscritLe: "08/03/2026", derniereConnexion: "01/07/2026", missionsRecentes: [], avis: [] },
+  { id: "pa1", nom: "Cheikh Fall", photo: "/images/plateforme/portraits/cheikh-fall.jpg", metier: "Électricité générale", ville: "Dakar", missions: 47, note: 4.8, statut: "Vérifié", telephone: "+221 76 543 21 09", email: "cheikh.fall@email.sn", ninea: "12345678", anneesActivite: "12 ans", competences: ["Installation électrique", "Dépannage", "Câblage industriel"], inscritLe: "18 février 2026", derniereConnexion: "24 août 2026", missionsRecentes: [{ title: "Installation de tableau de bord", sub: "Senegal Construction", badge: "Terminée" }, { title: "Dépannage réseau triphasé", sub: "Particulier (Plateau)", badge: "En cours" }, { title: "Rénovation électrique complète", sub: "Thiès Électrique", badge: "Terminée" }], avis: [{ title: "Alassane Diop", sub: "Travail très soigné, ponctuel et respectueux des normes.", value: "★ 5,0" }, { title: "Mariama Ndiaye", sub: "Installation rapide et efficace de nos nouveaux luminaires.", value: "★ 4,5" }] },
+  { id: "pa2", nom: "Awa Diallo", photo: "/images/plateforme/portraits/awa-diallo.jpg", metier: "Plomberie", ville: "Thiès", missions: 32, note: 4.6, statut: "Actif", telephone: "+221 77 123 98 76", email: "awa.diallo@email.sn", ninea: "23456789", anneesActivite: "6 ans", competences: ["Plomberie sanitaire"], inscritLe: "10 mars 2026", derniereConnexion: "20 août 2026", missionsRecentes: [{ title: "Installation sanitaire", sub: "Particulier", badge: "Terminée" }], avis: [{ title: "Cheikh Ba", sub: "Très efficace.", value: "★ 5,0" }] },
+  { id: "pa3", nom: "Mamadou Sy", photo: "/images/plateforme/portraits/mamadou-sy.jpg", metier: "Maçonnerie", ville: "Dakar", missions: 65, note: 4.9, statut: "Vérifié", telephone: "+221 78 234 56 78", email: "mamadou.sy@email.sn", ninea: "34567890", anneesActivite: "15 ans", competences: ["Maçonnerie générale", "Fondations"], inscritLe: "5 janvier 2026", derniereConnexion: "25 août 2026", missionsRecentes: [{ title: "Construction villa", sub: "Modou Fall", badge: "En cours" }], avis: [{ title: "Awa Ndiaye", sub: "Excellent maçon.", value: "★ 5,0" }] },
+  { id: "pa4", nom: "Ndèye Fatou Mbaye", photo: "/images/plateforme/portraits/ndeye-fatou-mbaye.jpg", metier: "Couture/Textile", ville: "Kaolack", missions: 28, note: 4.7, statut: "Actif", telephone: "+221 76 345 67 89", email: "ndeye.mbaye@email.sn", ninea: "45678901", anneesActivite: "9 ans", competences: ["Couture sur mesure"], inscritLe: "12 février 2026", derniereConnexion: "18 août 2026", missionsRecentes: [], avis: [] },
+  { id: "pa5", nom: "Alioune Ndiaye", photo: "/images/plateforme/portraits/alioune-ndiaye.jpg", metier: "Menuiserie", ville: "Saint-Louis", missions: 41, note: 4.5, statut: "En attente", telephone: "+221 77 456 78 90", email: "alioune.ndiaye@email.sn", ninea: "56789012", anneesActivite: "10 ans", competences: ["Menuiserie", "Ébénisterie"], inscritLe: "20 avril 2026", derniereConnexion: "15 août 2026", missionsRecentes: [], avis: [] },
+  { id: "pa6", nom: "Sokhna Dieng", photo: "/images/plateforme/portraits/sokhna-dieng.jpg", metier: "Peinture", ville: "Dakar", missions: 19, note: 4.3, statut: "Nouveau", telephone: "+221 78 567 89 01", email: "sokhna.dieng@email.sn", ninea: "67890123", anneesActivite: "3 ans", competences: ["Peinture intérieure"], inscritLe: "1er juillet 2026", derniereConnexion: "22 août 2026", missionsRecentes: [], avis: [] },
+  { id: "pa7", nom: "Babacar Faye", photo: "/images/plateforme/portraits/babacar-faye.jpg", metier: "Carrelage", ville: "Rufisque", missions: 53, note: 4.8, statut: "Vérifié", telephone: "+221 76 678 90 12", email: "babacar.faye@email.sn", ninea: "78901234", anneesActivite: "11 ans", competences: ["Pose de carrelage"], inscritLe: "15 janvier 2026", derniereConnexion: "23 août 2026", missionsRecentes: [], avis: [] },
+  { id: "pa8", nom: "Khady Thiam", photo: "/images/plateforme/portraits/khady-thiam.jpg", metier: "Électricité", ville: "Mbour", missions: 22, note: 4.4, statut: "Suspendu", telephone: "+221 77 789 01 23", email: "khady.thiam@email.sn", ninea: "89012345", anneesActivite: "5 ans", competences: ["Électricité domestique"], inscritLe: "8 mars 2026", derniereConnexion: "1er juillet 2026", missionsRecentes: [], avis: [] },
 ];
 
 function PrestatairesAdminDetail(row, { onBack, update, remove }) {
@@ -6312,7 +6319,7 @@ function PrestatairesAdminDetail(row, { onBack, update, remove }) {
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
           <Row label="E-mail" value={row.email} /><div className="h-2" />
           <Row label="NINEA" value={row.ninea} /><div className="h-2" />
-          <Row label="Années d'activité" value={row.anneesActivite} />
+          <Row label="Années d’activité" value={row.anneesActivite} />
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Compétences clés</p>
           <div className="flex flex-wrap gap-1.5">
             {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{c}</span>)}
@@ -6346,7 +6353,7 @@ function PrestatairesAdminScreen() {
         { key: "profil", label: "Formule", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "prestataire") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "prestataire") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "missions", label: "Missions", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.missions} missions</span> },
-        { key: "note", label: "Note", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>★ {r.note}</span> },
+        { key: "note", label: "Note", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>★ {noteFr(r.note)}</span> },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
       exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
@@ -6358,25 +6365,25 @@ function PrestatairesAdminScreen() {
 /* ---------- Entreprises (Admin) ---------- */
 
 const ENTREPRISES_ADMIN_INITIAL = [
-  { id: "ea1", nom: "Senegal Construction SARL", secteur: "BTP", ville: "Dakar", offresActives: 12, employes: "45-50 emp.", statut: "Actif", ninea: "2938472 2G3", rccm: "SN-DKR-2008-B-1120", telephone: "+221 33 821 45 67", email: "contact@senegalconstruct.sn", siteWeb: "www.senegalconstruct.sn", secteurs: ["BTP", "Électricité", "Plomberie", "Maçonnerie"], inscritLe: "10/01/2026", derniereActivite: "26/08/2026", offresListe: [{ title: "Chef d'équipe électricité", value: "5 candidatures" }, { title: "Maçon qualifié", value: "12 candidatures" }, { title: "Plombier chantier", value: "3 candidatures" }], recrutements: [{ title: "Moussa Diop", sub: "Embauché le 20/08/2026" }, { title: "Fatou Sarr", sub: "Embauchée le 15/07/2026" }] },
-  { id: "ea2", nom: "Thiès Électrique", secteur: "Électricité", ville: "Thiès", offresActives: 5, employes: "15-20 emp.", statut: "Vérifié", ninea: "1122334 4G5", rccm: "SN-THS-2015-B-0234", telephone: "+221 33 951 23 45", email: "contact@thieselectrique.sn", siteWeb: "www.thieselectrique.sn", secteurs: ["Électricité"], inscritLe: "22/05/2025", derniereActivite: "20/08/2026", offresListe: [], recrutements: [] },
-  { id: "ea3", nom: "Diallo & Fils Plomberie", secteur: "Plomberie", ville: "Saint-Louis", offresActives: 3, employes: "8-10 emp.", statut: "Actif", ninea: "5566778 8G9", rccm: "SN-STL-2012-B-0456", telephone: "+221 33 961 34 56", email: "contact@dialloplomberie.sn", siteWeb: "", secteurs: ["Plomberie"], inscritLe: "14/03/2024", derniereActivite: "18/08/2026", offresListe: [], recrutements: [] },
-  { id: "ea4", nom: "Ndiaye Menuiserie", secteur: "Menuiserie", ville: "Kaolack", offresActives: 7, employes: "20-25 emp.", statut: "En attente", ninea: "9900112 2G3", rccm: "SN-KLK-2018-B-0678", telephone: "+221 33 941 45 67", email: "contact@ndiayemenuiserie.sn", siteWeb: "", secteurs: ["Menuiserie"], inscritLe: "05/06/2026", derniereActivite: "10/08/2026", offresListe: [], recrutements: [] },
-  { id: "ea5", nom: "Dakar Services Pro", secteur: "Multi-services", ville: "Dakar", offresActives: 15, employes: "100+ emp.", statut: "Vérifié", ninea: "3344556 6G7", rccm: "SN-DKR-2010-B-0890", telephone: "+221 33 823 56 78", email: "contact@dakarservicespro.sn", siteWeb: "www.dakarservicespro.sn", secteurs: ["Multi-services"], inscritLe: "01/02/2024", derniereActivite: "26/08/2026", offresListe: [], recrutements: [] },
-  { id: "ea6", nom: "Mbour Construction", secteur: "BTP", ville: "Mbour", offresActives: 4, employes: "30-35 emp.", statut: "Nouveau", ninea: "7788990 0G1", rccm: "SN-MBR-2023-B-0123", telephone: "+221 33 957 67 89", email: "contact@mbourconstruction.sn", siteWeb: "", secteurs: ["BTP"], inscritLe: "15/07/2026", derniereActivite: "24/08/2026", offresListe: [], recrutements: [] },
-  { id: "ea7", nom: "Atelier Couture Nationale", secteur: "Textile", ville: "Dakar", offresActives: 6, employes: "12-15 emp.", statut: "Actif", ninea: "1234567 8G9", rccm: "SN-DKR-2016-B-0345", telephone: "+221 33 825 78 90", email: "contact@ateliercouture.sn", siteWeb: "", secteurs: ["Textile"], inscritLe: "10/09/2025", derniereActivite: "19/08/2026", offresListe: [], recrutements: [] },
-  { id: "ea8", nom: "Rufisque Bâtiment", secteur: "BTP", ville: "Rufisque", offresActives: 8, employes: "25-30 emp.", statut: "Suspendu", ninea: "2233445 5G6", rccm: "SN-RFQ-2014-B-0567", telephone: "+221 33 836 89 01", email: "contact@rufisquebatiment.sn", siteWeb: "", secteurs: ["BTP"], inscritLe: "18/11/2024", derniereActivite: "02/07/2026", offresListe: [], recrutements: [] },
+  { id: "ea1", nom: "Senegal Construction SARL", secteur: "BTP", ville: "Dakar", offresActives: 12, employes: "45-50 emp.", statut: "Actif", ninea: "2938472 2G3", rccm: "SN-DKR-2008-B-1120", telephone: "+221 33 821 45 67", email: "contact@senegalconstruct.sn", siteWeb: "www.senegalconstruct.sn", secteurs: ["BTP", "Électricité", "Plomberie", "Maçonnerie"], inscritLe: "10 janvier 2026", derniereActivite: "26 août 2026", offresListe: [{ title: "Chef d’équipe électricité", value: "5 candidatures" }, { title: "Maçon qualifié", value: "12 candidatures" }, { title: "Plombier chantier", value: "3 candidatures" }], recrutements: [{ title: "Moussa Diop", sub: "Embauché le 20 août 2026" }, { title: "Fatou Sarr", sub: "Embauchée le 15 juillet 2026" }] },
+  { id: "ea2", nom: "Thiès Électrique", secteur: "Électricité", ville: "Thiès", offresActives: 5, employes: "15-20 emp.", statut: "Vérifié", ninea: "1122334 4G5", rccm: "SN-THS-2015-B-0234", telephone: "+221 33 951 23 45", email: "contact@thieselectrique.sn", siteWeb: "www.thieselectrique.sn", secteurs: ["Électricité"], inscritLe: "22 mai 2025", derniereActivite: "20 août 2026", offresListe: [], recrutements: [] },
+  { id: "ea3", nom: "Diallo & Fils Plomberie", secteur: "Plomberie", ville: "Saint-Louis", offresActives: 3, employes: "8-10 emp.", statut: "Actif", ninea: "5566778 8G9", rccm: "SN-STL-2012-B-0456", telephone: "+221 33 961 34 56", email: "contact@dialloplomberie.sn", siteWeb: "", secteurs: ["Plomberie"], inscritLe: "14 mars 2024", derniereActivite: "18 août 2026", offresListe: [], recrutements: [] },
+  { id: "ea4", nom: "Ndiaye Menuiserie", secteur: "Menuiserie", ville: "Kaolack", offresActives: 7, employes: "20-25 emp.", statut: "En attente", ninea: "9900112 2G3", rccm: "SN-KLK-2018-B-0678", telephone: "+221 33 941 45 67", email: "contact@ndiayemenuiserie.sn", siteWeb: "", secteurs: ["Menuiserie"], inscritLe: "5 juin 2026", derniereActivite: "10 août 2026", offresListe: [], recrutements: [] },
+  { id: "ea5", nom: "Dakar Services Pro", secteur: "Multi-services", ville: "Dakar", offresActives: 15, employes: "100+ emp.", statut: "Vérifié", ninea: "3344556 6G7", rccm: "SN-DKR-2010-B-0890", telephone: "+221 33 823 56 78", email: "contact@dakarservicespro.sn", siteWeb: "www.dakarservicespro.sn", secteurs: ["Multi-services"], inscritLe: "1er février 2024", derniereActivite: "26 août 2026", offresListe: [], recrutements: [] },
+  { id: "ea6", nom: "Mbour Construction", secteur: "BTP", ville: "Mbour", offresActives: 4, employes: "30-35 emp.", statut: "Nouveau", ninea: "7788990 0G1", rccm: "SN-MBR-2023-B-0123", telephone: "+221 33 957 67 89", email: "contact@mbourconstruction.sn", siteWeb: "", secteurs: ["BTP"], inscritLe: "15 juillet 2026", derniereActivite: "24 août 2026", offresListe: [], recrutements: [] },
+  { id: "ea7", nom: "Atelier Couture Nationale", secteur: "Textile", ville: "Dakar", offresActives: 6, employes: "12-15 emp.", statut: "Actif", ninea: "1234567 8G9", rccm: "SN-DKR-2016-B-0345", telephone: "+221 33 825 78 90", email: "contact@ateliercouture.sn", siteWeb: "", secteurs: ["Textile"], inscritLe: "10 septembre 2025", derniereActivite: "19 août 2026", offresListe: [], recrutements: [] },
+  { id: "ea8", nom: "Rufisque Bâtiment", secteur: "BTP", ville: "Rufisque", offresActives: 8, employes: "25-30 emp.", statut: "Suspendu", ninea: "2233445 5G6", rccm: "SN-RFQ-2014-B-0567", telephone: "+221 33 836 89 01", email: "contact@rufisquebatiment.sn", siteWeb: "", secteurs: ["BTP"], inscritLe: "18 novembre 2024", derniereActivite: "2 juillet 2026", offresListe: [], recrutements: [] },
 ];
 
 function EntreprisesAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
-      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de l'entreprise</h2>
+      <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de l’entreprise</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de cette entreprise</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
-          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil de l'entreprise</h3>
+          <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil de l’entreprise</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <div className="w-14 h-14 rounded-md flex items-center justify-center text-sm font-semibold mb-2" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.nom)}</div>
             <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
@@ -6388,21 +6395,21 @@ function EntreprisesAdminDetail(row, { onBack, update, remove }) {
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
           <Row label="E-mail" value={row.email} />
           {row.siteWeb && <><div className="h-2" /><Row label="Site web" value={row.siteWeb} /></>}
-          <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Secteurs d'activité</p>
+          <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Secteurs d’activité</p>
           <div className="flex flex-wrap gap-1.5">
             {row.secteurs.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{c}</span>)}
           </div>
         </div>
         <div className="flex flex-col gap-4">
           <AdminInfoCard title="Statut du compte entreprise" rows={[{ label: "Statut", value: row.statut, badge: true }, { label: "Inscrit le", value: row.inscritLe }, { label: "Dernière activité", value: row.derniereActivite }]} />
-          <AdminSubListCard title={`Offres d'emploi actives (${row.offresListe.length})`} items={row.offresListe} />
+          <AdminSubListCard title={`Offres d’emploi actives (${row.offresListe.length})`} items={row.offresListe} />
           <AdminSubListCard title={`Recrutements récents (${row.recrutements.length})`} items={row.recrutements} />
         </div>
       </div>
       <div className="flex gap-3">
         <ActionButton label="Supprimer" variant="danger" onClick={remove} />
         <ActionButton label={row.statut === "Suspendu" ? "Réactiver" : "Suspendre"} variant="warning" onClick={() => update({ statut: row.statut === "Suspendu" ? "Actif" : "Suspendu" })} />
-        <ActionButton label="Vérifier l'entreprise" variant="primary" onClick={() => update({ statut: "Vérifié" })} />
+        <ActionButton label="Vérifier l’entreprise" variant="primary" onClick={() => update({ statut: "Vérifié" })} />
       </div>
     </div>
   );
@@ -6433,14 +6440,14 @@ function EntreprisesAdminScreen() {
 /* ---------- Offres (Admin) ---------- */
 
 const OFFRES_ADMIN_INITIAL = [
-  { id: "oa1", titre: "Chef d'équipe électricité", entreprise: "Senegal Construction SARL", secteur: "BTP & Construction", candidatures: 5, date: "15/07/2026", statut: "Active", localisation: "Dakar, Plateau", contrat: "CDI", experience: "5+ ans", salaire: "350 000 - 450 000 FCFA/mois", description: "Nous recherchons un Chef d'équipe électricité expérimenté pour superviser nos chantiers de construction résidentiels et tertiaires à Dakar. Vous serez responsable de la gestion d'une équipe d'électriciens, de la planification des travaux et du respect rigoureux des consignes de sécurité sur le terrain.", competences: ["Normes NF C 15-100", "Management d'équipe", "Lecture de plans", "Câblage industriel"], publieeLe: "15/07/2026", expireLe: "15/09/2026", candidatsRecents: [{ title: "Moussa Diop", sub: "Électricien bâtiment", badge: "En cours" }, { title: "Fatou Sarr", sub: "Plombière sanitaire", badge: "Retenu" }, { title: "Ibrahima Diallo", sub: "Soudeur industriel", badge: "Rejeté" }] },
-  { id: "oa2", titre: "Plombier qualifié", entreprise: "Diallo & Fils", secteur: "Plomberie", candidatures: 8, date: "10/07/2026", statut: "Active", localisation: "Saint-Louis", contrat: "CDD", experience: "2-5 ans", salaire: "200 000 - 250 000 FCFA/mois", description: "Poste de plombier qualifié pour l'entretien et l'installation de systèmes sanitaires.", competences: ["Plomberie sanitaire"], publieeLe: "10/07/2026", expireLe: "10/09/2026", candidatsRecents: [] },
-  { id: "oa3", titre: "Menuisier ébéniste", entreprise: "Ndiaye Menuiserie", secteur: "Menuiserie", candidatures: 12, date: "05/07/2026", statut: "Active", localisation: "Kaolack", contrat: "CDI", experience: "5+ ans", salaire: "280 000 - 320 000 FCFA/mois", description: "Fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], publieeLe: "05/07/2026", expireLe: "05/09/2026", candidatsRecents: [] },
-  { id: "oa4", titre: "Technicien maintenance", entreprise: "Dakar Services Pro", secteur: "Multi-services", candidatures: 3, date: "01/07/2026", statut: "En vérification", localisation: "Dakar", contrat: "CDI", experience: "3-5 ans", salaire: "250 000 FCFA/mois", description: "Maintenance générale de bâtiments tertiaires.", competences: ["Maintenance générale"], publieeLe: "01/07/2026", expireLe: "01/09/2026", candidatsRecents: [] },
-  { id: "oa5", titre: "Maçon qualifié", entreprise: "Mbour Construction", secteur: "BTP", candidatures: 15, date: "25/06/2026", statut: "Active", localisation: "Mbour", contrat: "CDD", experience: "3-8 ans", salaire: "250 000 - 300 000 FCFA/mois", description: "Travaux de maçonnerie générale sur chantiers résidentiels.", competences: ["Maçonnerie", "Fondations"], publieeLe: "25/06/2026", expireLe: "25/08/2026", candidatsRecents: [] },
-  { id: "oa6", titre: "Électricien chantier", entreprise: "Thiès Électrique", secteur: "Électricité", candidatures: 0, date: "20/06/2026", statut: "Expirée", localisation: "Thiès", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 FCFA/mois", description: "Installation électrique sur chantier.", competences: ["Électricité de base"], publieeLe: "20/06/2026", expireLe: "20/08/2026", candidatsRecents: [] },
-  { id: "oa7", titre: "Peintre bâtiment", entreprise: "Rufisque Bâtiment", secteur: "BTP", candidatures: 7, date: "15/06/2026", statut: "Suspendue", localisation: "Rufisque", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 - 220 000 FCFA/mois", description: "Travaux de peinture sur chantiers résidentiels.", competences: ["Peinture", "Enduits"], publieeLe: "15/06/2026", expireLe: "15/08/2026", candidatsRecents: [] },
-  { id: "oa8", titre: "Carreleur intérieur", entreprise: "Senegal Construction", secteur: "BTP", candidatures: 4, date: "10/06/2026", statut: "Active", localisation: "Dakar", contrat: "CDD", experience: "2-4 ans", salaire: "230 000 FCFA/mois", description: "Pose de carrelage sur chantiers résidentiels.", competences: ["Pose de carrelage"], publieeLe: "10/06/2026", expireLe: "10/08/2026", candidatsRecents: [] },
+  { id: "oa1", titre: "Chef d’équipe électricité", entreprise: "Senegal Construction SARL", secteur: "BTP et construction", candidatures: 5, date: "15 juillet 2026", statut: "Active", localisation: "Dakar, Plateau", contrat: "CDI", experience: "5+ ans", salaire: "350 000 - 450 000 FCFA/mois", description: "Nous recherchons un Chef d’équipe électricité expérimenté pour superviser nos chantiers de construction résidentiels et tertiaires à Dakar. Vous serez responsable de la gestion d’une équipe d’électriciens, de la planification des travaux et du respect rigoureux des consignes de sécurité sur le terrain.", competences: ["Normes NF C 15-100", "Management d’équipe", "Lecture de plans", "Câblage industriel"], publieeLe: "15 juillet 2026", expireLe: "15 septembre 2026", candidatsRecents: [{ title: "Moussa Diop", sub: "Électricien bâtiment", badge: "En cours" }, { title: "Fatou Sarr", sub: "Plombière sanitaire", badge: "Retenu" }, { title: "Ibrahima Diallo", sub: "Soudeur industriel", badge: "Rejeté" }] },
+  { id: "oa2", titre: "Plombier qualifié", entreprise: "Diallo & Fils", secteur: "Plomberie", candidatures: 8, date: "10 juillet 2026", statut: "Active", localisation: "Saint-Louis", contrat: "CDD", experience: "2-5 ans", salaire: "200 000 - 250 000 FCFA/mois", description: "Poste de plombier qualifié pour l’entretien et l’installation de systèmes sanitaires.", competences: ["Plomberie sanitaire"], publieeLe: "10 juillet 2026", expireLe: "10 septembre 2026", candidatsRecents: [] },
+  { id: "oa3", titre: "Menuisier ébéniste", entreprise: "Ndiaye Menuiserie", secteur: "Menuiserie", candidatures: 12, date: "5 juillet 2026", statut: "Active", localisation: "Kaolack", contrat: "CDI", experience: "5+ ans", salaire: "280 000 - 320 000 FCFA/mois", description: "Fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], publieeLe: "5 juillet 2026", expireLe: "5 septembre 2026", candidatsRecents: [] },
+  { id: "oa4", titre: "Technicien maintenance", entreprise: "Dakar Services Pro", secteur: "Multi-services", candidatures: 3, date: "1er juillet 2026", statut: "En vérification", localisation: "Dakar", contrat: "CDI", experience: "3-5 ans", salaire: "250 000 FCFA/mois", description: "Maintenance générale de bâtiments tertiaires.", competences: ["Maintenance générale"], publieeLe: "1er juillet 2026", expireLe: "1er septembre 2026", candidatsRecents: [] },
+  { id: "oa5", titre: "Maçon qualifié", entreprise: "Mbour Construction", secteur: "BTP", candidatures: 15, date: "25 juin 2026", statut: "Active", localisation: "Mbour", contrat: "CDD", experience: "3-8 ans", salaire: "250 000 - 300 000 FCFA/mois", description: "Travaux de maçonnerie générale sur chantiers résidentiels.", competences: ["Maçonnerie", "Fondations"], publieeLe: "25 juin 2026", expireLe: "25 août 2026", candidatsRecents: [] },
+  { id: "oa6", titre: "Électricien chantier", entreprise: "Thiès Électrique", secteur: "Électricité", candidatures: 0, date: "20 juin 2026", statut: "Expirée", localisation: "Thiès", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 FCFA/mois", description: "Installation électrique sur chantier.", competences: ["Électricité de base"], publieeLe: "20 juin 2026", expireLe: "20 août 2026", candidatsRecents: [] },
+  { id: "oa7", titre: "Peintre bâtiment", entreprise: "Rufisque Bâtiment", secteur: "BTP", candidatures: 7, date: "15 juin 2026", statut: "Suspendue", localisation: "Rufisque", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 - 220 000 FCFA/mois", description: "Travaux de peinture sur chantiers résidentiels.", competences: ["Peinture", "Enduits"], publieeLe: "15 juin 2026", expireLe: "15 août 2026", candidatsRecents: [] },
+  { id: "oa8", titre: "Carreleur intérieur", entreprise: "Senegal Construction", secteur: "BTP", candidatures: 4, date: "10 juin 2026", statut: "Active", localisation: "Dakar", contrat: "CDD", experience: "2-4 ans", salaire: "230 000 FCFA/mois", description: "Pose de carrelage sur chantiers résidentiels.", competences: ["Pose de carrelage"], publieeLe: "10 juin 2026", expireLe: "10 août 2026", candidatsRecents: [] },
 ];
 
 function OffresAdminDetail(row, { onBack, update, remove }) {
@@ -6448,9 +6455,9 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <div className="flex items-start justify-between mb-1">
-        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Détail de l'offre</h2>
+        <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Détail de l’offre</h2>
       </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez cette offre d'emploi</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez cette offre d’emploi</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6">
         <div className="flex flex-col gap-4">
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -6477,32 +6484,32 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
           </div>
         </div>
         <div className="flex flex-col gap-4">
-          <AdminInfoCard title="Statut de l'offre" rows={[{ label: "Statut actuel", value: row.statut, badge: true }, { label: "Publiée le", value: row.publieeLe }, { label: "Expire le", value: row.expireLe }]} />
+          <AdminInfoCard title="Statut de l’offre" rows={[{ label: "Statut actuel", value: row.statut, badge: true }, { label: "Publiée le", value: row.publieeLe }, { label: "Expire le", value: row.expireLe }]} />
           <AdminSubListCard title={`Candidatures récentes (${row.candidatsRecents.length})`} items={row.candidatsRecents} />
         </div>
       </div>
       <div className="flex gap-3">
         <ActionButton label="Supprimer" variant="danger" onClick={remove} />
         <ActionButton label={row.statut === "Suspendue" ? "Réactiver" : "Suspendre"} variant="warning" onClick={() => update({ statut: row.statut === "Suspendue" ? "Active" : "Suspendue" })} />
-        <ActionButton label="Valider l'offre" variant="primary" onClick={() => update({ statut: "Active" })} />
+        <ActionButton label="Valider l’offre" variant="primary" onClick={() => update({ statut: "Active" })} />
       </div>
     </div>
   );
 }
 
-/* Points contrôlés par l'admin avant de publier une offre d'entreprise. */
+/* Points contrôlés par l’admin avant de publier une offre d’entreprise. */
 const CONTROLES_OFFRE = [
-  { id: "entreprise", label: "L'entreprise est vérifiée (NINEA, RCCM, coordonnées)" },
+  { id: "entreprise", label: "L’entreprise est vérifiée (NINEA, RCCM, coordonnées)" },
   { id: "poste", label: "Le poste, les missions et le lieu sont clairs et réels" },
   { id: "salaire", label: "Le salaire et le type de contrat sont indiqués et cohérents" },
-  { id: "frais", label: "Aucun frais n'est demandé aux candidats" },
+  { id: "frais", label: "Aucun frais n’est demandé aux candidats" },
   { id: "discrimination", label: "Aucun critère discriminatoire (âge, sexe, religion, ethnie…)" },
 ];
 const MOTIFS_REFUS_OFFRE = [
   "Informations sur le poste incomplètes",
   "Salaire absent ou incohérent",
   "Frais demandés aux candidats",
-  "Critère discriminatoire dans l'annonce",
+  "Critère discriminatoire dans l’annonce",
   "Entreprise non vérifiée",
 ];
 
@@ -6524,7 +6531,7 @@ function OffreAVerifierCard({ offre, entreprise, onDecide }) {
           <p className="mt-1 text-sm text-secondaire">{offre.contrat} · {offre.localisation} · {offre.salaire}{offre.experience ? ` · ${offre.experience}` : ""}</p>
         </div>
         <App.Bouton petit variante="neutre" onClick={() => setOuverte((o) => !o)} aria-expanded={ouverte}>
-          {ouverte ? "Masquer" : "Vérifier l'offre"}
+          {ouverte ? "Masquer" : "Vérifier l’offre"}
         </App.Bouton>
       </div>
 
@@ -6563,14 +6570,14 @@ function OffreAVerifierCard({ offre, entreprise, onDecide }) {
       )}
       {ouverte && refus && (
         <div className="mt-4 space-y-2">
-          <label className={AUTH.libelle} htmlFor={`motif-${offre.id}`}>Motif du refus, visible par l'entreprise</label>
+          <label className={AUTH.libelle} htmlFor={`motif-${offre.id}`}>Motif du refus, visible par l’entreprise</label>
           <div className="flex flex-wrap gap-2">
             {MOTIFS_REFUS_OFFRE.map((m) => (
               <button key={m} type="button" onClick={() => setMotif(m)} aria-pressed={motif === m} className={FORM.pastille(motif === m)}>{m}</button>
             ))}
           </div>
           <div className="flex flex-col gap-3 sm:flex-row">
-            <input id={`motif-${offre.id}`} value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Expliquez ce que l'entreprise doit corriger" className={`${FORM.champ()} flex-1`} />
+            <input id={`motif-${offre.id}`} value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Expliquez ce que l’entreprise doit corriger" className={`${FORM.champ()} flex-1`} />
             <App.Bouton variante="neutre" onClick={() => { setRefus(false); setMotif(""); }} className="min-h-[48px]">Annuler</App.Bouton>
             <BoutonDanger disabled={!motif.trim()} onClick={() => onDecide("Refusée", motif.trim())}>Confirmer le refus</BoutonDanger>
           </div>
@@ -6580,15 +6587,15 @@ function OffreAVerifierCard({ offre, entreprise, onDecide }) {
   );
 }
 
-/* Offres créées par les entreprises : vérifiées par l'admin avant d'être visibles des candidats. */
+/* Offres créées par les entreprises : vérifiées par l’admin avant d’être visibles des candidats. */
 function VerificationOffresAdmin({ offres, setOffres, entreprise }) {
   const aVerifier = offres.filter((o) => o.statut === "En vérification");
   const traitees = offres.filter((o) => o.decision);
 
   function decide(o, statut, motif) {
-    const le = demoNow().toLocaleDateString("fr-FR");
+    const le = dateFr(demoNow());
     setOffres((l) => l.map((x) => (x.id === o.id ? { ...x, statut, motifRefus: motif || null, decision: { statut, le, motif: motif || null } } : x)));
-    notify(statut === "Active" ? `Offre « ${o.titre} » validée : elle est maintenant visible des candidats.` : `Offre « ${o.titre} » refusée. L'entreprise est prévenue.`, statut === "Active" ? "success" : "info");
+    notify(statut === "Active" ? `Offre « ${o.titre} » validée : elle est maintenant visible des candidats.` : `Offre « ${o.titre} » refusée. L’entreprise est prévenue.`, statut === "Active" ? "success" : "info");
   }
 
   return (
@@ -6635,8 +6642,8 @@ function OffresAdminScreen({ offresEntreprise, setOffresEntreprise }) {
     <>
     {offresEntreprise && <VerificationOffresAdmin offres={offresEntreprise} setOffres={setOffresEntreprise} entreprise={ENTREPRISE_DEMO_NOM} />}
     <AdminEntityModule
-      title="Offres d'emploi"
-      subtitle="Gérez toutes les offres d'emploi publiées sur la plateforme LIGGEEY"
+      title="Offres d’emploi"
+      subtitle="Gérez toutes les offres d’emploi publiées sur la plateforme LIGGEEY"
       initialData={OFFRES_ADMIN_INITIAL}
       searchKeys={["titre", "entreprise", "secteur"]}
       filters={[
@@ -6660,14 +6667,14 @@ function OffresAdminScreen({ offresEntreprise, setOffresEntreprise }) {
 /* ---------- Formations (Admin) ---------- */
 
 const FORMATIONS_ADMIN_INITIAL = [
-  { id: "fa1", nom: "Sécurité Électrique", organisme: "CNEAP Dakar", categorie: "Sécurité", inscrits: 45, duree: "40h", statut: "Active", niveau: "Intermédiaire", tarif: "75 000 FCFA", description: "Cette formation qualifiante est spécifiquement conçue pour sensibiliser et former les électriciens professionnels aux dangers inhérents aux chantiers. Elle couvre l'ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d'urgence.", prerequis: ["Expérience électricité", "Habilitation B2V"], enCoursApprentissage: 38, certificatsDelivres: 7, dernieresInscriptions: [{ title: "Moussa Diop", sub: "Inscrit le 12/08/2026", badge: "Apprenant" }, { title: "Fatou Sarr", sub: "Inscrit le 14/08/2026", badge: "Apprenant" }, { title: "Ibrahima Diallo", sub: "Inscrit le 15/08/2026", badge: "Apprenant" }] },
-  { id: "fa2", nom: "Lecture de plans BTP", organisme: "Institut BTP", categorie: "Technique", inscrits: 32, duree: "24h", statut: "Active", niveau: "Débutant", tarif: "50 000 FCFA", description: "Apprendre à lire et interpréter des plans de construction BTP.", prerequis: [], enCoursApprentissage: 20, certificatsDelivres: 12, dernieresInscriptions: [] },
-  { id: "fa3", nom: "Normes NF C 15-100", organisme: "CNEAP Dakar", categorie: "Réglementation", inscrits: 28, duree: "16h", statut: "Active", niveau: "Intermédiaire", tarif: "45 000 FCFA", description: "Maîtriser les normes électriques françaises appliquées au Sénégal.", prerequis: ["Expérience électricité"], enCoursApprentissage: 18, certificatsDelivres: 10, dernieresInscriptions: [] },
-  { id: "fa4", nom: "Plomberie sanitaire", organisme: "Centre Formation Thiès", categorie: "Plomberie", inscrits: 18, duree: "32h", statut: "Complète", niveau: "Débutant", tarif: "60 000 FCFA", description: "Formation complète en plomberie sanitaire résidentielle.", prerequis: [], enCoursApprentissage: 18, certificatsDelivres: 0, dernieresInscriptions: [] },
-  { id: "fa5", nom: "Soudure TIG-MIG", organisme: "CNEAP Dakar", categorie: "Technique", inscrits: 22, duree: "48h", statut: "Active", niveau: "Avancé", tarif: "90 000 FCFA", description: "Techniques avancées de soudure TIG et MIG.", prerequis: ["Expérience soudure"], enCoursApprentissage: 15, certificatsDelivres: 7, dernieresInscriptions: [] },
-  { id: "fa6", nom: "Gestion de chantier", organisme: "Institut BTP", categorie: "Management", inscrits: 15, duree: "20h", statut: "Brouillon", niveau: "Intermédiaire", tarif: "65 000 FCFA", description: "Piloter un chantier de construction de bout en bout.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
-  { id: "fa7", nom: "Menuiserie avancée", organisme: "Centre Artisanat", categorie: "Menuiserie", inscrits: 12, duree: "36h", statut: "Active", niveau: "Avancé", tarif: "70 000 FCFA", description: "Techniques avancées de menuiserie et ébénisterie.", prerequis: ["Bases menuiserie"], enCoursApprentissage: 10, certificatsDelivres: 2, dernieresInscriptions: [] },
-  { id: "fa8", nom: "Peinture décorative", organisme: "Centre Artisanat", categorie: "Peinture", inscrits: 8, duree: "16h", statut: "Suspendue", niveau: "Débutant", tarif: "35 000 FCFA", description: "Techniques de peinture décorative et finitions.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
+  { id: "fa1", nom: "Sécurité électrique", organisme: "CNEAP Dakar", categorie: "Sécurité", inscrits: 45, duree: "40 h", statut: "Active", niveau: "Intermédiaire", tarif: "75 000 FCFA", description: "Cette formation qualifiante est spécifiquement conçue pour sensibiliser et former les électriciens professionnels aux dangers inhérents aux chantiers. Elle couvre l’ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d’urgence.", prerequis: ["Expérience électricité", "Habilitation B2V"], enCoursApprentissage: 38, certificatsDelivres: 7, dernieresInscriptions: [{ title: "Moussa Diop", sub: "Inscrit le 12 août 2026", badge: "Apprenant" }, { title: "Fatou Sarr", sub: "Inscrit le 14 août 2026", badge: "Apprenant" }, { title: "Ibrahima Diallo", sub: "Inscrit le 15 août 2026", badge: "Apprenant" }] },
+  { id: "fa2", nom: "Lecture de plans BTP", organisme: "Institut BTP", categorie: "Technique", inscrits: 32, duree: "24 h", statut: "Active", niveau: "Débutant", tarif: "50 000 FCFA", description: "Apprendre à lire et interpréter des plans de construction BTP.", prerequis: [], enCoursApprentissage: 20, certificatsDelivres: 12, dernieresInscriptions: [] },
+  { id: "fa3", nom: "Normes NF C 15-100", organisme: "CNEAP Dakar", categorie: "Réglementation", inscrits: 28, duree: "16 h", statut: "Active", niveau: "Intermédiaire", tarif: "45 000 FCFA", description: "Maîtriser les normes électriques françaises appliquées au Sénégal.", prerequis: ["Expérience électricité"], enCoursApprentissage: 18, certificatsDelivres: 10, dernieresInscriptions: [] },
+  { id: "fa4", nom: "Plomberie sanitaire", organisme: "Centre de formation de Thiès", categorie: "Plomberie", inscrits: 18, duree: "32 h", statut: "Complète", niveau: "Débutant", tarif: "60 000 FCFA", description: "Formation complète en plomberie sanitaire résidentielle.", prerequis: [], enCoursApprentissage: 18, certificatsDelivres: 0, dernieresInscriptions: [] },
+  { id: "fa5", nom: "Soudure TIG-MIG", organisme: "CNEAP Dakar", categorie: "Technique", inscrits: 22, duree: "48 h", statut: "Active", niveau: "Avancé", tarif: "90 000 FCFA", description: "Techniques avancées de soudure TIG et MIG.", prerequis: ["Expérience soudure"], enCoursApprentissage: 15, certificatsDelivres: 7, dernieresInscriptions: [] },
+  { id: "fa6", nom: "Gestion de chantier", organisme: "Institut BTP", categorie: "Management", inscrits: 15, duree: "20 h", statut: "Brouillon", niveau: "Intermédiaire", tarif: "65 000 FCFA", description: "Piloter un chantier de construction de bout en bout.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
+  { id: "fa7", nom: "Menuiserie avancée", organisme: "Centre d’artisanat", categorie: "Menuiserie", inscrits: 12, duree: "36 h", statut: "Active", niveau: "Avancé", tarif: "70 000 FCFA", description: "Techniques avancées de menuiserie et ébénisterie.", prerequis: ["Bases menuiserie"], enCoursApprentissage: 10, certificatsDelivres: 2, dernieresInscriptions: [] },
+  { id: "fa8", nom: "Peinture décorative", organisme: "Centre d’artisanat", categorie: "Peinture", inscrits: 8, duree: "16 h", statut: "Suspendue", niveau: "Débutant", tarif: "35 000 FCFA", description: "Techniques de peinture décorative et finitions.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
 ];
 
 function FormationsAdminDetail(row, { onBack, update, remove }) {
@@ -6687,7 +6694,7 @@ function FormationsAdminDetail(row, { onBack, update, remove }) {
           <div className="grid grid-cols-2 gap-4 mb-4">
             <Row label="Catégorie" value={row.categorie} />
             <Row label="Durée" value={row.duree} />
-            <Row label="Tarif d'inscription" value={row.tarif} />
+            <Row label="Tarif d’inscription" value={row.tarif} />
           </div>
           <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>Description de la formation</p>
           <p className="text-sm mb-4" style={{ color: COLORS.slate }}>{row.description}</p>
@@ -6701,7 +6708,7 @@ function FormationsAdminDetail(row, { onBack, update, remove }) {
           )}
         </div>
         <div className="flex flex-col gap-4">
-          <AdminInfoCard title="Statut opérationnel" rows={[{ label: "Statut", value: row.statut, badge: true }, { label: "Inscrits totaux", value: `${row.inscrits} apprenants` }, { label: "En cours d'apprentissage", value: `${row.enCoursApprentissage} apprenants` }, { label: "Certificats délivrés", value: `${row.certificatsDelivres} diplômés` }]} />
+          <AdminInfoCard title="Statut opérationnel" rows={[{ label: "Statut", value: row.statut, badge: true }, { label: "Inscrits totaux", value: `${row.inscrits} apprenants` }, { label: "En cours d’apprentissage", value: `${row.enCoursApprentissage} apprenants` }, { label: "Certificats délivrés", value: `${row.certificatsDelivres} diplômés` }]} />
           <AdminSubListCard title={`Dernières inscriptions (${row.dernieresInscriptions.length})`} items={row.dernieresInscriptions} />
         </div>
       </div>
@@ -6740,14 +6747,14 @@ function FormationsAdminScreen() {
 /* ---------- Mentorat (Admin) ---------- */
 
 const MENTORAT_ADMIN_INITIAL = [
-  { id: "ma1", nom: "Cheikh Fall", photo: "/images/plateforme/portraits/cheikh-fall.jpg", metier: "Électricien", mentoresActifs: 3, specialite: "Électricité générale", note: 4.9, statut: "Actif", telephone: "+221 77 654 32 10", email: "cheikh.fall@email.sn", experience: "12 ans d'expérience", ninea: "1234567 2G3", competences: ["Installation électrique", "Dépannage rapide", "Câblage industriel"], certifications: [{ title: "Habilitation électrique B2V", badge: "Validé" }, { title: "Sécurité sur chantier BTP", badge: "Validé" }], totalAccompagnes: 5, membresActuels: [{ title: "Moussa Diop", sub: "Depuis le 01/06/2026", badge: "Mentoré" }, { title: "Abdoulaye Sow", sub: "Depuis le 15/07/2026", badge: "Mentoré" }, { title: "Aissatou Gueye", sub: "Depuis le 01/08/2026", badge: "Mentoré" }] },
-  { id: "ma2", nom: "Mamadou Sy", photo: "/images/plateforme/portraits/mamadou-sy.jpg", metier: "Maçon", mentoresActifs: 5, specialite: "Maçonnerie", note: 4.8, statut: "Actif", telephone: "+221 78 765 43 21", email: "mamadou.sy@email.sn", experience: "15 ans d'expérience", ninea: "2345678 3G4", competences: ["Maçonnerie générale"], certifications: [], totalAccompagnes: 8, membresActuels: [] },
-  { id: "ma3", nom: "Awa Diallo", photo: "/images/plateforme/portraits/awa-diallo.jpg", metier: "Plombière", mentoresActifs: 2, specialite: "Plomberie", note: 4.7, statut: "Actif", telephone: "+221 76 876 54 32", email: "awa.diallo@email.sn", experience: "9 ans d'expérience", ninea: "3456789 4G5", competences: ["Plomberie sanitaire"], certifications: [], totalAccompagnes: 4, membresActuels: [] },
-  { id: "ma4", nom: "Babacar Faye", photo: "/images/plateforme/portraits/babacar-faye.jpg", metier: "Carreleur", mentoresActifs: 4, specialite: "Carrelage", note: 4.6, statut: "Actif", telephone: "+221 77 987 65 43", email: "babacar.faye@email.sn", experience: "11 ans d'expérience", ninea: "4567890 5G6", competences: ["Pose de carrelage"], certifications: [], totalAccompagnes: 6, membresActuels: [] },
-  { id: "ma5", nom: "Ndèye Mbaye", photo: "/images/plateforme/portraits/ndeye-mbaye.jpg", metier: "Couturière", mentoresActifs: 1, specialite: "Couture", note: 4.5, statut: "En attente", telephone: "+221 78 098 76 54", email: "ndeye.mbaye@email.sn", experience: "9 ans d'expérience", ninea: "5678901 6G7", competences: ["Couture sur mesure"], certifications: [], totalAccompagnes: 1, membresActuels: [] },
-  { id: "ma6", nom: "Alioune Ndiaye", photo: "/images/plateforme/portraits/alioune-ndiaye.jpg", metier: "Menuisier", mentoresActifs: 3, specialite: "Menuiserie", note: 4.4, statut: "Inactif", telephone: "+221 76 109 87 65", email: "alioune.ndiaye@email.sn", experience: "10 ans d'expérience", ninea: "6789012 7G8", competences: ["Menuiserie"], certifications: [], totalAccompagnes: 5, membresActuels: [] },
-  { id: "ma7", nom: "Sokhna Dieng", photo: "/images/plateforme/portraits/sokhna-dieng.jpg", metier: "Peintre", mentoresActifs: 2, specialite: "Peinture", note: 4.3, statut: "Actif", telephone: "+221 77 210 98 76", email: "sokhna.dieng@email.sn", experience: "3 ans d'expérience", ninea: "7890123 8G9", competences: ["Peinture intérieure"], certifications: [], totalAccompagnes: 2, membresActuels: [] },
-  { id: "ma8", nom: "Khady Thiam", photo: "/images/plateforme/portraits/khady-thiam.jpg", metier: "Électricienne", mentoresActifs: 0, specialite: "Électricité", note: 0, statut: "En attente", telephone: "+221 78 321 09 87", email: "khady.thiam@email.sn", experience: "5 ans d'expérience", ninea: "8901234 9G0", competences: ["Électricité domestique"], certifications: [], totalAccompagnes: 0, membresActuels: [] },
+  { id: "ma1", nom: "Cheikh Fall", photo: "/images/plateforme/portraits/cheikh-fall.jpg", metier: "Électricien", mentoresActifs: 3, specialite: "Électricité générale", note: 4.9, statut: "Actif", telephone: "+221 77 654 32 10", email: "cheikh.fall@email.sn", experience: "12 ans d’expérience", ninea: "1234567 2G3", competences: ["Installation électrique", "Dépannage rapide", "Câblage industriel"], certifications: [{ title: "Habilitation électrique B2V", badge: "Validé" }, { title: "Sécurité sur chantier BTP", badge: "Validé" }], totalAccompagnes: 5, membresActuels: [{ title: "Moussa Diop", sub: "Depuis le 1er juin 2026", badge: "Mentoré" }, { title: "Abdoulaye Sow", sub: "Depuis le 15 juillet 2026", badge: "Mentoré" }, { title: "Aissatou Gueye", sub: "Depuis le 1er août 2026", badge: "Mentoré" }] },
+  { id: "ma2", nom: "Mamadou Sy", photo: "/images/plateforme/portraits/mamadou-sy.jpg", metier: "Maçon", mentoresActifs: 5, specialite: "Maçonnerie", note: 4.8, statut: "Actif", telephone: "+221 78 765 43 21", email: "mamadou.sy@email.sn", experience: "15 ans d’expérience", ninea: "2345678 3G4", competences: ["Maçonnerie générale"], certifications: [], totalAccompagnes: 8, membresActuels: [] },
+  { id: "ma3", nom: "Awa Diallo", photo: "/images/plateforme/portraits/awa-diallo.jpg", metier: "Plombière", mentoresActifs: 2, specialite: "Plomberie", note: 4.7, statut: "Actif", telephone: "+221 76 876 54 32", email: "awa.diallo@email.sn", experience: "9 ans d’expérience", ninea: "3456789 4G5", competences: ["Plomberie sanitaire"], certifications: [], totalAccompagnes: 4, membresActuels: [] },
+  { id: "ma4", nom: "Babacar Faye", photo: "/images/plateforme/portraits/babacar-faye.jpg", metier: "Carreleur", mentoresActifs: 4, specialite: "Carrelage", note: 4.6, statut: "Actif", telephone: "+221 77 987 65 43", email: "babacar.faye@email.sn", experience: "11 ans d’expérience", ninea: "4567890 5G6", competences: ["Pose de carrelage"], certifications: [], totalAccompagnes: 6, membresActuels: [] },
+  { id: "ma5", nom: "Ndèye Mbaye", photo: "/images/plateforme/portraits/ndeye-mbaye.jpg", metier: "Couturière", mentoresActifs: 1, specialite: "Couture", note: 4.5, statut: "En attente", telephone: "+221 78 098 76 54", email: "ndeye.mbaye@email.sn", experience: "9 ans d’expérience", ninea: "5678901 6G7", competences: ["Couture sur mesure"], certifications: [], totalAccompagnes: 1, membresActuels: [] },
+  { id: "ma6", nom: "Alioune Ndiaye", photo: "/images/plateforme/portraits/alioune-ndiaye.jpg", metier: "Menuisier", mentoresActifs: 3, specialite: "Menuiserie", note: 4.4, statut: "Inactif", telephone: "+221 76 109 87 65", email: "alioune.ndiaye@email.sn", experience: "10 ans d’expérience", ninea: "6789012 7G8", competences: ["Menuiserie"], certifications: [], totalAccompagnes: 5, membresActuels: [] },
+  { id: "ma7", nom: "Sokhna Dieng", photo: "/images/plateforme/portraits/sokhna-dieng.jpg", metier: "Peintre", mentoresActifs: 2, specialite: "Peinture", note: 4.3, statut: "Actif", telephone: "+221 77 210 98 76", email: "sokhna.dieng@email.sn", experience: "3 ans d’expérience", ninea: "7890123 8G9", competences: ["Peinture intérieure"], certifications: [], totalAccompagnes: 2, membresActuels: [] },
+  { id: "ma8", nom: "Khady Thiam", photo: "/images/plateforme/portraits/khady-thiam.jpg", metier: "Électricienne", mentoresActifs: 0, specialite: "Électricité", note: 0, statut: "En attente", telephone: "+221 78 321 09 87", email: "khady.thiam@email.sn", experience: "5 ans d’expérience", ninea: "8901234 9G0", competences: ["Électricité domestique"], certifications: [], totalAccompagnes: 0, membresActuels: [] },
 ];
 
 function MentoratAdminDetail(row, { onBack, update, remove }) {
@@ -6784,7 +6791,7 @@ function MentoratAdminDetail(row, { onBack, update, remove }) {
           )}
         </div>
         <div className="flex flex-col gap-4">
-          <AdminInfoCard title="Statut Mentor" rows={[{ label: "Statut", value: row.statut, badge: true }, { label: "Mentorés actifs", value: `${row.mentoresActifs} apprenants` }, { label: "Total accompagnés", value: `${row.totalAccompagnes} professionnels` }]} />
+          <AdminInfoCard title="Statut mentor" rows={[{ label: "Statut", value: row.statut, badge: true }, { label: "Mentorés actifs", value: `${row.mentoresActifs} apprenants` }, { label: "Total accompagnés", value: `${row.totalAccompagnes} professionnels` }]} />
           <AdminSubListCard title={`Membres accompagnés actuellement (${row.membresActuels.length})`} items={row.membresActuels} />
         </div>
       </div>
@@ -6809,7 +6816,7 @@ function MentoratAdminScreen() {
         { key: "nom", label: "Mentor", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
         { key: "mentoresActifs", label: "Mentorés actifs", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.mentoresActifs} mentorés</span> },
         { key: "specialite", label: "Spécialité", flex: 1 },
-        { key: "note", label: "Note globale", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>★ {r.note}/5</span> },
+        { key: "note", label: "Note globale", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>★ {noteFr(r.note)}/5</span> },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
       exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
@@ -6821,14 +6828,14 @@ function MentoratAdminScreen() {
 /* ---------- Services (Admin) ---------- */
 
 const SERVICES_ADMIN_INITIAL = [
-  { id: "sa1", prestataire: "Moussa Diop", service: "Plomberie générale", categorie: "Plomberie", tarif: "15 000 FCFA/h", statut: "Actif", date: "12/04/2026", metier: "Plombier qualifié", experience: "5 ans d'expérience", description: "Service complet d'installation, de réparation et de dépannage de plomberie générale. Intervention sur fuites d'eau, débouchage de canalisations, pose de sanitaires, chauffe-eau et raccordements divers. Travail soigné et respect des normes de sécurité.", tarifHoraire: "15 000 FCFA / heure", forfaitInstallation: "45 000 FCFA", zones: ["Dakar Ville", "Pikine", "Guédiawaye", "Rufisque"], devisRecus: 47, missionsTerminees: 38, note: 4.5, avis: [{ title: "Amadou Bamba", sub: "Intervention rapide pour une fuite d'eau urgente. Très professionnel !", value: "5/5" }, { title: "Khady Sy", sub: "Installation propre du nouveau lavabo. Service fiable et courtois.", value: "4/5" }] },
-  { id: "sa2", prestataire: "Fatou Cissé", service: "Couture traditionnelle", categorie: "Couture", tarif: "25 000 FCFA/forfait", statut: "Actif", date: "08/04/2026", metier: "Couturière", experience: "10 ans d'expérience", description: "Confection de vêtements traditionnels sur mesure.", tarifHoraire: "—", forfaitInstallation: "25 000 FCFA / pièce", zones: ["Dakar"], devisRecus: 30, missionsTerminees: 25, note: 4.7, avis: [] },
-  { id: "sa3", prestataire: "Ibrahima Diallo", service: "Installation & dépannage électrique", categorie: "Électricité", tarif: "12 000 FCFA/h", statut: "En pause", date: "05/04/2026", metier: "Électricien", experience: "6 ans d'expérience", description: "Installation et dépannage électrique résidentiel.", tarifHoraire: "12 000 FCFA / heure", forfaitInstallation: "—", zones: ["Saint-Louis"], devisRecus: 20, missionsTerminees: 15, note: 4.6, avis: [] },
-  { id: "sa4", prestataire: "Amadou Sow", service: "Rénovation de maison", categorie: "Maçonnerie", tarif: "35 000 FCFA/jour", statut: "Actif", date: "30/03/2026", metier: "Maçon", experience: "8 ans d'expérience", description: "Travaux de rénovation complète de maisons.", tarifHoraire: "—", forfaitInstallation: "35 000 FCFA / jour", zones: ["Dakar"], devisRecus: 25, missionsTerminees: 20, note: 4.8, avis: [] },
-  { id: "sa5", prestataire: "Khady Ndiaye", service: "Tresses & soins capillaires", categorie: "Esthétique", tarif: "10 000 FCFA/forfait", statut: "Actif", date: "24/03/2026", metier: "Coiffeuse", experience: "7 ans d'expérience", description: "Tresses, soins et coiffures pour femmes.", tarifHoraire: "—", forfaitInstallation: "10 000 FCFA / prestation", zones: ["Dakar"], devisRecus: 40, missionsTerminees: 35, note: 4.9, avis: [] },
-  { id: "sa6", prestataire: "Ousmane Fall", service: "Fabrication de meubles", categorie: "Menuiserie", tarif: "150 000 FCFA/forfait", statut: "Suspendu", date: "15/03/2026", metier: "Menuisier", experience: "12 ans d'expérience", description: "Fabrication de meubles sur mesure.", tarifHoraire: "—", forfaitInstallation: "150 000 FCFA / meuble", zones: ["Dakar"], devisRecus: 10, missionsTerminees: 8, note: 4.5, avis: [] },
-  { id: "sa7", prestataire: "Babacar Gueye", service: "Peinture intérieure/extérieure", categorie: "Peinture", tarif: "8 000 FCFA/h", statut: "Actif", date: "10/03/2026", metier: "Peintre", experience: "5 ans d'expérience", description: "Peinture intérieure et extérieure de bâtiments.", tarifHoraire: "8 000 FCFA / heure", forfaitInstallation: "—", zones: ["Dakar"], devisRecus: 18, missionsTerminees: 14, note: 4.4, avis: [] },
-  { id: "sa8", prestataire: "Mariama Sarr", service: "Entretien & réparation climatisation", categorie: "Froid & Climatisation", tarif: "20 000 FCFA/forfait", statut: "En pause", date: "02/03/2026", metier: "Technicienne froid", experience: "6 ans d'expérience", description: "Entretien et réparation de climatiseurs.", tarifHoraire: "—", forfaitInstallation: "20 000 FCFA / intervention", zones: ["Dakar"], devisRecus: 22, missionsTerminees: 18, note: 4.6, avis: [] },
+  { id: "sa1", prestataire: "Moussa Diop", service: "Plomberie générale", categorie: "Plomberie", tarif: "15 000 FCFA/h", statut: "Actif", date: "12 avril 2026", metier: "Plombier qualifié", experience: "5 ans d’expérience", description: "Service complet d’installation, de réparation et de dépannage de plomberie générale. Intervention sur fuites d’eau, débouchage de canalisations, pose de sanitaires, chauffe-eau et raccordements divers. Travail soigné et respect des normes de sécurité.", tarifHoraire: "15 000 FCFA / heure", forfaitInstallation: "45 000 FCFA", zones: ["Dakar Ville", "Pikine", "Guédiawaye", "Rufisque"], devisRecus: 47, missionsTerminees: 38, note: 4.5, avis: [{ title: "Amadou Bamba", sub: "Intervention rapide pour une fuite d’eau urgente. Très professionnel !", value: "5/5" }, { title: "Khady Sy", sub: "Installation propre du nouveau lavabo. Service fiable et courtois.", value: "4/5" }] },
+  { id: "sa2", prestataire: "Fatou Cissé", service: "Couture traditionnelle", categorie: "Couture", tarif: "25 000 FCFA/forfait", statut: "Actif", date: "8 avril 2026", metier: "Couturière", experience: "10 ans d’expérience", description: "Confection de vêtements traditionnels sur mesure.", tarifHoraire: "—", forfaitInstallation: "25 000 FCFA / pièce", zones: ["Dakar"], devisRecus: 30, missionsTerminees: 25, note: 4.7, avis: [] },
+  { id: "sa3", prestataire: "Ibrahima Diallo", service: "Installation & dépannage électrique", categorie: "Électricité", tarif: "12 000 FCFA/h", statut: "En pause", date: "5 avril 2026", metier: "Électricien", experience: "6 ans d’expérience", description: "Installation et dépannage électrique résidentiel.", tarifHoraire: "12 000 FCFA / heure", forfaitInstallation: "—", zones: ["Saint-Louis"], devisRecus: 20, missionsTerminees: 15, note: 4.6, avis: [] },
+  { id: "sa4", prestataire: "Amadou Sow", service: "Rénovation de maison", categorie: "Maçonnerie", tarif: "35 000 FCFA/jour", statut: "Actif", date: "30 mars 2026", metier: "Maçon", experience: "8 ans d’expérience", description: "Travaux de rénovation complète de maisons.", tarifHoraire: "—", forfaitInstallation: "35 000 FCFA / jour", zones: ["Dakar"], devisRecus: 25, missionsTerminees: 20, note: 4.8, avis: [] },
+  { id: "sa5", prestataire: "Khady Ndiaye", service: "Tresses & soins capillaires", categorie: "Esthétique", tarif: "10 000 FCFA/forfait", statut: "Actif", date: "24 mars 2026", metier: "Coiffeuse", experience: "7 ans d’expérience", description: "Tresses, soins et coiffures pour femmes.", tarifHoraire: "—", forfaitInstallation: "10 000 FCFA / prestation", zones: ["Dakar"], devisRecus: 40, missionsTerminees: 35, note: 4.9, avis: [] },
+  { id: "sa6", prestataire: "Ousmane Fall", service: "Fabrication de meubles", categorie: "Menuiserie", tarif: "150 000 FCFA/forfait", statut: "Suspendu", date: "15 mars 2026", metier: "Menuisier", experience: "12 ans d’expérience", description: "Fabrication de meubles sur mesure.", tarifHoraire: "—", forfaitInstallation: "150 000 FCFA / meuble", zones: ["Dakar"], devisRecus: 10, missionsTerminees: 8, note: 4.5, avis: [] },
+  { id: "sa7", prestataire: "Babacar Gueye", service: "Peinture intérieure/extérieure", categorie: "Peinture", tarif: "8 000 FCFA/h", statut: "Actif", date: "10 mars 2026", metier: "Peintre", experience: "5 ans d’expérience", description: "Peinture intérieure et extérieure de bâtiments.", tarifHoraire: "8 000 FCFA / heure", forfaitInstallation: "—", zones: ["Dakar"], devisRecus: 18, missionsTerminees: 14, note: 4.4, avis: [] },
+  { id: "sa8", prestataire: "Mariama Sarr", service: "Entretien & réparation climatisation", categorie: "Froid et climatisation", tarif: "20 000 FCFA/forfait", statut: "En pause", date: "2 mars 2026", metier: "Technicienne froid", experience: "6 ans d’expérience", description: "Entretien et réparation de climatiseurs.", tarifHoraire: "—", forfaitInstallation: "20 000 FCFA / intervention", zones: ["Dakar"], devisRecus: 22, missionsTerminees: 18, note: 4.6, avis: [] },
 ];
 
 function ServicesAdminDetail(row, { onBack, update }) {
@@ -6850,7 +6857,7 @@ function ServicesAdminDetail(row, { onBack, update }) {
           <p className="text-xs font-semibold mb-2" style={{ color: COLORS.slateLight }}>Tarification et modalité</p>
           <Row label="Tarif horaire standard" value={row.tarifHoraire} /><div className="h-2" />
           <Row label="Forfait" value={row.forfaitInstallation} />
-          <p className="text-xs font-semibold mt-4 mb-1.5" style={{ color: COLORS.slateLight }}>Zone d'intervention</p>
+          <p className="text-xs font-semibold mt-4 mb-1.5" style={{ color: COLORS.slateLight }}>Zone d’intervention</p>
           <div className="flex flex-wrap gap-1.5">
             {row.zones.map((z) => <span key={z} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.softStrong, color: COLORS.slate }}>{z}</span>)}
           </div>
@@ -6897,14 +6904,14 @@ function ServicesAdminScreen() {
 /* ---------- Candidatures (Admin) — custom detail ---------- */
 
 const CANDIDATURES_ADMIN_INITIAL = [
-  { id: "cda1", nom: "Moussa Diop", metier: "Électricien", offre: "Chef d'équipe électricité", entreprise: "Senegal Construction", date: "15/08/2026", statut: "Nouveau", localisation: "Dakar", experience: "8 ans d'expérience", telephone: "+221 77 123 45 67", email: "moussa.diop@email.sn", lettre: "Je me permets de postuler à votre offre de chef d'équipe en électricité. Fort de mes 8 années d'expérience en électricité de bâtiment, j'ai supervisé plusieurs chantiers d'envergure à Dakar, assurant à la fois le respect des délais et des strictes normes réglementaires. Dynamique et rigoureux, je souhaite mettre mes compétences de meneur d'hommes au service de Senegal Construction.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d'équipe", "Habilitation B2V"], documents: [{ nom: "CV_Moussa_Diop.pdf" }, { nom: "Certificat_NF_C15.pdf" }] },
-  { id: "cda2", nom: "Fatou Sarr", metier: "Plombière", offre: "Plombier qualifié", entreprise: "Diallo & Fils", date: "14/08/2026", statut: "En cours", localisation: "Thiès", experience: "5 ans d'expérience", telephone: "+221 76 234 56 78", email: "fatou.sarr@email.sn", lettre: "Je souhaite postuler au poste de plombier qualifié. J'ai 5 ans d'expérience en installation et dépannage sanitaire.", competences: ["Plomberie sanitaire"], documents: [{ nom: "CV_Fatou_Sarr.pdf" }] },
-  { id: "cda3", nom: "Ibrahima Diallo", metier: "Soudeur", offre: "Technicien maintenance", entreprise: "Dakar Services Pro", date: "12/08/2026", statut: "Retenu", localisation: "Saint-Louis", experience: "6 ans d'expérience", telephone: "+221 78 345 67 89", email: "ibrahima.diallo@email.sn", lettre: "Soudeur industriel qualifié, je souhaite intégrer votre équipe de maintenance.", competences: ["Soudure TIG", "Soudure MIG"], documents: [{ nom: "CV_Ibrahima_Diallo.pdf" }] },
-  { id: "cda4", nom: "Aminata Ndiaye", metier: "Couturière", offre: "Couturière atelier", entreprise: "Atelier Couture", date: "10/08/2026", statut: "Rejeté", localisation: "Dakar", experience: "10 ans d'expérience", telephone: "+221 77 456 78 90", email: "aminata.ndiaye@email.sn", lettre: "Couturière expérimentée, je gère un atelier depuis 10 ans.", competences: ["Couture sur mesure"], documents: [{ nom: "CV_Aminata_Ndiaye.pdf" }] },
-  { id: "cda5", nom: "Ousmane Ba", metier: "Menuisier", offre: "Menuisier ébéniste", entreprise: "Ndiaye Menuiserie", date: "09/08/2026", statut: "En cours", localisation: "Kaolack", experience: "12 ans d'expérience", telephone: "+221 76 567 89 01", email: "ousmane.ba@email.sn", lettre: "Menuisier ébéniste depuis 12 ans, spécialisé dans le mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], documents: [{ nom: "CV_Ousmane_Ba.pdf" }] },
-  { id: "cda6", nom: "Mariama Tall", metier: "Carreleur", offre: "Carreleur intérieur", entreprise: "Senegal Construction", date: "08/08/2026", statut: "Nouveau", localisation: "Rufisque", experience: "4 ans d'expérience", telephone: "+221 78 678 90 12", email: "mariama.tall@email.sn", lettre: "Carreleuse spécialisée dans les finitions haut de gamme.", competences: ["Pose de carrelage"], documents: [{ nom: "CV_Mariama_Tall.pdf" }] },
-  { id: "cda7", nom: "Abdoulaye Sow", metier: "Peintre", offre: "Peintre bâtiment", entreprise: "Rufisque Bâtiment", date: "07/08/2026", statut: "En cours", localisation: "Ziguinchor", experience: "3 ans d'expérience", telephone: "+221 77 789 01 23", email: "abdoulaye.sow@email.sn", lettre: "Peintre en bâtiment depuis 3 ans, disponible rapidement.", competences: ["Peinture", "Enduits"], documents: [{ nom: "CV_Abdoulaye_Sow.pdf" }] },
-  { id: "cda8", nom: "Aissatou Gueye", metier: "Électricienne", offre: "Électricien chantier", entreprise: "Thiès Électrique", date: "05/08/2026", statut: "Nouveau", localisation: "Mbour", experience: "7 ans d'expérience", telephone: "+221 76 890 12 34", email: "aissatou.gueye@email.sn", lettre: "Électricienne qualifiée avec 7 ans d'expérience en encadrement de chantier.", competences: ["Normes NF C 15-100", "Management d'équipe"], documents: [{ nom: "CV_Aissatou_Gueye.pdf" }] },
+  { id: "cda1", nom: "Moussa Diop", metier: "Électricien", offre: "Chef d’équipe électricité", entreprise: "Senegal Construction", date: "15 août 2026", statut: "Nouveau", localisation: "Dakar", experience: "8 ans d’expérience", telephone: "+221 77 123 45 67", email: "moussa.diop@email.sn", lettre: "Je me permets de postuler à votre offre de chef d’équipe en électricité. Fort de mes 8 années d’expérience en électricité de bâtiment, j’ai supervisé plusieurs chantiers d’envergure à Dakar, assurant à la fois le respect des délais et des strictes normes réglementaires. Dynamique et rigoureux, je souhaite mettre mes compétences de meneur d’hommes au service de Senegal Construction.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d’équipe", "Habilitation B2V"], documents: [{ nom: "CV_Moussa_Diop.pdf" }, { nom: "Certificat_NF_C15.pdf" }] },
+  { id: "cda2", nom: "Fatou Sarr", metier: "Plombière", offre: "Plombier qualifié", entreprise: "Diallo & Fils", date: "14 août 2026", statut: "En cours", localisation: "Thiès", experience: "5 ans d’expérience", telephone: "+221 76 234 56 78", email: "fatou.sarr@email.sn", lettre: "Je souhaite postuler au poste de plombier qualifié. J’ai 5 ans d’expérience en installation et dépannage sanitaire.", competences: ["Plomberie sanitaire"], documents: [{ nom: "CV_Fatou_Sarr.pdf" }] },
+  { id: "cda3", nom: "Ibrahima Diallo", metier: "Soudeur", offre: "Technicien maintenance", entreprise: "Dakar Services Pro", date: "12 août 2026", statut: "Retenu", localisation: "Saint-Louis", experience: "6 ans d’expérience", telephone: "+221 78 345 67 89", email: "ibrahima.diallo@email.sn", lettre: "Soudeur industriel qualifié, je souhaite intégrer votre équipe de maintenance.", competences: ["Soudure TIG", "Soudure MIG"], documents: [{ nom: "CV_Ibrahima_Diallo.pdf" }] },
+  { id: "cda4", nom: "Aminata Ndiaye", metier: "Couturière", offre: "Couturière atelier", entreprise: "Atelier Couture", date: "10 août 2026", statut: "Rejeté", localisation: "Dakar", experience: "10 ans d’expérience", telephone: "+221 77 456 78 90", email: "aminata.ndiaye@email.sn", lettre: "Couturière expérimentée, je gère un atelier depuis 10 ans.", competences: ["Couture sur mesure"], documents: [{ nom: "CV_Aminata_Ndiaye.pdf" }] },
+  { id: "cda5", nom: "Ousmane Ba", metier: "Menuisier", offre: "Menuisier ébéniste", entreprise: "Ndiaye Menuiserie", date: "9 août 2026", statut: "En cours", localisation: "Kaolack", experience: "12 ans d’expérience", telephone: "+221 76 567 89 01", email: "ousmane.ba@email.sn", lettre: "Menuisier ébéniste depuis 12 ans, spécialisé dans le mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], documents: [{ nom: "CV_Ousmane_Ba.pdf" }] },
+  { id: "cda6", nom: "Mariama Tall", metier: "Carreleur", offre: "Carreleur intérieur", entreprise: "Senegal Construction", date: "8 août 2026", statut: "Nouveau", localisation: "Rufisque", experience: "4 ans d’expérience", telephone: "+221 78 678 90 12", email: "mariama.tall@email.sn", lettre: "Carreleuse spécialisée dans les finitions haut de gamme.", competences: ["Pose de carrelage"], documents: [{ nom: "CV_Mariama_Tall.pdf" }] },
+  { id: "cda7", nom: "Abdoulaye Sow", metier: "Peintre", offre: "Peintre bâtiment", entreprise: "Rufisque Bâtiment", date: "7 août 2026", statut: "En cours", localisation: "Ziguinchor", experience: "3 ans d’expérience", telephone: "+221 77 789 01 23", email: "abdoulaye.sow@email.sn", lettre: "Peintre en bâtiment depuis 3 ans, disponible rapidement.", competences: ["Peinture", "Enduits"], documents: [{ nom: "CV_Abdoulaye_Sow.pdf" }] },
+  { id: "cda8", nom: "Aissatou Gueye", metier: "Électricienne", offre: "Électricien chantier", entreprise: "Thiès Électrique", date: "5 août 2026", statut: "Nouveau", localisation: "Mbour", experience: "7 ans d’expérience", telephone: "+221 76 890 12 34", email: "aissatou.gueye@email.sn", lettre: "Électricienne qualifiée avec 7 ans d’expérience en encadrement de chantier.", competences: ["Normes NF C 15-100", "Management d’équipe"], documents: [{ nom: "CV_Aissatou_Gueye.pdf" }] },
 ];
 
 function CandidaturesAdminDetail(row, { onBack, update, remove }) {
@@ -6932,7 +6939,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
         <div className="flex flex-col gap-4">
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center justify-between mb-1">
-              <h3 className="font-semibold" style={{ color: COLORS.slate }}>Détails de l'application</h3>
+              <h3 className="font-semibold" style={{ color: COLORS.slate }}>Détails de l’application</h3>
               <StatusBadge status={row.statut} />
             </div>
             <Row label="Offre postulée" value={row.offre} /><div className="h-2" />
@@ -6985,14 +6992,14 @@ function CandidaturesAdminScreen() {
 /* ---------- Missions (Admin) — custom detail ---------- */
 
 const MISSIONS_ADMIN_INITIAL = [
-  { id: "mia1", refId: "M-2026-041", description: "Réparation fuite d'eau urgente", prestataire: "Moussa Diop", client: "Alioune Sow", service: "Plomberie", statut: "En cours", montant: "45 000 FCFA", dateDebut: "15/04/2026 à 09:00", dateFin: "15/04/2026 à 13:00", duree: "4 heures", statutPaiement: "En attente", historique: [{ label: "Mission créée & Devis validé", meta: "14/04/2026 à 15:30 · Par Alioune Sow" }, { label: "Prestataire assigné", meta: "14/04/2026 à 16:00 · Moussa Diop" }, { label: "Début des travaux validé", meta: "15/04/2026 à 09:15 · Par le prestataire" }] },
-  { id: "mia2", refId: "M-2026-039", description: "Couture de rideaux sur mesure", prestataire: "Fatou Cissé", client: "Awa Ndiaye", service: "Couture", statut: "Terminée", montant: "65 000 FCFA", dateDebut: "10/04/2026 à 10:00", dateFin: "12/04/2026 à 17:00", duree: "2 jours", statutPaiement: "Payé", historique: [{ label: "Mission créée & Devis validé", meta: "09/04/2026 à 11:00 · Par Awa Ndiaye" }, { label: "Mission terminée", meta: "12/04/2026 à 17:00 · Par le prestataire" }] },
-  { id: "mia3", refId: "M-2026-038", description: "Installation tableau électrique", prestataire: "Ibrahima Diallo", client: "Dakar Bâtiment", service: "Électricité", statut: "Terminée", montant: "80 000 FCFA", dateDebut: "05/04/2026 à 08:00", dateFin: "05/04/2026 à 16:00", duree: "8 heures", statutPaiement: "Payé", historique: [] },
-  { id: "mia4", refId: "M-2026-035", description: "Construction mur de clôture", prestataire: "Amadou Sow", client: "Modou Fall", service: "Maçonnerie", statut: "En attente", montant: "120 000 FCFA", dateDebut: "20/04/2026 à 08:00", dateFin: "25/04/2026 à 18:00", duree: "5 jours", statutPaiement: "En attente", historique: [] },
+  { id: "mia1", refId: "M-2026-041", description: "Réparation fuite d’eau urgente", prestataire: "Moussa Diop", client: "Alioune Sow", service: "Plomberie", statut: "En cours", montant: "45 000 FCFA", dateDebut: "15 avril 2026 à 9 h", dateFin: "15 avril 2026 à 13 h", duree: "4 heures", statutPaiement: "En attente", historique: [{ label: "Mission créée et devis validé", meta: "14 avril 2026 à 15 h 30 · Par Alioune Sow" }, { label: "Prestataire assigné", meta: "14 avril 2026 à 16 h · Moussa Diop" }, { label: "Début des travaux validé", meta: "15 avril 2026 à 9 h 15 · Par le prestataire" }] },
+  { id: "mia2", refId: "M-2026-039", description: "Couture de rideaux sur mesure", prestataire: "Fatou Cissé", client: "Awa Ndiaye", service: "Couture", statut: "Terminée", montant: "65 000 FCFA", dateDebut: "10 avril 2026 à 10 h", dateFin: "12 avril 2026 à 17 h", duree: "2 jours", statutPaiement: "Payé", historique: [{ label: "Mission créée et devis validé", meta: "9 avril 2026 à 11 h · Par Awa Ndiaye" }, { label: "Mission terminée", meta: "12 avril 2026 à 17 h · Par le prestataire" }] },
+  { id: "mia3", refId: "M-2026-038", description: "Installation tableau électrique", prestataire: "Ibrahima Diallo", client: "Dakar Bâtiment", service: "Électricité", statut: "Terminée", montant: "80 000 FCFA", dateDebut: "5 avril 2026 à 8 h", dateFin: "5 avril 2026 à 16 h", duree: "8 heures", statutPaiement: "Payé", historique: [] },
+  { id: "mia4", refId: "M-2026-035", description: "Construction mur de clôture", prestataire: "Amadou Sow", client: "Modou Fall", service: "Maçonnerie", statut: "En attente", montant: "120 000 FCFA", dateDebut: "20 avril 2026 à 8 h", dateFin: "25 avril 2026 à 18 h", duree: "5 jours", statutPaiement: "En attente", historique: [] },
   { id: "mia5", refId: "M-2026-032", description: "Peinture façade extérieure", prestataire: "Babacar Gueye", client: "Seynabou Diop", service: "Peinture", statut: "Annulée", montant: "35 000 FCFA", dateDebut: "—", dateFin: "—", duree: "—", statutPaiement: "Annulé", historique: [] },
-  { id: "mia6", refId: "M-2026-030", description: "Entretien climatiseur split", prestataire: "Mariama Sarr", client: "Pathé Gueye", service: "Climatisation", statut: "Terminée", montant: "20 000 FCFA", dateDebut: "01/04/2026 à 09:00", dateFin: "01/04/2026 à 11:00", duree: "2 heures", statutPaiement: "Payé", historique: [] },
-  { id: "mia7", refId: "M-2026-027", description: "Soudure structure métallique", prestataire: "Cheikh Ndiaye", client: "Gorgui Diouf", service: "Soudure", statut: "Terminée", montant: "45 000 FCFA", dateDebut: "20/03/2026 à 08:00", dateFin: "21/03/2026 à 17:00", duree: "2 jours", statutPaiement: "Payé", historique: [] },
-  { id: "mia8", refId: "M-2026-025", description: "Tresses et soins capillaires", prestataire: "Khady Ndiaye", client: "Aicha Cissé", service: "Esthétique", statut: "Terminée", montant: "10 000 FCFA", dateDebut: "15/03/2026 à 10:00", dateFin: "15/03/2026 à 12:00", duree: "2 heures", statutPaiement: "Payé", historique: [] },
+  { id: "mia6", refId: "M-2026-030", description: "Entretien climatiseur split", prestataire: "Mariama Sarr", client: "Pathé Gueye", service: "Climatisation", statut: "Terminée", montant: "20 000 FCFA", dateDebut: "1er avril 2026 à 9 h", dateFin: "1er avril 2026 à 11 h", duree: "2 heures", statutPaiement: "Payé", historique: [] },
+  { id: "mia7", refId: "M-2026-027", description: "Soudure structure métallique", prestataire: "Cheikh Ndiaye", client: "Gorgui Diouf", service: "Soudure", statut: "Terminée", montant: "45 000 FCFA", dateDebut: "20 mars 2026 à 8 h", dateFin: "21 mars 2026 à 17 h", duree: "2 jours", statutPaiement: "Payé", historique: [] },
+  { id: "mia8", refId: "M-2026-025", description: "Tresses et soins capillaires", prestataire: "Khady Ndiaye", client: "Aicha Cissé", service: "Esthétique", statut: "Terminée", montant: "10 000 FCFA", dateDebut: "15 mars 2026 à 10 h", dateFin: "15 mars 2026 à 12 h", duree: "2 heures", statutPaiement: "Payé", historique: [] },
 ];
 
 function MissionsAdminDetail(row, { onBack, update }) {
@@ -7056,7 +7063,7 @@ function MissionsAdminScreen() {
       searchKeys={["refId", "prestataire", "client", "service"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["En cours", "Terminée", "En attente", "Annulée"], matcher: (r, v) => r.statut === v }]}
       columns={[
-        { key: "refId", label: "ID Mission", flex: 1 },
+        { key: "refId", label: "Numéro de mission", flex: 1 },
         { key: "prestataire", label: "Prestataire", flex: 1.4, render: (r) => <IdentityCell nom={r.prestataire} /> },
         { key: "client", label: "Client", flex: 1 },
         { key: "service", label: "Service", flex: 1 },
@@ -7072,14 +7079,14 @@ function MissionsAdminScreen() {
 /* ---------- Vérification CV & Diplômes (Admin) ---------- */
 
 const DOCUMENTS_ADMIN_INITIAL = [
-  { id: "da1", nom: "Moustapha Diop", metier: "Électricien BTP", document: "Diplôme d'État (CAP)", fichier: "CAP_Electricite_Diop.pdf", date: "14 Août 2026", statut: "En attente", taille: "2.4 MB", pages: 2, correspondance: 85 },
-  { id: "da2", nom: "Fatoumata Diallo", metier: "Couturière Styliste", document: "Certificat de couture", fichier: "Attestation_Diallo.pdf", date: "14 Août 2026", statut: "En attente", taille: "1.1 MB", pages: 1, correspondance: 72 },
-  { id: "da3", nom: "Amadou Sow", metier: "Maçon Applicateur", document: "CV Technique", fichier: "CV_Sow_Macon.pdf", date: "13 Août 2026", statut: "En cours", taille: "0.8 MB", pages: 2, correspondance: 60 },
-  { id: "da4", nom: "Aissatou Ndiaye", metier: "Coiffeuse Esthéticienne", document: "Certificat Pro", fichier: "Certif_Salon.pdf", date: "12 Août 2026", statut: "Validé", taille: "1.5 MB", pages: 1, correspondance: 90 },
-  { id: "da5", nom: "Ibrahima Fall", metier: "Mécanicien Auto", document: "CAP Mécanique", fichier: "CAP_Meca_Fall.pdf", date: "11 Août 2026", statut: "Validé", taille: "2.0 MB", pages: 2, correspondance: 88 },
-  { id: "da6", nom: "Mariama Sarr", metier: "Transformateur Agro", document: "Attestation", fichier: "Attestation_Sarr.pdf", date: "10 Août 2026", statut: "Rejeté", taille: "0.9 MB", pages: 1, correspondance: 40 },
-  { id: "da7", nom: "Ousmane Cissé", metier: "Plombier Sanitaire", document: "CV Technique", fichier: "CV_Cisse_Plomberie.pdf", date: "09 Août 2026", statut: "Validé", taille: "1.2 MB", pages: 2, correspondance: 82 },
-  { id: "da8", nom: "Aminata Gueye", metier: "Teinturière Artisanale", document: "Attestation", fichier: "Certif_Teinture.pdf", date: "08 Août 2026", statut: "En attente", taille: "1.0 MB", pages: 1, correspondance: 65 },
+  { id: "da1", nom: "Moustapha Diop", metier: "Électricien BTP", document: "Diplôme d’État (CAP)", fichier: "CAP_Electricite_Diop.pdf", date: "14 août 2026", statut: "En attente", taille: "2.4 MB", pages: 2, correspondance: 85 },
+  { id: "da2", nom: "Fatoumata Diallo", metier: "Couturière styliste", document: "Certificat de couture", fichier: "Attestation_Diallo.pdf", date: "14 août 2026", statut: "En attente", taille: "1.1 MB", pages: 1, correspondance: 72 },
+  { id: "da3", nom: "Amadou Sow", metier: "Maçon applicateur", document: "CV technique", fichier: "CV_Sow_Macon.pdf", date: "13 août 2026", statut: "En cours", taille: "0.8 MB", pages: 2, correspondance: 60 },
+  { id: "da4", nom: "Aissatou Ndiaye", metier: "Coiffeuse esthéticienne", document: "Certificat Pro", fichier: "Certif_Salon.pdf", date: "12 août 2026", statut: "Validé", taille: "1.5 MB", pages: 1, correspondance: 90 },
+  { id: "da5", nom: "Ibrahima Fall", metier: "Mécanicien auto", document: "CAP mécanique", fichier: "CAP_Meca_Fall.pdf", date: "11 août 2026", statut: "Validé", taille: "2.0 MB", pages: 2, correspondance: 88 },
+  { id: "da6", nom: "Mariama Sarr", metier: "Transformateur agroalimentaire", document: "Attestation", fichier: "Attestation_Sarr.pdf", date: "10 août 2026", statut: "Rejeté", taille: "0.9 MB", pages: 1, correspondance: 40 },
+  { id: "da7", nom: "Ousmane Cissé", metier: "Plombier sanitaire", document: "CV technique", fichier: "CV_Cisse_Plomberie.pdf", date: "9 août 2026", statut: "Validé", taille: "1.2 MB", pages: 2, correspondance: 82 },
+  { id: "da8", nom: "Aminata Gueye", metier: "Teinturière artisanale", document: "Attestation", fichier: "Certif_Teinture.pdf", date: "8 août 2026", statut: "En attente", taille: "1.0 MB", pages: 1, correspondance: 65 },
 ];
 
 function DocumentControlScreen({ doc, onBack, onDecide }) {
@@ -7108,7 +7115,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             </div>
           </div>
           <div className="rounded-lg border bg-surface p-10 flex items-center justify-center" style={{ borderColor: COLORS.border, minHeight: 480 }}>
-            {/* Fac-similé d'un document papier : il reste clair, quel que soit le thème. */}
+            {/* Fac-similé d’un document papier : il reste clair, quel que soit le thème. */}
             <div
               data-theme="clair"
               className="bg-surface text-center px-10 py-10"
@@ -7116,7 +7123,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
             >
               <p className="text-xs tracking-widest mb-6" style={{ color: "#9A8F7A" }}>RÉPUBLIQUE DU SÉNÉGAL</p>
               <div className="w-14 h-14 rounded-full border-2 mx-auto mb-6" style={{ borderColor: "#C9A227" }} />
-              <h2 className="text-2xl font-semibold mb-1" style={{ color: "#2B2B2B", fontFamily: "Georgia, serif" }}>Certificat d'Aptitude<br />Professionnelle</h2>
+              <h2 className="text-2xl font-semibold mb-1" style={{ color: "#2B2B2B", fontFamily: "Georgia, serif" }}>Certificat d’Aptitude<br />Professionnelle</h2>
               <p className="text-sm italic my-4" style={{ color: "#6B6259" }}>Électricité - Équipement industriel</p>
               <div className="w-full h-px my-4" style={{ background: "#E5E0D5" }} />
               <p className="text-xs" style={{ color: "#9A8F7A" }}>Décerné à</p>
@@ -7247,20 +7254,20 @@ function VerificationCVScreen() {
 }
 
 /* ---------- Messagerie (Admin et profils) ----------
-   Une seule messagerie : chaque profil échange avec l'équipe LIGGEEY, et l'admin répond depuis
+   Une seule messagerie : chaque profil échange avec l’équipe LIGGEEY, et l’admin répond depuis
    Communication › Messagerie. Les conversations sont partagées (mémoire « conversations »).
-   - de : "moi" = l'équipe LIGGEEY (admin), "eux" = le profil ;
+   - de : "moi" = l’équipe LIGGEEY (admin), "eux" = le profil ;
    - espace : rattache la conversation au profil connecté de cet espace (démo) ;
-   - nonLu : messages non lus par l'admin ; nonLuProfil : non lus par le profil. */
+   - nonLu : messages non lus par l’admin ; nonLuProfil : non lus par le profil. */
 
 const CONVERSATIONS_INITIAL = [
   {
     id: "c1", nom: "Moustapha Diop", role: "Prestataire · Électricien", nonLu: 2,
     messages: [
-      { de: "eux", texte: "Bonjour, j'ai envoyé mon diplôme CAP électricité hier. Pouvez-vous me dire si le format convient ?", heure: "09:12" },
-      { de: "moi", texte: "Bonjour Moustapha, nous l'avons bien reçu. Le scan est un peu flou en bas de page.", heure: "09:40" },
-      { de: "eux", texte: "D'accord, je peux le renvoyer en meilleure qualité ce soir.", heure: "10:02" },
-      { de: "eux", texte: "Faut-il aussi l'attestation de stage ?", heure: "10:03" },
+      { de: "eux", texte: "Bonjour, j’ai envoyé mon diplôme CAP électricité hier. Pouvez-vous me dire si le format convient ?", heure: "09:12" },
+      { de: "moi", texte: "Bonjour Moustapha, nous l’avons bien reçu. Le scan est un peu flou en bas de page.", heure: "09:40" },
+      { de: "eux", texte: "D’accord, je peux le renvoyer en meilleure qualité ce soir.", heure: "10:02" },
+      { de: "eux", texte: "Faut-il aussi l’attestation de stage ?", heure: "10:03" },
     ],
   },
   {
@@ -7270,22 +7277,22 @@ const CONVERSATIONS_INITIAL = [
     ],
   },
   {
-    id: "c3", espace: "chercheur", nom: "Absatou Diallo", role: "Chercheuse d'emploi", nonLu: 0, nonLuProfil: 1,
+    id: "c3", espace: "chercheur", nom: "Absatou Diallo", role: "Chercheuse d’emploi", nonLu: 0, nonLuProfil: 1,
     messages: [
-      { de: "eux", texte: "Merci pour la mise en relation avec Cheikh Fall, la première séance s'est très bien passée.", heure: "Lun." },
-      { de: "moi", texte: "Avec plaisir Absatou ! N'hésitez pas à revenir vers nous après la simulation d'entretien.", heure: "Lun." },
+      { de: "eux", texte: "Merci pour la mise en relation avec Cheikh Fall, la première séance s’est très bien passée.", heure: "Lun." },
+      { de: "moi", texte: "Avec plaisir Absatou ! N’hésitez pas à revenir vers nous après la simulation d’entretien.", heure: "Lun." },
     ],
   },
   {
     id: "c6", espace: "prestataire", nom: "Mamadou Ndiaye", role: "Prestataire · Électricien", nonLu: 0, nonLuProfil: 1,
     messages: [
-      { de: "moi", texte: "Bonjour Mamadou, bienvenue sur LIGGEEY ! Si un jour vous souhaitez régulariser votre activité, nous pouvons vous accompagner : tout est expliqué dans l'écran Régularisation. Ce n'est pas obligatoire.", heure: "Hier" },
+      { de: "moi", texte: "Bonjour Mamadou, bienvenue sur LIGGEEY ! Si un jour vous souhaitez régulariser votre activité, nous pouvons vous accompagner : tout est expliqué dans l’écran Régularisation. Ce n’est pas obligatoire.", heure: "Hier" },
     ],
   },
   {
     id: "c4", nom: "Fatou Sow", role: "Prestataire · Couturière", nonLu: 0,
     messages: [
-      { de: "moi", texte: "Bonjour Fatou, il reste 3 places pour l'atelier couture de Pikine. Souhaitez-vous animer la seconde session ?", heure: "28 sept." },
+      { de: "moi", texte: "Bonjour Fatou, il reste 3 places pour l’atelier couture de Pikine. Souhaitez-vous animer la seconde session ?", heure: "28 sept." },
       { de: "eux", texte: "Oui, avec plaisir. Je suis disponible le samedi.", heure: "28 sept." },
     ],
   },
@@ -7293,14 +7300,14 @@ const CONVERSATIONS_INITIAL = [
     id: "c5", nom: "Diallo & Fils", role: "Client · Particulier", nonLu: 0,
     messages: [
       { de: "eux", texte: "La mission de plomberie est terminée et réglée. Comment laisser un avis au prestataire ?", heure: "25 sept." },
-      { de: "moi", texte: "Depuis l'onglet Missions, cliquez sur la mission terminée puis sur « Laisser un avis ».", heure: "25 sept." },
+      { de: "moi", texte: "Depuis l’onglet Missions, cliquez sur la mission terminée puis sur « Laisser un avis ».", heure: "25 sept." },
     ],
   },
 ];
 
 function MessagerieTab() {
   const [convs, setConvs] = useStore("conversations", CONVERSATIONS_INITIAL);
-  // Sur ordinateur, la première conversation est ouverte d'emblée ; sur mobile, on part de la liste.
+  // Sur ordinateur, la première conversation est ouverte d’emblée ; sur mobile, on part de la liste.
   const [activeId, setActiveId] = useState(() => (typeof window !== "undefined" && window.matchMedia && window.matchMedia("(min-width: 768px)").matches ? CONVERSATIONS_INITIAL[0]?.id ?? null : null));
   const [query, setQuery] = useState("");
   const [draft, setDraft] = useState("");
@@ -7396,9 +7403,9 @@ function MessagerieTab() {
   );
 }
 
-/* ---------- Messages (profils) : conversation avec l'équipe LIGGEEY ---------- */
+/* ---------- Messages (profils) : conversation avec l’équipe LIGGEEY ---------- */
 
-const ROLE_CONVERSATION = { chercheur: "Chercheur d'emploi", prestataire: "Prestataire", entreprise: "Entreprise", jeune: "Cap Métier", mentor: "Mentor" };
+const ROLE_CONVERSATION = { chercheur: "Chercheur d’emploi", prestataire: "Prestataire", entreprise: "Entreprise", jeune: "Cap Métier", mentor: "Mentor" };
 
 function MessagesScreen({ espace, user }) {
   const [convs, setConvs] = useStore("conversations", CONVERSATIONS_INITIAL);
@@ -7437,7 +7444,7 @@ function MessagesScreen({ espace, user }) {
         </div>
         <div className="flex max-h-[460px] min-h-[360px] flex-1 flex-col gap-4 overflow-y-auto px-5 py-5" aria-live="polite">
           {messages.length === 0 ? (
-            <App.EtatVide icone={MessageCircle} titre="Aucun message pour l'instant" texte="Écrivez votre question ci-dessous : l'équipe LIGGEEY vous répond ici même." />
+            <App.EtatVide icone={MessageCircle} titre="Aucun message pour l’instant" texte="Écrivez votre question ci-dessous : l’équipe LIGGEEY vous répond ici même." />
           ) : (
             messages.map((m, i) => {
               const suivant = messages[i + 1];
@@ -7456,18 +7463,18 @@ function MessagesScreen({ espace, user }) {
           )}
           <div ref={endRef} />
         </div>
-        <App.ZoneSaisie onEnvoyer={envoyer} placeholder="Écrire à l'équipe LIGGEEY…" />
+        <App.ZoneSaisie onEnvoyer={envoyer} placeholder="Écrire à l’équipe LIGGEEY…" />
       </App.Carte>
 
       <div className="space-y-4">
         <App.Carte titre="Autres moyens de nous joindre">
-          <p className="mb-3 text-sm text-secondaire">Vous préférez parler de vive voix ? Écrivez-nous sur WhatsApp ou passez au bureau d'accueil de Dakar.</p>
+          <p className="mb-3 text-sm text-secondaire">Vous préférez parler de vive voix ? Écrivez-nous sur WhatsApp ou passez au bureau d’accueil de Dakar.</p>
           <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className="inline-flex min-h-[44px] items-center gap-2 rounded bg-doux px-4 text-sm font-semibold text-principal hover:bg-doux-fort">
             <MessageCircle size={16} aria-hidden="true" /> WhatsApp
           </a>
         </App.Carte>
         <App.Carte titre="Votre sécurité">
-          <p className="text-sm text-secondaire">L'équipe LIGGEEY ne vous demandera jamais votre mot de passe ni un code de paiement Wave ou Orange Money.</p>
+          <p className="text-sm text-secondaire">L’équipe LIGGEEY ne vous demandera jamais votre mot de passe ni un code de paiement Wave ou Orange Money.</p>
         </App.Carte>
       </div>
     </div>
@@ -7477,15 +7484,15 @@ function MessagesScreen({ espace, user }) {
 /* ---------- Archives (Admin) ---------- */
 
 const ARCHIVES_INITIAL = [
-  { id: "a1", titre: "Diplôme BTS Comptabilité — Mariama Ba", type: "Document", categorie: "Vérification", date: "12/09/2026", taille: "1,2 Mo" },
-  { id: "a2", titre: "Signalement offre #2791 — résolu", type: "Discussion", categorie: "Modération", date: "08/09/2026", taille: "14 messages" },
-  { id: "a3", titre: "Contrat mission #M-2026-0745", type: "Document", categorie: "Missions", date: "02/09/2026", taille: "340 Ko" },
-  { id: "a4", titre: "Litige paiement — Diallo & Fils", type: "Discussion", categorie: "Missions", date: "29/08/2026", taille: "22 messages" },
-  { id: "a5", titre: "Attestation formation Électricité Pro (lot de 15)", type: "Document", categorie: "Formations", date: "06/08/2026", taille: "4,8 Mo" },
-  { id: "a6", titre: "Pièce d'identité — Ibrahima Faye", type: "Document", categorie: "Vérification", date: "30/07/2026", taille: "860 Ko" },
-  { id: "a7", titre: "Demande de suppression de compte — Khady Ndour", type: "Discussion", categorie: "Comptes", date: "21/07/2026", taille: "6 messages" },
-  { id: "a8", titre: "Kbis / RCCM — Dakar Services SARL", type: "Document", categorie: "Vérification", date: "15/07/2026", taille: "1,9 Mo" },
-  { id: "a9", titre: "Retour participants — Atelier Couture Pikine", type: "Discussion", categorie: "Formations", date: "02/07/2026", taille: "31 messages" },
+  { id: "a1", titre: "Diplôme BTS Comptabilité — Mariama Ba", type: "Document", categorie: "Vérification", date: "12 septembre 2026", taille: "1,2 Mo" },
+  { id: "a2", titre: "Signalement offre #2791 — résolu", type: "Discussion", categorie: "Modération", date: "8 septembre 2026", taille: "14 messages" },
+  { id: "a3", titre: "Contrat mission #M-2026-0745", type: "Document", categorie: "Missions", date: "2 septembre 2026", taille: "340 Ko" },
+  { id: "a4", titre: "Litige paiement — Diallo & Fils", type: "Discussion", categorie: "Missions", date: "29 août 2026", taille: "22 messages" },
+  { id: "a5", titre: "Attestation formation Électricité Pro (lot de 15)", type: "Document", categorie: "Formations", date: "6 août 2026", taille: "4,8 Mo" },
+  { id: "a6", titre: "Pièce d’identité — Ibrahima Faye", type: "Document", categorie: "Vérification", date: "30 juillet 2026", taille: "860 Ko" },
+  { id: "a7", titre: "Demande de suppression de compte — Khady Ndour", type: "Discussion", categorie: "Comptes", date: "21 juillet 2026", taille: "6 messages" },
+  { id: "a8", titre: "Kbis / RCCM — Dakar Services SARL", type: "Document", categorie: "Vérification", date: "15 juillet 2026", taille: "1,9 Mo" },
+  { id: "a9", titre: "Retour participants — Atelier couture à Pikine", type: "Discussion", categorie: "Formations", date: "2 juillet 2026", taille: "31 messages" },
 ];
 
 function ArchivesTab() {
@@ -7502,7 +7509,7 @@ function ArchivesTab() {
 
   function restore(a) {
     setItems((list) => list.filter((x) => x.id !== a.id));
-    notify(`« ${a.titre} » restauré dans l'espace actif.`);
+    notify(`« ${a.titre} » restauré dans l’espace actif.`);
   }
 
   return (
@@ -7522,7 +7529,7 @@ function ArchivesTab() {
           label="Rechercher dans les archives"
           className="w-full sm:max-w-xs sm:flex-1"
         />
-        <div className="flex flex-wrap gap-2" role="group" aria-label="Type d'archive">
+        <div className="flex flex-wrap gap-2" role="group" aria-label="Type d’archive">
           {["Tous", "Document", "Discussion"].map((t) => (
             <button key={t} type="button" onClick={() => { setType(t); setPage(1); }} aria-pressed={type === t} className={FORM.pastille(type === t)}>
               {t === "Tous" ? "Tous" : t === "Document" ? "Documents" : "Discussions"}
@@ -7571,12 +7578,12 @@ const EVENT_TYPE_COLORS = {
 
 const PLANNING_EVENTS_INITIAL = [
   { id: "e1", titre: "Formation Électricité Pro", type: "Formation", debut: "2026-10-03", fin: "2026-10-05", meta: "15 inscrits" },
-  { id: "e2", titre: "Atelier Couture Pikine", type: "Mission", debut: "2026-10-10", fin: "2026-10-10", meta: "28 places" },
-  { id: "e3", titre: "Limite Candidatures Offres BTP", type: "Date limite", debut: "2026-10-15", fin: "2026-10-15", meta: "Alerte système" },
-  { id: "e4", titre: "Session Mentorat Individuel", type: "Événement", debut: "2026-10-18", fin: "2026-10-19", meta: "12 sessions" },
-  { id: "e5", titre: "Forum Emploi Artisanat", type: "Événement", debut: "2026-10-25", fin: "2026-10-25", meta: "500 attendus" },
+  { id: "e2", titre: "Atelier couture à Pikine", type: "Mission", debut: "2026-10-10", fin: "2026-10-10", meta: "28 places" },
+  { id: "e3", titre: "Limite des candidatures, offres BTP", type: "Date limite", debut: "2026-10-15", fin: "2026-10-15", meta: "Alerte système" },
+  { id: "e4", titre: "Session de mentorat individuel", type: "Événement", debut: "2026-10-18", fin: "2026-10-19", meta: "12 sessions" },
+  { id: "e5", titre: "Forum emploi et artisanat", type: "Événement", debut: "2026-10-25", fin: "2026-10-25", meta: "500 attendus" },
   { id: "e6", titre: "Formation Plomberie sanitaire", type: "Formation", debut: "2026-11-07", fin: "2026-11-09", meta: "12 inscrits" },
-  { id: "e7", titre: "Clôture offres Hôtellerie", type: "Date limite", debut: "2026-11-21", fin: "2026-11-21", meta: "Alerte système" },
+  { id: "e7", titre: "Clôture des offres hôtellerie", type: "Date limite", debut: "2026-11-21", fin: "2026-11-21", meta: "Alerte système" },
   { id: "e8", titre: "Journée portes ouvertes LIGGEEY", type: "Événement", debut: "2026-10-10", fin: "2026-10-10", meta: "Guédiawaye" },
 ];
 
@@ -7621,7 +7628,7 @@ function EventChip({ e }) {
 
 function EventForm({ defaultDate, onSave, onCancel }) {
   const f = useFormulaire({ titre: "", type: "Formation", debut: defaultDate, fin: defaultDate, meta: "" }, (v) => ({
-    titre: !v.titre.trim() && "Donnez un titre à l'événement.",
+    titre: !v.titre.trim() && "Donnez un titre à l’événement.",
     fin: v.fin < v.debut && "La date de fin doit suivre la date de début.",
   }));
   const { v, err, attrs } = f;
@@ -7634,13 +7641,13 @@ function EventForm({ defaultDate, onSave, onCancel }) {
         <div className="mb-5 flex items-start justify-between gap-4">
           <div>
             <h2 id="event-form-title" className="text-lg font-semibold text-principal">Ajouter un événement</h2>
-            <p className="mt-0.5 text-sm text-discret">Les champs marqués d'un * sont obligatoires.</p>
+            <p className="mt-0.5 text-sm text-discret">Les champs marqués d’un * sont obligatoires.</p>
           </div>
           <App.BoutonIcone icone={X} label="Fermer" onClick={onCancel} />
         </div>
         <div className="grid grid-cols-1 gap-5 sm:grid-cols-2">
           <Champ id="ev-titre" label="Titre" requis erreur={err("titre")} large>
-            <input {...attrs("ev-titre", "titre", { requis: true })} placeholder="Ex : Formation soudure, niveau 1" className={FORM.champ(err("titre"))} />
+            <input {...attrs("ev-titre", "titre", { requis: true })} placeholder="Ex. : Formation soudure, niveau 1" className={FORM.champ(err("titre"))} />
           </Champ>
           <Champ id="ev-type" label="Type" large>
             <ListeChamp {...attrs("ev-type", "type")}>
@@ -7654,12 +7661,12 @@ function EventForm({ defaultDate, onSave, onCancel }) {
             <input {...attrs("ev-fin", "fin")} type="date" min={v.debut} className={FORM.champ(err("fin"))} />
           </Champ>
           <Champ id="ev-meta" label="Détail" aide="Lieu, nombre de places…" large>
-            <input {...attrs("ev-meta", "meta", { aide: true })} placeholder="Ex : 20 places, Pikine" className={FORM.champ()} />
+            <input {...attrs("ev-meta", "meta", { aide: true })} placeholder="Ex. : 20 places, Pikine" className={FORM.champ()} />
           </Champ>
         </div>
         <div className={FORM.actions}>
           <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
-          <App.Bouton type="submit">Ajouter l'événement</App.Bouton>
+          <App.Bouton type="submit">Ajouter l’événement</App.Bouton>
         </div>
       </form>
     </ModalFrame>
@@ -7816,11 +7823,11 @@ function PlanningScreen() {
 /* ---------- Centre de communication (Admin) ---------- */
 
 const NOTIFICATIONS_INITIAL = [
-  { id: "n1", titre: "Nouveau profil en attente de vérification", badge: "Utilisateurs", description: "Moustapha Diop a soumis un document d'électricien CAP.", temps: "Il y a 5 min", lu: false, icon: UserPlus, target: "verifications" },
-  { id: "n2", titre: "Signalement reçu – Offre #2847", badge: "Système", description: "Offre signalée pour motif d'informations suspicieuses par un utilisateur.", temps: "Il y a 2 heures", lu: false, icon: AlertCircle, target: "offres" },
-  { id: "n3", titre: "Formation complétée par 15 participants", badge: "Système", description: "La formation « Électricité Pro » s'est achevée avec succès.", temps: "Il y a 4 heures", lu: true, icon: CheckCircle2, target: "formations" },
+  { id: "n1", titre: "Nouveau profil en attente de vérification", badge: "Utilisateurs", description: "Moustapha Diop a soumis un document d’électricien CAP.", temps: "Il y a 5 min", lu: false, icon: UserPlus, target: "verifications" },
+  { id: "n2", titre: "Signalement reçu – Offre #2847", badge: "Système", description: "Offre signalée pour motif d’informations suspicieuses par un utilisateur.", temps: "Il y a 2 heures", lu: false, icon: AlertCircle, target: "offres" },
+  { id: "n3", titre: "Formation complétée par 15 participants", badge: "Système", description: "La formation « Électricité Pro » s’est achevée avec succès.", temps: "Il y a 4 heures", lu: true, icon: CheckCircle2, target: "formations" },
   { id: "n4", titre: "Mission #M-2024-0892 terminée", badge: "Système", description: "Diallo & Fils a marqué le travail de plomberie comme payé.", temps: "Hier", lu: true, icon: CheckCircle2, target: "missions" },
-  { id: "n5", titre: "3 nouveaux avis à modérer", badge: "Utilisateurs", description: "Les avis d'utilisateurs sur les prestataires de Pikine attendent approbation.", temps: "Hier", lu: true, icon: AlertCircle, target: "prestataires" },
+  { id: "n5", titre: "3 nouveaux avis à modérer", badge: "Utilisateurs", description: "Les avis d’utilisateurs sur les prestataires de Pikine attendent approbation.", temps: "Hier", lu: true, icon: AlertCircle, target: "prestataires" },
 ];
 
 function CommunicationScreen({ onNavigate, ongletInitial }) {
@@ -7897,7 +7904,7 @@ function CommunicationScreen({ onNavigate, ongletInitial }) {
             </div>
             <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <div className="flex items-center gap-2 mb-2"><Archive size={16} color={COLORS.slate} /><h3 className="font-semibold" style={{ color: COLORS.slate }}>Archives plateforme</h3></div>
-              <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>Accédez à l'historique complet des dossiers archivés pour libérer l'espace actif de la base.</p>
+              <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>Accédez à l’historique complet des dossiers archivés pour libérer l’espace actif de la base.</p>
               <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents archivés</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>342</p></div>
               <div className="flex items-center justify-between py-1 mb-3"><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>89</p></div>
               <button type="button" onClick={() => setMainTab("Archives")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>Consulter les archives</button>
@@ -7975,7 +7982,7 @@ function ParametresScreen() {
         <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-4" style={{ color: COLORS.slate }}>Compte administrateur</h3>
           <Row label="Nom" value="Admin LIGGEEY" /><div className="h-2" />
-          <Row label="Rôle" value="Super Admin" /><div className="h-2" />
+          <Row label="Rôle" value="Super admin" /><div className="h-2" />
           <Row label="E-mail" value="admin@liggeey.sn" />
         </div>
         <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
@@ -7988,7 +7995,7 @@ function ParametresScreen() {
         </div>
       </div>
 
-      <App.Carte titre="Apparence" sousTitre="Le thème s'applique tout de suite et reste mémorisé sur cet appareil." className="mb-4">
+      <App.Carte titre="Apparence" sousTitre="Le thème s’applique tout de suite et reste mémorisé sur cet appareil." className="mb-4">
         <App.ChoixTheme label="Thème de la plateforme" />
       </App.Carte>
 
@@ -8016,7 +8023,7 @@ function ParametresScreen() {
 
 /* =====================================================================
    ABONNEMENTS & OFFRES PREMIUM
-   - Offres par type d'utilisateur (chercheur, prestataire, entreprise)
+   - Offres par type d’utilisateur (chercheur, prestataire, entreprise)
    - Limites mensuelles + fonctionnalités réservées
    - Paiement mobile money (Wave, Orange Money), tarifs alignés sur la page Tarifs du site
    - Pilotage admin : tarifs, quotas, abonnés, transactions
@@ -8029,6 +8036,11 @@ function usePlan() {
 
 const UNLIMITED = Infinity;
 
+/* Note sur 5, à la française : 4,5 (virgule décimale). */
+function noteFr(n) {
+  return Number(n || 0).toFixed(1).replace(".", ",");
+}
+
 function fcfa(n) {
   return `${String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FCFA`;
 }
@@ -8036,7 +8048,7 @@ function fcfa(n) {
 function todayFr(offsetMonths = 0) {
   const d = demoNow();
   d.setMonth(d.getMonth() + offsetMonths);
-  return d.toLocaleDateString("fr-FR");
+  return dateFr(d);
 }
 
 const PLANS_INITIAL = {
@@ -8045,15 +8057,15 @@ const PLANS_INITIAL = {
     { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { candidatures: UNLIMITED }, features: { formationsPremium: true, mentorat: true, miseEnAvant: true }, avantages: ["Tout le Pack Essentiel", "Candidatures illimitées", "Profil mis en avant auprès des recruteurs", "Sessions de mentorat collectives", "Formations premium incluses", "Voir qui a consulté votre profil"] },
   ],
   prestataire: [
-    { id: "essentiel", nom: "Essentiel", prixMensuel: 1500, description: "Les fonctionnalités essentielles pour proposer vos services.", limits: { services: 10 }, features: {}, avantages: ["Profil complet et badge « Profil vérifié »", "Jusqu'à 10 services publiés", "Formations gratuites avec certificat", "Guide de formalisation en ligne"] },
+    { id: "essentiel", nom: "Essentiel", prixMensuel: 1500, description: "Les fonctionnalités essentielles pour proposer vos services.", limits: { services: 10 }, features: {}, avantages: ["Profil complet et badge « Profil vérifié »", "Jusqu’à 10 services publiés", "Formations gratuites avec certificat", "Guide de formalisation en ligne"] },
     { id: "premium", nom: "Premium", prixMensuel: 3000, recommande: true, description: "Pour aller plus loin : fonctionnalités avancées, mentorat, certaines formations.", limits: { services: UNLIMITED }, features: { formationsPremium: true, mentorat: true, contreOffre: true, badgePro: true, accompagnementRegularisation: true }, avantages: ["Tout le Pack Essentiel", "Services illimités", "Profil prioritaire et badge Premium", "Contre-propositions de tarif aux clients", "Sessions de mentorat collectives", "Formations premium incluses"] },
   ],
   entreprise: [
-    { id: "premium", nom: "Entreprise", prixMensuel: 40000, description: "Publication d'offres, sélection et short-list des profils par LIGGEEY.", limits: { offres: UNLIMITED }, features: { coordonnees: true, contactPrestataires: true, sponsoring: true }, avantages: ["Offres illimitées", "Sélection et short-list des profils par LIGGEEY", "Coordonnées et CV des candidats", "Contact direct et missions aux prestataires", "Offres sponsorisées en tête de liste"] },
+    { id: "premium", nom: "Entreprise", prixMensuel: 40000, description: "Publication d’offres, sélection et short-list des profils par LIGGEEY.", limits: { offres: UNLIMITED }, features: { coordonnees: true, contactPrestataires: true, sponsoring: true }, avantages: ["Offres illimitées", "Sélection et short-list des profils par LIGGEEY", "Coordonnées et CV des candidats", "Contact direct et missions aux prestataires", "Offres sponsorisées en tête de liste"] },
   ],
 };
 
-const ESPACE_LABELS = { chercheur: "Chercheur d'emploi", prestataire: "Prestataire", entreprise: "Entreprise" };
+const ESPACE_LABELS = { chercheur: "Chercheur d’emploi", prestataire: "Prestataire", entreprise: "Entreprise" };
 
 const LIMIT_LABELS = {
   candidatures: "Candidatures ce mois-ci",
@@ -8066,20 +8078,20 @@ const UPGRADE_REASONS = {
   formationsPremium: { titre: "Cette formation est réservée à la formule Premium", texte: "Débloquez toutes les formations et obtenez les certificats associés.", feature: "formationsPremium" },
   mentorat: { titre: "Le mentorat est réservé à la formule Premium", texte: "Profitez des sessions de mentorat collectives avec des professionnels de votre secteur.", feature: "mentorat" },
   services: { titre: "Vous avez atteint le nombre maximum de services", texte: "Publiez autant de services que vous le souhaitez avec la formule Premium.", limit: "services" },
-  contreOffre: { titre: "Les contre-propositions sont réservées à la formule Premium", texte: "Négociez le tarif d'une mission directement avec le client.", feature: "contreOffre" },
-  offres: { titre: "Vous avez publié toutes vos offres du mois", texte: "Publiez davantage d'offres et touchez plus de candidats.", limit: "offres" },
+  contreOffre: { titre: "Les contre-propositions sont réservées à la formule Premium", texte: "Négociez le tarif d’une mission directement avec le client.", feature: "contreOffre" },
+  offres: { titre: "Vous avez publié toutes vos offres du mois", texte: "Publiez davantage d’offres et touchez plus de candidats.", limit: "offres" },
   coordonnees: { titre: "Coordonnées et CV réservés à la formule Premium", texte: "Contactez directement les candidats et téléchargez leurs documents.", feature: "coordonnees" },
   contactPrestataires: { titre: "Le contact direct avec les prestataires est réservé à la formule Premium", texte: "Échangez avec les artisans et proposez-leur des missions.", feature: "contactPrestataires" },
-  accompagnementRegularisation: { titre: "L'accompagnement par un conseiller est inclus dans Premium", texte: "Un conseiller LIGGEEY prépare vos dossiers avec vous et vous oriente vers les bons guichets.", feature: "accompagnementRegularisation" },
+  accompagnementRegularisation: { titre: "L’accompagnement par un conseiller est inclus dans Premium", texte: "Un conseiller LIGGEEY prépare vos dossiers avec vous et vous oriente vers les bons guichets.", feature: "accompagnementRegularisation" },
   sponsoring: { titre: "Les offres sponsorisées sont réservées à la formule Premium", texte: "Placez votre offre en tête des résultats pendant 7 jours.", feature: "sponsoring" },
 };
 
 const PREMIUM_FORMATIONS = new Set(["devweb", "excel", "leadership", "entrepreneuriat", "peinture-moderne", "soudure-tech", "solaire-pv"]);
 
 const SUBS_INITIAL = {
-  chercheur: { planId: "essentiel", cycle: "mensuel", moyen: "Wave", depuis: "01/09/2026", prochain: "01/11/2026" },
-  prestataire: { planId: "essentiel", cycle: "mensuel", moyen: "Orange Money", depuis: "15/08/2026", prochain: "15/10/2026" },
-  entreprise: { planId: "premium", cycle: "mensuel", moyen: "Wave", depuis: "03/09/2026", prochain: "03/11/2026" },
+  chercheur: { planId: "essentiel", cycle: "mensuel", moyen: "Wave", depuis: "1er septembre 2026", prochain: "1er novembre 2026" },
+  prestataire: { planId: "essentiel", cycle: "mensuel", moyen: "Orange Money", depuis: "15 août 2026", prochain: "15 octobre 2026" },
+  entreprise: { planId: "premium", cycle: "mensuel", moyen: "Wave", depuis: "3 septembre 2026", prochain: "3 novembre 2026" },
 };
 
 const USAGE_INITIAL = {
@@ -8099,39 +8111,39 @@ function clientPaiement(espace, user) {
 }
 
 const TRANSACTIONS_INITIAL = [
-  { id: "t1", ref: "LIG-26-10-0418", date: "07/10/2026", client: "Sonatel SA", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
-  { id: "t2", ref: "LIG-26-10-0417", date: "06/10/2026", client: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
-  { id: "t3", ref: "LIG-26-10-0415", date: "05/10/2026", client: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
-  { id: "t4", ref: "LIG-26-10-0411", date: "04/10/2026", client: "Kirène", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Échoué" },
-  { id: "t11", ref: "LIG-26-10-0410", date: "03/10/2026", client: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
-  { id: "t5", ref: "LIG-26-10-0409", date: "03/10/2026", client: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
-  { id: "t6", ref: "LIG-26-10-0402", date: "02/10/2026", client: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
-  { id: "t12", ref: "LIG-26-10-0398", date: "01/10/2026", client: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Wave", statut: "Payé" },
-  { id: "t7", ref: "LIG-26-10-0397", date: "01/10/2026", client: "Teranga Capital", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
-  { id: "t8", ref: "LIG-26-09-0388", date: "29/09/2026", client: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Remboursé" },
-  { id: "t9", ref: "LIG-26-09-0381", date: "27/09/2026", client: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Échoué" },
-  { id: "t10", ref: "LIG-26-09-0376", date: "25/09/2026", client: "Dakar Bâtiment", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
-  { id: "t13", ref: "LIG-26-09-0367", date: "15/09/2026", client: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Orange Money", statut: "Payé" },
-  { id: "t14", ref: "LIG-26-09-0352", date: "03/09/2026", client: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
-  { id: "t15", ref: "LIG-26-09-0348", date: "01/09/2026", client: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Wave", statut: "Payé" },
-  { id: "t16", ref: "LIG-26-08-0331", date: "15/08/2026", client: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Orange Money", statut: "Payé" },
+  { id: "t1", ref: "LIG-26-10-0418", date: "7 octobre 2026", client: "Sonatel SA", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t2", ref: "LIG-26-10-0417", date: "6 octobre 2026", client: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
+  { id: "t3", ref: "LIG-26-10-0415", date: "5 octobre 2026", client: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Payé" },
+  { id: "t4", ref: "LIG-26-10-0411", date: "4 octobre 2026", client: "Kirène", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Échoué" },
+  { id: "t11", ref: "LIG-26-10-0410", date: "3 octobre 2026", client: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
+  { id: "t5", ref: "LIG-26-10-0409", date: "3 octobre 2026", client: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t6", ref: "LIG-26-10-0402", date: "2 octobre 2026", client: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t12", ref: "LIG-26-10-0398", date: "1er octobre 2026", client: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Wave", statut: "Payé" },
+  { id: "t7", ref: "LIG-26-10-0397", date: "1er octobre 2026", client: "Teranga Capital", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
+  { id: "t8", ref: "LIG-26-09-0388", date: "29 septembre 2026", client: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Remboursé" },
+  { id: "t9", ref: "LIG-26-09-0381", date: "27 septembre 2026", client: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, moyen: "Wave", statut: "Échoué" },
+  { id: "t10", ref: "LIG-26-09-0376", date: "25 septembre 2026", client: "Dakar Bâtiment", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Orange Money", statut: "Payé" },
+  { id: "t13", ref: "LIG-26-09-0367", date: "15 septembre 2026", client: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Orange Money", statut: "Payé" },
+  { id: "t14", ref: "LIG-26-09-0352", date: "3 septembre 2026", client: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, moyen: "Wave", statut: "Payé" },
+  { id: "t15", ref: "LIG-26-09-0348", date: "1er septembre 2026", client: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Wave", statut: "Payé" },
+  { id: "t16", ref: "LIG-26-08-0331", date: "15 août 2026", client: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, moyen: "Orange Money", statut: "Payé" },
 ];
 
 const ABONNES_ADMIN_INITIAL = [
-  { id: "ab1", nom: "Sonatel SA", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "07/03/2026", prochain: "07/11/2026", statut: "Actif" },
-  { id: "ab2", nom: "Teranga Capital", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "01/10/2026", prochain: "01/11/2026", statut: "Actif" },
-  { id: "ab3", nom: "Kirène", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "04/06/2026", prochain: "04/10/2026", statut: "Échec de paiement" },
-  { id: "ab4", nom: "Dakar Bâtiment", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "25/05/2026", prochain: "25/10/2026", statut: "Actif" },
-  { id: "ab5", nom: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "06/07/2026", prochain: "06/11/2026", statut: "Actif" },
-  { id: "ab6", nom: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "03/10/2026", prochain: "03/11/2026", statut: "Actif" },
-  { id: "ab7", nom: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "29/08/2026", prochain: "—", statut: "Suspendu" },
-  { id: "ab8", nom: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "05/10/2026", prochain: "05/11/2026", statut: "Actif" },
-  { id: "ab9", nom: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "02/08/2026", prochain: "02/11/2026", statut: "Actif" },
-  { id: "ab10", nom: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "27/07/2026", prochain: "27/09/2026", statut: "Échec de paiement" },
+  { id: "ab1", nom: "Sonatel SA", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "7 mars 2026", prochain: "7 novembre 2026", statut: "Actif" },
+  { id: "ab2", nom: "Teranga Capital", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "1er octobre 2026", prochain: "1er novembre 2026", statut: "Actif" },
+  { id: "ab3", nom: "Kirène", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "4 juin 2026", prochain: "4 octobre 2026", statut: "Échec de paiement" },
+  { id: "ab4", nom: "Dakar Bâtiment", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "25 mai 2026", prochain: "25 octobre 2026", statut: "Actif" },
+  { id: "ab5", nom: "Fatou Cissé", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "6 juillet 2026", prochain: "6 novembre 2026", statut: "Actif" },
+  { id: "ab6", nom: "Ibrahima Diallo", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "3 octobre 2026", prochain: "3 novembre 2026", statut: "Actif" },
+  { id: "ab7", nom: "Khady Ndiaye", espace: "prestataire", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "29 août 2026", prochain: "—", statut: "Suspendu" },
+  { id: "ab8", nom: "Moussa Diop", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "5 octobre 2026", prochain: "5 novembre 2026", statut: "Actif" },
+  { id: "ab9", nom: "Aïcha Ndoye", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "2 août 2026", prochain: "2 novembre 2026", statut: "Actif" },
+  { id: "ab10", nom: "Ousmane Fall", espace: "chercheur", offre: "Premium", cycle: "Mensuel", montant: 3000, depuis: "27 juillet 2026", prochain: "27 septembre 2026", statut: "Échec de paiement" },
   // Comptes de démonstration (même formule que dans leur espace, voir SUBS_INITIAL)
-  { id: "ab11", nom: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "03/09/2026", prochain: "03/11/2026", statut: "Actif" },
-  { id: "ab12", nom: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, depuis: "15/08/2026", prochain: "15/10/2026", statut: "Actif" },
-  { id: "ab13", nom: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, depuis: "01/09/2026", prochain: "01/11/2026", statut: "Actif" },
+  { id: "ab11", nom: "Senegal Construction SARL", espace: "entreprise", offre: "Entreprise", cycle: "Mensuel", montant: 40000, depuis: "3 septembre 2026", prochain: "3 novembre 2026", statut: "Actif" },
+  { id: "ab12", nom: "Mamadou Ndiaye", espace: "prestataire", offre: "Essentiel", cycle: "Mensuel", montant: 1500, depuis: "15 août 2026", prochain: "15 octobre 2026", statut: "Actif" },
+  { id: "ab13", nom: "Absatou Diallo", espace: "chercheur", offre: "Essentiel", cycle: "Mensuel", montant: 1500, depuis: "1er septembre 2026", prochain: "1er novembre 2026", statut: "Actif" },
 ];
 
 /* Revenus mensuels des abonnements. Le mois en cours reprend le revenu mensuel récurrent
@@ -8239,7 +8251,7 @@ function ModalFrame({ onClose, children, labelledBy, maxWidth = "max-w-md" }) {
   );
 }
 
-/* ----- Modale d'incitation : s'ouvre quand une action est verrouillée ----- */
+/* ----- Modale d’incitation : s’ouvre quand une action est verrouillée ----- */
 
 function UpgradeModal({ reasonKey, onClose, onNavigate }) {
   const api = usePlan();
@@ -8288,7 +8300,7 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
           </div>
         </div>
       ) : (
-        <div className="p-6 text-sm" style={{ color: COLORS.slateLight }}>Aucun profil supérieur n'est disponible pour votre espace.</div>
+        <div className="p-6 text-sm" style={{ color: COLORS.slateLight }}>Aucun profil supérieur n’est disponible pour votre espace.</div>
       )}
     </ModalFrame>
   );
@@ -8452,7 +8464,7 @@ function AbonnementScreen() {
           </p>
           {canDowngrade && (
             <button type="button" onClick={() => setConfirmDowngrade(true)} className="text-xs font-semibold mt-4 underline" style={{ color: COLORS.onDarkMuted }}>
-              Résilier l'abonnement
+              Résilier l’abonnement
             </button>
           )}
         </div>
@@ -8513,7 +8525,7 @@ function AbonnementScreen() {
       <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
         {history.length === 0 ? (
           <div className="p-6 text-sm flex items-center gap-2" style={{ color: COLORS.slateLight }}>
-            <Receipt size={16} /> Aucun paiement pour l'instant. Vos reçus apparaîtront ici après votre premier abonnement.
+            <Receipt size={16} /> Aucun paiement pour l’instant. Vos reçus apparaîtront ici après votre premier abonnement.
           </div>
         ) : (
           <table className="w-full text-sm min-w-[620px]">
@@ -8545,7 +8557,7 @@ function AbonnementScreen() {
         <ModalFrame onClose={() => setConfirmDowngrade(false)} labelledBy="downgrade-title">
           <div className="p-6">
             <h3 id="downgrade-title" className="text-lg font-bold mb-2" style={{ color: COLORS.slate }}>Résilier la formule {plan.nom} ?</h3>
-            <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Vous reviendrez à la formule {base.nom} et perdrez l'accès à :</p>
+            <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Vous reviendrez à la formule {base.nom} et perdrez l’accès à :</p>
             <ul className="flex flex-col gap-1.5 mb-6">
               {plan.avantages.slice(0, 3).map((a) => (
                 <li key={a} className="flex items-start gap-2 text-sm" style={{ color: COLORS.slate }}><X size={14} color={COLORS.danger} className="mt-0.5 shrink-0" /> {a}</li>
@@ -8667,7 +8679,7 @@ function AbonnementsAdminScreen() {
               onChange={(v) => { setEspaceFilter(v); setPage(1); }}
               options={[
                 { id: "tous", label: "Tous les espaces" },
-                { id: "chercheur", label: "Chercheurs d'emploi" },
+                { id: "chercheur", label: "Chercheurs d’emploi" },
                 { id: "prestataire", label: "Prestataires" },
                 { id: "entreprise", label: "Entreprises" },
               ]}
@@ -8752,7 +8764,7 @@ function AbonnementsAdminScreen() {
 
       {tab === "tarifs" && (
         <div>
-          <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Les prix et quotas modifiés ici s'appliquent immédiatement aux écrans « Abonnement » de chaque espace.</p>
+          <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Les prix et quotas modifiés ici s’appliquent immédiatement aux écrans « Abonnement » de chaque espace.</p>
           <div className="flex flex-col gap-4">
             {Object.keys(draft).map((esp) => (
               <div key={esp} className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -8818,7 +8830,7 @@ const PROFILE_TIER_PERKS = {
 };
 
 const PROFILE_VIEWERS = [
-  { nom: "Sonatel", quand: "Aujourd'hui" },
+  { nom: "Sonatel", quand: "Aujourd’hui" },
   { nom: "Teranga Capital", quand: "Hier" },
   { nom: "Wave Mobile", quand: "Il y a 3 jours" },
 ];
@@ -8861,7 +8873,7 @@ function ProfileTierCard() {
             {`Votre formule : ${api.plan.nom}`}
           </p>
           <p className="text-sm" style={{ color: premium ? COLORS.onDarkMuted : COLORS.slateLight }}>
-            {premium ? `Actif jusqu'au ${api.sub.prochain || "prochain renouvellement"}.` : "Passez à la formule Premium pour être vu en priorité."}
+            {premium ? `Actif jusqu’au ${api.sub.prochain || "prochain renouvellement"}.` : "Passez à la formule Premium pour être vu en priorité."}
           </p>
         </div>
         {!premium && premiumPlan && (
@@ -8891,7 +8903,7 @@ function ProfileTierCard() {
         <div className="px-6 py-4 flex items-center gap-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
           <TrendingUp size={18} color={COLORS.success} />
           <p className="text-sm" style={{ color: COLORS.slate }}>
-            {api.espace === "prestataire" ? "Votre profil s'affiche en priorité : 3,2 fois plus de vues que le mois dernier." : "Vos offres peuvent être sponsorisées et remonter en tête des résultats."}
+            {api.espace === "prestataire" ? "Votre profil s’affiche en priorité : 3,2 fois plus de vues que le mois dernier." : "Vos offres peuvent être sponsorisées et remonter en tête des résultats."}
           </p>
         </div>
       )}
@@ -8922,7 +8934,7 @@ function ProfileTierCard() {
   );
 }
 
-/* Niveaux affichés pour les autres utilisateurs (vus par les entreprises et l'admin) */
+/* Niveaux affichés pour les autres utilisateurs (vus par les entreprises et l’admin) */
 const PREMIUM_CANDIDATS = new Set(["c1", "c3", "c8"]);
 const PREMIUM_PRESTATAIRES = new Set(["p1", "p3", "p5"]);
 const PRESTATAIRES_REGULARISES = new Set(["p1", "p3", "p4", "p5"]);
@@ -8958,17 +8970,17 @@ function mentorProfile(m) {
   const milieu = Math.round((debut + pivot) / 2);
   const ancien = (m.stats && parseInt(m.stats.anciennete, 10)) || 1 + (h % 3);
   return {
-    bio: m.tagline || `${m.role} avec ${m.exp} ans d'expérience. ${m.nom.split(" ")[0]} accompagne les professionnels qui veulent progresser dans son domaine.`,
+    bio: m.tagline || `${m.role} avec ${m.exp} ans d’expérience. ${m.nom.split(" ")[0]} accompagne les professionnels qui veulent progresser dans son domaine.`,
     langues: ["Français", "Wolof", ...(h % 2 ? ["Anglais"] : [])],
     formats: ["Visio", "Téléphone", ...(h % 3 === 0 ? [] : ["Au bureau de Dakar"])],
-    stats: m.stats || { mentores: 6 + (h % 20), note: `${(4.3 + (h % 7) / 10).toFixed(1)}/5`, anciennete: `${ancien} an${ancien > 1 ? "s" : ""}`, heures: 20 + (h % 90) },
+    stats: m.stats || { mentores: 6 + (h % 20), note: `${noteFr(4.3 + (h % 7) / 10)}/5`, anciennete: `${ancien} an${ancien > 1 ? "s" : ""}`, heures: 20 + (h % 90) },
     parcours: [
-      { poste: m.role, structure: emp(0), periode: `${pivot} – aujourd'hui`, description: "Pilote une équipe et forme les nouvelles recrues sur le terrain." },
-      { poste: "Mentor bénévole", structure: "LIGGEEY", periode: `${2026 - ancien} – aujourd'hui`, description: "Accompagnement individuel de jeunes professionnels et de personnes en reconversion." },
-      { poste: "Postes à responsabilité", structure: emp(4), periode: `${milieu} – ${pivot}`, description: "Gestion de projets et encadrement d'équipes de terrain." },
+      { poste: m.role, structure: emp(0), periode: `${pivot} – aujourd’hui`, description: "Pilote une équipe et forme les nouvelles recrues sur le terrain." },
+      { poste: "Mentor bénévole", structure: "LIGGEEY", periode: `${2026 - ancien} – aujourd’hui`, description: "Accompagnement individuel de jeunes professionnels et de personnes en reconversion." },
+      { poste: "Postes à responsabilité", structure: emp(4), periode: `${milieu} – ${pivot}`, description: "Gestion de projets et encadrement d’équipes de terrain." },
       { poste: "Débuts professionnels", structure: emp(7), periode: `${debut} – ${milieu}`, description: "Premières expériences et apprentissage du métier." },
     ],
-    themes: m.competences ? m.competences.slice(0, 6) : ["Orientation professionnelle", "Développement des compétences", "Préparation d'entretien", "Gestion de carrière"],
+    themes: m.competences ? m.competences.slice(0, 6) : ["Orientation professionnelle", "Développement des compétences", "Préparation d’entretien", "Gestion de carrière"],
   };
 }
 
@@ -8993,8 +9005,8 @@ function nextSlots(n = 6) {
     if (wd === 0 || wd === 6) continue;
     for (const hr of [10, 16]) {
       if (out.length < n) {
-        const label = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
-        out.push(`${label.charAt(0).toUpperCase() + label.slice(1)} · ${hr}h00 – ${hr + 1}h00`);
+        const label = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }).replace(/ 1 /, " 1er ");
+        out.push(`${label.charAt(0).toUpperCase() + label.slice(1)} · ${hr} h – ${hr + 1} h`);
       }
     }
   }
@@ -9105,7 +9117,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
           {mentor.historique && <App.Badge ton="marque" point taille="moyen">Votre mentor</App.Badge>}
         </>}
         titre={mentor.nom}
-        sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
+        sousTitre={`${mentor.role} · ${mentor.exp} ans d’expérience`}
         meta={<>
           <MetaOffre icone={Star}>{profile.stats.note}</MetaOffre>
           <MetaOffre icone={UsersRound}>{profile.stats.mentores} mentorés</MetaOffre>
@@ -9131,7 +9143,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
               { icone: CalendarDays, libelle: "Sur LIGGEEY depuis", valeur: profile.stats.anciennete },
             ]}
           />
-          <App.Carte titre="Domaines d'accompagnement">
+          <App.Carte titre="Domaines d’accompagnement">
             <Etiquettes items={themes} />
           </App.Carte>
         </>}
@@ -9219,7 +9231,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
         <div className="flex flex-col gap-3">
           {coachings.history.length === 0 && (
             <div className="rounded-lg border bg-surface p-6 text-sm" style={{ borderColor: COLORS.border, color: COLORS.slateLight }}>
-              Vous n'avez pas encore eu de séance avec {prenom}. Les comptes rendus apparaîtront ici après chaque coaching.
+              Vous n’avez pas encore eu de séance avec {prenom}. Les comptes rendus apparaîtront ici après chaque coaching.
             </div>
           )}
           {coachings.history.map((h) => (
@@ -9302,7 +9314,7 @@ function jalonDate(iso, jours) {
   return d;
 }
 function frLongDate(d) {
-  return d.toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return dateFr(d);
 }
 function joursDepuis(iso) {
   return Math.max(0, Math.floor((DEMO_TODAY.getTime() - new Date(`${iso}T00:00:00`).getTime()) / JOUR_MS));
@@ -9312,7 +9324,7 @@ const JALONS = [
   { id: "j7", jour: 7, label: "Point de la première semaine" },
   { id: "j30", jour: 30, label: "Bilan du premier mois" },
   { id: "j60", jour: 60, label: "Point à mi-parcours" },
-  { id: "j90", jour: 90, label: "Fin de la période d'essai" },
+  { id: "j90", jour: 90, label: "Fin de la période d’essai" },
 ];
 const DUREE_ESSAI = 90;
 
@@ -9333,43 +9345,43 @@ const EMBAUCHE_CHERCHEUR = {
 
 const OBJECTIFS_INTEGRATION = [
   { id: "o1", label: "Signer le contrat et remettre les documents administratifs" },
-  { id: "o2", label: "Suivre la formation d'accueil sur les outils clients" },
+  { id: "o2", label: "Suivre la formation d’accueil sur les outils clients" },
   { id: "o3", label: "Traiter ses premiers dossiers en autonomie" },
   { id: "o4", label: "Faire un point objectifs avec son manager" },
-  { id: "o5", label: "Valider la période d'essai" },
+  { id: "o5", label: "Valider la période d’essai" },
 ];
 
 const CHECKIN_QUESTIONS = [
-  { id: "missions", label: "Vos missions correspondent-elles à l'offre ?" },
+  { id: "missions", label: "Vos missions correspondent-elles à l’offre ?" },
   { id: "formation", label: "Avez-vous été formé(e) ou accompagné(e) à votre arrivée ?" },
   { id: "salaire", label: "Votre salaire est-il versé à temps ?" },
-  { id: "integration", label: "Vous sentez-vous bien intégré(e) dans l'équipe ?" },
+  { id: "integration", label: "Vous sentez-vous bien intégré(e) dans l’équipe ?" },
 ];
 const HUMEURS = ["Très difficile", "Difficile", "Correct", "Bien", "Très bien"];
-const TYPES_SIGNALEMENT = ["Retard ou absence de salaire", "Missions différentes de l'offre", "Conditions de travail", "Conflit avec la hiérarchie ou l'équipe", "Contrat non remis", "Autre"];
+const TYPES_SIGNALEMENT = ["Retard ou absence de salaire", "Missions différentes de l’offre", "Conditions de travail", "Conflit avec la hiérarchie ou l’équipe", "Contrat non remis", "Autre"];
 
 const SUIVI_CHERCHEUR_INITIAL = {
   reponses: {
-    j7: { humeur: 4, reponses: { missions: "Oui", formation: "Oui", salaire: "Oui", integration: "Oui" }, commentaire: "Très bon accueil de l'équipe. Beaucoup à apprendre sur les outils internes." },
+    j7: { humeur: 4, reponses: { missions: "Oui", formation: "Oui", salaire: "Oui", integration: "Oui" }, commentaire: "Très bon accueil de l’équipe. Beaucoup à apprendre sur les outils internes." },
   },
   objectifs: { o1: true, o2: true },
 };
 
 const SIGNALEMENTS_INITIAL = [
-  { id: "s1", date: "09/10/2026", auteur: "Modou Faye", espace: "chercheur", concerne: "Dakar Bâtiment · Aide-maçon", type: "Retard ou absence de salaire", description: "Le salaire de septembre n'a toujours pas été versé.", statut: "Ouvert" },
-  { id: "s2", date: "02/10/2026", auteur: "Thiès Électrique", espace: "entreprise", concerne: "Alioune Ndiaye · Électricien", type: "Absences répétées", description: "Trois absences non justifiées depuis la prise de poste.", statut: "Traité" },
+  { id: "s1", date: "9 octobre 2026", auteur: "Modou Faye", espace: "chercheur", concerne: "Dakar Bâtiment · Aide-maçon", type: "Retard ou absence de salaire", description: "Le salaire de septembre n’a toujours pas été versé.", statut: "Ouvert" },
+  { id: "s2", date: "2 octobre 2026", auteur: "Thiès Électrique", espace: "entreprise", concerne: "Alioune Ndiaye · Électricien", type: "Absences répétées", description: "Trois absences non justifiées depuis la prise de poste.", statut: "Traité" },
 ];
 
 const RECRUES_INITIAL = [
-  { id: "r1", nom: "Ibrahima Diallo", poste: "Soudeur TIG/MIG", contrat: "CDD 12 mois", dateIso: isoFromOffset(-57), statut: "En période d'essai", ressenti: 4, evaluations: { j7: { competences: 4, integration: 4, ponctualite: 5, commentaire: "Bonne prise en main des postes de soudure." }, j30: { competences: 4, integration: 4, ponctualite: 4, commentaire: "Autonome sur les travaux courants." } } },
-  { id: "r2", nom: "Aissatou Gueye", poste: "Chef d'équipe électricité", contrat: "CDI", dateIso: isoFromOffset(-35), statut: "À risque", ressenti: 2, evaluations: { j7: { competences: 5, integration: 2, ponctualite: 4, commentaire: "A du mal à s'imposer auprès de l'équipe déjà en place." } } },
+  { id: "r1", nom: "Ibrahima Diallo", poste: "Soudeur TIG/MIG", contrat: "CDD 12 mois", dateIso: isoFromOffset(-57), statut: "En période d’essai", ressenti: 4, evaluations: { j7: { competences: 4, integration: 4, ponctualite: 5, commentaire: "Bonne prise en main des postes de soudure." }, j30: { competences: 4, integration: 4, ponctualite: 4, commentaire: "Autonome sur les travaux courants." } } },
+  { id: "r2", nom: "Aissatou Gueye", poste: "Chef d’équipe électricité", contrat: "CDI", dateIso: isoFromOffset(-35), statut: "À risque", ressenti: 2, evaluations: { j7: { competences: 5, integration: 2, ponctualite: 4, commentaire: "A du mal à s’imposer auprès de l’équipe déjà en place." } } },
   { id: "r3", nom: "Khadim Sarr", poste: "Maçon coffreur", contrat: "CDI", dateIso: isoFromOffset(-150), statut: "Confirmé", ressenti: 5, evaluations: { j7: { competences: 4, integration: 5, ponctualite: 5, commentaire: "Très bon départ." }, j30: { competences: 4, integration: 5, ponctualite: 5, commentaire: "Fiable." }, j60: { competences: 5, integration: 5, ponctualite: 5, commentaire: "Prend des initiatives." }, j90: { competences: 5, integration: 5, ponctualite: 5, commentaire: "Embauche confirmée." } } },
 ];
 
 const PLACEMENTS_AUTRES = [
   { id: "pl1", nom: "Moussa Diop", entreprise: "Senelec", poste: "Technicien réseau", jour: 120, statut: "Confirmé" },
   { id: "pl2", nom: "Modou Faye", entreprise: "Dakar Bâtiment", poste: "Aide-maçon", jour: 38, statut: "À risque" },
-  { id: "pl3", nom: "Awa Ndiaye", entreprise: "Teranga Capital", poste: "Assistante comptable", jour: 74, statut: "En période d'essai" },
+  { id: "pl3", nom: "Awa Ndiaye", entreprise: "Teranga Capital", poste: "Assistante comptable", jour: 74, statut: "En période d’essai" },
 ];
 
 function ProgressBar({ pct, color = COLORS.orange, track = COLORS.softStrong }) {
@@ -9506,7 +9518,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
           <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.darkLine, color: COLORS.brandPale }}>En poste depuis {jour} jours</span>
         </div>
         <div className="flex justify-between text-sm mb-1.5">
-          <span style={{ color: COLORS.onDarkMuted }}>Période d'essai</span>
+          <span style={{ color: COLORS.onDarkMuted }}>Période d’essai</span>
           <span className="text-sur-sombre font-semibold">{jour >= DUREE_ESSAI ? "Terminée" : `Jour ${jour} sur ${DUREE_ESSAI} · fin le ${frLongDate(finEssai)}`}</span>
         </div>
         <ProgressBar pct={(jour / DUREE_ESSAI) * 100} track={COLORS.darkLine} />
@@ -9570,7 +9582,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
 
           <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center justify-between mb-2">
-              <h3 className="font-semibold" style={{ color: COLORS.slate }}>Objectifs d'intégration</h3>
+              <h3 className="font-semibold" style={{ color: COLORS.slate }}>Objectifs d’intégration</h3>
               <span className="text-xs font-semibold" style={{ color: COLORS.slateLight }}>{objectifsFaits}/{OBJECTIFS_INTEGRATION.length}</span>
             </div>
             <div className="mb-3"><ProgressBar pct={(objectifsFaits / OBJECTIFS_INTEGRATION.length) * 100} color={COLORS.success} /></div>
@@ -9588,7 +9600,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
         <div className="flex items-center justify-between flex-wrap gap-3 mb-3">
           <div>
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Une difficulté dans votre poste ?</h3>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}>Votre référente traite chaque signalement. Votre employeur n'est contacté qu'avec votre accord.</p>
+            <p className="text-sm" style={{ color: COLORS.slateLight }}>Votre référente traite chaque signalement. Votre employeur n’est contacté qu’avec votre accord.</p>
           </div>
           {!signalOpen && <button type="button" onClick={() => setSignalOpen(true)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler une difficulté</button>}
         </div>
@@ -9630,7 +9642,7 @@ function EvaluationRecrueForm({ onSubmit, onCancel }) {
     <form onSubmit={envoyer} noValidate className={`${FORM.encart} mt-3`}>
       <div className="divide-y divide-base border-b border-base pb-1">
         <RatingInput label="Compétences techniques" value={v.competences} onChange={(n) => setV((s) => ({ ...s, competences: n }))} />
-        <RatingInput label="Intégration dans l'équipe" value={v.integration} onChange={(n) => setV((s) => ({ ...s, integration: n }))} />
+        <RatingInput label="Intégration dans l’équipe" value={v.integration} onChange={(n) => setV((s) => ({ ...s, integration: n }))} />
         <RatingInput label="Ponctualité et assiduité" value={v.ponctualite} onChange={(n) => setV((s) => ({ ...s, ponctualite: n }))} />
       </div>
       <div className="mt-5">
@@ -9640,7 +9652,7 @@ function EvaluationRecrueForm({ onSubmit, onCancel }) {
       <AlerteFormulaire visible={essai && !ok}>Donnez une note à chacun des trois critères.</AlerteFormulaire>
       <div className={FORM.actions}>
         <App.Bouton variante="neutre" onClick={onCancel}>Annuler</App.Bouton>
-        <App.Bouton type="submit">Enregistrer l'évaluation</App.Bouton>
+        <App.Bouton type="submit">Enregistrer l’évaluation</App.Bouton>
       </div>
     </form>
   );
@@ -9660,7 +9672,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
         </div>
         <div className="flex gap-2 flex-wrap">
           {r.statut !== "Confirmé" && (
-            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-statut inline-flex items-center gap-1.5" style={{ background: COLORS.success }}><UserCheck size={14} /> Confirmer l'embauche</button>
+            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-statut inline-flex items-center gap-1.5" style={{ background: COLORS.success }}><UserCheck size={14} /> Confirmer l’embauche</button>
           )}
           <button type="button" onClick={() => setSignalOpen((o) => !o)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler un problème</button>
         </div>
@@ -9710,7 +9722,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
         </div>
         <div className="flex flex-col gap-4">
           <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
-            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Période d'essai</h3>
+            <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Période d’essai</h3>
             <p className="text-sm mb-2" style={{ color: COLORS.slateLight }}>{jour >= DUREE_ESSAI ? "Terminée" : `Jour ${jour} sur ${DUREE_ESSAI} · fin le ${frLongDate(jalonDate(r.dateIso, DUREE_ESSAI))}`}</p>
             <ProgressBar pct={(jour / DUREE_ESSAI) * 100} />
           </div>
@@ -9734,7 +9746,7 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
   const aEvaluer = recrues.reduce((n, r) => n + JALONS.filter((j) => jalonStatut(r.dateIso, j, r.evaluations[j.id]) === "À compléter").length, 0);
   return (
     <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Accompagnez vos nouvelles recrues jusqu'à la fin de leur période d'essai et au-delà.</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Accompagnez vos nouvelles recrues jusqu’à la fin de leur période d’essai et au-delà.</p>
       <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard icon={Users2} value={recrues.length} label="Recrues suivies" />
         <StatCard icon={UserCheck} value={recrues.filter((r) => r.statut === "Confirmé").length} label="Embauches confirmées" />
@@ -9755,7 +9767,7 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
                 </div>
               </div>
               <div>
-                <p className="text-xs mb-1" style={{ color: COLORS.slateLight }}>{jour >= DUREE_ESSAI ? "Période d'essai terminée" : `Essai : jour ${jour}/${DUREE_ESSAI}`}</p>
+                <p className="text-xs mb-1" style={{ color: COLORS.slateLight }}>{jour >= DUREE_ESSAI ? "Période d’essai terminée" : `Essai : jour ${jour}/${DUREE_ESSAI}`}</p>
                 <ProgressBar pct={(jour / DUREE_ESSAI) * 100} />
               </div>
               <p className="text-xs" style={{ color: COLORS.slateLight }}>{next ? `Prochain point : ${frLongDate(jalonDate(r.dateIso, next.jour))}` : "Suivi terminé"}</p>
@@ -9770,7 +9782,7 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
 
 function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }) {
   const placements = [
-    { id: "pl0", nom: "Absatou Diallo", entreprise: EMBAUCHE_CHERCHEUR.entreprise, poste: EMBAUCHE_CHERCHEUR.poste, jour: joursDepuis(EMBAUCHE_CHERCHEUR.dateIso), statut: "En période d'essai" },
+    { id: "pl0", nom: "Absatou Diallo", entreprise: EMBAUCHE_CHERCHEUR.entreprise, poste: EMBAUCHE_CHERCHEUR.poste, jour: joursDepuis(EMBAUCHE_CHERCHEUR.dateIso), statut: "En période d’essai" },
     ...recrues.map((r) => ({ id: r.id, nom: r.nom, entreprise: "Senegal Construction SARL", poste: r.poste, jour: joursDepuis(r.dateIso), statut: r.statut })),
     ...PLACEMENTS_AUTRES,
   ];
@@ -9860,33 +9872,33 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
 }
 
 /* =====================================================================
-   RÉGULARISATION DE L'ACTIVITÉ (prestataires)
+   RÉGULARISATION DE L’ACTIVITÉ (prestataires)
    ===================================================================== */
 
 const REGUL_STEPS_INITIAL = [
-  { id: "identite", titre: "Pièce d'identité", obligatoire: true, statut: "Validé", description: "Carte nationale d'identité CEDEAO ou passeport en cours de validité.", ou: "Déjà fournie lors de votre inscription.", document: "CNI_Mamadou_Ndiaye.pdf" },
-  { id: "ninea", titre: "Numéro NINEA", obligatoire: true, statut: "À compléter", champ: "Numéro NINEA", valeur: "", description: "Identifiant unique de votre activité auprès de l'administration fiscale.", ou: "Centre des services fiscaux de votre zone ou guichet unique de l'APIX." },
-  { id: "immatriculation", titre: "Immatriculation de l'activité", obligatoire: true, statut: "À compléter", champ: "Numéro d'immatriculation", valeur: "", description: "Inscription au Registre des métiers pour les artisans, ou au RCCM pour une activité commerciale.", ou: "Chambre de métiers de votre région, ou greffe du tribunal de commerce." },
-  { id: "fiscal", titre: "Régime fiscal", obligatoire: true, statut: "À compléter", choix: ["Contribution globale unique (CGU)", "Régime du réel", "Je ne sais pas encore"], valeur: "", description: "Le régime d'imposition qui s'applique à votre activité, selon votre chiffre d'affaires.", ou: "Centre des services fiscaux ou conseiller LIGGEEY." },
+  { id: "identite", titre: "Pièce d’identité", obligatoire: true, statut: "Validé", description: "Carte nationale d’identité CEDEAO ou passeport en cours de validité.", ou: "Déjà fournie lors de votre inscription.", document: "CNI_Mamadou_Ndiaye.pdf" },
+  { id: "ninea", titre: "Numéro NINEA", obligatoire: true, statut: "À compléter", champ: "Numéro NINEA", valeur: "", description: "Identifiant unique de votre activité auprès de l’administration fiscale.", ou: "Centre des services fiscaux de votre zone ou guichet unique de l’APIX." },
+  { id: "immatriculation", titre: "Immatriculation de l’activité", obligatoire: true, statut: "À compléter", champ: "Numéro d’immatriculation", valeur: "", description: "Inscription au Registre des métiers pour les artisans, ou au RCCM pour une activité commerciale.", ou: "Chambre de métiers de votre région, ou greffe du tribunal de commerce." },
+  { id: "fiscal", titre: "Régime fiscal", obligatoire: true, statut: "À compléter", choix: ["Contribution globale unique (CGU)", "Régime du réel", "Je ne sais pas encore"], valeur: "", description: "Le régime d’imposition qui s’applique à votre activité, selon votre chiffre d’affaires.", ou: "Centre des services fiscaux ou conseiller LIGGEEY." },
   { id: "social", titre: "Protection sociale", obligatoire: false, statut: "À compléter", description: "Affiliation à une caisse de retraite ou à une mutuelle de santé pour vous protéger, vous et votre famille.", ou: "IPRES, Caisse de sécurité sociale ou mutuelle de santé de votre commune." },
-  { id: "assurance", titre: "Assurance responsabilité civile professionnelle", obligatoire: false, statut: "À compléter", description: "Couvre les dommages causés chez vos clients pendant une intervention.", ou: "Compagnies d'assurance agréées au Sénégal." },
+  { id: "assurance", titre: "Assurance responsabilité civile professionnelle", obligatoire: false, statut: "À compléter", description: "Couvre les dommages causés chez vos clients pendant une intervention.", ou: "Compagnies d’assurance agréées au Sénégal." },
 ];
 
 const REGUL_DEMANDES_AUTRES = [
-  { id: "rd1", prestataire: "Fatou Cissé", metier: "Couturière", etape: "Numéro NINEA", document: "ninea_fatou_cisse.pdf", valeur: "008 765 432", date: "11/10/2026", statut: "En vérification" },
-  { id: "rd2", prestataire: "Babacar Gueye", metier: "Peintre", etape: "Immatriculation de l'activité", document: "carte_artisan_bgueye.jpg", valeur: "RM-DKR-2026-0412", date: "10/10/2026", statut: "En vérification" },
-  { id: "rd3", prestataire: "Khady Ndiaye", metier: "Esthéticienne", etape: "Régime fiscal", document: "—", valeur: "Contribution globale unique (CGU)", date: "08/10/2026", statut: "En vérification" },
+  { id: "rd1", prestataire: "Fatou Cissé", metier: "Couturière", etape: "Numéro NINEA", document: "ninea_fatou_cisse.pdf", valeur: "008 765 432", date: "11 octobre 2026", statut: "En vérification" },
+  { id: "rd2", prestataire: "Babacar Gueye", metier: "Peintre", etape: "Immatriculation de l’activité", document: "carte_artisan_bgueye.jpg", valeur: "RM-DKR-2026-0412", date: "10 octobre 2026", statut: "En vérification" },
+  { id: "rd3", prestataire: "Khady Ndiaye", metier: "Esthéticienne", etape: "Régime fiscal", document: "—", valeur: "Contribution globale unique (CGU)", date: "8 octobre 2026", statut: "En vérification" },
 ];
 
 /* La régularisation est facultative : le prestataire choisit de la faire (« regul-choix » : "oui"),
-   de la remettre à plus tard ("plus-tard"), ou n'a encore rien choisi (null). Envoyer un justificatif
+   de la remettre à plus tard ("plus-tard"), ou n’a encore rien choisi (null). Envoyer un justificatif
    vaut engagement. Les rappels (tâches, compteur du menu, badge « en cours ») ne concernent que
    les prestataires engagés. */
 /* « Votre étape validée est gardée » / « Vos 2 étapes validées sur 4 sont gardées » */
 function etapesGardees(valides, total) {
   return valides > 1
     ? `Vos ${valides} étapes validées${total ? ` sur ${total}` : ""} sont gardées`
-    : `L'étape déjà validée${total ? ` (1 sur ${total})` : ""} est gardée`;
+    : `L’étape déjà validée${total ? ` (1 sur ${total})` : ""} est gardée`;
 }
 
 function regulCommencee(steps) {
@@ -9946,11 +9958,11 @@ function RegulStepCard({ step, index, onChange }) {
       {open && (
         <div className="px-5 pb-5" style={{ borderTop: `1px solid ${COLORS.border}` }}>
           <p className="text-sm mt-4" style={{ color: COLORS.slate }}>{step.description}</p>
-          <p className="text-sm mt-1 mb-3" style={{ color: COLORS.slateLight }}><span className="font-semibold">Où l'obtenir : </span>{step.ou}</p>
+          <p className="text-sm mt-1 mb-3" style={{ color: COLORS.slateLight }}><span className="font-semibold">Où l’obtenir : </span>{step.ou}</p>
           {step.statut === "Refusé" && step.motif && (
             <div className="rounded-md px-3 py-2 text-sm mb-3 flex items-start gap-2" style={{ background: COLORS.dangerSoft, color: COLORS.danger }}><AlertCircle size={15} className="mt-0.5 shrink-0" /> {step.motif}</div>
           )}
-          {step.statut === "En vérification" && <p className="text-sm" style={{ color: COLORS.orangeText }}>Document reçu le {step.envoyeLe}. Vérification par l'équipe LIGGEEY sous 72 h.</p>}
+          {step.statut === "En vérification" && <p className="text-sm" style={{ color: COLORS.orangeText }}>Document reçu le {step.envoyeLe}. Vérification par l’équipe LIGGEEY sous 72 h.</p>}
           {step.statut === "Validé" && step.document && <p className="text-sm flex items-center gap-1.5" style={{ color: COLORS.success }}><FileCheck2 size={15} /> {step.document}{step.valeur ? ` · ${step.valeur}` : ""}</p>}
           {editable && (
             <div className="flex flex-col gap-3">
@@ -9989,10 +10001,10 @@ function RegulStepCard({ step, index, onChange }) {
 }
 
 const REGUL_ETAPES_EXPLIQUEES = [
-  { icone: Compass, titre: "Vous décidez", texte: "Rien n'est imposé. Vous commencez quand vous voulez, et vous pouvez faire une pause." },
-  { icone: MapPin, titre: "Vous obtenez vos papiers", texte: "Pour chaque étape, nous indiquons le document et le guichet où l'obtenir." },
-  { icone: Upload, titre: "Vous les envoyez ici", texte: "Une photo nette suffit. L'équipe LIGGEEY vérifie chaque document." },
-  { icone: BadgeCheck, titre: "Vous recevez le badge", texte: "« Activité régularisée » s'affiche sur votre profil, à la vue des clients." },
+  { icone: Compass, titre: "Vous décidez", texte: "Rien n’est imposé. Vous commencez quand vous voulez, et vous pouvez faire une pause." },
+  { icone: MapPin, titre: "Vous obtenez vos papiers", texte: "Pour chaque étape, nous indiquons le document et le guichet où l’obtenir." },
+  { icone: Upload, titre: "Vous les envoyez ici", texte: "Une photo nette suffit. L’équipe LIGGEEY vérifie chaque document." },
+  { icone: BadgeCheck, titre: "Vous recevez le badge", texte: "« Activité régularisée » s’affiche sur votre profil, à la vue des clients." },
 ];
 
 const REGUL_AVEC_SANS = [
@@ -10006,16 +10018,16 @@ const REGUL_AVEC_SANS = [
 
 const REGUL_QUESTIONS = [
   { q: "Est-ce obligatoire pour travailler sur LIGGEEY ?", r: "Non. Vous pouvez proposer vos services et être payé sans régulariser votre activité. La régularisation vous ouvre simplement plus de portes." },
-  { q: "Combien ça coûte ?", r: "Le suivi sur LIGGEEY est gratuit, avec un guide en ligne. Certains organismes demandent des frais pour leurs documents : renseignez-vous auprès d'eux. Avec Premium, un conseiller prépare les dossiers avec vous." },
-  { q: "Qui voit mes documents ?", r: "Seule l'équipe LIGGEEY, pour les vérifier. Vos clients voient uniquement le badge." },
-  { q: "Je change d'avis : puis-je commencer plus tard ?", r: "Oui. Même si vous avez répondu « Non », vous pouvez commencer à tout moment depuis cet écran ou depuis votre profil." },
-  { q: "J'ai commencé mais je ne veux plus continuer : que se passe-t-il ?", r: "Vous arrêtez quand vous voulez avec le bouton « Arrêter la régularisation ». Vous ne recevez plus de rappels, vos missions et vos paiements continuent normalement. Les étapes déjà validées sont gardées, et les documents envoyés restent vus seulement par l'équipe LIGGEEY. Si vous reprenez un jour, vous repartez là où vous vous étiez arrêté." },
+  { q: "Combien ça coûte ?", r: "Le suivi sur LIGGEEY est gratuit, avec un guide en ligne. Certains organismes demandent des frais pour leurs documents : renseignez-vous auprès d’eux. Avec Premium, un conseiller prépare les dossiers avec vous." },
+  { q: "Qui voit mes documents ?", r: "Seule l’équipe LIGGEEY, pour les vérifier. Vos clients voient uniquement le badge." },
+  { q: "Je change d’avis : puis-je commencer plus tard ?", r: "Oui. Même si vous avez répondu « Non », vous pouvez commencer à tout moment depuis cet écran ou depuis votre profil." },
+  { q: "J’ai commencé mais je ne veux plus continuer : que se passe-t-il ?", r: "Vous arrêtez quand vous voulez avec le bouton « Arrêter la régularisation ». Vous ne recevez plus de rappels, vos missions et vos paiements continuent normalement. Les étapes déjà validées sont gardées, et les documents envoyés restent vus seulement par l’équipe LIGGEEY. Si vous reprenez un jour, vous repartez là où vous vous étiez arrêté." },
 ];
 
-/* Écran Régularisation, organisé autour d'une question :
-   - pas encore de réponse : « Souhaitez-vous qu'on vous accompagne… ? » ;
+/* Écran Régularisation, organisé autour d’une question :
+   - pas encore de réponse : « Souhaitez-vous qu’on vous accompagne… ? » ;
    - Oui (ou démarche déjà commencée) : les étapes à suivre ;
-   - Non : seulement les informations à savoir, avec la possibilité de changer d'avis. */
+   - Non : seulement les informations à savoir, avec la possibilité de changer d’avis. */
 function RegulQuestion({ choix, onOui, onNon, reprise = null }) {
   const dejaNon = choix === "plus-tard";
   return (
@@ -10024,20 +10036,20 @@ function RegulQuestion({ choix, onOui, onNon, reprise = null }) {
         <App.PastilleIcone icone={HeartHandshake} taille="lg" />
         <div className="min-w-0 flex-1">
           <h2 id="regul-question" className="text-lg font-semibold text-principal">
-            {reprise ? "Vous voulez reprendre ?" : dejaNon ? "Vous changez d'avis ?" : "Souhaitez-vous qu'on vous accompagne dans la régularisation de votre activité ?"}
+            {reprise ? "Vous voulez reprendre ?" : dejaNon ? "Vous changez d’avis ?" : "Souhaitez-vous qu’on vous accompagne dans la régularisation de votre activité ?"}
           </h2>
           <p className="mt-2 text-[15px] leading-[1.7] text-secondaire">
             {reprise
               ? `Vous repartez là où vous vous étiez arrêté : ${reprise.valides} étape${reprise.valides > 1 ? "s" : ""} sur ${reprise.total} déjà validée${reprise.valides > 1 ? "s" : ""}.`
               : dejaNon
               ? "LIGGEEY peut vous guider étape par étape quand vous le souhaitez : quels papiers demander, où les obtenir, et la vérification de vos documents."
-              : "Régulariser, c'est déclarer officiellement votre activité (NINEA, immatriculation, régime fiscal). Ce n'est pas obligatoire : vous pouvez travailler et être payé sur LIGGEEY sans le faire. Si vous le souhaitez, nous vous guidons étape par étape."}
+              : "Régulariser, c’est déclarer officiellement votre activité (NINEA, immatriculation, régime fiscal). Ce n’est pas obligatoire : vous pouvez travailler et être payé sur LIGGEEY sans le faire. Si vous le souhaitez, nous vous guidons étape par étape."}
           </p>
           <div className="mt-4 flex flex-wrap gap-2">
             <App.Bouton onClick={onOui}>{reprise ? "Reprendre ma régularisation" : "Oui, accompagnez-moi"}</App.Bouton>
             {!dejaNon && <App.Bouton variante="neutre" onClick={onNon}>Non, pas maintenant</App.Bouton>}
           </div>
-          <p className="mt-3 text-xs text-discret">Votre réponse ne change rien à vos missions ni à vos paiements. Vous pourrez changer d'avis à tout moment.</p>
+          <p className="mt-3 text-xs text-discret">Votre réponse ne change rien à vos missions ni à vos paiements. Vous pourrez changer d’avis à tout moment.</p>
         </div>
       </div>
     </section>
@@ -10112,7 +10124,7 @@ function RegulQuestionsFrequentes() {
 }
 
 /* Carte « Régularisation » du profil prestataire : reflète le choix (pas encore répondu, non, oui)
-   et mène à l'écran Régularisation. */
+   et mène à l’écran Régularisation. */
 function CarteRegularisationProfil({ onNavigate }) {
   const api = usePlan();
   const [choix, setChoix] = useStore("regul-choix", null);
@@ -10125,7 +10137,7 @@ function CarteRegularisationProfil({ onNavigate }) {
     return (
       <App.Carte titre="Régularisation">
         <p className="flex items-center gap-2 text-sm font-semibold text-statut-succes"><BadgeCheck size={16} aria-hidden="true" /> Activité régularisée</p>
-        <p className="mt-1 text-sm text-secondaire">Le badge s'affiche sur votre profil, à la vue des clients.</p>
+        <p className="mt-1 text-sm text-secondaire">Le badge s’affiche sur votre profil, à la vue des clients.</p>
       </App.Carte>
     );
   }
@@ -10149,9 +10161,9 @@ function CarteRegularisationProfil({ onNavigate }) {
   if (choix === "plus-tard") {
     return (
       <App.Carte titre="Régularisation" actions={<App.Badge ton="neutre" taille="moyen">Facultatif</App.Badge>}>
-        <p className="text-sm text-secondaire">Vous avez choisi de ne pas régulariser votre activité pour l'instant. Vos missions et vos paiements continuent normalement.</p>
+        <p className="text-sm text-secondaire">Vous avez choisi de ne pas régulariser votre activité pour l’instant. Vos missions et vos paiements continuent normalement.</p>
         <div className="mt-4 flex flex-wrap gap-2">
-          <App.Bouton petit onClick={() => { setChoix("oui"); onNavigate("regularisation"); }}>J'ai changé d'avis</App.Bouton>
+          <App.Bouton petit onClick={() => { setChoix("oui"); onNavigate("regularisation"); }}>J’ai changé d’avis</App.Bouton>
           <App.Bouton petit variante="doux" onClick={() => onNavigate("regularisation")}>En savoir plus</App.Bouton>
         </div>
       </App.Carte>
@@ -10159,11 +10171,11 @@ function CarteRegularisationProfil({ onNavigate }) {
   }
   return (
     <App.Carte titre="Régularisation" actions={<App.Badge ton="neutre" taille="moyen">Facultatif</App.Badge>}>
-      <p className="text-sm font-semibold text-principal">Souhaitez-vous qu'on vous accompagne dans la régularisation de votre activité ?</p>
-      <p className="mt-1 text-sm text-secondaire">Ce n'est pas obligatoire : vous pouvez travailler et être payé sans le faire.</p>
+      <p className="text-sm font-semibold text-principal">Souhaitez-vous qu’on vous accompagne dans la régularisation de votre activité ?</p>
+      <p className="mt-1 text-sm text-secondaire">Ce n’est pas obligatoire : vous pouvez travailler et être payé sans le faire.</p>
       <div className="mt-4 flex flex-wrap gap-2">
         <App.Bouton petit onClick={() => { setChoix("oui"); onNavigate("regularisation"); }}>Oui</App.Bouton>
-        <App.Bouton petit variante="neutre" onClick={() => { setChoix("plus-tard"); notify("C'est noté : aucun rappel ne vous sera envoyé.", "info"); }}>Non, pas maintenant</App.Bouton>
+        <App.Bouton petit variante="neutre" onClick={() => { setChoix("plus-tard"); notify("C’est noté : aucun rappel ne vous sera envoyé.", "info"); }}>Non, pas maintenant</App.Bouton>
       </div>
     </App.Carte>
   );
@@ -10179,8 +10191,8 @@ function RegularisationScreen({ steps, setSteps }) {
   const arretee = !engage && choix === "plus-tard" && regulCommencee(steps);
   const [confirmerArret, setConfirmerArret] = useState(false);
 
-  const oui = () => { setChoix("oui"); window.scrollTo(0, 0); notify(arretee ? "Bon retour ! Vous reprenez là où vous vous étiez arrêté." : "C'est parti ! Voici les étapes à suivre, à votre rythme."); };
-  const non = () => { setChoix("plus-tard"); window.scrollTo(0, 0); notify("C'est noté : aucun rappel ne vous sera envoyé. Les informations restent disponibles ici.", "info"); };
+  const oui = () => { setChoix("oui"); window.scrollTo(0, 0); notify(arretee ? "Bon retour ! Vous reprenez là où vous vous étiez arrêté." : "C’est parti ! Voici les étapes à suivre, à votre rythme."); };
+  const non = () => { setChoix("plus-tard"); window.scrollTo(0, 0); notify("C’est noté : aucun rappel ne vous sera envoyé. Les informations restent disponibles ici.", "info"); };
   const arreter = () => { setConfirmerArret(false); setChoix("plus-tard"); window.scrollTo(0, 0); notify("Régularisation arrêtée. Vos étapes validées sont gardées : vous pourrez reprendre à tout moment.", "info"); };
 
   // Pas encore de réponse : la question seule.
@@ -10192,7 +10204,7 @@ function RegularisationScreen({ steps, setSteps }) {
     );
   }
 
-  // Non : les informations à savoir, et la possibilité de changer d'avis.
+  // Non : les informations à savoir, et la possibilité de changer d’avis.
   if (!engage) {
     return (
       <div className="space-y-6">
@@ -10200,15 +10212,15 @@ function RegularisationScreen({ steps, setSteps }) {
           <Check size={18} className="mt-0.5 shrink-0 text-statut-succes" aria-hidden="true" />
           <p className="text-sm text-principal">
             {arretee
-              ? <>Vous avez arrêté votre régularisation. <span className="text-secondaire">Vos services, vos missions et vos paiements continuent normalement. {etapesGardees(valides, total)}{enVerif ? `, et ${enVerif} document${enVerif > 1 ? "s" : ""} déjà envoyé${enVerif > 1 ? "s" : ""} ${enVerif > 1 ? "sont" : "est"} encore vérifié${enVerif > 1 ? "s" : ""} par l'équipe` : ""}.</span></>
-              : <>Vous avez choisi de ne pas régulariser votre activité pour l'instant. <span className="text-secondaire">Vos services, vos missions et vos paiements continuent normalement.</span></>}
+              ? <>Vous avez arrêté votre régularisation. <span className="text-secondaire">Vos services, vos missions et vos paiements continuent normalement. {etapesGardees(valides, total)}{enVerif ? `, et ${enVerif} document${enVerif > 1 ? "s" : ""} déjà envoyé${enVerif > 1 ? "s" : ""} ${enVerif > 1 ? "sont" : "est"} encore vérifié${enVerif > 1 ? "s" : ""} par l’équipe` : ""}.</span></>
+              : <>Vous avez choisi de ne pas régulariser votre activité pour l’instant. <span className="text-secondaire">Vos services, vos missions et vos paiements continuent normalement.</span></>}
           </p>
         </div>
         {arretee && <RegulQuestion choix={choix} onOui={oui} onNon={non} reprise={{ valides, total }} />}
         <RegulInfos />
         <RegulQuestionsFrequentes />
         {!arretee && <RegulQuestion choix={choix} onOui={oui} onNon={non} />}
-        <p className="text-xs text-discret">Les démarches et organismes indiqués sont donnés à titre d'orientation. Renseignez-vous auprès de l'organisme concerné pour les conditions et frais en vigueur.</p>
+        <p className="text-xs text-discret">Les démarches et organismes indiqués sont donnés à titre d’orientation. Renseignez-vous auprès de l’organisme concerné pour les conditions et frais en vigueur.</p>
       </div>
     );
   }
@@ -10225,7 +10237,7 @@ function RegularisationScreen({ steps, setSteps }) {
           <p className="mb-1 text-sm" style={{ color: COLORS.onDarkMuted }}>Étapes validées pour le badge</p>
           <p className="mb-3 text-3xl font-bold text-sur-sombre">{valides} / {total}</p>
           <ProgressBar pct={(valides / total) * 100} color={complete ? COLORS.successBright : COLORS.orange} track={COLORS.darkLine} />
-          <p className="mt-3 text-sm" style={{ color: COLORS.onDarkMuted }}>{complete ? "Votre activité est régularisée. Le badge s'affiche sur votre profil." : enVerif ? `${enVerif} document${enVerif > 1 ? "s" : ""} en cours de vérification.` : "Suivez les étapes ci-dessous, à votre rythme."}</p>
+          <p className="mt-3 text-sm" style={{ color: COLORS.onDarkMuted }}>{complete ? "Votre activité est régularisée. Le badge s’affiche sur votre profil." : enVerif ? `${enVerif} document${enVerif > 1 ? "s" : ""} en cours de vérification.` : "Suivez les étapes ci-dessous, à votre rythme."}</p>
         </div>
         {!complete && (
           <App.Bouton petit variante="clair" onClick={() => setConfirmerArret(true)} className="justify-self-start md:justify-self-end">
@@ -10238,13 +10250,13 @@ function RegularisationScreen({ steps, setSteps }) {
         <ModalFrame onClose={() => setConfirmerArret(false)} labelledBy="regul-arret-titre">
           <div className="p-6">
             <h3 id="regul-arret-titre" className="mb-2 text-lg font-semibold text-principal">Ne plus continuer la régularisation ?</h3>
-            <p className="mb-3 text-sm text-secondaire">C'est votre choix, et vous pouvez revenir dessus à tout moment.</p>
+            <p className="mb-3 text-sm text-secondaire">C’est votre choix, et vous pouvez revenir dessus à tout moment.</p>
             <ul className="mb-6 space-y-2 text-sm text-principal">
               {[
                 "Vos missions et vos paiements continuent normalement.",
                 "Vous ne recevez plus de rappels.",
                 `${etapesGardees(valides)} : vous reprendrez là où vous vous êtes arrêté.`,
-                "Le badge « Activité régularisée » ne s'affichera que si vous allez jusqu'au bout.",
+                "Le badge « Activité régularisée » ne s’affichera que si vous allez jusqu’au bout.",
               ].map((t) => (
                 <li key={t} className="flex items-start gap-2"><Check size={15} className="mt-0.5 shrink-0 text-statut-succes" aria-hidden="true" /> {t}</li>
               ))}
@@ -10259,7 +10271,7 @@ function RegularisationScreen({ steps, setSteps }) {
 
       <section aria-labelledby="regul-etapes">
         <h2 id="regul-etapes" className="mb-1 text-lg font-semibold text-principal">Les étapes à suivre</h2>
-        <p className="mb-3 text-sm text-secondaire">Pour chaque étape : le document à obtenir, où le demander, puis l'envoi ici. L'équipe LIGGEEY vérifie chaque document.</p>
+        <p className="mb-3 text-sm text-secondaire">Pour chaque étape : le document à obtenir, où le demander, puis l’envoi ici. L’équipe LIGGEEY vérifie chaque document.</p>
         <div className="flex flex-col gap-3">
           {steps.map((st, i) => (
             <RegulStepCard key={st.id + st.statut} step={st} index={i} onChange={(patch) => { setSteps((l) => l.map((x) => (x.id === st.id ? { ...x, ...patch } : x))); if (choix !== "oui") setChoix("oui"); notify(`« ${st.titre} » envoyé pour vérification.`); }} />
@@ -10279,7 +10291,7 @@ function RegularisationScreen({ steps, setSteps }) {
 
       <div className="flex flex-col justify-between gap-3 rounded-lg border bg-surface p-5 sm:flex-row sm:items-center" style={{ borderColor: accompOk ? COLORS.border : COLORS.orange }}>
         <div>
-          <p className="flex items-center gap-2 font-semibold" style={{ color: COLORS.slate }}>Besoin d'aide pour vos dossiers ? {!accompOk && <PremiumChip locked />}</p>
+          <p className="flex items-center gap-2 font-semibold" style={{ color: COLORS.slate }}>Besoin d’aide pour vos dossiers ? {!accompOk && <PremiumChip locked />}</p>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Un conseiller LIGGEEY prépare les dossiers avec vous et vous oriente vers les bons guichets.</p>
         </div>
         <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
@@ -10288,7 +10300,7 @@ function RegularisationScreen({ steps, setSteps }) {
       </div>
 
       <RegulQuestionsFrequentes />
-      <p className="text-xs text-discret">Les démarches et organismes indiqués sont donnés à titre d'orientation. Renseignez-vous auprès de l'organisme concerné pour les conditions et frais en vigueur.</p>
+      <p className="text-xs text-discret">Les démarches et organismes indiqués sont donnés à titre d’orientation. Renseignez-vous auprès de l’organisme concerné pour les conditions et frais en vigueur.</p>
     </div>
   );
 }
@@ -10354,7 +10366,7 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
               <div className="mt-4">
                 <label htmlFor={`motif-regul-${d.id}`} className={AUTH.libelle}>Motif du refus, visible par le prestataire</label>
                 <div className="flex flex-col gap-3 sm:flex-row">
-                  <input id={`motif-regul-${d.id}`} value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Ex : document illisible, merci de le renvoyer" className={`${FORM.champ()} flex-1`} />
+                  <input id={`motif-regul-${d.id}`} value={motif} onChange={(e) => setMotif(e.target.value)} placeholder="Ex. : document illisible, merci de le renvoyer" className={`${FORM.champ()} flex-1`} />
                   <App.Bouton variante="neutre" onClick={() => { setRefusing(null); setMotif(""); }} className="min-h-[48px]">Annuler</App.Bouton>
                   <BoutonDanger disabled={!motif.trim()} onClick={() => decide(d, "Refusé", motif)}>Confirmer le refus</BoutonDanger>
                 </div>
@@ -10438,70 +10450,70 @@ function InfoField({ label, value }) {
 /* =====================================================================
    CAP MÉTIER ET ESPACE MENTOR
    - Cap Métier : suivi et coaching des jeunes sans métier, dès 15 ans
-     (accord d'un parent ou tuteur avant 18 ans : voir AGE_MIN_PAR_PROFIL).
-   - Espace mentor : mentorés attribués (Cap Métier et chercheurs d'emploi),
+     (accord d’un parent ou tuteur avant 18 ans : voir AGE_MIN_PAR_PROFIL).
+   - Espace mentor : mentorés attribués (Cap Métier et chercheurs d’emploi),
      séances, comptes rendus.
    - Admin : attribution des mentors aux jeunes, accords parentaux.
    Protection des mineurs, appliquée dans la démo :
-   - un mentor n'est attribué qu'après l'accord du parent ou tuteur ;
+   - un mentor n’est attribué qu’après l’accord du parent ou tuteur ;
    - les séances avec un mineur ont lieu en groupe ou au bureau de Dakar ;
-   - le mentor ne voit ni le téléphone ni l'adresse d'un mineur ;
+   - le mentor ne voit ni le téléphone ni l’adresse d’un mineur ;
    - pas de photo pour les jeunes (initiales seulement).
    Mémoire partagée (useStore) : cap-jeunes, mentorat-seances, mentorat-notes,
    cap-ateliers, cap-orientation, mentor-disponible.
    ===================================================================== */
 
-const MENTOR_CONNECTE = MENTORS[0]; // Cheikh Fall : le mentor de l'espace mentor de démo
-const JEUNE_CONNECTE_ID = "mame-diarra-sene"; // la jeune de l'espace Cap Métier de démo
+const MENTOR_CONNECTE = MENTORS[0]; // Cheikh Fall : le mentor de l’espace mentor de démo
+const JEUNE_CONNECTE_ID = "mame-diarra-sene"; // la jeune de l’espace Cap Métier de démo
 
 const ETAPES_CAP = [
-  { id: "bilan", label: "Bilan d'orientation", texte: "Ce que vous aimez, vos forces, vos contraintes." },
-  { id: "piste", label: "Choix d'une piste métier", texte: "Un ou deux métiers à explorer." },
+  { id: "bilan", label: "Bilan d’orientation", texte: "Ce que vous aimez, vos forces, vos contraintes." },
+  { id: "piste", label: "Choix d’une piste métier", texte: "Un ou deux métiers à explorer." },
   { id: "decouverte", label: "Découverte et formation", texte: "Ateliers, rencontres avec des professionnels, bases du métier." },
-  { id: "apprentissage", label: "Apprentissage ou stage", texte: "Apprendre auprès d'un professionnel, possible dès 15 ans." },
-  { id: "projet", label: "Projet prêt", texte: "Vers l'emploi ou une activité à son compte, à partir de 18 ans." },
+  { id: "apprentissage", label: "Apprentissage ou stage", texte: "Apprendre auprès d’un professionnel, possible dès 15 ans." },
+  { id: "projet", label: "Projet prêt", texte: "Vers l’emploi ou une activité à son compte, à partir de 18 ans." },
 ];
 
 const FORMATS_SEANCE = ["Visio", "Téléphone", "Au bureau de Dakar", "En groupe, au bureau de Dakar"];
 const FORMATS_SEANCE_MINEUR = ["Au bureau de Dakar", "En groupe, au bureau de Dakar"];
-const HEURES_SEANCE = ["10h00", "14h00", "16h00", "18h00"];
+const HEURES_SEANCE = ["10 h", "14 h", "16 h", "18 h"];
 
 const JEUNES_CAP_INITIAL = [
-  { id: "mame-diarra-sene", nom: "Mame Diarra Sène", naissance: "2010-03-12", ville: "Pikine", telephone: "+221 77 000 11 22", parent: { nom: "Ndèye Sène", lien: "Mère", telephone: "+221 77 000 12 34", accord: "Confirmé" }, etape: 2, piste: "Couture et stylisme", mentorId: "cheikh-fall", souhait: "", inscription: "2 septembre 2026", objectifs: ["Choisir entre la couture et la coiffure", "Trouver un atelier d'apprentissage à Pikine"] },
-  { id: "serigne-mbaye", nom: "Serigne Mbaye", naissance: "2004-01-15", ville: "Dakar, Médina", telephone: "+221 78 000 22 33", parent: null, etape: 3, piste: "Électricité bâtiment", mentorId: "cheikh-fall", souhait: "", inscription: "10 juin 2026", objectifs: ["Terminer l'apprentissage chez un électricien de la Médina", "Préparer un CV pour les entreprises du BTP"] },
+  { id: "mame-diarra-sene", nom: "Mame Diarra Sène", naissance: "2010-03-12", ville: "Pikine", telephone: "+221 77 000 11 22", parent: { nom: "Ndèye Sène", lien: "Mère", telephone: "+221 77 000 12 34", accord: "Confirmé" }, etape: 2, piste: "Couture et stylisme", mentorId: "cheikh-fall", souhait: "", inscription: "2 septembre 2026", objectifs: ["Choisir entre la couture et la coiffure", "Trouver un atelier d’apprentissage à Pikine"] },
+  { id: "serigne-mbaye", nom: "Serigne Mbaye", naissance: "2004-01-15", ville: "Dakar, Médina", telephone: "+221 78 000 22 33", parent: null, etape: 3, piste: "Électricité bâtiment", mentorId: "cheikh-fall", souhait: "", inscription: "10 juin 2026", objectifs: ["Terminer l’apprentissage chez un électricien de la Médina", "Préparer un CV pour les entreprises du BTP"] },
   { id: "ousmane-diatta", nom: "Ousmane Diatta", naissance: "2007-06-02", ville: "Ziguinchor", telephone: "+221 76 000 33 44", parent: null, etape: 1, piste: "Mécanique auto et moto", mentorId: null, souhait: "Un professionnel de la mécanique ou du froid", inscription: "28 septembre 2026", objectifs: [] },
-  { id: "fatoumata-kane", nom: "Fatoumata Kane", naissance: "2009-11-20", ville: "Thiès", telephone: "+221 77 000 44 55", parent: { nom: "Abdou Kane", lien: "Père", telephone: "+221 77 000 45 67", accord: "En attente" }, etape: 0, piste: "", mentorId: null, souhait: "Quelqu'un qui travaille dans la santé", inscription: "12 octobre 2026", objectifs: [] },
-  { id: "lamine-badji", nom: "Lamine Badji", naissance: "2008-02-28", ville: "Kaolack", telephone: "+221 70 000 55 66", parent: null, etape: 0, piste: "", mentorId: null, souhait: "Quelqu'un qui connaît l'agriculture", inscription: "8 octobre 2026", objectifs: [] },
-  { id: "aicha-faye", nom: "Aïcha Faye", naissance: "2006-09-05", ville: "Rufisque", telephone: "+221 76 000 66 77", parent: null, etape: 4, piste: "Cuisine et pâtisserie", mentorId: "aminata-ndiaye", souhait: "", inscription: "3 mars 2026", objectifs: ["Ouvrir l'espace chercheur d'emploi", "Postuler dans les pâtisseries de Rufisque et de Dakar"] },
+  { id: "fatoumata-kane", nom: "Fatoumata Kane", naissance: "2009-11-20", ville: "Thiès", telephone: "+221 77 000 44 55", parent: { nom: "Abdou Kane", lien: "Père", telephone: "+221 77 000 45 67", accord: "En attente" }, etape: 0, piste: "", mentorId: null, souhait: "Quelqu’un qui travaille dans la santé", inscription: "12 octobre 2026", objectifs: [] },
+  { id: "lamine-badji", nom: "Lamine Badji", naissance: "2008-02-28", ville: "Kaolack", telephone: "+221 70 000 55 66", parent: null, etape: 0, piste: "", mentorId: null, souhait: "Quelqu’un qui connaît l’agriculture", inscription: "8 octobre 2026", objectifs: [] },
+  { id: "aicha-faye", nom: "Aïcha Faye", naissance: "2006-09-05", ville: "Rufisque", telephone: "+221 76 000 66 77", parent: null, etape: 4, piste: "Cuisine et pâtisserie", mentorId: "aminata-ndiaye", souhait: "", inscription: "3 mars 2026", objectifs: ["Ouvrir l’espace chercheur d’emploi", "Postuler dans les pâtisseries de Rufisque et de Dakar"] },
 ];
 
-/* Chercheurs d'emploi suivis par le mentor connecté (en plus des jeunes Cap Métier) */
+/* Chercheurs d’emploi suivis par le mentor connecté (en plus des jeunes Cap Métier) */
 const MENTORES_CHERCHEURS = [
-  { id: "absatou-diallo", nom: "Absatou Diallo", parcours: "Chercheuse d'emploi", ville: "Dakar", objectif: "Décrocher un poste de chargée de clientèle", depuis: "2 juillet 2026", candidatures: CANDIDATURES },
-  { id: "pape-ndiaye", nom: "Pape Ndiaye", parcours: "Jeune diplômé en comptabilité", ville: "Dakar, Grand Yoff", objectif: "Trouver un premier poste d'assistant comptable", depuis: "15 septembre 2026", candidatures: [{ poste: "Assistant comptable", entreprise: "Cabinet Diop & Associés", date: "5 octobre 2026", statut: "Vue par le recruteur" }] },
+  { id: "absatou-diallo", nom: "Absatou Diallo", parcours: "Chercheuse d’emploi", ville: "Dakar", objectif: "Décrocher un poste de chargée de clientèle", depuis: "2 juillet 2026", candidatures: CANDIDATURES },
+  { id: "pape-ndiaye", nom: "Pape Ndiaye", parcours: "Jeune diplômé en comptabilité", ville: "Dakar, Grand Yoff", objectif: "Trouver un premier poste d’assistant comptable", depuis: "15 septembre 2026", candidatures: [{ poste: "Assistant comptable", entreprise: "Cabinet Diop & Associés", date: "5 octobre 2026", statut: "Vue par le recruteur" }] },
 ];
 
 const NOTES_MENTORAT_INITIAL = {
   "absatou-diallo": MENTORS[0].historique,
   "mame-diarra-sene": [
-    { date: "3 octobre 2026", note: "Atelier découverte couture, en groupe : très motivée, à l'aise avec la machine. Prochaine étape : rencontrer une couturière de Pikine qui prend des apprentis." },
-    { date: "19 septembre 2026", note: "Bilan d'orientation au bureau, avec sa mère : intérêt pour la couture et la coiffure. Elle veut continuer les cours du soir." },
+    { date: "3 octobre 2026", note: "Atelier découverte couture, en groupe : très motivée, à l’aise avec la machine. Prochaine étape : rencontrer une couturière de Pikine qui prend des apprentis." },
+    { date: "19 septembre 2026", note: "Bilan d’orientation au bureau, avec sa mère : intérêt pour la couture et la coiffure. Elle veut continuer les cours du soir." },
   ],
-  "serigne-mbaye": [{ date: "6 octobre 2026", note: "Point d'étape : l'apprentissage se passe bien. Il note chaque chantier pour préparer son CV." }],
+  "serigne-mbaye": [{ date: "6 octobre 2026", note: "Point d’étape : l’apprentissage se passe bien. Il note chaque chantier pour préparer son CV." }],
 };
 
 const SEANCES_INITIAL = [
-  { id: "se1", mentoreId: "absatou-diallo", date: "2026-10-16", heure: "16h00", format: "Visio", statut: "Confirmée" }, // même créneau que le « prochain coaching » vu par Absatou (nextSlots)
-  { id: "se2", mentoreId: "mame-diarra-sene", date: "2026-10-17", heure: "10h00", format: "En groupe, au bureau de Dakar", statut: "Confirmée" },
-  { id: "se3", mentoreId: "serigne-mbaye", date: "2026-10-20", heure: "18h00", format: "Visio", statut: "Demandée", message: "Je voudrais qu'on travaille mon CV ensemble." },
-  { id: "se4", mentoreId: "pape-ndiaye", date: "2026-10-22", heure: "16h00", format: "Téléphone", statut: "Demandée", message: "Préparer mon entretien au cabinet Diop & Associés." },
+  { id: "se1", mentoreId: "absatou-diallo", date: "2026-10-16", heure: "16 h", format: "Visio", statut: "Confirmée" }, // même créneau que le « prochain coaching » vu par Absatou (nextSlots)
+  { id: "se2", mentoreId: "mame-diarra-sene", date: "2026-10-17", heure: "10 h", format: "En groupe, au bureau de Dakar", statut: "Confirmée" },
+  { id: "se3", mentoreId: "serigne-mbaye", date: "2026-10-20", heure: "18 h", format: "Visio", statut: "Demandée", message: "Je voudrais qu’on travaille mon CV ensemble." },
+  { id: "se4", mentoreId: "pape-ndiaye", date: "2026-10-22", heure: "16 h", format: "Téléphone", statut: "Demandée", message: "Préparer mon entretien au cabinet Diop & Associés." },
 ];
 
 const ATELIERS_CAP = [
-  { id: "at-couture", titre: "Découvrir la couture", lieu: "Bureau LIGGEEY, Dakar", date: "2026-10-24", heure: "10h00 – 12h00", places: 12, texte: "Prendre en main une machine à coudre et réaliser une première pièce simple." },
-  { id: "at-numerique", titre: "Les métiers du numérique", lieu: "En ligne", date: "2026-10-28", heure: "16h00 – 17h00", places: 30, texte: "Graphisme, réseaux sociaux, maintenance informatique : qui fait quoi, et comment s'y former ?" },
-  { id: "at-cuisine", titre: "Cuisine et pâtisserie", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-07", heure: "10h00 – 12h00", places: 10, texte: "Rencontrer une pâtissière et découvrir le travail en cuisine." },
-  { id: "at-electricite", titre: "Électricité : le métier et la sécurité", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-14", heure: "10h00 – 12h00", places: 12, texte: "Comprendre le métier, ses risques et les règles de sécurité.", noteMineur: "Avant 18 ans : démonstration seulement, sans manipulation." },
+  { id: "at-couture", titre: "Découvrir la couture", lieu: "Bureau LIGGEEY, Dakar", date: "2026-10-24", heure: "10 h – 12 h", places: 12, texte: "Prendre en main une machine à coudre et réaliser une première pièce simple." },
+  { id: "at-numerique", titre: "Les métiers du numérique", lieu: "En ligne", date: "2026-10-28", heure: "16 h – 17 h", places: 30, texte: "Graphisme, réseaux sociaux, maintenance informatique : qui fait quoi, et comment s’y former ?" },
+  { id: "at-cuisine", titre: "Cuisine et pâtisserie", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-07", heure: "10 h – 12 h", places: 10, texte: "Rencontrer une pâtissière et découvrir le travail en cuisine." },
+  { id: "at-electricite", titre: "Électricité : le métier et la sécurité", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-14", heure: "10 h – 12 h", places: 12, texte: "Comprendre le métier, ses risques et les règles de sécurité.", noteMineur: "Avant 18 ans : démonstration seulement, sans manipulation." },
 ];
 
 const GOUTS_ORIENTATION = [
@@ -10510,7 +10522,7 @@ const GOUTS_ORIENTATION = [
   { id: "aider", label: "Aider et prendre soin des autres" },
   { id: "cuisine", label: "Cuisiner" },
   { id: "reparer", label: "Réparer, comprendre comment ça marche" },
-  { id: "numerique", label: "Le téléphone, l'ordinateur, internet" },
+  { id: "numerique", label: "Le téléphone, l’ordinateur, internet" },
   { id: "dehors", label: "Être dehors, la nature" },
   { id: "vendre", label: "Parler aux gens, vendre" },
 ];
@@ -10531,11 +10543,11 @@ const PISTES_METIER = [
 ];
 
 const CHARTE_MENTOR = [
-  "J'échange avec les jeunes uniquement par LIGGEEY : messagerie et séances prévues.",
+  "J’échange avec les jeunes uniquement par LIGGEEY : messagerie et séances prévues.",
   "Avec un jeune de moins de 18 ans, je le rencontre seulement en groupe ou au bureau de Dakar.",
-  "Je ne demande jamais d'argent, de service ni de photo.",
-  "Je garde pour moi ce que le jeune me confie, sauf s'il est en danger.",
-  "Je signale à l'équipe LIGGEEY toute situation préoccupante.",
+  "Je ne demande jamais d’argent, de service ni de photo.",
+  "Je garde pour moi ce que le jeune me confie, sauf s’il est en danger.",
+  "Je signale à l’équipe LIGGEEY toute situation préoccupante.",
 ];
 
 function estMineur(j) {
@@ -10552,22 +10564,24 @@ function statutCap(j) {
 
 function dateLongue(iso) {
   const d = new Date(`${iso}T12:00:00`);
-  const t = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" });
+  const t = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }).replace(/ 1 /, " 1er ");
   return t.charAt(0).toUpperCase() + t.slice(1);
 }
 
 function dateDuJourLongue() {
-  return demoNow().toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return dateFr(demoNow());
 }
 
 function dateMajorite(naissance) {
   const [a, m, j] = naissance.split("-").map(Number);
-  return new Date(a + AGE_MAJORITE, m - 1, j).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  return dateFr(new Date(a + AGE_MAJORITE, m - 1, j));
 }
 
-const parDate = (a, b) => (a.date + a.heure).localeCompare(b.date + b.heure);
+// Tri des séances par date puis par heure (« 9 h » avant « 16 h »).
+const heureTri = (h) => String(parseInt(h, 10) || 0).padStart(2, "0");
+const parDate = (a, b) => (a.date + heureTri(a.heure)).localeCompare(b.date + heureTri(b.heure));
 
-/* Mentorés d'un mentor : jeunes Cap Métier attribués, et chercheurs d'emploi pour le mentor de démo */
+/* Mentorés d’un mentor : jeunes Cap Métier attribués, et chercheurs d’emploi pour le mentor de démo */
 function mentoresDe(mentorId, jeunes) {
   return [
     ...jeunes.filter((j) => j.mentorId === mentorId).map((j) => ({ id: j.id, nom: j.nom, type: "Cap Métier", sous: j.piste ? `Cap Métier · ${j.piste}` : "Cap Métier", mineur: estMineur(j), age: ageAu(j.naissance), jeune: j })),
@@ -10664,7 +10678,7 @@ function CapParcoursScreen({ onNavigate, todos }) {
                 <App.Bouton pleineLargeur variante="neutre" onClick={() => onNavigate("mentor")}>Voir mon mentor</App.Bouton>
               </div>
             ) : (
-              <App.EtatVide icone={UsersRound} titre="Mentor en cours d'attribution" texte="L'équipe LIGGEEY choisit le mentor qui vous correspond." />
+              <App.EtatVide icone={UsersRound} titre="Mentor en cours d’attribution" texte="L’équipe LIGGEEY choisit le mentor qui vous correspond." />
             )}
           </App.Carte>
 
@@ -10689,8 +10703,8 @@ function CapParcoursScreen({ onNavigate, todos }) {
         <NoteMineur>
           {moi.parent.accord === "Confirmé"
             ? `${moi.parent.nom} (${moi.parent.lien.toLowerCase()}) a donné son accord et reçoit un SMS avant chaque séance. `
-            : `Nous attendons l'accord de ${moi.parent.nom}. `}
-          Avant 18 ans, vos séances ont lieu en groupe ou au bureau de Dakar. À partir du {dateMajorite(moi.naissance)}, vous pourrez aussi ouvrir l'espace emploi ou l'espace prestataire.
+            : `Nous attendons l’accord de ${moi.parent.nom}. `}
+          Avant 18 ans, vos séances ont lieu en groupe ou au bureau de Dakar. À partir du {dateMajorite(moi.naissance)}, vous pourrez aussi ouvrir l’espace emploi ou l’espace prestataire.
         </NoteMineur>
       )}
 
@@ -10699,7 +10713,7 @@ function CapParcoursScreen({ onNavigate, todos }) {
   );
 }
 
-/* ---------- Cap Métier (jeune) : bilan d'orientation ---------- */
+/* ---------- Cap Métier (jeune) : bilan d’orientation ---------- */
 
 function CapOrientationScreen({ onNavigate }) {
   const { moi, majMoi } = useJeuneConnecte();
@@ -10720,7 +10734,7 @@ function CapOrientationScreen({ onNavigate }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-secondaire">Il n'y a pas de bonne ou de mauvaise réponse. Choisissez ce qui vous plaît vraiment : nous vous proposons des pistes métier.</p>
+      <p className="text-sm text-secondaire">Il n’y a pas de bonne ou de mauvaise réponse. Choisissez ce qui vous plaît vraiment : nous vous proposons des pistes métier.</p>
 
       <App.Carte titre="Ce que vous aimez" sousTitre="Plusieurs choix possibles">
         <div className="flex flex-wrap gap-2">
@@ -10756,7 +10770,7 @@ function CapOrientationScreen({ onNavigate }) {
                     {choisie && <App.Badge ton="succes" taille="moyen">Ma piste</App.Badge>}
                   </div>
                   {p.dangereux && mineur && (
-                    <p className="text-xs text-secondaire">Apprentissage possible dès 15 ans. Certaines tâches sont interdites avant 18 ans : votre maître d'apprentissage doit les respecter.</p>
+                    <p className="text-xs text-secondaire">Apprentissage possible dès 15 ans. Certaines tâches sont interdites avant 18 ans : votre maître d’apprentissage doit les respecter.</p>
                   )}
                   {!choisie && (
                     <App.Bouton petit variante="doux" onClick={() => choisir(p)}>Choisir cette piste</App.Bouton>
@@ -10846,7 +10860,7 @@ function CapAteliersScreen() {
                 </>}
                 actions={
                   <App.Bouton petit variante={inscrit ? "neutre" : "principal"} onClick={() => basculer(a)}>
-                    {inscrit ? "Annuler mon inscription" : "M'inscrire"}
+                    {inscrit ? "Annuler mon inscription" : "M’inscrire"}
                   </App.Bouton>
                 }
               >
@@ -10858,7 +10872,7 @@ function CapAteliersScreen() {
       ) : (
         <ListeVide
           icone={GraduationCap}
-          titre={vue === "mes" && !q ? "Vous n'êtes inscrit à aucun atelier" : "Aucun atelier ne correspond"}
+          titre={vue === "mes" && !q ? "Vous n’êtes inscrit à aucun atelier" : "Aucun atelier ne correspond"}
           texte={vue === "mes" && !q ? "Choisissez un atelier pour découvrir un métier." : "Essayez un autre mot-clé."}
           action={<App.Bouton petit variante="neutre" onClick={() => { setVue("tous"); setQuery(""); }}>Voir tous les ateliers</App.Bouton>}
         />
@@ -10955,11 +10969,11 @@ function CapMentorScreen() {
     return (
       <div className="space-y-6">
         <App.Carte titre="Demander un mentor">
-          <p className="mb-4 text-sm text-secondaire">Dites-nous quel professionnel vous aimeriez rencontrer. L'équipe LIGGEEY choisit votre mentor et vous prévient.</p>
+          <p className="mb-4 text-sm text-secondaire">Dites-nous quel professionnel vous aimeriez rencontrer. L’équipe LIGGEEY choisit votre mentor et vous prévient.</p>
           <label htmlFor="souhait-mentor" className={AUTH.libelle}>Le mentor que vous souhaitez</label>
-          <textarea id="souhait-mentor" value={souhait} onChange={(e) => setSouhait(e.target.value)} rows={3} placeholder="Ex : une couturière qui a son propre atelier" className={FORM.zone()} />
+          <textarea id="souhait-mentor" value={souhait} onChange={(e) => setSouhait(e.target.value)} rows={3} placeholder="Ex. : une couturière qui a son propre atelier" className={FORM.zone()} />
           <div className="mt-4">
-            <App.Bouton onClick={() => { majMoi({ souhait: souhait.trim() }); notify("Demande envoyée. L'équipe LIGGEEY vous propose un mentor dès que possible."); }}>Envoyer ma demande</App.Bouton>
+            <App.Bouton onClick={() => { majMoi({ souhait: souhait.trim() }); notify("Demande envoyée. L’équipe LIGGEEY vous propose un mentor dès que possible."); }}>Envoyer ma demande</App.Bouton>
           </div>
         </App.Carte>
         {mineur && moi.parent?.accord !== "Confirmé" && <NoteMineur>Votre mentor sera attribué dès que votre parent ou tuteur aura confirmé son accord.</NoteMineur>}
@@ -10976,7 +10990,7 @@ function CapMentorScreen() {
         visuel={<AvatarListe nom={mentor.nom} photo={mentor.photo} taille="lg" />}
         badges={<App.Badge ton="succes" taille="moyen"><BadgeCheck size={13} aria-hidden="true" /> Mentor vérifié par LIGGEEY</App.Badge>}
         titre={mentor.nom}
-        sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
+        sousTitre={`${mentor.role} · ${mentor.exp} ans d’expérience`}
         meta={<>
           <MetaOffre icone={MessageCircle}>{profil.langues.join(", ")}</MetaOffre>
           {prochaine && <MetaOffre icone={CalendarDays}>Prochaine séance : {dateLongue(prochaine.date)} · {prochaine.heure}</MetaOffre>}
@@ -11027,7 +11041,7 @@ function CapMentorScreen() {
               <p className="text-sm leading-[1.7] text-secondaire">{mentor.tagline}</p>
             </App.Carte>
           )}
-          {mineur && <NoteMineur>Un souci avec une séance ou avec votre mentor ? Parlez-en à votre parent ou écrivez à l'équipe LIGGEEY sur WhatsApp : nous sommes là pour vous protéger.</NoteMineur>}
+          {mineur && <NoteMineur>Un souci avec une séance ou avec votre mentor ? Parlez-en à votre parent ou écrivez à l’équipe LIGGEEY sur WhatsApp : nous sommes là pour vous protéger.</NoteMineur>}
         </>}
       />
     </div>
@@ -11043,7 +11057,7 @@ function CapProfilScreen({ onNavigate = () => {} }) {
   const [notes] = useStore("mentorat-notes", NOTES_MENTORAT_INITIAL);
   const age = ageAu(moi.naissance);
   const mineur = age < AGE_MAJORITE;
-  const naissance = new Date(`${moi.naissance}T12:00:00`).toLocaleDateString("fr-FR", { day: "numeric", month: "long", year: "numeric" });
+  const naissance = dateFr(new Date(`${moi.naissance}T12:00:00`));
   const mentor = MENTORS.find((m) => m.id === moi.mentorId);
   const mesAteliers = ATELIERS_CAP.filter((a) => inscrits.includes(a.id));
   const mesSeances = seances.filter((s) => s.mentoreId === moi.id && ["Confirmée", "Demandée"].includes(s.statut));
@@ -11090,7 +11104,7 @@ function CapProfilScreen({ onNavigate = () => {} }) {
 
           <App.Carte titre="Mes ateliers" actions={<App.Bouton petit variante="doux" onClick={() => onNavigate("ateliers")}>Voir les ateliers</App.Bouton>} flush>
             {mesAteliers.length === 0 ? (
-              <p className="px-6 pb-6 text-sm text-secondaire">Vous n'êtes inscrit à aucun atelier pour le moment.</p>
+              <p className="px-6 pb-6 text-sm text-secondaire">Vous n’êtes inscrit à aucun atelier pour le moment.</p>
             ) : (
               <ul className="divide-y divide-base border-t border-base">
                 {mesAteliers.map((a) => (
@@ -11113,7 +11127,7 @@ function CapProfilScreen({ onNavigate = () => {} }) {
                   <AvatarListe nom={mentor.nom} photo={mentor.photo} />
                   <div className="min-w-0">
                     <p className="font-semibold text-principal">{mentor.nom}</p>
-                    <p className="text-sm text-discret">{mentor.role} · {mentor.exp} ans d'expérience</p>
+                    <p className="text-sm text-discret">{mentor.role} · {mentor.exp} ans d’expérience</p>
                   </div>
                 </div>
                 <App.Bouton petit variante="neutre" onClick={() => onNavigate("mentor")}>Voir mon mentor</App.Bouton>
@@ -11122,7 +11136,7 @@ function CapProfilScreen({ onNavigate = () => {} }) {
               <p className="text-sm text-secondaire">
                 {mineur && moi.parent?.accord !== "Confirmé"
                   ? "Votre mentor sera attribué dès que votre parent ou tuteur aura confirmé son accord."
-                  : "L'équipe LIGGEEY choisit votre mentor et vous prévient."}
+                  : "L’équipe LIGGEEY choisit votre mentor et vous prévient."}
               </p>
             )}
           </App.Carte>
@@ -11149,8 +11163,8 @@ function CapProfilScreen({ onNavigate = () => {} }) {
           <App.Carte titre="À 18 ans">
             <p className="text-sm text-secondaire">
               {mineur
-                ? `À partir du ${dateMajorite(moi.naissance)}, vous pourrez ouvrir l'espace emploi pour postuler aux offres, ou l'espace prestataire pour travailler à votre compte. Votre parcours Cap Métier vous suivra.`
-                : "Vous pouvez ouvrir l'espace emploi ou l'espace prestataire. Votre mentor vous aide à choisir."}
+                ? `À partir du ${dateMajorite(moi.naissance)}, vous pourrez ouvrir l’espace emploi pour postuler aux offres, ou l’espace prestataire pour travailler à votre compte. Votre parcours Cap Métier vous suivra.`
+                : "Vous pouvez ouvrir l’espace emploi ou l’espace prestataire. Votre mentor vous aide à choisir."}
             </p>
           </App.Carte>
         </>}
@@ -11262,7 +11276,7 @@ function MentoreDetail({ mentore, onBack }) {
           {jeune && <MetaOffre icone={Flag}>Étape {jeune.etape + 1} / {ETAPES_CAP.length}</MetaOffre>}
         </>}
         actions={
-          <App.Bouton variante="neutre" onClick={() => notify("Signalement transmis à l'équipe LIGGEEY. Elle vous recontacte rapidement.")}>
+          <App.Bouton variante="neutre" onClick={() => notify("Signalement transmis à l’équipe LIGGEEY. Elle vous recontacte rapidement.")}>
             <AlertCircle size={16} aria-hidden="true" /> Signaler une situation
           </App.Bouton>
         }
@@ -11276,7 +11290,7 @@ function MentoreDetail({ mentore, onBack }) {
               sousTitre={jeune.piste ? `Piste : ${jeune.piste}` : "Piste métier à choisir"}
               actions={jeune.etape < ETAPES_CAP.length - 1 && (
                 <App.Bouton petit variante="doux" onClick={() => { majJeune({ etape: jeune.etape + 1 }); notify(`Étape « ${ETAPES_CAP[jeune.etape].label} » validée.`); }}>
-                  Valider l'étape en cours
+                  Valider l’étape en cours
                 </App.Bouton>
               )}
             >
@@ -11365,7 +11379,7 @@ function MentoresScreen({ initialId }) {
   const TYPES = [
     { id: "tous", label: "Tous", test: () => true },
     { id: "cap", label: "Cap Métier", test: (m) => m.type === "Cap Métier" },
-    { id: "chercheur", label: "Chercheurs d'emploi", test: (m) => m.type === "Chercheur" },
+    { id: "chercheur", label: "Chercheurs d’emploi", test: (m) => m.type === "Chercheur" },
   ];
   const q = sansAccents(recherche.trim());
   const liste = mentores.filter((m) => TYPES.find((t) => t.id === filtre).test(m) && (!q || sansAccents(m.nom + " " + m.sous).includes(q)));
@@ -11375,7 +11389,7 @@ function MentoresScreen({ initialId }) {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-secondaire">Les jeunes que l'équipe LIGGEEY vous a confiés.</p>
+      <p className="text-sm text-secondaire">Les jeunes que l’équipe LIGGEEY vous a confiés.</p>
 
       <BarreFiltres label="Rechercher un mentoré">
         <App.ChampRecherche
@@ -11495,7 +11509,7 @@ function SeancesMentorScreen() {
             <ListeVide
               icone={CalendarDays}
               titre={onglet === "demandes" ? "Aucune demande en attente" : "Aucune séance à venir"}
-              texte="Proposez une séance à l'un de vos mentorés."
+              texte="Proposez une séance à l’un de vos mentorés."
             />
           )}
 
@@ -11553,7 +11567,7 @@ function MentorProfilScreen({ onNavigate = () => {} }) {
           <App.Badge ton={disponible ? "succes" : "neutre"} point taille="moyen">{disponible ? "Accepte de nouveaux mentorés" : "Complet pour le moment"}</App.Badge>
         </>}
         titre={mentor.nom}
-        sousTitre={`${mentor.role} · ${mentor.exp} ans d'expérience`}
+        sousTitre={`${mentor.role} · ${mentor.exp} ans d’expérience`}
         meta={<>
           <MetaOffre icone={MessageCircle}>{m.langues.join(", ")}</MetaOffre>
           <MetaOffre icone={Video}>{m.formats.join(", ")}</MetaOffre>
@@ -11578,7 +11592,7 @@ function MentorProfilScreen({ onNavigate = () => {} }) {
           <App.Carte titre="Parcours professionnel">
             <FriseParcours etapes={m.parcours} />
           </App.Carte>
-          <App.Carte titre="Domaines d'accompagnement">
+          <App.Carte titre="Domaines d’accompagnement">
             <Etiquettes items={mentor.competences || m.themes} />
           </App.Carte>
           <App.Carte titre="Charte du mentor" actions={<StatusBadge status="Signée" />}>
@@ -11591,7 +11605,7 @@ function MentorProfilScreen({ onNavigate = () => {} }) {
               actif={disponible}
               onChange={setDisponible}
               label="Accepter de nouveaux mentorés"
-              description="L'équipe LIGGEEY vous attribue des jeunes seulement si cette option est active."
+              description="L’équipe LIGGEEY vous attribue des jeunes seulement si cette option est active."
             />
           </App.Carte>
           <ApercuFiche
@@ -11656,7 +11670,7 @@ function CapMetierAdminDetail({ jeune, onBack, maj }) {
               {accordManquant && (
                 <div className="mt-4 flex flex-wrap gap-2">
                   <App.Bouton petit variante="doux" onClick={() => notify(`SMS de relance envoyé à ${jeune.parent.nom}.`)}>Relancer par SMS</App.Bouton>
-                  <App.Bouton petit variante="neutre" onClick={() => { maj({ parent: { ...jeune.parent, accord: "Confirmé" } }); notify("Accord parental enregistré."); }}>Enregistrer l'accord reçu</App.Bouton>
+                  <App.Bouton petit variante="neutre" onClick={() => { maj({ parent: { ...jeune.parent, accord: "Confirmé" } }); notify("Accord parental enregistré."); }}>Enregistrer l’accord reçu</App.Bouton>
                 </div>
               )}
             </App.Carte>
@@ -11664,7 +11678,7 @@ function CapMetierAdminDetail({ jeune, onBack, maj }) {
 
           <App.Carte titre="Mentor" sousTitre={mentor ? `Actuellement : ${mentor.nom}` : "Aucun mentor attribué"}>
             {accordManquant ? (
-              <NoteMineur>Le mentor pourra être attribué après l'accord du parent ou tuteur.</NoteMineur>
+              <NoteMineur>Le mentor pourra être attribué après l’accord du parent ou tuteur.</NoteMineur>
             ) : (
               <div className="flex flex-wrap items-end gap-3">
                 <div className="min-w-[220px] flex-1">
@@ -11709,7 +11723,7 @@ function CapMetierAdminScreen() {
 
   return (
     <div className="space-y-6">
-      <p className="text-sm text-secondaire">Les jeunes sans métier accompagnés par LIGGEEY, dès 15 ans. Attribuez un mentor à chacun, après l'accord du parent ou tuteur pour les mineurs.</p>
+      <p className="text-sm text-secondaire">Les jeunes sans métier accompagnés par LIGGEEY, dès 15 ans. Attribuez un mentor à chacun, après l’accord du parent ou tuteur pour les mineurs.</p>
       <div className="grid grid-cols-1 gap-4 sm:grid-cols-2 xl:grid-cols-4">
         <StatCard icon={Compass} value={jeunes.length} label="Jeunes suivis" detail="Parcours Cap Métier" onClick={() => setFiltre("tous")} />
         <StatCard icon={ShieldCheck} value={compte("mineurs")} label="Mineurs" detail="15 à 17 ans" tone="info" onClick={() => setFiltre("mineurs")} />
@@ -11762,7 +11776,7 @@ function CapMetierAdminScreen() {
 /* =====================================================================
    VERSION DE TEST
    - Sauvegarde automatique dans le navigateur du testeur (localStorage)
-   - Barre « Mode test » : scénarios à dérouler, commentaire sur l'écran,
+   - Barre « Mode test » : scénarios à dérouler, commentaire sur l’écran,
      réinitialisation de la démo
    ===================================================================== */
 
@@ -11808,15 +11822,15 @@ const TEST_SCENARIOS = [
   { id: "c5", espace: "chercheur", to: "profil", label: "Modifier ses informations de profil" },
   { id: "p1", espace: "prestataire", to: "regularisation", label: "Répondre à la question sur la régularisation, puis envoyer un justificatif" },
   { id: "p2", espace: "prestataire", to: "missions", label: "Accepter une demande de mission" },
-  { id: "p3", espace: "prestataire", to: "services", label: "Ajouter des services jusqu'à la limite de la formule Essentiel" },
-  { id: "e1", espace: "entreprise", to: "offres", label: "Publier une offre, puis la retrouver dans l'espace chercheur" },
+  { id: "p3", espace: "prestataire", to: "services", label: "Ajouter des services jusqu’à la limite de la formule Essentiel" },
+  { id: "e1", espace: "entreprise", to: "offres", label: "Publier une offre, puis la retrouver dans l’espace chercheur" },
   { id: "e2", espace: "entreprise", to: "candidatures", label: "Ouvrir une candidature et débloquer les coordonnées" },
   { id: "e3", espace: "entreprise", to: "suivi", label: "Évaluer une recrue et confirmer son embauche" },
   { id: "a1", espace: "admin", to: "regularisations", label: "Valider les justificatifs envoyés par le prestataire" },
   { id: "a2", espace: "admin", to: "suivi", label: "Traiter un signalement post-embauche" },
-  { id: "a3", espace: "admin", to: "abonnements", label: "Changer un tarif et le voir dans l'espace concerné" },
+  { id: "a3", espace: "admin", to: "abonnements", label: "Changer un tarif et le voir dans l’espace concerné" },
 ];
-const TEST_ESPACE_LABELS = { chercheur: "Chercheur d'emploi", prestataire: "Prestataire", entreprise: "Entreprise", admin: "Admin" };
+const TEST_ESPACE_LABELS = { chercheur: "Chercheur d’emploi", prestataire: "Prestataire", entreprise: "Entreprise", admin: "Admin" };
 
 function loadScenarios() {
   try {
@@ -11915,7 +11929,7 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
                 <MessageCircle size={14} /> Commenter cet écran
               </button>
             ) : (
-              <p className="text-xs" style={{ color: COLORS.slateLight }}>Les commentaires ne sont pas disponibles depuis cette page. Notez vos remarques et transmettez-les à l'équipe LIGGEEY.</p>
+              <p className="text-xs" style={{ color: COLORS.slateLight }}>Les commentaires ne sont pas disponibles depuis cette page. Notez vos remarques et transmettez-les à l’équipe LIGGEEY.</p>
             )}
             {!confirmReset ? (
               <button type="button" onClick={() => setConfirmReset(true)} className="w-full rounded-md px-3 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
@@ -11942,16 +11956,16 @@ function ecranValide(espace, ecran) {
   return (NAV_ITEMS_BY_ESPACE[espace] || []).some((n) => n.id === ecran) || (ecran in SUB_PAGES && espace === "prestataire");
 }
 
-/* Une session de test est ouverte quand le dernier écran enregistré est un écran de l'application. */
+/* Une session de test est ouverte quand le dernier écran enregistré est un écran de l’application. */
 function sessionOuverte(saved, espace) {
   return !!saved && !ECRANS_AUTH.includes(saved.screen) && saved.espace === espace;
 }
 
-/* Écran d'ouverture :
+/* Écran d’ouverture :
    0. avec le serveur (compte fourni, même null) : la page /plateforme a déjà vérifié la session et redirigé
-      si besoin. Un écran interne s'ouvre donc dans l'espace du compte connecté ;
+      si besoin. Un écran interne s’ouvre donc dans l’espace du compte connecté ;
    1. ecranInitial / espaceInitial (Storybook) ;
-   2. l'adresse (/plateforme/connexion, /plateforme/admin/offres…) : un écran interne ne s'ouvre
+   2. l’adresse (/plateforme/connexion, /plateforme/admin/offres…) : un écran interne ne s’ouvre
       que si une session est ouverte pour cet espace. Session ouverte dans un autre espace : son
       tableau de bord ; aucune session : la connexion ;
    3. /plateforme seul : la dernière session de test, sinon la connexion. */
@@ -11977,7 +11991,7 @@ function ecranDeDepart({ ecranInitial, espaceInitial, profilInitial, cheminIniti
 }
 
 /* compte : compte connecté, lu par le serveur (null si personne). undefined (Storybook) : connexion simulée, sans serveur.
-   comptesDemo : l'écran de connexion propose les comptes de démonstration. */
+   comptesDemo : l’écran de connexion propose les comptes de démonstration. */
 export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = null, profilInitial = null, cheminInitial = null, profilAdresse = null, synchroniserAdresse = false, compte = undefined, comptesDemo = false } = {}) {
   const modeServeur = compte !== undefined;
   const [compteCourant, setCompteCourant] = useState(compte ?? null);
@@ -11989,8 +12003,8 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   const [espace, setEspace] = useState(depart.espace);
   const [signupProfile, setSignupProfile] = useState(depart.profil);
 
-  /* Adresse du navigateur : elle suit l'écran affiché (/plateforme/{espace}/{écran}).
-     Précédent / Suivant rouvrent l'écran correspondant. Désactivé dans Storybook. */
+  /* Adresse du navigateur : elle suit l’écran affiché (/plateforme/{espace}/{écran}).
+     Précédent / Suivant rouvrent l’écran correspondant. Désactivé dans Storybook. */
   const adresseAppliquee = useRef(false);
   const depuisHistorique = useRef(false);
   useEffect(() => {
@@ -11998,7 +12012,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     const url = adressePlateforme({ screen, espace, profil: signupProfile });
     const actuelle = window.location.pathname + window.location.search;
     if (url !== actuelle) {
-      // Première adresse, ou correction après Précédent / Suivant : on remplace ; sinon nouvelle entrée d'historique.
+      // Première adresse, ou correction après Précédent / Suivant : on remplace ; sinon nouvelle entrée d’historique.
       if (!adresseAppliquee.current || depuisHistorique.current) window.history.replaceState(null, "", url);
       else window.history.pushState(null, "", url);
     }
@@ -12016,7 +12030,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
         setScreen(demande.screen);
         return;
       }
-      // Avec le serveur, un écran interne n'est ouvert qu'au compte connecté de cet espace.
+      // Avec le serveur, un écran interne n’est ouvert qu’au compte connecté de cet espace.
       const compteActuel = compteRef.current;
       if (modeServeur && !compteActuel) { setScreen("login"); return; }
       if (modeServeur && demande.espace !== compteActuel.profil) { setEspace(compteActuel.profil); setScreen("dashboard"); return; }
@@ -12076,7 +12090,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     setScreen(next);
   }
 
-  /* Comptes réels : connexion, inscription et déconnexion passent par l'API (components/plateforme/apiComptes.js). */
+  /* Comptes réels : connexion, inscription et déconnexion passent par l’API (components/plateforme/apiComptes.js). */
   const serveurApi = React.useMemo(() => (modeServeur ? {
     compte: compteCourant,
     comptesDemo,
@@ -12091,7 +12105,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   } : null), [modeServeur, compteCourant, comptesDemo]); // eslint-disable-line react-hooks/exhaustive-deps
 
   /* Le nom, le rôle et les initiales affichés viennent du compte connecté ; les données des écrans restent celles de la démo.
-     Comptes de démonstration : profil de démo d'origine (USER_BY_ESPACE), pour que l'affichage reste celui des captures. */
+     Comptes de démonstration : profil de démo d’origine (USER_BY_ESPACE), pour que l’affichage reste celui des captures. */
   const estCompteDemo = !!compteCourant && COMPTES_DEMO.some((c) => c.email === compteCourant.email);
   const currentUser = compteCourant && compteCourant.profil === espace && !estCompteDemo
     ? { ...USER_BY_ESPACE[espace], name: compteCourant.nom, role: compteCourant.role, initials: compteCourant.initiales }
@@ -12101,7 +12115,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   planApi.regulSteps = espace === "prestataire" ? regulSteps : null;
   planApi.regulChoix = readStore(storeData, "regul-choix", null);
 
-  /* Fil d'Ariane et entrée active du menu, déduits du menu lui-même */
+  /* Fil d’Ariane et entrée active du menu, déduits du menu lui-même */
   const subPage = SUB_PAGES[screen];
   const navEntry = navItems.find((n) => n.id === (subPage ? subPage.parent : screen));
   const breadcrumb = subPage ? [{ label: navEntry?.label, id: subPage.parent }, { label: subPage.label }] : [{ label: navEntry?.label || "Tableau de bord" }];
@@ -12132,7 +12146,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
   const offresAVerifier = offresEntreprise.filter((o) => o.statut === "En vérification").length;
   const offresRefusees = offresEntreprise.filter((o) => o.statut === "Refusée");
   const pl = (n, one, many) => `${n} ${n > 1 ? many : one}`;
-  const tacheMessages = messagesProfilNonLus > 0 && { label: `Lire ${pl(messagesProfilNonLus, "message", "messages")} de l'équipe LIGGEEY`, to: "messages", icon: MessageCircle };
+  const tacheMessages = messagesProfilNonLus > 0 && { label: `Lire ${pl(messagesProfilNonLus, "message", "messages")} de l’équipe LIGGEEY`, to: "messages", icon: MessageCircle };
 
   /* Cap Métier et mentorat */
   const jeunesCap = readStore(storeData, "cap-jeunes", JEUNES_CAP_INITIAL);
@@ -12161,14 +12175,14 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     ],
     entreprise: [
       tacheMessages,
-      ...offresRefusees.map((o) => ({ label: `Corriger l'offre « ${o.titre} », refusée par LIGGEEY`, to: "offres", icon: Briefcase, urgent: true })),
+      ...offresRefusees.map((o) => ({ label: `Corriger l’offre « ${o.titre} », refusée par LIGGEEY`, to: "offres", icon: Briefcase, urgent: true })),
       recruesARisque > 0 && { label: `Accompagner ${pl(recruesARisque, "recrue à risque", "recrues à risque")}`, to: "suivi", icon: AlertCircle, urgent: true },
       evaluationsAFaire > 0 && { label: `Évaluer vos recrues (${pl(evaluationsAFaire, "point de suivi", "points de suivi")})`, to: "suivi", icon: HeartHandshake },
       nouvellesCandidatures > 0 && { label: `Traiter ${pl(nouvellesCandidatures, "nouvelle candidature", "nouvelles candidatures")}`, to: "candidatures", icon: ClipboardList },
     ],
     jeune: [
       tacheMessages,
-      jeuneConnecte && !jeuneConnecte.piste && { label: "Faire votre bilan d'orientation", to: "orientation", icon: Compass },
+      jeuneConnecte && !jeuneConnecte.piste && { label: "Faire votre bilan d’orientation", to: "orientation", icon: Compass },
       seanceJeune && mentorJeune && { label: `Séance avec ${mentorJeune.nom} : ${dateLongue(seanceJeune.date)} à ${seanceJeune.heure}`, to: "mentor", icon: Calendar },
     ],
     mentor: [
@@ -12178,8 +12192,8 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     ],
     admin: [
       messagesAdminNonLus > 0 && { label: `Répondre à ${pl(messagesAdminNonLus, "message", "messages")} des utilisateurs`, to: "communication", data: { onglet: "Messagerie" }, icon: MessageCircle },
-      offresAVerifier > 0 && { label: `Vérifier ${pl(offresAVerifier, "offre d'emploi", "offres d'emploi")} avant publication`, to: "offres", icon: Briefcase, urgent: true },
-      capAccords > 0 && { label: `Relancer ${pl(capAccords, "parent", "parents")} pour l'accord parental (Cap Métier)`, to: "cap-metier", icon: Phone },
+      offresAVerifier > 0 && { label: `Vérifier ${pl(offresAVerifier, "offre d’emploi", "offres d’emploi")} avant publication`, to: "offres", icon: Briefcase, urgent: true },
+      capAccords > 0 && { label: `Relancer ${pl(capAccords, "parent", "parents")} pour l’accord parental (Cap Métier)`, to: "cap-metier", icon: Phone },
       capAAttribuer > 0 && { label: `Attribuer un mentor à ${pl(capAAttribuer, "jeune", "jeunes")} (Cap Métier)`, to: "cap-metier", icon: Compass },
       signalementsOuverts > 0 && { label: `Traiter ${pl(signalementsOuverts, "signalement post-embauche", "signalements post-embauche")}`, to: "suivi", icon: Flag, urgent: true },
       regulAVerifier > 0 && { label: `Vérifier ${pl(regulAVerifier, "justificatif de régularisation", "justificatifs de régularisation")}`, to: "regularisations", icon: Landmark },
@@ -12196,9 +12210,9 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     admin: { communication: messagesAdminNonLus, offres: offresAVerifier, suivi: signalementsOuverts, regularisations: regulAVerifier, abonnements: paiementsEchoues, "cap-metier": capAAttribuer + capAccords },
   };
 
-  /* Les offres actives publiées par l'entreprise apparaissent aussi côté chercheur */
+  /* Les offres actives publiées par l’entreprise apparaissent aussi côté chercheur */
   const offresPubliees = offresEntreprise.filter((o) => o.statut === "Active").map((o) => ({
-    titre: o.titre, contrat: o.contrat || "CDI", entreprise: ENTREPRISE_DEMO_NOM, secteur: "BTP & Construction",
+    titre: o.titre, contrat: o.contrat || "CDI", entreprise: ENTREPRISE_DEMO_NOM, secteur: "BTP et construction",
     localisation: o.localisation, description: o.description || "", competences: o.competences || [o.categorie], sponsorisee: o.sponsorisee,
     experience: o.experience, salaire: o.salaire, dateLimite: o.dateLimite,
   }));
@@ -12306,7 +12320,7 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
 }
 
 /* =====================================================================
-   EXPORTS POUR STORYBOOK (ajout au fichier d'origine)
+   EXPORTS POUR STORYBOOK (ajout au fichier d’origine)
    Les composants et données de démo ci-dessous sont exposés pour être
    présentés un à un dans Storybook (stories/composants/application/).
    Le comportement de la plateforme ne change pas.

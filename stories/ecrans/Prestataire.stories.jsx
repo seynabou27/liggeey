@@ -1,6 +1,6 @@
 import { Ecran, parametresEcran } from './_ecran';
 
-/* Une story par entrée du menu de l'espace « Prestataire » (NAV_ITEMS_BY_ESPACE.prestataire). */
+/* Une story par entrée du menu de l’espace « Prestataire » (NAV_ITEMS_BY_ESPACE.prestataire). */
 export default {
   title: 'Écrans/Prestataire',
   parameters: parametresEcran,

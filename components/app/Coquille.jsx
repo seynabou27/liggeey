@@ -8,10 +8,10 @@ import { BoutonIcone, ChampRecherche } from './Controles';
 import { BoutonTheme } from './Theme';
 
 /* =====================================================================
-   COQUILLE DE L'APPLICATION
+   COQUILLE DE L’APPLICATION
    Barre latérale claire (groupes titrés, élément actif teinté), barre du haut
    (salutation, recherche, thème clair ou sombre, notifications, compte), en-tête de page (titre et
-   fil d'Ariane), pied de page. Sur mobile, le menu s'ouvre en tiroir.
+   fil d’Ariane), pied de page. Sur mobile, le menu s’ouvre en tiroir.
    ===================================================================== */
 
 const CLE_REPLI = 'liggeey-menu-replie';
@@ -28,7 +28,7 @@ function ecrireRepli(v) {
   try {
     window.localStorage.setItem(CLE_REPLI, v ? '1' : '0');
   } catch {
-    /* stockage indisponible : le choix n'est pas retenu */
+    /* stockage indisponible : le choix n’est pas retenu */
   }
 }
 
@@ -90,9 +90,9 @@ const HABILLAGES = {
 };
 
 /**
- * - elements : [{ id, label, icone, section }] (les sections suivent l'ordre)
+ * - elements : [{ id, label, icone, section }] (les sections suivent l’ordre)
  * - compteurs : { [id]: nombre } affichés en pastille
- * - replie : n'affiche que les icônes (ordinateur)
+ * - replie : n’affiche que les icônes (ordinateur)
  * - encart : bloc en bas du menu (formule, aide…)
  * - habillage : sombre (bleu ardoise) | claire
  */
@@ -103,7 +103,7 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
   return (
     <aside
       className={`flex h-full flex-col border-r transition-[width] duration-200 ${h.fond} ${etroit ? 'w-[76px]' : 'w-[264px]'}`}
-      aria-label="Menu de l'application"
+      aria-label="Menu de l’application"
     >
       <div className={`flex h-[72px] shrink-0 items-center ${etroit ? 'justify-center' : 'justify-between px-6'}`}>
         {etroit ? logoReduit : logo}
@@ -156,7 +156,7 @@ export function BarreLaterale({ elements, actif, onNaviguer, compteurs = {}, rep
   );
 }
 
-/* ---------- Barre d'icônes ---------- */
+/* ---------- Barre d’icônes ---------- */
 
 function ElementRail({ icone: Icone, label, actif, compteur = 0, onClick, href, externe }) {
   const nom = `${label}${compteur > 0 ? ` (${compteur})` : ''}${externe ? ', nouvel onglet' : ''}`;
@@ -196,7 +196,7 @@ function ElementRail({ icone: Icone, label, actif, compteur = 0, onClick, href, 
 
 /**
  * Colonne étroite en bleu le plus foncé (neutre-900), placée avant la barre latérale (ordinateur seulement).
- * Mise en page d'origine (icônes empilées en haut) ; chaque icône est un raccourci, avec une info-bulle
+ * Mise en page d’origine (icônes empilées en haut) ; chaque icône est un raccourci, avec une info-bulle
  * au survol et au focus.
  * - elements : [{ icone, label, onClick | href, externe?, actif?, compteur? }]
  */
@@ -338,7 +338,7 @@ function RechercheMenu({ elements, onNaviguer }) {
         valeur={q}
         onChange={setQ}
         placeholder="Rechercher…"
-        label="Rechercher une page de l'application"
+        label="Rechercher une page de l’application"
         onKeyDown={(e) => {
           if (e.key === 'Enter' && resultats[0]) {
             onNaviguer(resultats[0].id);
@@ -398,7 +398,7 @@ export function BarreHaut({ salutation, onMenu, menuOuvert, elements = [], onNav
 /* ---------- En-tête de page ---------- */
 
 /**
- * Titre de la page à gauche, fil d'Ariane à droite.
+ * Titre de la page à gauche, fil d’Ariane à droite.
  * filAriane : [{ label, id? }] ; le dernier élément est la page courante.
  */
 export function EnTetePage({ titre, filAriane = [], onNaviguer, racine = 'LIGGEEY', description, actions }) {
@@ -410,7 +410,7 @@ export function EnTetePage({ titre, filAriane = [], onNaviguer, racine = 'LIGGEE
       </div>
       <div className="flex flex-col gap-3 md:items-end">
         {filAriane.length > 0 && (
-          <nav aria-label="Fil d'Ariane" className="order-first md:order-none">
+          <nav aria-label="Fil d’Ariane" className="order-first md:order-none">
             <ol className="flex flex-wrap items-center gap-1.5 text-sm">
               <li className="flex items-center gap-1.5">
                 {onNaviguer ? (
@@ -461,7 +461,7 @@ export function PiedApp({ gauche = `© ${new Date().getFullYear()} LIGGEEY`, dro
 /* ---------- Coquille complète ---------- */
 
 /**
- * Assemble barre d'icônes (rail, facultatif), barre latérale, barre du haut, en-tête de page, contenu et pied de page.
+ * Assemble barre d’icônes (rail, facultatif), barre latérale, barre du haut, en-tête de page, contenu et pied de page.
  * Sur ordinateur, le bouton menu replie la barre latérale (choix retenu) ;
  * sur mobile, il ouvre un tiroir qui se ferme après chaque navigation.
  */

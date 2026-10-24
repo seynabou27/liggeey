@@ -35,7 +35,7 @@ export default async function Accueil() {
 
       <Section id="offres" aria-labelledby="titre-offres">
         <TitreSection id="titre-offres" centre titre={t.titre} texte={t.texte} />
-        {/* Les filtres viennent de l'adresse (?q=…&secteur=…) : rendu client sous Suspense */}
+        {/* Les filtres viennent de l’adresse (?q=…&secteur=…) : rendu client sous Suspense */}
         <Suspense fallback={offres.length > 0 ? <GrilleOffres offres={offres} /> : null}>
           <VitrineOffres offres={offres} />
         </Suspense>
@@ -49,7 +49,7 @@ export default async function Accueil() {
       <GrilleSecteurs />
       <CommentCaMarche avecCapture={imageExiste(accueil.etapes.capture)} />
       <BandeConstat />
-      {/* Bande vidéo masquée tant que la vidéo de présentation n'existe pas (accueil.video.src) */}
+      {/* Bande vidéo masquée tant que la vidéo de présentation n’existe pas (accueil.video.src) */}
       {accueil.video.src && <BandeVideo avecPhoto={imageExiste(accueil.video.image)} />}
       <Engagements />
       <AVenir evenement={evenement} />

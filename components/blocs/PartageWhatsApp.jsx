@@ -6,7 +6,7 @@ import { site } from '@/lib/site';
 
 /**
  * Lien « Partager sur WhatsApp ».
- * - avec `evenement` : message du Job Dating (titre, date, lieu, lien d'inscription) ;
+ * - avec `evenement` : message du Job Dating (titre, date, lieu, lien d’inscription) ;
  * - avec `texte` : message libre.
  */
 export default function PartageWhatsApp({ evenement, texte, clair = false }) {

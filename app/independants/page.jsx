@@ -21,7 +21,7 @@ function Lettre({ children }) {
 
 export default function PageIndependants() {
   const t = independants;
-  // Seules les vidéos déjà produites s'affichent ; sans vidéo, la section et son lien sont masqués
+  // Seules les vidéos déjà produites s’affichent ; sans vidéo, la section et son lien sont masqués
   const videos = t.wolof.videos.filter((v) => v.src);
   return (
     <>

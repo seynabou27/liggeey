@@ -14,7 +14,7 @@ export function Section({ id, fond = 'blanc', etroit = false, className = '', ch
   );
 }
 
-/** Titre de section : surtitre, h2 et phrase d'introduction. */
+/** Titre de section : surtitre, h2 et phrase d’introduction. */
 export function TitreSection({ surtitre, titre, texte, centre = false, clair = false, id, className = '' }) {
   return (
     <div className={`mb-8 flex flex-col gap-2 md:mb-10 ${centre ? 'items-center text-center' : ''} ${className}`}>

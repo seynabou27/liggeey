@@ -7,7 +7,7 @@ import { lienWhatsApp } from '@/lib/liens';
 
 /**
  * Bouton WhatsApp flottant, présent sur toutes les pages.
- * Il s'efface quand le pied de page est visible : celui-ci affiche déjà WhatsApp,
+ * Il s’efface quand le pied de page est visible : celui-ci affiche déjà WhatsApp,
  * et le bouton ne recouvre plus la fin de la page.
  */
 export default function BoutonWhatsApp() {

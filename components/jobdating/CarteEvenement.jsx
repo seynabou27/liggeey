@@ -4,7 +4,7 @@ import { dateLongue, datePastille, fcfa, heure } from '@/lib/format';
 import Bouton from '@/components/ui/Bouton';
 import PartageWhatsApp from '@/components/blocs/PartageWhatsApp';
 
-/** Carte d'un Job Dating : date, horaires, lieu, prix, inscription et partage. */
+/** Carte d’un Job Dating : date, horaires, lieu, prix, inscription et partage. */
 export default function CarteEvenement({ evenement, lienDetails = false }) {
   const t = jobDating.prochain;
   const pastille = datePastille(evenement.date);

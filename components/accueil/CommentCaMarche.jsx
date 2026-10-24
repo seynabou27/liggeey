@@ -30,9 +30,9 @@ function Colonne({ id, groupe, visible }) {
 }
 
 /**
- * « Comment ça marche » autour d'un téléphone (comme le modèle).
+ * « Comment ça marche » autour d’un téléphone (comme le modèle).
  * Ordinateur : talents à gauche, entreprises à droite. Mobile : deux onglets.
- * @param {{ avecCapture: boolean }} props  capture de l'app présente dans /public ?
+ * @param {{ avecCapture: boolean }} props  capture de l’app présente dans /public ?
  */
 export default function CommentCaMarche({ avecCapture }) {
   const t = accueil.etapes;
@@ -64,7 +64,7 @@ export default function CommentCaMarche({ avecCapture }) {
           <div className="order-first mx-auto hidden w-[220px] md:block lg:order-none lg:w-[260px]">
             <div className="relative aspect-[9/18] overflow-hidden rounded-[36px] border-[10px] border-principal bg-marque-doux shadow-carte">
               {avecCapture ? (
-                <Image src={t.capture} alt="Écran de l'application LIGGEEY" fill sizes="260px" className="object-cover" />
+                <Image src={t.capture} alt="Écran de l’application LIGGEEY" fill sizes="260px" className="object-cover" />
               ) : (
                 <div className="grid h-full place-items-center">
                   <Image src="/logo/monogramme-orange.svg" alt="" width={64} height={67} />

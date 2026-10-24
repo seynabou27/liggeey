@@ -1,6 +1,6 @@
 import { Ecran, parametresEcran } from './_ecran';
 
-/* Une story par entrée du menu de l'espace « Admin » (NAV_ITEMS_BY_ESPACE.admin). */
+/* Une story par entrée du menu de l’espace « Admin » (NAV_ITEMS_BY_ESPACE.admin). */
 export default {
   title: 'Écrans/Admin',
   parameters: parametresEcran,

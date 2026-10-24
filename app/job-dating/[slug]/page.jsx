@@ -22,7 +22,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-/** Fiche d'un Job Dating : détails, programme, entreprises confirmées, inscription. */
+/** Fiche d’un Job Dating : détails, programme, entreprises confirmées, inscription. */
 export default async function PageEvenement({ params }) {
   const { slug } = await params;
   const evenement = getEvenement(slug);

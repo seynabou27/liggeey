@@ -1,4 +1,4 @@
-/* Bibliothèque de l'application LIGGEEY (structure inspirée de Mifty, tokens LIGGEEY).
+/* Bibliothèque de l’application LIGGEEY (structure inspirée de Mifty, tokens LIGGEEY).
    Chaque composant a sa story dans stories/composants/application/bibliotheque/. */
 export { Badge, Compteur, TONS } from './Badge';
 export { Avatar, GroupeAvatars, initiales } from './Avatar';

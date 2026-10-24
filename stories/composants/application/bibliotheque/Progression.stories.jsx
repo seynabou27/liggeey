@@ -24,7 +24,7 @@ export const Liste = {
     <Carte titre="Mes offres actives" sousTitre="Candidatures reçues par offre" className="max-w-lg">
       <ListeClassee
         elements={[
-          { id: 1, libelle: "Chef d'équipe électricité", pourcentage: 100, valeur: '12', visuel: <PastilleIcone icone={Briefcase} taille="sm" /> },
+          { id: 1, libelle: "Chef d’équipe électricité", pourcentage: 100, valeur: '12', visuel: <PastilleIcone icone={Briefcase} taille="sm" /> },
           { id: 2, libelle: 'Technicienne plomberie', pourcentage: 67, valeur: '8', visuel: <PastilleIcone icone={Briefcase} taille="sm" /> },
           { id: 3, libelle: 'Soudeur TIG/MIG', pourcentage: 25, valeur: '3', visuel: <PastilleIcone icone={Briefcase} taille="sm" /> },
         ]}

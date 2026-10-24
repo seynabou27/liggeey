@@ -49,7 +49,7 @@ export function ListeClassee({ elements }) {
   );
 }
 
-/** Anneau de progression (taux de complétion, période d'essai). */
+/** Anneau de progression (taux de complétion, période d’essai). */
 export function Anneau({ valeur, taille = 64, epaisseur = 7, label, children }) {
   const v = Math.max(0, Math.min(100, valeur));
   const r = (taille - epaisseur) / 2;

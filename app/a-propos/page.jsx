@@ -10,7 +10,7 @@ import CarteBureau from '@/components/blocs/CarteBureau';
 
 export const metadata = { title: apropos.meta.titre, description: apropos.meta.description, alternates: { canonical: '/a-propos' } };
 
-/** Initiales affichées tant que la photo d'un membre n'est pas fournie. */
+/** Initiales affichées tant que la photo d’un membre n’est pas fournie. */
 const initiales = (nom) =>
   nom
     .split(/\s+/)

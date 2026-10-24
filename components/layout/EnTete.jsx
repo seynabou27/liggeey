@@ -11,8 +11,8 @@ import MenuMobile from './MenuMobile';
 
 /**
  * En-tête fixe, transparent au-dessus des bandeaux photo (comme le modèle),
- * puis ardoise dès que l'on fait défiler la page.
- * Le menu complet s'affiche à partir de 1280 px ; en dessous, menu mobile.
+ * puis ardoise dès que l’on fait défiler la page.
+ * Le menu complet s’affiche à partir de 1280 px ; en dessous, menu mobile.
  */
 export default function EnTete() {
   const chemin = usePathname();
@@ -35,7 +35,7 @@ export default function EnTete() {
   return (
     <header className={`fixed inset-x-0 top-0 z-50 transition-colors duration-300 ${defile ? 'bg-sombre/95 shadow-lg backdrop-blur' : 'bg-transparent'}`}>
       <div className={`container flex h-[72px] items-center gap-8 border-b ${defile ? 'border-transparent' : 'border-white/15'}`}>
-        <Link href="/" className="shrink-0" aria-label="LIGGEEY, retour à l'accueil">
+        <Link href="/" className="shrink-0" aria-label="LIGGEEY, retour à l’accueil">
           <Image src="/logo/liggeey-blanc.svg" alt="" width={123} height={24} priority />
         </Link>
 

@@ -6,7 +6,7 @@ import Compteur from '@/components/ui/Compteur';
 import CarteRecherche from './CarteRecherche';
 
 /**
- * Bandeau d'accueil, calqué sur le modèle validé (étape 4, wireframe 2a) :
+ * Bandeau d’accueil, calqué sur le modèle validé (étape 4, wireframe 2a) :
  * photo assombrie, titre et repères à gauche, carte de recherche à droite,
  * découpe en vague qui remonte vers la droite sous la carte.
  */
@@ -32,7 +32,7 @@ export default function BandeauAccueil() {
             {hero.titre}
           </h1>
           <p className="mt-4 max-w-[600px] text-pretty text-base leading-[1.7] text-white/90 sm:mt-6 sm:text-xl sm:leading-[1.8]">{hero.texte}</p>
-          {/* Les trois repères toujours sur une ligne : grille jusqu'à 768 px, puis espacés librement */}
+          {/* Les trois repères toujours sur une ligne : grille jusqu’à 768 px, puis espacés librement */}
           <dl className="mt-6 grid grid-cols-3 gap-3 sm:mt-8 sm:gap-6 md:flex md:flex-wrap md:gap-x-12 md:gap-y-5 xl:gap-x-8">
             {hero.reperes.map((r) => (
               <div key={r.libelle} className="flex flex-col-reverse justify-end gap-1.5 sm:gap-2">
@@ -45,7 +45,7 @@ export default function BandeauAccueil() {
             ))}
           </dl>
         </div>
-        {/* Carte empilée sous le texte jusqu'à 1280 px, sans s'étirer sur toute la largeur */}
+        {/* Carte empilée sous le texte jusqu’à 1280 px, sans s’étirer sur toute la largeur */}
         <div className="w-full max-w-2xl xl:max-w-none">
           <CarteRecherche />
         </div>

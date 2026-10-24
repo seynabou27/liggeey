@@ -11,7 +11,7 @@ import { CaseConsentement, ChampSelect, ChampTexte, ChampZone, GroupeCases, Grou
 
 /**
  * Demande de démo entreprise.
- * `service="jobdating"` dans l'adresse coche d'avance « Job Dating ».
+ * `service="jobdating"` dans l’adresse coche d’avance « Job Dating ».
  */
 export default function FormulaireDemo({ service = '' }) {
   const c = demo.champs;

@@ -4,7 +4,7 @@ import { VagueDouce } from '@/components/ui/Vague';
 
 /**
  * Haut des pages intérieures : bandeau sombre (photo facultative), titre h1,
- * texte et boutons, avec une vague discrète. L'en-tête transparent se pose dessus.
+ * texte et boutons, avec une vague discrète. L’en-tête transparent se pose dessus.
  */
 export default function EnTetePage({ surtitre, titre, texte, image, source, children }) {
   const avecPhoto = imageExiste(image);

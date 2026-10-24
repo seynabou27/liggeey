@@ -3,10 +3,10 @@
 import { useEffect, useRef, useState } from 'react';
 
 /**
- * Chiffre qui défile de 0 jusqu'à sa valeur quand il apparaît à l'écran (comme les compteurs du modèle).
- * - Rendu serveur et sans JavaScript : la valeur finale s'affiche directement.
- * - Les lecteurs d'écran lisent la valeur finale, pas le défilement.
- * - Pas d'animation si l'utilisateur a demandé à réduire les mouvements.
+ * Chiffre qui défile de 0 jusqu’à sa valeur quand il apparaît à l’écran (comme les compteurs du modèle).
+ * - Rendu serveur et sans JavaScript : la valeur finale s’affiche directement.
+ * - Les lecteurs d’écran lisent la valeur finale, pas le défilement.
+ * - Pas d’animation si l’utilisateur a demandé à réduire les mouvements.
  * @param {{ valeur: string, duree?: number }} props  valeur au format français, par exemple « 1 500 » ou « 78,5 »
  */
 export default function Compteur({ valeur, duree = 1500 }) {

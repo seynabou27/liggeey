@@ -23,7 +23,7 @@ export async function generateMetadata({ params }) {
   };
 }
 
-/** Bouton de fin d'article selon le public visé. */
+/** Bouton de fin d’article selon le public visé. */
 function lienCta(publicVise) {
   if (publicVise === 'entreprises') return '/entreprises/demande-de-demo';
   return lienInscription(publicVise === 'independants' ? 'independant' : 'talent');
@@ -44,7 +44,7 @@ export default async function PageArticle({ params }) {
     <>
       <div className="bg-sombre pb-14 pt-[128px] text-sur-sombre md:pt-[150px]">
         <div className="container max-w-3xl">
-          <nav aria-label="Fil d'Ariane" className="text-sm text-white/85">
+          <nav aria-label="Fil d’Ariane" className="text-sm text-white/85">
             <Link href="/ressources" className="hover:text-marque-vif">
               Ressources
             </Link>{' '}
@@ -58,7 +58,7 @@ export default async function PageArticle({ params }) {
       </div>
 
       <article className="container max-w-3xl py-12">
-        {/* Contenu Markdown converti en HTML (fichiers rédigés par l'équipe) */}
+        {/* Contenu Markdown converti en HTML (fichiers rédigés par l’équipe) */}
         <div className="article font-serif text-principal" dangerouslySetInnerHTML={{ __html: article.html }} />
 
         <aside className="mt-12 flex flex-col gap-4 rounded-lg bg-sombre p-7 text-sur-sombre sm:flex-row sm:items-center sm:justify-between">

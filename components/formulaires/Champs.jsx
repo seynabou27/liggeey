@@ -136,11 +136,11 @@ export function PotDeMiel() {
   );
 }
 
-/** Message d'échec d'envoi, avec repli WhatsApp. */
+/** Message d’échec d’envoi, avec repli WhatsApp. */
 export function MessageErreur({ lienWhatsApp }) {
   return (
     <p role="alert" className="rounded-lg bg-statut-danger-doux p-4">
-      L'envoi n'a pas abouti. Réessayez dans un instant, ou{' '}
+      L’envoi n’a pas abouti. Réessayez dans un instant, ou{' '}
       <a href={lienWhatsApp} target="_blank" rel="noopener noreferrer" className="lien">
         écrivez-nous sur WhatsApp
       </a>

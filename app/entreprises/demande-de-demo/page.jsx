@@ -8,7 +8,7 @@ import FormulaireDemo from '@/components/formulaires/FormulaireDemo';
 
 export const metadata = { title: demo.meta.titre, description: demo.meta.description, alternates: { canonical: '/entreprises/demande-de-demo' } };
 
-/** /entreprises/demande-de-demo?service=jobdating coche d'avance « Job Dating ». */
+/** /entreprises/demande-de-demo?service=jobdating coche d’avance « Job Dating ». */
 export default async function PageDemo({ searchParams }) {
   const { service = '' } = await searchParams;
   return (

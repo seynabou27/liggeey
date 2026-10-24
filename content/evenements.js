@@ -1,7 +1,7 @@
 /**
  * Job Dating (un par trimestre).
  * ⚠️ Événement de décembre 2026 : date, lieu et programme PROVISOIRES.
- * Les entreprises participantes ne sont listées que si elles l'ont confirmé.
+ * Les entreprises participantes ne sont listées que si elles l’ont confirmé.
  */
 export const evenements = [
   {
@@ -11,7 +11,7 @@ export const evenements = [
     debut: '09:00',
     fin: '14:00',
     lieu: 'Dakar Plateau',
-    precisionLieu: "Salle communiquée à l'inscription",
+    precisionLieu: "Salle communiquée à l’inscription",
     prix: 5000,
     public: 'Talents et indépendants',
     programme: [

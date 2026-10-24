@@ -39,7 +39,7 @@ export function BandeParcours() {
   );
 }
 
-/** Secteurs : chaque carte ouvre les offres du secteur dans l'application. */
+/** Secteurs : chaque carte ouvre les offres du secteur dans l’application. */
 export function GrilleSecteurs() {
   const t = accueil.secteurs;
   return (
@@ -63,7 +63,7 @@ export function GrilleSecteurs() {
 }
 
 /**
- * Constat (chiffres de l'enquête) : titre et texte à gauche, chiffres animés à droite.
+ * Constat (chiffres de l’enquête) : titre et texte à gauche, chiffres animés à droite.
  * Les sources restent toujours affichées sous les chiffres.
  */
 export function BandeConstat() {

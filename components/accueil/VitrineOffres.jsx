@@ -48,7 +48,7 @@ function Message({ texte, filtres }) {
   );
 }
 
-/** Vitrine des offres, filtrée par la carte de recherche du bandeau (paramètres d'URL). */
+/** Vitrine des offres, filtrée par la carte de recherche du bandeau (paramètres d’URL). */
 export default function VitrineOffres({ offres }) {
   const params = useSearchParams();
   const filtres = Object.fromEntries(CLES.map((cle) => [cle, params.get(cle) ?? '']));

@@ -4,9 +4,9 @@ import { useState } from 'react';
 import { verifier } from '@/lib/validation';
 
 /**
- * Gère l'envoi d'un formulaire vers /api/formulaires :
+ * Gère l’envoi d’un formulaire vers /api/formulaires :
  * lecture des champs, vérification, envoi, états (repos, envoi, succes, erreur).
- * Les cases multiples s'écrivent name="interets[]".
+ * Les cases multiples s’écrivent name="interets[]".
  *
  * @param {string} type     contact | demo | jobdating | newsletter
  * @param {string[]} requis champs obligatoires

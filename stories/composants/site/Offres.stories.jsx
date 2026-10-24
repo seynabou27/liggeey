@@ -5,7 +5,7 @@ import VitrineOffres from '../../../components/accueil/VitrineOffres';
 import CarteRecherche from '../../../components/accueil/CarteRecherche';
 import offres from '../../../content/offres-demo.json';
 
-/* Offres d'exemple : content/offres-demo.json (entreprises fictives). */
+/* Offres d’exemple : content/offres-demo.json (entreprises fictives). */
 
 export const Carte = {
   name: 'CarteOffre',

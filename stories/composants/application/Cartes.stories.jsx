@@ -13,7 +13,7 @@ const carte = (Composant, args, largeur = 'max-w-xs') => ({
   args,
 });
 
-/* ---------- Chercheur d'emploi ---------- */
+/* ---------- Chercheur d’emploi ---------- */
 
 export const Offre = { name: 'OfferCard', ...carte(OfferCard, { offre: OFFRES_DATA[0], applied: false, saved: false, onOpen: fn(), onToggleSave: fn() }, 'max-w-3xl') };
 export const OffreSauvegardee = { name: 'OfferCard · sauvegardée', ...carte(OfferCard, { offre: OFFRES_DATA[3], applied: false, saved: true, onOpen: fn(), onToggleSave: fn() }, 'max-w-3xl') };

@@ -10,7 +10,7 @@ import FormulaireContact from '@/components/formulaires/FormulaireContact';
 
 export const metadata = { title: contact.meta.titre, description: contact.meta.description, alternates: { canonical: '/contact' } };
 
-/** Une carte « moyen de contact » : icône, titre, phrase, coordonnée et action (en bas, alignées d'une carte à l'autre). */
+/** Une carte « moyen de contact » : icône, titre, phrase, coordonnée et action (en bas, alignées d’une carte à l’autre). */
 function MoyenContact({ icone: IconeMoyen, titre, texte, children }) {
   return (
     <li className="flex flex-col gap-3 rounded-lg border border-base bg-surface p-6 transition-shadow hover:shadow-carte">

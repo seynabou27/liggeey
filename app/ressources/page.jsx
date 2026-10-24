@@ -8,7 +8,7 @@ import BandeNewsletter from '@/components/blocs/BandeNewsletter';
 export const metadata = { title: ressources.meta.titre, description: ressources.meta.description, alternates: { canonical: '/ressources' } };
 
 export default function PageRessources() {
-  // On n'envoie au navigateur que ce qui sert à la liste (pas le texte complet).
+  // On n’envoie au navigateur que ce qui sert à la liste (pas le texte complet).
   const articles = getArticles().map(({ slug, titre, resume, public: cible, auteur, date, minutes }) => ({ slug, titre, resume, public: cible, auteur, date, minutes }));
   const t = ressources;
 

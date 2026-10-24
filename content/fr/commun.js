@@ -19,7 +19,7 @@ const liggeey = [
 ];
 
 export const commun = {
-  // Pas de lien « Accueil » dans l'en-tête : le logo y ramène (le menu mobile garde « Accueil »)
+  // Pas de lien « Accueil » dans l’en-tête : le logo y ramène (le menu mobile garde « Accueil »)
   nav: [...parcours, ...services, { href: '/contact', label: 'Contact' }],
   groupes: [
     { titre: 'Parcours', liens: parcours },
@@ -37,13 +37,13 @@ export const commun = {
   pied: {
     inscription: 'Créer mon compte',
     reseaux: { titre: 'Suivez-nous', nouvelOnglet: 'nouvel onglet' },
-    contact: { titre: 'Nous contacter', whatsapp: 'WhatsApp', email: 'E-mail', bureau: "Bureau d'accueil", horaires: 'Horaires' },
+    contact: { titre: 'Nous contacter', whatsapp: 'WhatsApp', email: 'E-mail', bureau: "Bureau d’accueil", horaires: 'Horaires' },
   },
   newsletter: {
     titre: 'Recevez nos nouveaux articles',
     texte: 'Conseils emploi, compétences et recrutement, et les dates des prochains Job Dating.',
     champ: 'Votre adresse e-mail',
-    bouton: "Je m'abonne",
-    succes: "C'est fait ! Vous recevrez notre prochain envoi.",
+    bouton: "Je m’abonne",
+    succes: "C’est fait ! Vous recevrez notre prochain envoi.",
   },
 };

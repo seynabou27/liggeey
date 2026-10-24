@@ -23,11 +23,11 @@ export async function POST(requete) {
     const db = await obtenirDb();
     const utilisateur = await creerUtilisateur(db, donnees);
     await ouvrirSession(utilisateur.id, { souvenir: true, agentUtilisateur: requete.headers.get('user-agent') });
-    // À venir : SMS au parent ou tuteur pour confirmer l'accord (Cap Métier), e-mail de bienvenue.
+    // À venir : SMS au parent ou tuteur pour confirmer l’accord (Cap Métier), e-mail de bienvenue.
     return reponse({ ok: true, compte: comptePublic(utilisateur) }, 201);
   } catch (e) {
     if (e instanceof ErreurDoublon) return reponse({ ok: false, erreur: e.message, erreurs: { [e.champ]: e.message } }, 409);
     console.error('[inscription]', e);
-    return reponse({ ok: false, erreur: "L'inscription est impossible pour le moment. Réessayez dans quelques minutes." }, 500);
+    return reponse({ ok: false, erreur: "L’inscription est impossible pour le moment. Réessayez dans quelques minutes." }, 500);
   }
 }

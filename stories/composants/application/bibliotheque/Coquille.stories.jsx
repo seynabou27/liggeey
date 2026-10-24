@@ -5,7 +5,7 @@ import Bouton from '../../../../components/ui/Bouton';
 
 const ELEMENTS = [
   { id: 'dashboard', label: 'Tableau de bord', icone: LayoutDashboard, section: 'Ma recherche' },
-  { id: 'offres', label: "Offres d'emploi", icone: Briefcase, section: 'Ma recherche' },
+  { id: 'offres', label: "Offres d’emploi", icone: Briefcase, section: 'Ma recherche' },
   { id: 'candidatures', label: 'Mes candidatures', icone: ClipboardList, section: 'Ma recherche' },
   { id: 'formations', label: 'Formations', icone: GraduationCap, section: 'Progresser' },
   { id: 'mentors', label: 'Mentors', icone: UsersRound, section: 'Progresser' },
@@ -68,7 +68,7 @@ export const Complete = {
       logoReduit={<LogoReduit />}
       encart={<Encart />}
       notifications={NOTIFICATIONS}
-      utilisateur={{ nom: 'Absatou Diallo', role: "Chercheuse d'emploi" }}
+      utilisateur={{ nom: 'Absatou Diallo', role: "Chercheuse d’emploi" }}
       menuUtilisateur={MENU_COMPTE}
     >
       <Carte titre="Contenu de l’écran">
@@ -76,7 +76,7 @@ export const Complete = {
       </Carte>
     </Coquille>
   ),
-  args: { actif: 'offres', compteurs: { suivi: 1 }, salutation: 'Bonjour, Absatou !', titre: "Offres d'emploi", filAriane: [{ label: "Offres d'emploi" }], onNaviguer: fn() },
+  args: { actif: 'offres', compteurs: { suivi: 1 }, salutation: 'Bonjour, Absatou !', titre: "Offres d’emploi", filAriane: [{ label: "Offres d’emploi" }], onNaviguer: fn() },
   argTypes: { actif: { control: 'select', options: ELEMENTS.map((e) => e.id) } },
   parameters: { docs: { story: { inline: false, height: '720px' } } },
 };
@@ -115,7 +115,7 @@ export const MenuClair = {
 
 export const Haut = {
   name: 'Barre du haut',
-  render: (args) => <BarreHaut {...args} elements={ELEMENTS} notifications={NOTIFICATIONS} utilisateur={{ nom: 'Absatou Diallo', role: "Chercheuse d'emploi" }} menuUtilisateur={MENU_COMPTE} />,
+  render: (args) => <BarreHaut {...args} elements={ELEMENTS} notifications={NOTIFICATIONS} utilisateur={{ nom: 'Absatou Diallo', role: "Chercheuse d’emploi" }} menuUtilisateur={MENU_COMPTE} />,
   args: { salutation: 'Bonjour, Absatou !', onMenu: fn(), onNaviguer: fn() },
 };
 

@@ -1,7 +1,7 @@
 import { useEffect, useState } from 'react';
 import { NUANCES, palettes, semantiques, hex, canaux, variable, variablesCss } from '../../lib/tokens/couleurs.mjs';
 
-/* Blocs d'affichage de la page « Fondations / Couleurs ». Tout est lu dans
+/* Blocs d’affichage de la page « Fondations / Couleurs ». Tout est lu dans
    lib/tokens/couleurs.mjs : la page se met à jour quand les tokens changent. */
 
 const BLANC = '#FFFFFF';

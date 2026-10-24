@@ -8,7 +8,7 @@ import { lienPartageWhatsApp } from '@/lib/liens';
 import DetailOffre, { messagePartage, PastilleSecteur } from './DetailOffre';
 
 /**
- * Une offre en vitrine, lisible d'un coup d'œil : secteur, poste, entreprise, puis contrat, lieu et expérience.
+ * Une offre en vitrine, lisible d’un coup d’œil : secteur, poste, entreprise, puis contrat, lieu et expérience.
  * Toute la carte ouvre le détail dans une fenêtre (bouton étiré) ; le partage WhatsApp reste à part.
  */
 export function CarteOffre({ offre, onVoir }) {
@@ -71,7 +71,7 @@ export function CarteOffre({ offre, onVoir }) {
 
 /** Grille des offres en vitrine, avec la fenêtre de détail. */
 export function GrilleOffres({ offres, offreInitiale = null }) {
-  // Lien partagé (/?offre=…) : la fenêtre de l'offre s'ouvre directement
+  // Lien partagé (/?offre=…) : la fenêtre de l’offre s’ouvre directement
   const [ouverte, setOuverte] = useState(() => offres.find((o) => o.id === offreInitiale) ?? null);
 
   return (

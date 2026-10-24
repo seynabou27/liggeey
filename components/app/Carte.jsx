@@ -1,6 +1,6 @@
 import { TrendingDown, TrendingUp } from 'lucide-react';
 
-/* Cartes de l'application : fond blanc, filet fin, coins de 8 px, sans ombre. */
+/* Cartes de l’application : fond blanc, filet fin, coins de 8 px, sans ombre. */
 
 const TONS_PASTILLE = {
   marque: 'bg-marque-doux text-marque-fort',
@@ -25,7 +25,7 @@ export function PastilleIcone({ icone: Icone, ton = 'marque', taille = 'md', for
 /**
  * Carte avec en-tête facultatif.
  * - titre, sousTitre : en-tête de la carte
- * - actions : éléments à droite de l'en-tête (sélecteur de période, bouton…)
+ * - actions : éléments à droite de l’en-tête (sélecteur de période, bouton…)
  * - flush : le contenu touche les bords (tableaux, listes)
  */
 export function Carte({ titre, sousTitre, actions, flush = false, as: Balise = 'section', className = '', children, ...props }) {
@@ -47,7 +47,7 @@ export function Carte({ titre, sousTitre, actions, flush = false, as: Balise = '
 }
 
 /**
- * Carte de chiffre clé : pastille d'icône, intitulé, détail (variation), grande valeur.
+ * Carte de chiffre clé : pastille d’icône, intitulé, détail (variation), grande valeur.
  * - tendance : hausse | baisse | aucune (colore le détail en vert ou rouge)
  * - visuel : élément facultatif à droite de la valeur (mini-graphique, anneau…)
  * - onClick : rend la carte cliquable
@@ -95,7 +95,7 @@ export function LigneInfo({ icone: Icone, libelle, children }) {
   );
 }
 
-/** Message d'état vide, à l'intérieur d'une carte ou d'un tableau. */
+/** Message d’état vide, à l’intérieur d’une carte ou d’un tableau. */
 export function EtatVide({ icone, titre, texte, action }) {
   return (
     <div className="flex flex-col items-center gap-3 px-6 py-12 text-center">

@@ -8,7 +8,7 @@ import { site } from '@/lib/site';
 
 /**
  * Carte du bureau, chargée seulement au clic : la page reste légère en 4G
- * et aucun service tiers n'est appelé sans action du visiteur.
+ * et aucun service tiers n’est appelé sans action du visiteur.
  */
 export default function CarteBureau() {
   const [affichee, setAffichee] = useState(false);

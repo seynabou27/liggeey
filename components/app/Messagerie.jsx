@@ -44,7 +44,7 @@ export function BulleMessage({ texte, heure, moi = false, nom, photo, montrerAva
   );
 }
 
-/** Zone de saisie au pied d'une conversation. */
+/** Zone de saisie au pied d’une conversation. */
 export function ZoneSaisie({ onEnvoyer, placeholder = 'Écrivez votre message…', onJoindre }) {
   const [texte, setTexte] = useState('');
   const envoyer = (e) => {
@@ -71,7 +71,7 @@ export function ZoneSaisie({ onEnvoyer, placeholder = 'Écrivez votre message…
   );
 }
 
-/** Séparateur de date dans le fil (« Hier », « Aujourd'hui »). */
+/** Séparateur de date dans le fil (« Hier », « Aujourd’hui »). */
 export function SeparateurDate({ children }) {
   return (
     <div className="flex items-center gap-3 text-xs text-discret" role="separator">

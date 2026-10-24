@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { Play } from 'lucide-react';
 import { independants } from '@/content/fr/independants';
 
-/** Transforme un lien YouTube en adresse d'intégration sans cookies. */
+/** Transforme un lien YouTube en adresse d’intégration sans cookies. */
 function adresseYouTube(src) {
   const m = src.match(/(?:youtu\.be\/|v=|embed\/)([\w-]{11})/);
   return m ? `https://www.youtube-nocookie.com/embed/${m[1]}?autoplay=1` : null;

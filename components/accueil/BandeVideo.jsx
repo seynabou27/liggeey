@@ -5,7 +5,7 @@ import Image from 'next/image';
 import { Play, X } from 'lucide-react';
 import { accueil } from '@/content/fr/accueil';
 
-/** Lien YouTube → adresse d'intégration sans cookies, lancée automatiquement. */
+/** Lien YouTube → adresse d’intégration sans cookies, lancée automatiquement. */
 function adresseYouTube(src) {
   const m = src.match(/(?:youtu\.be\/|v=|embed\/|shorts\/)([\w-]{11})/);
   return m ? `https://www.youtube-nocookie.com/embed/${m[1]}?autoplay=1&rel=0` : null;
@@ -13,7 +13,7 @@ function adresseYouTube(src) {
 
 /**
  * Bande vidéo (comme le modèle) : grande photo, bouton de lecture au centre.
- * La vidéo s'ouvre dans une fenêtre et n'est chargée qu'au clic (économie de données mobiles).
+ * La vidéo s’ouvre dans une fenêtre et n’est chargée qu’au clic (économie de données mobiles).
  * Tant que `accueil.video.src` est vide, le bouton indique « Vidéo bientôt disponible ».
  * @param {{ avecPhoto: boolean }} props  photo présente dans /public ?
  */
@@ -42,7 +42,7 @@ export default function BandeVideo({ avecPhoto }) {
           aria-label={t.src ? t.lire : `${t.titre} : ${t.bientot}`}
           className="group relative grid h-20 w-20 place-items-center rounded-full bg-surface text-marque shadow-carte transition-transform hover:scale-105 disabled:cursor-default disabled:hover:scale-100 md:h-24 md:w-24"
         >
-          {/* Halo qui pulse autour du bouton (désactivé si l'on a demandé à réduire les mouvements) */}
+          {/* Halo qui pulse autour du bouton (désactivé si l’on a demandé à réduire les mouvements) */}
           {t.src && <span className="absolute inset-0 animate-ping rounded-full bg-white/40 motion-reduce:hidden" aria-hidden="true" />}
           <Play className="relative ml-1 h-8 w-8 fill-current md:h-9 md:w-9" aria-hidden="true" />
         </button>

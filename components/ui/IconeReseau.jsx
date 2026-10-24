@@ -1,6 +1,6 @@
 import { Facebook, Globe, Instagram, Linkedin, Youtube } from 'lucide-react';
 
-/* lucide-react n'a pas TikTok ni X : tracés au même style (trait de 2, 24 × 24). */
+/* lucide-react n’a pas TikTok ni X : tracés au même style (trait de 2, 24 × 24). */
 function TikTok(props) {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" {...props}>
@@ -18,7 +18,7 @@ function X(props) {
   );
 }
 
-/** Icônes par nom de réseau, tel qu'écrit dans lib/site.js (contact.reseaux). */
+/** Icônes par nom de réseau, tel qu’écrit dans lib/site.js (contact.reseaux). */
 const ICONES_RESEAUX = { LinkedIn: Linkedin, Facebook, Instagram, TikTok, YouTube: Youtube, X };
 
 export default function IconeReseau({ nom, className = 'h-[18px] w-[18px]' }) {

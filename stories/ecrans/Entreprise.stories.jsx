@@ -1,6 +1,6 @@
 import { Ecran, parametresEcran } from './_ecran';
 
-/* Une story par entrée du menu de l'espace « Entreprise » (NAV_ITEMS_BY_ESPACE.entreprise). */
+/* Une story par entrée du menu de l’espace « Entreprise » (NAV_ITEMS_BY_ESPACE.entreprise). */
 export default {
   title: 'Écrans/Entreprise',
   parameters: parametresEcran,

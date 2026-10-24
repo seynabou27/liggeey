@@ -91,7 +91,7 @@ export function BlocAide({ titre, texte }) {
               Écrire sur WhatsApp
             </Bouton>
             <Link href="/contact#bureau" className="lien inline-flex min-h-[44px] items-center">
-              Voir l'adresse du bureau
+              Voir l’adresse du bureau
             </Link>
           </div>
         </div>

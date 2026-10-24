@@ -2,9 +2,9 @@
 
 /**
  * - colonnes : [{ cle, titre, rendu?(ligne), alignement?: 'gauche' | 'droite' | 'centre', largeur?, masqueMobile? }]
- * - lignes : tableau d'objets ; cleLigne : nom du champ identifiant (id par défaut)
+ * - lignes : tableau d’objets ; cleLigne : nom du champ identifiant (id par défaut)
  * - onLigne : rend chaque ligne cliquable (ouvre un détail)
- * - vide : contenu affiché quand il n'y a aucune ligne
+ * - vide : contenu affiché quand il n’y a aucune ligne
  */
 export function Tableau({ colonnes, lignes, cleLigne = 'id', onLigne, vide = 'Aucun élément à afficher.', legende, className = '' }) {
   const align = (a) => (a === 'droite' ? 'text-right' : a === 'centre' ? 'text-center' : 'text-left');

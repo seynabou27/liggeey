@@ -12,7 +12,7 @@ const ECHEC = 'E-mail, téléphone ou mot de passe incorrect.';
 /**
  * Connexion : POST /api/auth/connexion
  * Corps : { identifiant (e-mail ou téléphone), motDePasse, souvenir }
- * Réponses : 200 { ok, compte } ; 401 identifiants incorrects ; 403 compte suspendu ; 429 trop d'essais.
+ * Réponses : 200 { ok, compte } ; 401 identifiants incorrects ; 403 compte suspendu ; 429 trop d’essais.
  */
 export async function POST(requete) {
   const refus = refuserSiAutreOrigine(requete);
@@ -22,7 +22,7 @@ export async function POST(requete) {
   const motDePasse = typeof corps?.motDePasse === 'string' ? corps.motDePasse.slice(0, 200) : '';
   if (!identifiant || !motDePasse) return reponse({ ok: false, erreur: ECHEC }, 400);
 
-  // Même clé pour « 77 000 00 00 » et « +221770000000 » : la limite d'essais ne se contourne pas par le format.
+  // Même clé pour « 77 000 00 00 » et « +221770000000 » : la limite d’essais ne se contourne pas par le format.
   const cle = identifiant.includes('@') ? normaliserEmail(identifiant) : normaliserTelephone(identifiant) ?? identifiant.toLowerCase();
   const ip = adresseIp(requete);
 
@@ -38,7 +38,7 @@ export async function POST(requete) {
     if (!valide) return reponse({ ok: false, erreur: ECHEC }, 401);
 
     if (utilisateur.statut === 'suspendu') {
-      return reponse({ ok: false, erreur: "Votre compte est suspendu. Contactez l'équipe LIGGEEY sur WhatsApp ou au bureau de Dakar." }, 403);
+      return reponse({ ok: false, erreur: "Votre compte est suspendu. Contactez l’équipe LIGGEEY sur WhatsApp ou au bureau de Dakar." }, 403);
     }
 
     await ouvrirSession(utilisateur.id, { souvenir: corps.souvenir === true, agentUtilisateur: requete.headers.get('user-agent') });

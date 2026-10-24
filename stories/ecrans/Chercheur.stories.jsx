@@ -1,6 +1,6 @@
 import { Ecran, parametresEcran } from './_ecran';
 
-/* Une story par entrée du menu de l'espace « Chercheur » (NAV_ITEMS_BY_ESPACE.chercheur). */
+/* Une story par entrée du menu de l’espace « Chercheur » (NAV_ITEMS_BY_ESPACE.chercheur). */
 export default {
   title: 'Écrans/Chercheur',
   parameters: parametresEcran,
@@ -8,7 +8,7 @@ export default {
 
 export const Dashboard = { name: "Tableau de bord", render: () => <Ecran ecran="dashboard" espace="chercheur" /> };
 
-export const Offres = { name: "Offres d'emploi", render: () => <Ecran ecran="offres" espace="chercheur" /> };
+export const Offres = { name: "Offres d’emploi", render: () => <Ecran ecran="offres" espace="chercheur" /> };
 
 export const Candidatures = { name: "Mes candidatures", render: () => <Ecran ecran="candidatures" espace="chercheur" /> };
 

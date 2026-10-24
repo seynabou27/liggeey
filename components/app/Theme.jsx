@@ -6,7 +6,7 @@ import { CLE_THEME, PREFERENCES_THEME, THEME_PAR_DEFAUT } from '../../lib/theme'
 import { BoutonIcone } from './Controles';
 
 /* =====================================================================
-   THÈME DE L'APPLICATION (clair, sombre ou selon l'appareil)
+   THÈME DE L’APPLICATION (clair, sombre ou selon l’appareil)
    Une seule préférence pour toute la plateforme, gardée dans le navigateur.
    - useTheme : lit et change la préférence ;
    - useThemeApplique : pose data-theme sur <html> (une fois, à la racine) ;
@@ -106,7 +106,7 @@ export function BoutonTheme({ variante = 'contour', className = '' }) {
 const CHOIX = [
   { id: 'clair', label: 'Clair', icone: Sun },
   { id: 'sombre', label: 'Sombre', icone: Moon },
-  { id: 'systeme', label: "Comme l'appareil", icone: Monitor },
+  { id: 'systeme', label: "Comme l’appareil", icone: Monitor },
 ];
 
 /** Les trois choix, en boutons groupés. */
