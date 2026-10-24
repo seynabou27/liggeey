@@ -29,7 +29,9 @@ export function VagueAccueil() {
   );
 }
 
-/** Vague plus discrète pour le haut des pages intérieures. */
+/** Vague plus discrète pour le haut des pages intérieures.
+ * Elle déborde de 2 px sous le bandeau (comme VagueAccueil) : à certains zooms, la bordure
+ * du dessin tombait sur un demi-pixel et laissait voir un trait du fond sombre. */
 export function VagueDouce() {
   return (
     <svg
@@ -37,7 +39,7 @@ export function VagueDouce() {
       preserveAspectRatio="none"
       aria-hidden="true"
       focusable="false"
-      className="pointer-events-none absolute inset-x-0 bottom-0 h-12 w-full md:h-20"
+      className="pointer-events-none absolute inset-x-0 -bottom-0.5 h-[50px] w-full md:h-[82px]"
     >
       <path d="M0 58 C220 82 640 76 1200 0 L1200 80 L0 80 Z" style={{ fill: 'rgb(var(--fond-page))' }} />
     </svg>

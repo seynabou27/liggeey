@@ -85,7 +85,7 @@ export default function CarteRecherche() {
       </div>
       <Liste nom="niveau" label={t.niveau} defaut={t.tousNiveaux} options={niveaux} className="mt-4 hidden sm:flex" />
 
-      <button type="submit" className="mt-6 inline-flex h-[55px] w-full items-center justify-center rounded-md bg-marque text-base font-medium text-sur-marque transition-colors hover:bg-marque-survol">
+      <button type="submit" className="mt-6 inline-flex h-[55px] w-full items-center justify-center rounded bg-marque text-base font-medium text-sur-marque transition-colors hover:bg-marque-survol">
         {t.bouton}
       </button>
     </form>

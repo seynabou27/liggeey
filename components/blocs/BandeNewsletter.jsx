@@ -38,7 +38,7 @@ export default function BandeNewsletter() {
                 aria-describedby={erreurs.email ? 'newsletter-erreur' : undefined}
                 className="h-11 min-w-0 flex-1 rounded px-3 text-[15px] placeholder:text-discret focus:outline-none"
               />
-              <button type="submit" disabled={etat === 'envoi'} className="h-11 shrink-0 rounded-md bg-sombre px-[30px] text-[13px] font-medium text-sur-sombre hover:bg-sombre-doux disabled:opacity-60">
+              <button type="submit" disabled={etat === 'envoi'} className="h-11 shrink-0 rounded bg-sombre px-[30px] text-[13px] font-medium text-sur-sombre hover:bg-sombre-doux disabled:opacity-60">
                 {t.bouton}
               </button>
             </div>

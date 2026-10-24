@@ -10,6 +10,11 @@
   body {
     @apply bg-page text-[15px] leading-normal text-principal antialiased;
   }
+  /* Charte : demi-gras, jamais de gras (y compris le texte mis en avant et les articles) */
+  strong,
+  b {
+    font-weight: 600;
+  }
   /* Les ancres ne passent pas sous l'en-tête fixe */
   [id] {
     scroll-margin-top: 88px;

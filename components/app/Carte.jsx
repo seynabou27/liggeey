@@ -75,7 +75,7 @@ export function CarteStat({ icone, ton = 'marque', titre, detail, tendance = 'au
         </div>
       </div>
       <div className="flex items-end justify-between gap-4">
-        <p className="text-[28px] font-bold leading-none tracking-tight text-principal">{valeur}</p>
+        <p className="text-[28px] font-semibold leading-none tracking-tight text-principal">{valeur}</p>
         {visuel}
       </div>
     </Balise>

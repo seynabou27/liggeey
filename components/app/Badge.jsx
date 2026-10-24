@@ -31,7 +31,7 @@ export function Badge({ ton = 'neutre', point = false, taille = 'petit', classNa
 export function Compteur({ valeur, ton = 'plein', label }) {
   if (!valeur) return null;
   return (
-    <span className={`inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[11px] font-bold ${TONS[ton] || TONS.plein}`} aria-label={label || `${valeur} à traiter`}>
+    <span className={`inline-flex h-5 min-w-[20px] items-center justify-center rounded-full px-1.5 text-[11px] font-semibold ${TONS[ton] || TONS.plein}`} aria-label={label || `${valeur} à traiter`}>
       {valeur > 99 ? '99+' : valeur}
     </span>
   );

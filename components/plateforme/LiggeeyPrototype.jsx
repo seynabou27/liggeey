@@ -141,6 +141,7 @@ const COLORS = {
   soft: "rgb(var(--fond-doux))",
   softStrong: "rgb(var(--fond-doux-fort))",
   dark: "rgb(var(--fond-sombre))", // menu, bandeaux sombres
+  darkSoft: "rgb(var(--fond-sombre-doux))", // pastilles et logos sombres : restent visibles en thème sombre
   darkDeep: "rgb(var(--fond-sombre-profond))",
   darkLine: "rgb(var(--bordure-sur-sombre))",
   darkTrack: "rgb(var(--neutre-700))",
@@ -999,7 +1000,7 @@ function AgeRefus({ profil, age, onCapMetier }) {
           : "Avant 18 ans, la loi protège les jeunes de certains travaux. "}
         Le parcours Cap Métier vous aide à choisir un métier, à vous former et à trouver un apprentissage, avec un mentor.
       </p>
-      <button type="button" onClick={onCapMetier} className="inline-flex min-h-[44px] items-center rounded-md bg-marque px-4 text-sm font-semibold text-sur-marque hover:bg-marque-survol">
+      <button type="button" onClick={onCapMetier} className="inline-flex min-h-[44px] items-center rounded bg-marque px-4 text-sm font-semibold text-sur-marque hover:bg-marque-survol">
         Continuer avec Cap Métier
       </button>
     </div>
@@ -1881,7 +1882,7 @@ function publieeIlYa(iso) {
 function LogoEntreprise({ nom, taille = "md" }) {
   const dims = taille === "lg" ? "h-16 w-16 text-xl" : "h-12 w-12 text-base";
   return (
-    <span className={`grid shrink-0 place-items-center rounded-lg bg-sombre font-semibold text-sur-sombre ${dims}`} aria-hidden="true">
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-sombre-doux font-semibold text-sur-sombre ${dims}`} aria-hidden="true">
       {initialesEntreprise(nom)}
     </span>
   );
@@ -2896,9 +2897,9 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
         <h2 className="text-2xl font-semibold mb-1" style={{ color: COLORS.slate }}>CERTIFICAT DE RÉUSSITE</h2>
         <p className="text-xs mb-5" style={{ color: COLORS.slateLight }}>Délivré par la plateforme nationale LIGGEEY pour l’insertion des professionnels</p>
         <p className="text-sm" style={{ color: COLORS.slateLight }}>Ce document atteste que</p>
-        <p className="text-xl font-bold mb-3" style={{ color: COLORS.slate }}>{userName}</p>
+        <p className="text-xl font-semibold mb-3" style={{ color: COLORS.slate }}>{userName}</p>
         <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>a suivi et validé avec succès l’ensemble des modules obligatoires requis pour la formation :</p>
-        <p className="text-lg font-bold mb-6" style={{ color: COLORS.orangeText }}>{formation.nom}</p>
+        <p className="text-lg font-semibold mb-6" style={{ color: COLORS.orangeText }}>{formation.nom}</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4" style={{ borderTop: `1px solid ${COLORS.border}` }}>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>DATE D’OBTENTION</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>30 octobre 2026</p></div>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>VOLUME HORAIRE</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{formation.modules} modules · {formation.heures}h</p></div>
@@ -2908,8 +2909,8 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
       </div>
 
       <div className="flex gap-3 mb-8">
-        <button type="button" onClick={() => setFeedback("téléchargé")} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Télécharger (PDF)</button>
-        <button type="button" onClick={() => setFeedback("partagé")} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Partager</button>
+        <button type="button" onClick={() => setFeedback("téléchargé")} className="rounded px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Télécharger (PDF)</button>
+        <button type="button" onClick={() => setFeedback("partagé")} className="rounded px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Partager</button>
         {feedback && <span className="self-center text-sm" style={{ color: COLORS.success }}>Certificat {feedback} (démo).</span>}
       </div>
 
@@ -3165,7 +3166,7 @@ function MentorCard({ m, onOpen }) {
 function StatMini({ value, label }) {
   return (
     <div className="rounded-lg border bg-surface p-4 text-center" style={{ borderColor: COLORS.border }}>
-      <p className="text-2xl font-bold" style={{ color: COLORS.orangeText }}>{value}</p>
+      <p className="text-2xl font-semibold" style={{ color: COLORS.orangeText }}>{value}</p>
       <p className="text-xs" style={{ color: COLORS.slateLight }}>{label}</p>
     </div>
   );
@@ -4675,7 +4676,7 @@ function EvaluationsScreen({ onNavigate }) {
 
   return (
     <div>
-      <button type="button" onClick={() => onNavigate("profil")} className="flex items-center gap-1.5 text-sm font-medium rounded-md border px-3 py-1.5 mb-5" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
+      <button type="button" onClick={() => onNavigate("profil")} className="flex items-center gap-1.5 text-sm font-medium rounded border px-3 py-1.5 mb-5" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
         <ArrowLeft size={14} /> Retour
       </button>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez les retours de vos clients après chaque prestation.</p>
@@ -4683,7 +4684,7 @@ function EvaluationsScreen({ onNavigate }) {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-6 text-center" style={{ borderColor: COLORS.border }}>
           <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>Note moyenne</p>
-          <p className="text-4xl font-bold mb-2" style={{ color: COLORS.orangeText }}>{noteFr(AVG_NOTE)}/5</p>
+          <p className="text-4xl font-semibold mb-2" style={{ color: COLORS.orangeText }}>{noteFr(AVG_NOTE)}/5</p>
           <Stars note={Math.round(AVG_NOTE)} size={16} />
           <p className="text-xs mt-2" style={{ color: COLORS.slateLight }}>{REVIEWS_DATA.length} avis au total</p>
         </div>
@@ -5917,7 +5918,7 @@ function ActionButton({ label, variant = "primary", onClick, icon: Icon }) {
     neutral: { border: `1px solid ${COLORS.border}`, color: COLORS.slate, background: COLORS.surface },
   };
   return (
-    <button type="button" onClick={onClick} className="flex items-center gap-1.5 rounded-md px-5 py-2.5 text-sm font-semibold" style={styles[variant]}>
+    <button type="button" onClick={onClick} className="flex items-center gap-1.5 rounded px-5 py-2.5 text-sm font-semibold" style={styles[variant]}>
       {Icon && <Icon size={14} />} {label}
     </button>
   );
@@ -6015,7 +6016,7 @@ function AdminEntityModule({ title, subtitle, columns, filters, initialData, sea
 
   return (
     <div>
-      <p className="mb-6 text-sm text-secondaire">{subtitle}</p>
+      {subtitle && <p className="mb-6 text-sm text-secondaire">{subtitle}</p>}
 
       <App.Carte titre={title} sousTitre={`${filtered.length} ${filtered.length > 1 ? "éléments" : "élément"}`} flush>
         <div className="flex flex-wrap items-center gap-3 px-6 pb-4 pt-2">
@@ -6230,13 +6231,13 @@ function ChercheursAdminDetail(row, { onBack, update, remove }) {
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du profil</h2>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce chercheur d’emploi</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce chercheur d’emploi.</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil du chercheur</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <SafeImg src={row.photo} alt={row.nom} className="w-14 h-14 rounded-full object-cover mb-2" />
-            <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
+            <p className="font-semibold" style={{ color: COLORS.slate }}>{row.nom}</p>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.metier} · {row.ville}</p>
           </div>
           <Row label="Téléphone" value={row.telephone} /><div className="h-2" />
@@ -6268,7 +6269,7 @@ function ChercheursAdminScreen() {
   return (
     <AdminEntityModule
       title="Chercheurs d’emploi"
-      subtitle="Gérez et suivez les profils des chercheurs d’emploi inscrits sur LIGGEEY"
+      subtitle="Gérez et suivez les profils des chercheurs d’emploi inscrits sur LIGGEEY."
       initialData={CHERCHEURS_ADMIN_INITIAL}
       searchKeys={["nom", "metier", "ville"]}
       filters={[
@@ -6306,13 +6307,13 @@ function PrestatairesAdminDetail(row, { onBack, update, remove }) {
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du prestataire</h2>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce prestataire de services</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce prestataire de services.</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil du prestataire</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <SafeImg src={row.photo} alt={row.nom} className="w-14 h-14 rounded-full object-cover mb-2" />
-            <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
+            <p className="font-semibold" style={{ color: COLORS.slate }}>{row.nom}</p>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.metier} · {row.ville}</p>
             <Stars note={Math.round(row.note)} size={13} />
           </div>
@@ -6344,7 +6345,7 @@ function PrestatairesAdminScreen() {
   return (
     <AdminEntityModule
       title="Prestataires"
-      subtitle="Gérez et suivez les prestataires de services inscrits sur LIGGEEY"
+      subtitle="Gérez et suivez les prestataires de services inscrits sur LIGGEEY."
       initialData={PRESTATAIRES_ADMIN_INITIAL}
       searchKeys={["nom", "metier", "ville"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Toutes les formules", options: ["Essentiel", "Premium"], matcher: (r, v) => adminTier(r.nom, "prestataire") === v }]}
@@ -6380,13 +6381,13 @@ function EntreprisesAdminDetail(row, { onBack, update, remove }) {
     <div>
       <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de l’entreprise</h2>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de cette entreprise</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de cette entreprise.</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil de l’entreprise</h3>
           <div className="flex flex-col items-center text-center mb-4">
             <div className="w-14 h-14 rounded-md flex items-center justify-center text-sm font-semibold mb-2" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.nom)}</div>
-            <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
+            <p className="font-semibold" style={{ color: COLORS.slate }}>{row.nom}</p>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.secteur} · {row.ville}</p>
           </div>
           <Row label="NINEA" value={row.ninea} /><div className="h-2" />
@@ -6419,7 +6420,7 @@ function EntreprisesAdminScreen() {
   return (
     <AdminEntityModule
       title="Entreprises"
-      subtitle="Gérez et suivez les entreprises et recruteurs inscrits sur LIGGEEY"
+      subtitle="Gérez et suivez les entreprises et recruteurs inscrits sur LIGGEEY."
       initialData={ENTREPRISES_ADMIN_INITIAL}
       searchKeys={["nom", "secteur", "ville"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Vérifié", "Suspendu", "Nouveau"], matcher: (r, v) => r.statut === v }, { key: "profil", label: "Toutes les formules", options: ["Sans formule", "Entreprise"], matcher: (r, v) => adminTier(r.nom, "entreprise") === v }]}
@@ -6457,14 +6458,14 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
       <div className="flex items-start justify-between mb-1">
         <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Détail de l’offre</h2>
       </div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez cette offre d’emploi</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez cette offre d’emploi.</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6">
         <div className="flex flex-col gap-4">
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center gap-3 mb-3">
               <div className="w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.entreprise)}</div>
               <div>
-                <p className="font-bold" style={{ color: COLORS.slate }}>{row.titre}</p>
+                <p className="font-semibold" style={{ color: COLORS.slate }}>{row.titre}</p>
                 <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.entreprise}</p>
               </div>
             </div>
@@ -6562,8 +6563,8 @@ function OffreAVerifierCard({ offre, entreprise, onDecide }) {
 
       {ouverte && !refus && (
         <div className="mt-4 flex flex-wrap justify-end gap-2">
-          <button type="button" onClick={() => setRefus(true)} className="min-h-[44px] rounded-md border px-4 text-sm font-semibold" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Refuser</button>
-          <button type="button" disabled={!toutCoche} onClick={() => onDecide("Active")} title={toutCoche ? undefined : "Cochez tous les points de contrôle"} className="min-h-[44px] rounded-md px-4 text-sm font-semibold text-sur-marque disabled:cursor-not-allowed disabled:opacity-50" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={() => setRefus(true)} className="min-h-[44px] rounded border px-4 text-sm font-semibold" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Refuser</button>
+          <button type="button" disabled={!toutCoche} onClick={() => onDecide("Active")} title={toutCoche ? undefined : "Cochez tous les points de contrôle"} className="min-h-[44px] rounded px-4 text-sm font-semibold text-sur-marque disabled:cursor-not-allowed disabled:opacity-50" style={{ background: COLORS.orange }}>
             Valider et publier
           </button>
         </div>
@@ -6640,10 +6641,11 @@ function VerificationOffresAdmin({ offres, setOffres, entreprise }) {
 function OffresAdminScreen({ offresEntreprise, setOffresEntreprise }) {
   return (
     <>
+    {/* Phrase d’introduction en tête de page, comme sur les autres écrans, avant le bloc « Offres à vérifier » */}
+    <p className="mb-6 text-sm text-secondaire">Gérez toutes les offres d’emploi publiées sur la plateforme LIGGEEY.</p>
     {offresEntreprise && <VerificationOffresAdmin offres={offresEntreprise} setOffres={setOffresEntreprise} entreprise={ENTREPRISE_DEMO_NOM} />}
     <AdminEntityModule
       title="Offres d’emploi"
-      subtitle="Gérez toutes les offres d’emploi publiées sur la plateforme LIGGEEY"
       initialData={OFFRES_ADMIN_INITIAL}
       searchKeys={["titre", "entreprise", "secteur"]}
       filters={[
@@ -6687,7 +6689,7 @@ function FormationsAdminDetail(row, { onBack, update, remove }) {
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-md flex items-center justify-center" style={{ background: COLORS.orangeSoft }}><GraduationCap size={18} color={COLORS.orange} /></div>
             <div>
-              <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
+              <p className="font-semibold" style={{ color: COLORS.slate }}>{row.nom}</p>
               <p className="text-sm" style={{ color: COLORS.slateLight }}>Organisme : {row.organisme} · Niveau {row.niveau}</p>
             </div>
           </div>
@@ -6725,7 +6727,7 @@ function FormationsAdminScreen() {
   return (
     <AdminEntityModule
       title="Formations"
-      subtitle="Gérez le catalogue de formations disponibles sur LIGGEEY"
+      subtitle="Gérez le catalogue de formations disponibles sur LIGGEEY."
       initialData={FORMATIONS_ADMIN_INITIAL}
       searchKeys={["nom", "organisme", "categorie"]}
       filters={[
@@ -6766,7 +6768,7 @@ function MentoratAdminDetail(row, { onBack, update, remove }) {
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex flex-col items-center text-center mb-4">
             <SafeImg src={row.photo} alt={row.nom} className="w-14 h-14 rounded-full object-cover mb-2" />
-            <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
+            <p className="font-semibold" style={{ color: COLORS.slate }}>{row.nom}</p>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.specialite} · {row.metier}</p>
             {row.note > 0 && <Stars note={Math.round(row.note)} size={13} />}
           </div>
@@ -6808,7 +6810,7 @@ function MentoratAdminScreen() {
   return (
     <AdminEntityModule
       title="Mentorat"
-      subtitle="Gérez les mentors et relations de mentorat sur LIGGEEY"
+      subtitle="Gérez les mentors et relations de mentorat sur LIGGEEY."
       initialData={MENTORAT_ADMIN_INITIAL}
       searchKeys={["nom", "metier", "specialite"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Actif", "En attente", "Inactif"], matcher: (r, v) => r.statut === v }]}
@@ -6848,7 +6850,7 @@ function ServicesAdminDetail(row, { onBack, update }) {
           <div className="flex items-center gap-3 mb-3">
             <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.prestataire)}</div>
             <div>
-              <p className="font-bold" style={{ color: COLORS.slate }}>{row.prestataire}</p>
+              <p className="font-semibold" style={{ color: COLORS.slate }}>{row.prestataire}</p>
               <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.metier} · {row.experience}</p>
             </div>
           </div>
@@ -6881,7 +6883,7 @@ function ServicesAdminScreen() {
   return (
     <AdminEntityModule
       title="Services"
-      subtitle="Gérez tous les services proposés par les prestataires sur la plateforme LIGGEEY"
+      subtitle="Gérez tous les services proposés par les prestataires sur la plateforme LIGGEEY."
       initialData={SERVICES_ADMIN_INITIAL}
       searchKeys={["prestataire", "service", "categorie"]}
       filters={[
@@ -6924,7 +6926,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
           <div className="flex items-center gap-3 mb-4">
             <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.nom)}</div>
             <div>
-              <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
+              <p className="font-semibold" style={{ color: COLORS.slate }}>{row.nom}</p>
               <p className="text-xs" style={{ color: COLORS.slateLight }}>{row.metier} · {row.localisation}</p>
             </div>
           </div>
@@ -6972,7 +6974,7 @@ function CandidaturesAdminScreen() {
   return (
     <AdminEntityModule
       title="Candidatures"
-      subtitle="Suivez toutes les candidatures déposées sur la plateforme LIGGEEY"
+      subtitle="Suivez toutes les candidatures déposées sur la plateforme LIGGEEY."
       initialData={CANDIDATURES_ADMIN_INITIAL}
       searchKeys={["nom", "offre", "entreprise"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["Nouveau", "En cours", "Retenu", "Rejeté"], matcher: (r, v) => r.statut === v }]}
@@ -7058,7 +7060,7 @@ function MissionsAdminScreen() {
   return (
     <AdminEntityModule
       title="Missions"
-      subtitle="Suivez toutes les missions de service en cours et terminées sur la plateforme LIGGEEY"
+      subtitle="Suivez toutes les missions de service en cours et terminées sur la plateforme LIGGEEY."
       initialData={MISSIONS_ADMIN_INITIAL}
       searchKeys={["refId", "prestataire", "client", "service"]}
       filters={[{ key: "statut", label: "Tous les statuts", options: ["En cours", "Terminée", "En attente", "Annulée"], matcher: (r, v) => r.statut === v }]}
@@ -7109,9 +7111,9 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
               <p className="text-xs" style={{ color: COLORS.slateLight }}>{doc.taille} · {doc.pages} pages</p>
             </div>
             <div className="flex items-center gap-2">
-              <button type="button" onClick={() => setZoom((z) => Math.max(60, z - 10))} className="w-7 h-7 rounded-md border flex items-center justify-center" style={{ borderColor: COLORS.border }}><ZoomOut size={13} /></button>
+              <button type="button" onClick={() => setZoom((z) => Math.max(60, z - 10))} className="w-7 h-7 rounded border flex items-center justify-center" style={{ borderColor: COLORS.border }}><ZoomOut size={13} /></button>
               <span className="text-xs font-semibold w-10 text-center" style={{ color: COLORS.slate }}>{zoom}%</span>
-              <button type="button" onClick={() => setZoom((z) => Math.min(150, z + 10))} className="w-7 h-7 rounded-md border flex items-center justify-center" style={{ borderColor: COLORS.border }}><ZoomIn size={13} /></button>
+              <button type="button" onClick={() => setZoom((z) => Math.min(150, z + 10))} className="w-7 h-7 rounded border flex items-center justify-center" style={{ borderColor: COLORS.border }}><ZoomIn size={13} /></button>
             </div>
           </div>
           <div className="rounded-lg border bg-surface p-10 flex items-center justify-center" style={{ borderColor: COLORS.border, minHeight: 480 }}>
@@ -7148,7 +7150,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
           <div className="rounded-lg p-4" style={{ background: COLORS.successSoft }}>
             <div className="flex items-center justify-between mb-1.5">
               <p className="text-sm font-semibold" style={{ color: COLORS.success }}>Correspondance profil</p>
-              <span className="text-sm font-bold" style={{ color: COLORS.success }}>{doc.correspondance}%</span>
+              <span className="text-sm font-semibold" style={{ color: COLORS.success }}>{doc.correspondance}%</span>
             </div>
             <p className="text-xs" style={{ color: COLORS.success }}>Le diplôme et la spécialité correspondent aux compétences déclarées sur le profil.</p>
           </div>
@@ -7166,8 +7168,8 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Décision de contrôle</h3>
             <p className="text-xs mb-4" style={{ color: COLORS.slateLight }}>Confirmez uniquement après avoir vérifié toutes les informations visibles.</p>
-            <button type="button" onClick={() => onDecide(doc.id, "Validé")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-marque mb-2" style={{ background: COLORS.orange }}>Valider</button>
-            <button type="button" onClick={() => onDecide(doc.id, "Rejeté")} className="w-full rounded-md py-2.5 text-sm font-semibold text-sur-statut" style={{ background: COLORS.danger }}>Rejeter</button>
+            <button type="button" onClick={() => onDecide(doc.id, "Validé")} className="w-full rounded py-2.5 text-sm font-semibold text-sur-marque mb-2" style={{ background: COLORS.orange }}>Valider</button>
+            <button type="button" onClick={() => onDecide(doc.id, "Rejeté")} className="w-full rounded py-2.5 text-sm font-semibold text-sur-statut" style={{ background: COLORS.danger }}>Rejeter</button>
           </div>
         </div>
       </div>
@@ -7209,22 +7211,27 @@ function VerificationCVScreen() {
     <div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez les documents soumis. Les décisions sont prises sur la page de contrôle dédiée.</p>
 
-      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
-        {["Tous", "En attente", "Validés", "Rejetés"].map((t) => (
-          <button key={t} type="button" onClick={() => { setTab(t); setPage(1); }} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
-            {t} ({counts[t]})
-          </button>
-        ))}
-      </div>
+      {/* Même barre que les autres listes : recherche dans une carte, puis filtres et nombre de résultats */}
+      <BarreFiltres label="Rechercher un document">
+        <App.ChampRecherche
+          variante="carre"
+          valeur={query}
+          onChange={(v) => { setQuery(v); setPage(1); }}
+          placeholder="Rechercher un candidat…"
+          label="Rechercher un candidat"
+          className="w-full"
+        />
+      </BarreFiltres>
 
-      <App.ChampRecherche
-        variante="carre"
-        valeur={query}
-        onChange={(v) => { setQuery(v); setPage(1); }}
-        placeholder="Rechercher un candidat..."
-        label="Rechercher un candidat"
-        className="mb-6 w-full max-w-sm"
-      />
+      <div className="my-4 flex flex-wrap items-center justify-between gap-3">
+        <App.Segments
+          label="Filtrer les documents"
+          options={["Tous", "En attente", "Validés", "Rejetés"].map((t) => ({ id: t, label: `${t} (${counts[t]})` }))}
+          actif={tab}
+          onChange={(t) => { setTab(t); setPage(1); }}
+        />
+        <CompteResultats n={filtered.length} nom="document" />
+      </div>
 
       <div className="rounded-lg border bg-surface overflow-hidden" style={{ borderColor: COLORS.border }}>
         <div className="flex items-center px-5 py-3" style={{ background: COLORS.soft, borderBottom: `1px solid ${COLORS.border}` }}>
@@ -7515,9 +7522,9 @@ function ArchivesTab() {
   return (
     <div>
       <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-5">
-        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{items.length}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Éléments archivés</p></div>
-        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{docs}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents</p></div>
-        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-bold" style={{ color: COLORS.slate }}>{discussions}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p></div>
+        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-semibold" style={{ color: COLORS.slate }}>{items.length}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Éléments archivés</p></div>
+        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-semibold" style={{ color: COLORS.slate }}>{docs}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents</p></div>
+        <div className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}><p className="text-2xl font-semibold" style={{ color: COLORS.slate }}>{discussions}</p><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p></div>
       </div>
 
       <div className="flex flex-wrap gap-3 mb-4 items-center">
@@ -7721,18 +7728,18 @@ function PlanningScreen() {
     <div>
       <div className="flex items-start justify-between gap-4 mb-1 flex-wrap">
         <div>
-          <p className="text-sm" style={{ color: COLORS.slateLight }}>Gérez le calendrier des formations, événements et activités de la plateforme LIGGEEY</p>
+          <p className="text-sm" style={{ color: COLORS.slateLight }}>Gérez le calendrier des formations, événements et activités de la plateforme LIGGEEY.</p>
         </div>
-        <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-1.5 rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque shrink-0" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => setFormOpen(true)} className="flex items-center gap-1.5 rounded px-4 py-2.5 text-sm font-semibold text-sur-marque shrink-0" style={{ background: COLORS.orange }}>
           <Plus size={15} /> Ajouter un événement
         </button>
       </div>
 
       <div className="flex items-center justify-between gap-3 mt-6 mb-4 flex-wrap">
         <div className="flex items-center gap-3">
-          <button type="button" onClick={() => move(-1)} aria-label="Période précédente" className="w-7 h-7 rounded-md border flex items-center justify-center bg-surface" style={{ borderColor: COLORS.border }}><ArrowLeft size={13} /></button>
-          <p className="font-bold text-lg" style={{ color: COLORS.slate }} aria-live="polite">{title}</p>
-          <button type="button" onClick={() => move(1)} aria-label="Période suivante" className="w-7 h-7 rounded-md border flex items-center justify-center bg-surface" style={{ borderColor: COLORS.border }}><ChevronRight size={13} /></button>
+          <button type="button" onClick={() => move(-1)} aria-label="Période précédente" className="w-7 h-7 rounded border flex items-center justify-center bg-surface" style={{ borderColor: COLORS.border }}><ArrowLeft size={13} /></button>
+          <p className="font-semibold text-lg" style={{ color: COLORS.slate }} aria-live="polite">{title}</p>
+          <button type="button" onClick={() => move(1)} aria-label="Période suivante" className="w-7 h-7 rounded border flex items-center justify-center bg-surface" style={{ borderColor: COLORS.border }}><ChevronRight size={13} /></button>
         </div>
         <div className="flex rounded-md border overflow-hidden" style={{ borderColor: COLORS.border }}>
           {["Mois", "Semaine", "Jour"].map((v) => (
@@ -7774,9 +7781,9 @@ function PlanningScreen() {
                   <button type="button" onClick={() => setFormOpen(true)} className="mt-3 text-sm font-semibold" style={{ color: COLORS.orangeText }}>Planifier un événement</button>
                 </div>
               ) : dayEvents.map((e) => (
-                <div key={e.id} className="rounded-md p-4 mb-3" style={{ background: EVENT_TYPE_COLORS[e.type].bg }}>
+                <div key={e.id} className="rounded p-4 mb-3" style={{ background: EVENT_TYPE_COLORS[e.type].bg }}>
                   <div className="flex items-center justify-between gap-2 mb-1">
-                    <p className="text-sm font-bold" style={{ color: EVENT_TYPE_COLORS[e.type].color }}>{e.titre}</p>
+                    <p className="text-sm font-semibold" style={{ color: EVENT_TYPE_COLORS[e.type].color }}>{e.titre}</p>
                     <span className="text-xs font-semibold" style={{ color: EVENT_TYPE_COLORS[e.type].color }}>{e.type}</span>
                   </div>
                   <p className="text-xs" style={{ color: COLORS.slate }}>{formatRange(e)}{e.meta ? ` · ${e.meta}` : ""}</p>
@@ -7844,14 +7851,10 @@ function CommunicationScreen({ onNavigate, ongletInitial }) {
 
   return (
     <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez les notifications, messages et archives de la plateforme LIGGEEY</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez les notifications, messages et archives de la plateforme LIGGEEY.</p>
 
-      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
-        {["Notifications", "Messagerie", "Archives"].map((t) => (
-          <button key={t} type="button" onClick={() => setMainTab(t)} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${mainTab === t ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
-            {t}
-          </button>
-        ))}
+      <div className="mb-5">
+        <App.Onglets label="Sections de la communication" onglets={["Notifications", "Messagerie", "Archives"].map((t) => ({ id: t, label: t }))} actif={mainTab} onChange={setMainTab} />
       </div>
 
       {mainTab === "Messagerie" && <MessagerieTab />}
@@ -7863,12 +7866,12 @@ function CommunicationScreen({ onNavigate, ongletInitial }) {
             <div className="flex items-center justify-between mb-4 flex-wrap gap-3">
               <div className="flex gap-2">
                 {[{ id: "Toutes", label: "Toutes" }, { id: "Non lues", label: `Non lues (${nonLues})` }, { id: "Système", label: "Système" }, { id: "Utilisateurs", label: "Utilisateurs" }].map((t) => (
-                  <button key={t.id} type="button" onClick={() => setSubTab(t.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold" style={{ background: subTab === t.id ? COLORS.softStrong : COLORS.surface, color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
+                  <button key={t.id} type="button" onClick={() => setSubTab(t.id)} className="rounded px-3 py-1.5 text-xs font-semibold" style={{ background: subTab === t.id ? COLORS.softStrong : COLORS.surface, color: COLORS.slate, border: `1px solid ${COLORS.border}` }}>
                     {t.label}
                   </button>
                 ))}
               </div>
-              <button type="button" onClick={() => setNotifs((list) => list.map((n) => ({ ...n, lu: true })))} className="rounded-md px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
+              <button type="button" onClick={() => setNotifs((list) => list.map((n) => ({ ...n, lu: true })))} className="rounded px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
                 Tout marquer comme lu
               </button>
             </div>
@@ -7898,16 +7901,16 @@ function CommunicationScreen({ onNavigate, ongletInitial }) {
           <div className="flex flex-col gap-4">
             <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Statistiques de communication</h3>
-              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Total envoyées</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>1 247</p></div>
-              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Taux de lecture</p><p className="text-sm font-bold" style={{ color: COLORS.success }}>78%</p></div>
-              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Messages en attente</p><p className="text-sm font-bold" style={{ color: COLORS.orangeText }}>5</p></div>
+              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Total envoyées</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>1 247</p></div>
+              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Taux de lecture</p><p className="text-sm font-semibold" style={{ color: COLORS.success }}>78%</p></div>
+              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Messages en attente</p><p className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>5</p></div>
             </div>
             <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <div className="flex items-center gap-2 mb-2"><Archive size={16} color={COLORS.slate} /><h3 className="font-semibold" style={{ color: COLORS.slate }}>Archives plateforme</h3></div>
               <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>Accédez à l’historique complet des dossiers archivés pour libérer l’espace actif de la base.</p>
-              <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents archivés</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>342</p></div>
-              <div className="flex items-center justify-between py-1 mb-3"><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>89</p></div>
-              <button type="button" onClick={() => setMainTab("Archives")} className="w-full rounded-md py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>Consulter les archives</button>
+              <div className="flex items-center justify-between py-1"><p className="text-sm" style={{ color: COLORS.slateLight }}>Documents archivés</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>342</p></div>
+              <div className="flex items-center justify-between py-1 mb-3"><p className="text-sm" style={{ color: COLORS.slateLight }}>Discussions résolues</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>89</p></div>
+              <button type="button" onClick={() => setMainTab("Archives")} className="w-full rounded py-2.5 text-sm font-semibold" style={{ background: COLORS.softStrong, color: COLORS.slate }}>Consulter les archives</button>
             </div>
           </div>
         </div>
@@ -7976,7 +7979,7 @@ function ParametresScreen() {
 
   return (
     <div>
-      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez votre compte administrateur et les préférences de la plateforme LIGGEEY</p>
+      <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Gérez votre compte administrateur et les préférences de la plateforme LIGGEEY.</p>
 
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 mb-4">
         <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
@@ -8013,7 +8016,7 @@ function ParametresScreen() {
         ))}
       </div>
 
-      <button type="button" onClick={() => setSaved(true)} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
+      <button type="button" onClick={() => setSaved(true)} className="rounded px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
         Enregistrer les modifications
       </button>
       {saved && <span className="ml-3 text-sm" style={{ color: COLORS.success }}>Préférences enregistrées.</span>}
@@ -8212,7 +8215,7 @@ function buildPlanApi({ espace, user, plans, setPlans, subs, setSubs, usage, set
 
 function PremiumChip({ label = "Premium", locked }) {
   return (
-    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.dark, color: COLORS.brandPale }}>
+    <span className="inline-flex items-center gap-1 text-[11px] font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.darkSoft, color: COLORS.brandPale }}>
       {locked ? <Lock size={10} /> : <Crown size={10} color={COLORS.orange} />}
       {label}
     </span>
@@ -8273,7 +8276,7 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
           </div>
           <button type="button" onClick={onClose} aria-label="Fermer" className="text-xl leading-none" style={{ color: COLORS.onDarkSubtle }}>×</button>
         </div>
-        <h3 id="upgrade-title" className="text-lg font-bold text-sur-sombre mt-4 mb-1">{reason.titre}</h3>
+        <h3 id="upgrade-title" className="text-lg font-semibold text-sur-sombre mt-4 mb-1">{reason.titre}</h3>
         <p className="text-sm" style={{ color: COLORS.onDarkMuted }}>{reason.texte}</p>
       </div>
 
@@ -8281,7 +8284,7 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
         <div className="p-6">
           <div className="flex items-baseline justify-between mb-3">
             <p className="font-semibold" style={{ color: COLORS.slate }}>Profil {target.nom}</p>
-            <p className="text-sm" style={{ color: COLORS.slateLight }}><span className="text-xl font-bold" style={{ color: COLORS.slate }}>{fcfa(target.prixMensuel)}</span> / mois</p>
+            <p className="text-sm" style={{ color: COLORS.slateLight }}><span className="text-xl font-semibold" style={{ color: COLORS.slate }}>{fcfa(target.prixMensuel)}</span> / mois</p>
           </div>
           <ul className="flex flex-col gap-2 mb-6">
             {target.avantages.slice(0, 4).map((a) => (
@@ -8291,10 +8294,10 @@ function UpgradeModal({ reasonKey, onClose, onNavigate }) {
             ))}
           </ul>
           <div className="flex flex-col-reverse sm:flex-row gap-2 sm:justify-end">
-            <button type="button" onClick={() => { onClose(); onNavigate("abonnement"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
+            <button type="button" onClick={() => { onClose(); onNavigate("abonnement"); }} className="rounded px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
               Comparer les profils
             </button>
-            <button type="button" onClick={() => { onClose(); api.startPayment(target.id, "mensuel"); }} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
+            <button type="button" onClick={() => { onClose(); api.startPayment(target.id, "mensuel"); }} className="rounded px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
               Passer à {target.nom}
             </button>
           </div>
@@ -8408,7 +8411,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
       {step === "pending" && (
         <div className="p-8 text-center" aria-live="polite">
           <Loader2 size={32} color={COLORS.orange} className="mx-auto mb-4 animate-spin" />
-          <h3 id="pay-title" className="text-lg font-bold mb-1" style={{ color: COLORS.slate }}>
+          <h3 id="pay-title" className="text-lg font-semibold mb-1" style={{ color: COLORS.slate }}>
             Confirmez sur votre téléphone
           </h3>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>
@@ -8422,7 +8425,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
           <div className="w-12 h-12 rounded-full mx-auto mb-4 flex items-center justify-center" style={{ background: COLORS.successSoft }}>
             <CheckCircle2 size={24} color={COLORS.success} />
           </div>
-          <h3 id="pay-title" className="text-lg font-bold mb-1" style={{ color: COLORS.slate }}>Paiement confirmé</h3>
+          <h3 id="pay-title" className="text-lg font-semibold mb-1" style={{ color: COLORS.slate }}>Paiement confirmé</h3>
           <p className="text-sm mb-5" style={{ color: COLORS.slateLight }}>
             Votre formule {target.nom} est active. Prochain renouvellement le {receipt.prochain}.
           </p>
@@ -8431,7 +8434,7 @@ function PaymentModal({ planId, initialCycle, onClose }) {
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Montant</span><span className="font-semibold" style={{ color: COLORS.slate }}>{fcfa(receipt.montant)}</span></div>
             <div className="flex justify-between"><span style={{ color: COLORS.slateLight }}>Moyen</span><span className="font-semibold" style={{ color: COLORS.slate }}>{m.nom}</span></div>
           </div>
-          <button type="button" onClick={onClose} className="w-full rounded-md px-4 py-3 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Terminer</button>
+          <button type="button" onClick={onClose} className="w-full rounded px-4 py-3 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Terminer</button>
         </div>
       )}
     </ModalFrame>
@@ -8456,7 +8459,7 @@ function AbonnementScreen() {
       <div className="rounded-lg p-6 mb-8 grid grid-cols-1 md:grid-cols-[1fr,1fr] gap-6" style={{ background: COLORS.dark }}>
         <div>
           <p className="text-sm mb-1" style={{ color: COLORS.onDarkMuted }}>Formule actuelle</p>
-          <p className="text-2xl font-bold text-sur-sombre flex items-center gap-2">
+          <p className="text-2xl font-semibold text-sur-sombre flex items-center gap-2">
             {plan.nom} {plan.id !== "essentiel" && <Crown size={20} color={COLORS.orange} />}
           </p>
           <p className="text-sm mt-1" style={{ color: COLORS.orangeOnDark }}>
@@ -8491,13 +8494,13 @@ function AbonnementScreen() {
           return (
             <div key={p.id} className="rounded-lg bg-surface p-6 flex flex-col relative" style={{ border: `${isCurrent ? 2 : 1}px solid ${isCurrent ? COLORS.orange : COLORS.border}` }}>
               <div className="flex items-center justify-between mb-1 min-h-[24px]">
-                <p className="font-bold text-lg" style={{ color: COLORS.slate }}>{p.nom}</p>
+                <p className="font-semibold text-lg" style={{ color: COLORS.slate }}>{p.nom}</p>
                 {p.recommande && !isCurrent && <PremiumChip label="Recommandé" />}
                 {isCurrent && <span className="text-xs font-semibold" style={{ color: COLORS.orangeText }}>Votre formule</span>}
               </div>
               <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>{p.description}</p>
               <p className="mb-5">
-                <span className="text-3xl font-bold" style={{ color: COLORS.slate }}>{fcfa(p.prixMensuel).replace(" FCFA", "")}</span>
+                <span className="text-3xl font-semibold" style={{ color: COLORS.slate }}>{fcfa(p.prixMensuel).replace(" FCFA", "")}</span>
                 <span className="text-sm ml-1" style={{ color: COLORS.slateLight }}>FCFA / mois</span>
               </p>
               <ul className="flex flex-col gap-2.5 mb-6 flex-1">
@@ -8556,7 +8559,7 @@ function AbonnementScreen() {
       {confirmDowngrade && (
         <ModalFrame onClose={() => setConfirmDowngrade(false)} labelledBy="downgrade-title">
           <div className="p-6">
-            <h3 id="downgrade-title" className="text-lg font-bold mb-2" style={{ color: COLORS.slate }}>Résilier la formule {plan.nom} ?</h3>
+            <h3 id="downgrade-title" className="text-lg font-semibold mb-2" style={{ color: COLORS.slate }}>Résilier la formule {plan.nom} ?</h3>
             <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>Vous reviendrez à la formule {base.nom} et perdrez l’accès à :</p>
             <ul className="flex flex-col gap-1.5 mb-6">
               {plan.avantages.slice(0, 3).map((a) => (
@@ -8564,8 +8567,8 @@ function AbonnementScreen() {
               ))}
             </ul>
             <div className="flex justify-end gap-2">
-              <button type="button" onClick={() => setConfirmDowngrade(false)} className="rounded-md px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Garder mon offre</button>
-              <button type="button" onClick={() => { api.downgrade(); setConfirmDowngrade(false); }} className="rounded-md px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Résilier</button>
+              <button type="button" onClick={() => setConfirmDowngrade(false)} className="rounded px-4 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Garder mon offre</button>
+              <button type="button" onClick={() => { api.downgrade(); setConfirmDowngrade(false); }} className="rounded px-4 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Résilier</button>
             </div>
           </div>
         </ModalFrame>
@@ -8653,12 +8656,8 @@ function AbonnementsAdminScreen() {
         </div>
       </div>
 
-      <div className="flex gap-1 overflow-x-auto border-b border-base mb-5">
-        {tabs.map((t) => (
-          <button key={t.id} type="button" onClick={() => { setTab(t.id); setPage(1); }} className={`-mb-px inline-flex min-h-[44px] items-center whitespace-nowrap border-b-2 px-4 text-sm font-medium transition-colors ${tab === t.id ? "border-marque text-principal" : "border-transparent text-secondaire hover:text-principal"}`} >
-            {t.label}
-          </button>
-        ))}
+      <div className="mb-5">
+        <App.Onglets label="Sections des abonnements" onglets={tabs} actif={tab} onChange={(t) => { setTab(t); setPage(1); }} />
       </div>
 
       {tab !== "tarifs" && (
@@ -8793,8 +8792,8 @@ function AbonnementsAdminScreen() {
             ))}
           </div>
           <div className="flex justify-end gap-2 mt-5">
-            <button type="button" disabled={!dirty} onClick={() => setDraft(api.plans)} className="rounded-md px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate, opacity: dirty ? 1 : 0.5 }}>Annuler les modifications</button>
-            <button type="button" disabled={!dirty} onClick={() => { api.setPlans(draft); notify("Tarifs et quotas enregistrés."); }} className="rounded-md px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: dirty ? 1 : 0.5 }}>Enregistrer les tarifs</button>
+            <button type="button" disabled={!dirty} onClick={() => setDraft(api.plans)} className="rounded px-5 py-2.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate, opacity: dirty ? 1 : 0.5 }}>Annuler les modifications</button>
+            <button type="button" disabled={!dirty} onClick={() => { api.setPlans(draft); notify("Tarifs et quotas enregistrés."); }} className="rounded px-5 py-2.5 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange, opacity: dirty ? 1 : 0.5 }}>Enregistrer les tarifs</button>
           </div>
         </div>
       )}
@@ -8842,7 +8841,7 @@ function isPremiumPlan(plan) {
 function TierBadge({ premium, label, size = "md" }) {
   const cls = size === "sm" ? "text-[11px] px-2 py-0.5" : "text-xs px-3 py-1";
   return premium ? (
-    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.dark, color: COLORS.brandPale }}>
+    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.darkSoft, color: COLORS.brandPale }}>
       <Crown size={size === "sm" ? 10 : 12} color={COLORS.orange} /> {label || "Premium"}
     </span>
   ) : (
@@ -8877,7 +8876,7 @@ function ProfileTierCard() {
           </p>
         </div>
         {!premium && premiumPlan && (
-          <button type="button" onClick={() => api.startPayment(premiumPlan.id, "mensuel")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+          <button type="button" onClick={() => api.startPayment(premiumPlan.id, "mensuel")} className="rounded px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
             <Crown size={14} /> Passer à la formule Premium · {fcfa(premiumPlan.prixMensuel)}/mois
           </button>
         )}
@@ -8886,7 +8885,7 @@ function ProfileTierCard() {
       {premium && api.espace === "chercheur" && (
         <div className="px-6 py-4 grid grid-cols-1 sm:grid-cols-[auto,1fr] gap-x-8 gap-y-3" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
           <div>
-            <p className="text-2xl font-bold" style={{ color: COLORS.slate }}>48</p>
+            <p className="text-2xl font-semibold" style={{ color: COLORS.slate }}>48</p>
             <p className="text-xs" style={{ color: COLORS.slateLight }}>vues cette semaine, +35 %</p>
           </div>
           <div>
@@ -9189,7 +9188,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
           {coachings.upcoming.length === 0 && !booking && (
             <div className="rounded-lg border bg-surface p-6 text-center" style={{ borderColor: COLORS.border }}>
               <p className="text-sm mb-3" style={{ color: COLORS.slateLight }}>Aucun coaching prévu avec {prenom}. Réservez un créneau pour commencer.</p>
-              <button type="button" onClick={openBooking} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
+              <button type="button" onClick={openBooking} className="rounded px-4 py-2 text-sm font-semibold text-sur-marque inline-flex items-center gap-1.5" style={{ background: COLORS.orange }}>
                 {locked && <Lock size={13} />} Réserver un coaching
               </button>
             </div>
@@ -9209,16 +9208,16 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
                 {toCancel === u.id ? (
                   <div className="flex items-center gap-2 flex-wrap">
                     <span className="text-sm" style={{ color: COLORS.slate }}>Annuler cette séance ?</span>
-                    <button type="button" onClick={() => { onUpdate((c) => ({ ...c, upcoming: c.upcoming.filter((x) => x.id !== u.id) })); setToCancel(null); notify("Séance annulée. Le mentor a été prévenu.", "info"); }} className="rounded-md px-3 py-1.5 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Oui, annuler</button>
-                    <button type="button" onClick={() => setToCancel(null)} className="rounded-md px-3 py-1.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Non</button>
+                    <button type="button" onClick={() => { onUpdate((c) => ({ ...c, upcoming: c.upcoming.filter((x) => x.id !== u.id) })); setToCancel(null); notify("Séance annulée. Le mentor a été prévenu.", "info"); }} className="rounded px-3 py-1.5 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Oui, annuler</button>
+                    <button type="button" onClick={() => setToCancel(null)} className="rounded px-3 py-1.5 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Non</button>
                   </div>
                 ) : (
                   <div className="flex gap-2 flex-wrap">
                     {u.format !== "Au bureau de Dakar" && (
-                      <button type="button" onClick={() => notify(`Connexion à la séance avec ${mentor.nom}…`)} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Rejoindre</button>
+                      <button type="button" onClick={() => notify(`Connexion à la séance avec ${mentor.nom}…`)} className="rounded px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Rejoindre</button>
                     )}
-                    <button type="button" onClick={() => setBooking({ mode: "move", id: u.id })} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Reprogrammer</button>
-                    <button type="button" onClick={() => setToCancel(u.id)} className="rounded-md px-4 py-2 text-sm font-semibold" style={{ color: COLORS.danger }}>Annuler</button>
+                    <button type="button" onClick={() => setBooking({ mode: "move", id: u.id })} className="rounded px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Reprogrammer</button>
+                    <button type="button" onClick={() => setToCancel(u.id)} className="rounded px-4 py-2 text-sm font-semibold" style={{ color: COLORS.danger }}>Annuler</button>
                   </div>
                 )}
               </div>
@@ -9512,7 +9511,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
       <div className="rounded-lg p-6 mb-6" style={{ background: COLORS.dark }}>
         <div className="flex items-start justify-between flex-wrap gap-4 mb-5">
           <div>
-            <p className="text-xl font-bold text-sur-sombre">{e.poste} · {e.entreprise}</p>
+            <p className="text-xl font-semibold text-sur-sombre">{e.poste} · {e.entreprise}</p>
             <p className="text-sm" style={{ color: COLORS.onDarkMuted }}>{e.contrat} · {e.ville} · Responsable : {e.manager}</p>
           </div>
           <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.darkLine, color: COLORS.brandPale }}>En poste depuis {jour} jours</span>
@@ -9534,7 +9533,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
               return (
                 <li key={j.id} className="flex gap-3 pb-5 last:pb-0">
                   <div className="flex flex-col items-center">
-                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-bold shrink-0" style={{ background: statut === "Fait" ? COLORS.successSoft : statut === "À compléter" ? COLORS.orange : COLORS.softStrong, color: statut === "Fait" ? COLORS.success : statut === "À compléter" ? COLORS.onOrange : COLORS.slateLight }}>
+                    <div className="w-6 h-6 rounded-full flex items-center justify-center text-[11px] font-semibold shrink-0" style={{ background: statut === "Fait" ? COLORS.successSoft : statut === "À compléter" ? COLORS.orange : COLORS.softStrong, color: statut === "Fait" ? COLORS.success : statut === "À compléter" ? COLORS.onOrange : COLORS.slateLight }}>
                       {statut === "Fait" ? <Check size={12} /> : i + 1}
                     </div>
                     {i < JALONS.length - 1 && <div className="w-px flex-1 mt-1" style={{ background: COLORS.border }} />}
@@ -9546,7 +9545,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
                         <p className="text-xs" style={{ color: COLORS.slateLight }}>Jour {j.jour} · {frLongDate(jalonDate(e.dateIso, j.jour))}</p>
                       </div>
                       {statut === "À compléter" && openJalon !== j.id ? (
-                        <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Répondre</button>
+                        <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Répondre</button>
                       ) : (
                         <StatusBadge status={statut} />
                       )}
@@ -9575,8 +9574,8 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
               </div>
             </div>
             <div className="flex gap-2 flex-wrap">
-              <button type="button" onClick={() => notify(`Appel vers ${e.referent.telephone}…`)} className="rounded-md px-3 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}><Phone size={14} /> Appeler</button>
-              <button type="button" onClick={() => notify(`Demande de rendez-vous envoyée à ${e.referent.nom}.`)} className="rounded-md px-3 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}><Calendar size={14} /> Prendre rendez-vous</button>
+              <button type="button" onClick={() => notify(`Appel vers ${e.referent.telephone}…`)} className="rounded px-3 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}><Phone size={14} /> Appeler</button>
+              <button type="button" onClick={() => notify(`Demande de rendez-vous envoyée à ${e.referent.nom}.`)} className="rounded px-3 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.border, color: COLORS.slate }}><Calendar size={14} /> Prendre rendez-vous</button>
             </div>
           </div>
 
@@ -9602,7 +9601,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Une difficulté dans votre poste ?</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>Votre référente traite chaque signalement. Votre employeur n’est contacté qu’avec votre accord.</p>
           </div>
-          {!signalOpen && <button type="button" onClick={() => setSignalOpen(true)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler une difficulté</button>}
+          {!signalOpen && <button type="button" onClick={() => setSignalOpen(true)} className="rounded px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler une difficulté</button>}
         </div>
         {signalOpen && (
           <SignalementForm
@@ -9672,9 +9671,9 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
         </div>
         <div className="flex gap-2 flex-wrap">
           {r.statut !== "Confirmé" && (
-            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-statut inline-flex items-center gap-1.5" style={{ background: COLORS.success }}><UserCheck size={14} /> Confirmer l’embauche</button>
+            <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded px-4 py-2 text-sm font-semibold text-sur-statut inline-flex items-center gap-1.5" style={{ background: COLORS.success }}><UserCheck size={14} /> Confirmer l’embauche</button>
           )}
-          <button type="button" onClick={() => setSignalOpen((o) => !o)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler un problème</button>
+          <button type="button" onClick={() => setSignalOpen((o) => !o)} className="rounded px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler un problème</button>
         </div>
       </div>
 
@@ -9703,7 +9702,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
                     <p className="text-xs" style={{ color: COLORS.slateLight }}>{frLongDate(jalonDate(r.dateIso, j.jour))}</p>
                   </div>
                   {statut === "À compléter" && openJalon !== j.id ? (
-                    <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Évaluer</button>
+                    <button type="button" onClick={() => setOpenJalon(j.id)} className="rounded px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Évaluer</button>
                   ) : (
                     <StatusBadge status={statut} />
                   )}
@@ -9729,7 +9728,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
           <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-1" style={{ color: COLORS.slate }}>Ressenti de la recrue</h3>
             <p className="text-xs mb-3" style={{ color: COLORS.slateLight }}>Partagé par la recrue lors de son dernier point de suivi.</p>
-            <p className="text-lg font-bold" style={{ color: r.ressenti <= 2 ? COLORS.danger : r.ressenti >= 4 ? COLORS.success : COLORS.slate }}>{HUMEURS[r.ressenti - 1]}</p>
+            <p className="text-lg font-semibold" style={{ color: r.ressenti <= 2 ? COLORS.danger : r.ressenti >= 4 ? COLORS.success : COLORS.slate }}>{HUMEURS[r.ressenti - 1]}</p>
           </div>
         </div>
       </div>
@@ -9825,8 +9824,8 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
               <StatusBadge status={s.statut} />
               {s.statut === "Ouvert" && (
                 <>
-                  <button type="button" onClick={() => notify(`Prise de contact avec ${s.auteur} enregistrée.`)} className="rounded-md px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Contacter</button>
-                  <button type="button" onClick={() => { setSignalements((l) => l.map((x) => (x.id === s.id ? { ...x, statut: "Traité" } : x))); notify("Signalement marqué comme traité."); }} className="rounded-md px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Marquer traité</button>
+                  <button type="button" onClick={() => notify(`Prise de contact avec ${s.auteur} enregistrée.`)} className="rounded px-3 py-1.5 text-xs font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Contacter</button>
+                  <button type="button" onClick={() => { setSignalements((l) => l.map((x) => (x.id === s.id ? { ...x, statut: "Traité" } : x))); notify("Signalement marqué comme traité."); }} className="rounded px-3 py-1.5 text-xs font-semibold text-sur-marque" style={{ background: COLORS.orange }}>Marquer traité</button>
                 </>
               )}
             </div>
@@ -9942,7 +9941,7 @@ function RegulStepCard({ step, index, onChange }) {
     <div className="rounded-lg border bg-surface" style={{ borderColor: step.statut === "Refusé" ? COLORS.danger : COLORS.border }}>
       <button type="button" onClick={() => setOpen((o) => !o)} aria-expanded={open} className="w-full flex items-center justify-between gap-3 px-5 py-4 text-left">
         <div className="flex items-center gap-3 min-w-0">
-          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold shrink-0" style={{ background: step.statut === "Validé" ? COLORS.successSoft : COLORS.softStrong, color: step.statut === "Validé" ? COLORS.success : COLORS.slate }}>
+          <div className="w-7 h-7 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: step.statut === "Validé" ? COLORS.successSoft : COLORS.softStrong, color: step.statut === "Validé" ? COLORS.success : COLORS.slate }}>
             {step.statut === "Validé" ? <Check size={13} /> : index + 1}
           </div>
           <div className="min-w-0">
@@ -10235,7 +10234,7 @@ function RegularisationScreen({ steps, setSteps }) {
             <RegulBadge size="sm" />
           </div>
           <p className="mb-1 text-sm" style={{ color: COLORS.onDarkMuted }}>Étapes validées pour le badge</p>
-          <p className="mb-3 text-3xl font-bold text-sur-sombre">{valides} / {total}</p>
+          <p className="mb-3 text-3xl font-semibold text-sur-sombre">{valides} / {total}</p>
           <ProgressBar pct={(valides / total) * 100} color={complete ? COLORS.successBright : COLORS.orange} track={COLORS.darkLine} />
           <p className="mt-3 text-sm" style={{ color: COLORS.onDarkMuted }}>{complete ? "Votre activité est régularisée. Le badge s’affiche sur votre profil." : enVerif ? `${enVerif} document${enVerif > 1 ? "s" : ""} en cours de vérification.` : "Suivez les étapes ci-dessous, à votre rythme."}</p>
         </div>
@@ -10294,7 +10293,7 @@ function RegularisationScreen({ steps, setSteps }) {
           <p className="flex items-center gap-2 font-semibold" style={{ color: COLORS.slate }}>Besoin d’aide pour vos dossiers ? {!accompOk && <PremiumChip locked />}</p>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Un conseiller LIGGEEY prépare les dossiers avec vous et vous oriente vers les bons guichets.</p>
         </div>
-        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="inline-flex shrink-0 items-center gap-1.5 rounded-md px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="inline-flex shrink-0 items-center gap-1.5 rounded px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           {!accompOk && <Lock size={13} />} Être rappelé(e) par un conseiller
         </button>
       </div>
@@ -10357,8 +10356,8 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
               </div>
               {refusing !== d.id && (
                 <div className="flex gap-2 shrink-0">
-                  <button type="button" onClick={() => setRefusing(d.id)} className="rounded-md px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Refuser</button>
-                  <button type="button" onClick={() => decide(d, "Validé")} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-statut" style={{ background: COLORS.success }}>Valider</button>
+                  <button type="button" onClick={() => setRefusing(d.id)} className="rounded px-4 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.danger, color: COLORS.danger }}>Refuser</button>
+                  <button type="button" onClick={() => decide(d, "Validé")} className="rounded px-4 py-2 text-sm font-semibold text-sur-statut" style={{ background: COLORS.success }}>Valider</button>
                 </div>
               )}
             </div>
@@ -10915,7 +10914,7 @@ function DemandeSeanceForm({ mineur, onEnvoyer, libelle = "Envoyer ma demande", 
             {HEURES_SEANCE.map((h) => <option key={h}>{h}</option>)}
           </ListeChamp>
         </Champ>
-        <Champ id={`${uid}-format`} label="Format" aide={mineur ? "Avant 18 ans, les séances ont lieu au bureau de Dakar ou en groupe." : null}>
+        <Champ id={`${uid}-format`} label="Format" large aide={mineur ? "Avant 18 ans, les séances ont lieu au bureau de Dakar ou en groupe." : null}>
           <ListeChamp id={`${uid}-format`} value={format} onChange={(e) => setFormat(e.target.value)} aria-describedby={mineur ? `${uid}-format-aide` : undefined}>
             {formats.map((f) => <option key={f}>{f}</option>)}
           </ListeChamp>
@@ -11925,22 +11924,22 @@ function TestModeBar({ espace, defaultOpen, onNavigate }) {
 
           <div className="p-4 flex flex-col gap-2" style={{ borderTop: `1px solid ${COLORS.border}` }}>
             {commentState !== "off" ? (
-              <button type="button" disabled={commentState === "busy"} onClick={comment} className="w-full rounded-md px-3 py-2 text-sm font-semibold text-sur-marque flex items-center justify-center gap-1.5" style={{ background: COLORS.orange }}>
+              <button type="button" disabled={commentState === "busy"} onClick={comment} className="w-full rounded px-3 py-2 text-sm font-semibold text-sur-marque flex items-center justify-center gap-1.5" style={{ background: COLORS.orange }}>
                 <MessageCircle size={14} /> Commenter cet écran
               </button>
             ) : (
               <p className="text-xs" style={{ color: COLORS.slateLight }}>Les commentaires ne sont pas disponibles depuis cette page. Notez vos remarques et transmettez-les à l’équipe LIGGEEY.</p>
             )}
             {!confirmReset ? (
-              <button type="button" onClick={() => setConfirmReset(true)} className="w-full rounded-md px-3 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
+              <button type="button" onClick={() => setConfirmReset(true)} className="w-full rounded px-3 py-2 text-sm font-semibold border" style={{ borderColor: COLORS.border, color: COLORS.slate }}>
                 Réinitialiser la démo
               </button>
             ) : (
               <div className="rounded-md p-3" style={{ background: COLORS.dangerSoft }}>
                 <p className="text-xs mb-2" style={{ color: COLORS.danger }}>Toutes vos actions de test seront effacées et la démo repartira de zéro.</p>
                 <div className="flex gap-2">
-                  <button type="button" onClick={() => { clearSnapshot(); window.location.reload(); }} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold text-sur-statut" style={{ background: COLORS.danger }}>Tout effacer</button>
-                  <button type="button" onClick={() => setConfirmReset(false)} className="flex-1 rounded-md px-3 py-1.5 text-xs font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
+                  <button type="button" onClick={() => { clearSnapshot(); window.location.reload(); }} className="flex-1 rounded px-3 py-1.5 text-xs font-semibold text-sur-statut" style={{ background: COLORS.danger }}>Tout effacer</button>
+                  <button type="button" onClick={() => setConfirmReset(false)} className="flex-1 rounded px-3 py-1.5 text-xs font-semibold border bg-surface" style={{ borderColor: COLORS.border, color: COLORS.slate }}>Annuler</button>
                 </div>
               </div>
             )}

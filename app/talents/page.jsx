@@ -30,7 +30,7 @@ export default function PageTalents() {
           <div>
             <dl className="grid grid-cols-2 gap-6">
               {t.constat.chiffres.map((c) => (
-                <div key={c.valeur} className="flex flex-col-reverse gap-2">
+                <div key={c.valeur} className="flex flex-col-reverse justify-end gap-2">
                   <dt>{c.texte}</dt>
                   <dd className="text-5xl font-light text-marque">{c.valeur}</dd>
                 </div>

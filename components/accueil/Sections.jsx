@@ -91,7 +91,7 @@ export function BandeConstat() {
         <div className="flex flex-col gap-4">
           <dl className="grid grid-cols-2 gap-3 md:gap-4">
             {t.chiffres.map((c) => (
-              <div key={c.texte} className="flex flex-col-reverse gap-2 rounded-lg bg-surface p-4 shadow-[0_0_0_1px_rgb(var(--bordure-base))] transition-shadow hover:shadow-carte md:gap-3 md:p-6">
+              <div key={c.texte} className="flex flex-col-reverse justify-end gap-2 rounded-lg bg-surface p-4 shadow-[0_0_0_1px_rgb(var(--bordure-base))] transition-shadow hover:shadow-carte md:gap-3 md:p-6">
                 <dt className="text-[13px] leading-[1.5] text-secondaire md:text-[15px] md:leading-[1.6]">{c.texte}</dt>
                 <dd className="text-[32px] font-light leading-none text-marque-titre md:text-5xl">
                   <Compteur valeur={c.valeur} />

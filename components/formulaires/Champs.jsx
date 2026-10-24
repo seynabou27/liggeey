@@ -33,7 +33,7 @@ export function ChampTexte({ nom, label, requis, erreur, type = 'text', ...props
       <Libelle pour={nom} requis={requis}>
         {label}
       </Libelle>
-      <input id={nom} name={nom} type={type} aria-required={requis || undefined} {...aria(nom, erreur)} className={`${BASE} h-12 ${bord(erreur)}`} {...props} />
+      <input id={nom} name={nom} type={type} aria-required={requis || undefined} {...aria(nom, erreur)} className={`${BASE} h-14 ${bord(erreur)}`} {...props} />
       <Erreur id={`${nom}-erreur`}>{erreur}</Erreur>
     </div>
   );
@@ -59,7 +59,7 @@ export function ChampSelect({ nom, label, requis, erreur, options, vide = 'Chois
         {label}
       </Libelle>
       <div className="relative">
-        <select id={nom} name={nom} defaultValue={defaultValue} aria-required={requis || undefined} {...aria(nom, erreur)} className={`${BASE} h-12 appearance-none pr-10 ${bord(erreur)}`} {...props}>
+        <select id={nom} name={nom} defaultValue={defaultValue} aria-required={requis || undefined} {...aria(nom, erreur)} className={`${BASE} h-14 appearance-none pr-10 ${bord(erreur)}`} {...props}>
           <option value="">{vide}</option>
           {options.map((o) => (
             <option key={o.id ?? o} value={o.id ?? o}>
