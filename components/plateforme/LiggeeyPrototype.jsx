@@ -2655,7 +2655,7 @@ function buildModules(formation) {
   const list = [];
   for (let i = 0; i < total; i++) {
     const titre = GENERIC_MODULE_TEMPLATES[i % GENERIC_MODULE_TEMPLATES.length];
-    const duree = `${Math.max(1, Math.round((formation.heures / total) * 2) / 2).toLocaleString("fr-FR")} h`;
+    const duree = `${Math.max(1, Math.round((formation.heures / total) * 2) / 2).toLocaleString("fr-FR")} h`;
     list.push({ n: i + 1, titre, duree });
   }
   return list;
@@ -2723,7 +2723,7 @@ function FormationCard({ f, onOpen, premium, locked, inscrit = false, progressio
           {f.tagline && <p className="mt-0.5 text-sm text-secondaire">{f.tagline}</p>}
           <div className="mt-3 flex flex-wrap items-center gap-x-4 gap-y-2">
             <MetaOffre icone={Layers}>{f.modules} modules</MetaOffre>
-            <MetaOffre icone={Clock}>{f.heures} h</MetaOffre>
+            <MetaOffre icone={Clock}>{f.heures} h</MetaOffre>
             <MetaOffre icone={CalendarDays}>{dureeFromHeures(f.heures)}</MetaOffre>
           </div>
           {inscrit && (
@@ -2772,7 +2772,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
         sousTitre={formation.tagline}
         meta={<>
           <MetaOffre icone={Layers}>{total} modules</MetaOffre>
-          <MetaOffre icone={Clock}>{formation.heures} h d’apprentissage</MetaOffre>
+          <MetaOffre icone={Clock}>{formation.heures} h d’apprentissage</MetaOffre>
           <MetaOffre icone={CalendarDays}>{dureeFromHeures(formation.heures)}</MetaOffre>
         </>}
         actions={
@@ -2832,7 +2832,7 @@ function FormationDetail({ formation, enrolled, progressCount, onToggleEnroll, o
             titre="Aperçu de la formation"
             items={[
               { icone: Layers, libelle: "Modules", valeur: `${total} modules` },
-              { icone: Clock, libelle: "Volume horaire", valeur: `${formation.heures} h` },
+              { icone: Clock, libelle: "Volume horaire", valeur: `${formation.heures} h` },
               { icone: CalendarDays, libelle: "Durée", valeur: dureeFromHeures(formation.heures) },
               { icone: UserCircle2, libelle: "Formateur", valeur: nomDepuisEmail(formation.coach) },
               { icone: Crown, libelle: "Accès", valeur: premium ? "Formule Premium" : "Inclus dans votre formule" },
@@ -2920,7 +2920,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
           <div key={f.id} className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}>
             <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>Recommandé</span>
             <p className="font-semibold text-sm mt-2" style={{ color: COLORS.slate }}>{f.nom}</p>
-            <p className="text-xs" style={{ color: COLORS.slateLight }}>{f.modules} modules · {f.heures} h</p>
+            <p className="text-xs" style={{ color: COLORS.slateLight }}>{f.modules} modules · {f.heures} h</p>
           </div>
         ))}
       </div>
@@ -2930,14 +2930,14 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
 
 const FORMATIONS_PRESTATAIRE_ALL = [
   { id: "securite-elec", domaines: ["electricite"], nom: "Sécurité électrique", modules: 8, heures: 24, enrolled: true, progressCount: 4, coach: "cheikh.fall@cneap.sn", tagline: "Maîtriser les normes de sécurité sur chantier électrique.", description: "Formation qualifiante couvrant l’ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d’urgence sur chantier.", moduleNames: [
-    { titre: "Introduction aux normes NF C 15-100", duree: "2 h 30" },
-    { titre: "Protection des personnes et des biens", duree: "3 h" },
-    { titre: "Dimensionnement des circuits", duree: "4 h" },
-    { titre: "Lecture de schémas électriques", duree: "2 h 30" },
-    { titre: "Gestes de sécurité essentiels", duree: "3 h 30" },
-    { titre: "Procédures de contrôle", duree: "3 h" },
-    { titre: "Mise en pratique — TP sur site", duree: "3 h" },
-    { titre: "Évaluation finale", duree: "3 h" },
+    { titre: "Introduction aux normes NF C 15-100", duree: "2 h 30" },
+    { titre: "Protection des personnes et des biens", duree: "3 h" },
+    { titre: "Dimensionnement des circuits", duree: "4 h" },
+    { titre: "Lecture de schémas électriques", duree: "2 h 30" },
+    { titre: "Gestes de sécurité essentiels", duree: "3 h 30" },
+    { titre: "Procédures de contrôle", duree: "3 h" },
+    { titre: "Mise en pratique — TP sur site", duree: "3 h" },
+    { titre: "Évaluation finale", duree: "3 h" },
   ] },
   { id: "peinture-moderne", domaines: ["btp"], nom: "Peinture moderne", modules: 8, heures: 24, enrolled: false, coach: "aida.sarr@centreartisanat.sn", tagline: "Techniques modernes de peinture décorative et finitions.", description: "Apprenez les techniques actuelles de peinture décorative, enduits et finitions haut de gamme recherchées par les clients particuliers." },
   { id: "gestion-micro", domaines: ["tous"], nom: "Gestion de micro-entreprise", modules: 12, heures: 32, enrolled: true, progressCount: 5, coach: "fatou.ba@cneap.sn", tagline: "Gérer et développer sa petite activité indépendante.", description: "Comptabilité de base, fixation des tarifs, gestion des devis et développement de la clientèle pour les travailleurs indépendants." },
@@ -3105,7 +3105,7 @@ const MENTORS = [
       { nom: "Guide de préparation aux entretiens.pdf", meta: "PDF · 15 mars 2026" },
       { nom: "Template CV professionnel.docx", meta: "DOCX · 2 avril 2026" },
       { nom: "Liste des entreprises qui recrutent.xlsx", meta: "XLSX · 20 juin 2026" },
-    ], prochainRdv: "Jeudi 11 août 2026 · 15 h – 16 h" },
+    ], prochainRdv: "Jeudi 11 août 2026 · 15 h – 16 h" },
   { id: "aminata-ndiaye", nom: "Aminata Ndiaye", role: "Directrice marketing", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye-cadre.jpg" },
   { id: "moussa-diop", nom: "Moussa Diop", role: "Ingénieur logiciel", exp: 10, photo: "/images/plateforme/portraits/moussa-diop-cadre.jpg" },
   { id: "fatou-sarr", nom: "Fatou Sarr", role: "Consultante finance", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr-cadre.jpg" },
@@ -3181,7 +3181,7 @@ const MENTORS_PRESTATAIRE = [
       { nom: "Guide des normes NF C 15-100.pdf", meta: "PDF · 15 mars 2026" },
       { nom: "Modèle de devis professionnel.docx", meta: "DOCX · 2 avril 2026" },
       { nom: "Liste des clients qui recrutent.xlsx", meta: "XLSX · 20 juin 2026" },
-    ], prochainRdv: "Jeudi 11 août 2026 · 15 h – 16 h" },
+    ], prochainRdv: "Jeudi 11 août 2026 · 15 h – 16 h" },
   { id: "aminata-ndiaye-couture", domaines: ["couture"], competences: ["Couture sur mesure", "Patronage", "Gestion d’atelier", "Tarifs et devis"], nom: "Aminata Ndiaye", role: "Couturière et styliste", exp: 15, photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
   { id: "moussa-diop-menuisier", domaines: ["menuiserie"], competences: ["Mobilier sur mesure", "Lecture de plans", "Devis", "Sécurité en atelier"], nom: "Moussa Diop", role: "Maître menuisier", exp: 10, photo: "/images/plateforme/portraits/moussa-diop.jpg" },
   { id: "fatou-sarr-elec", domaines: ["electricite"], competences: ["Normes NF C 15-100", "Installation résidentielle", "Sécurité sur chantier", "Devis & Facturation"], nom: "Fatou Sarr", role: "Électricienne bâtiment", exp: 18, photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
@@ -3403,7 +3403,7 @@ function useCompletionChercheur() {
 const PRESTATAIRE_DETAILS = {
   experience: "8 ans",
   membreDepuis: "Janvier 2024",
-  disponibilite: "Lundi – samedi, 8 h – 18 h · urgences 24 h/24",
+  disponibilite: "Lundi – samedi, 8 h – 18 h · urgences 24 h/24",
   langues: [{ l: "Wolof", n: "Langue maternelle" }, { l: "Français", n: "Courant" }],
   certifications: ["CAP Électricité (2018)", "Formation sécurité électrique Senelec (2020)", "Attestation installation solaire (2023)"],
 };
@@ -3561,7 +3561,7 @@ function ProfilScreen({ onNavigate }) {
               <p className="text-sm text-secondaire">Votre pièce d’identité et vos diplômes ont été vérifiés par l’équipe LIGGEEY.</p>
             ) : verif === "en-cours" ? (
               <p className="inline-flex items-center gap-2 rounded-md bg-statut-succes-doux px-4 py-3 text-sm text-statut-succes">
-                <CheckCircle2 size={16} aria-hidden="true" /> Documents transmis : vérification sous 48 h ouvrées.
+                <CheckCircle2 size={16} aria-hidden="true" /> Documents transmis : vérification sous 48 h ouvrées.
               </p>
             ) : (
               <>
@@ -3569,7 +3569,7 @@ function ProfilScreen({ onNavigate }) {
                   Pour rassurer les employeurs, transmettez une pièce d’identité en cours de validité et vos diplômes.
                 </p>
                 <div className="flex flex-wrap gap-3">
-                  <App.Bouton petit onClick={() => { setVerif("en-cours"); notify("Documents transmis. Vérification sous 48 h ouvrées."); }}>Transmettre mes documents</App.Bouton>
+                  <App.Bouton petit onClick={() => { setVerif("en-cours"); notify("Documents transmis. Vérification sous 48 h ouvrées."); }}>Transmettre mes documents</App.Bouton>
                   <App.Bouton petit variante="neutre" onClick={() => setShowVerifInfo((v) => !v)} aria-expanded={showVerifInfo}>
                     {showVerifInfo ? "Masquer" : "En savoir plus"}
                   </App.Bouton>
@@ -3629,10 +3629,10 @@ function ProfilScreen({ onNavigate }) {
 /* ---------- Screen 11 : Dashboard Prestataire ---------- */
 
 const DEMANDES_RECENTES = [
-  { titre: "Installation électrique", client: "Fatou Sarr", ville: "Dakar Plateau", prix: "85 000 FCFA", priorite: "Urgent", date: "Aujourd’hui, 10 h 30" },
-  { titre: "Remplacement de disjoncteur", client: "Ousmane Ba", ville: "Médina", prix: "35 000 FCFA", priorite: "Normal", date: "Hier, 18 h 15" },
-  { titre: "Câblage réseau bureau", client: "Aminata Diop", ville: "Almadies", prix: "120 000 FCFA", priorite: "Normal", date: "Aujourd’hui, 9 h 10" },
-  { titre: "Dépannage compteur", client: "Cheikh Fall", ville: "Parcelles Assainies", prix: "25 000 FCFA", priorite: "Urgent", date: "Aujourd’hui, 8 h 45" },
+  { titre: "Installation électrique", client: "Fatou Sarr", ville: "Dakar Plateau", prix: "85 000 FCFA", priorite: "Urgent", date: "Aujourd’hui, 10 h 30" },
+  { titre: "Remplacement de disjoncteur", client: "Ousmane Ba", ville: "Médina", prix: "35 000 FCFA", priorite: "Normal", date: "Hier, 18 h 15" },
+  { titre: "Câblage réseau bureau", client: "Aminata Diop", ville: "Almadies", prix: "120 000 FCFA", priorite: "Normal", date: "Aujourd’hui, 9 h 10" },
+  { titre: "Dépannage compteur", client: "Cheikh Fall", ville: "Parcelles Assainies", prix: "25 000 FCFA", priorite: "Urgent", date: "Aujourd’hui, 8 h 45" },
 ];
 
 function DemandeCard({ d }) {
@@ -3847,15 +3847,15 @@ function NoteDomaine({ metier, domaine, texte }) {
 }
 
 const SERVICES_INITIAL = [
-  { id: "elec-bat", nom: "Électricité bâtiment", tag: "Installation", tarifBase: "25 000 FCFA", note: 4.5, missions: 15, disponible: true, description: "Installation, réparation et mise aux normes de systèmes électriques résidentiels et commerciaux. Câblage complet, pose de tableaux électriques, installation de prises et éclairage, dépannage urgent.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine, Guédiawaye, Rufisque", disponibilite: "Lundi-Samedi, 8 h-18 h | Urgences 24 h/7", avis: [{ auteur: "Fatou Sarr", note: 5, commentaire: "Excellent travail, rapide et soigné" }, { auteur: "Ousmane Ba", note: 4, commentaire: "Bon prestataire, ponctuel" }] },
-  { id: "cablage", nom: "Câblage réseau", tag: "Câblage réseau", tarifBase: "50 000 FCFA", note: 4.8, missions: 8, disponible: true, description: "Installation et maintenance de réseaux informatiques et de télécommunication pour bureaux et résidences.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 60 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [{ auteur: "Aminata Diop", note: 5, commentaire: "Très satisfaite du câblage de mon bureau" }] },
-  { id: "depannage", nom: "Dépannage électrique", tag: "Dépannage", tarifBase: "15 000 FCFA", note: 4.6, missions: 32, disponible: false, description: "Intervention rapide en cas de panne électrique, urgences comprises, 24 h/24 et 7j/7.", tarifDeplacement: "5 000 FCFA", tarifSimple: "10 000 - 20 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Guédiawaye", disponibilite: "Urgences 24 h/7", avis: [{ auteur: "Cheikh Fall", note: 5, commentaire: "Intervention rapide en urgence" }] },
-  { id: "solaire", nom: "Installation solaire", tag: "Énergie solaire", tarifBase: "150 000 FCFA", note: 4.4, missions: 5, disponible: true, description: "Pose et raccordement de panneaux solaires domestiques.", tarifDeplacement: "10 000 FCFA", tarifSimple: "120 000 - 180 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Vendredi, 8 h-17 h", avis: [] },
-  { id: "maintenance", nom: "Maintenance préventive", tag: "Maintenance", tarifBase: "20 000 FCFA", note: 4.7, missions: 12, disponible: false, description: "Contrôle et entretien périodique des installations électriques.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [] },
-  { id: "domotique", nom: "Installation domotique", tag: "Domotique", tarifBase: "60 000 FCFA", note: 4.9, missions: 22, disponible: true, description: "Pilotage de l’éclairage, des volets et de la climatisation depuis un téléphone ou un interrupteur central.", tarifDeplacement: "5 000 FCFA", tarifSimple: "60 000 - 90 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [] },
-  { id: "eclairage", nom: "Éclairage LED", tag: "Éclairage", tarifBase: "20 000 FCFA", note: 4.3, missions: 18, disponible: true, description: "Remplacement de l’éclairage par des LED basse consommation, à l’intérieur comme à l’extérieur.", tarifDeplacement: "5 000 FCFA", tarifSimple: "20 000 - 45 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Lundi-Samedi, 8 h-18 h", avis: [] },
-  { id: "normes", nom: "Mise aux normes électriques", tag: "Mise aux normes", tarifBase: "40 000 FCFA", note: 4.6, missions: 9, disponible: true, description: "Diagnostic de l’installation et mise en conformité avec la norme NF C 15-100, avec un rapport remis au client.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 65 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Lundi-Vendredi, 8 h-17 h", avis: [] },
-  { id: "formation-elec", nom: "Formation électricité", tag: "Formation", tarifBase: "75 000 FCFA", note: 5.0, missions: 2, disponible: true, description: "Initiation aux normes électriques et aux gestes de sécurité pour particuliers et professionnels.", tarifDeplacement: "—", tarifSimple: "75 000 FCFA / session", tarifComplete: "Sur devis (groupe)", zone: "Dakar", disponibilite: "Sur rendez-vous", avis: [] },
+  { id: "elec-bat", nom: "Électricité bâtiment", tag: "Installation", tarifBase: "25 000 FCFA", note: 4.5, missions: 15, disponible: true, description: "Installation, réparation et mise aux normes de systèmes électriques résidentiels et commerciaux. Câblage complet, pose de tableaux électriques, installation de prises et éclairage, dépannage urgent.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine, Guédiawaye, Rufisque", disponibilite: "Du lundi au samedi, 8 h – 18 h | Urgences 24 h/7", avis: [{ auteur: "Fatou Sarr", note: 5, commentaire: "Excellent travail, rapide et soigné" }, { auteur: "Ousmane Ba", note: 4, commentaire: "Bon prestataire, ponctuel" }] },
+  { id: "cablage", nom: "Câblage réseau", tag: "Câblage réseau", tarifBase: "50 000 FCFA", note: 4.8, missions: 8, disponible: true, description: "Installation et maintenance de réseaux informatiques et de télécommunication pour bureaux et résidences.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 60 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Du lundi au samedi, 8 h – 18 h", avis: [{ auteur: "Aminata Diop", note: 5, commentaire: "Très satisfaite du câblage de mon bureau" }] },
+  { id: "depannage", nom: "Dépannage électrique", tag: "Dépannage", tarifBase: "15 000 FCFA", note: 4.6, missions: 32, disponible: false, description: "Intervention rapide en cas de panne électrique, urgences comprises, 24 h/24 et 7j/7.", tarifDeplacement: "5 000 FCFA", tarifSimple: "10 000 - 20 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Guédiawaye", disponibilite: "Urgences 24 h/7", avis: [{ auteur: "Cheikh Fall", note: 5, commentaire: "Intervention rapide en urgence" }] },
+  { id: "solaire", nom: "Installation solaire", tag: "Énergie solaire", tarifBase: "150 000 FCFA", note: 4.4, missions: 5, disponible: true, description: "Pose et raccordement de panneaux solaires domestiques.", tarifDeplacement: "10 000 FCFA", tarifSimple: "120 000 - 180 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Du lundi au vendredi, 8 h – 17 h", avis: [] },
+  { id: "maintenance", nom: "Maintenance préventive", tag: "Maintenance", tarifBase: "20 000 FCFA", note: 4.7, missions: 12, disponible: false, description: "Contrôle et entretien périodique des installations électriques.", tarifDeplacement: "5 000 FCFA", tarifSimple: "15 000 - 25 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Du lundi au samedi, 8 h – 18 h", avis: [] },
+  { id: "domotique", nom: "Installation domotique", tag: "Domotique", tarifBase: "60 000 FCFA", note: 4.9, missions: 22, disponible: true, description: "Pilotage de l’éclairage, des volets et de la climatisation depuis un téléphone ou un interrupteur central.", tarifDeplacement: "5 000 FCFA", tarifSimple: "60 000 - 90 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Pikine", disponibilite: "Du lundi au samedi, 8 h – 18 h", avis: [] },
+  { id: "eclairage", nom: "Éclairage LED", tag: "Éclairage", tarifBase: "20 000 FCFA", note: 4.3, missions: 18, disponible: true, description: "Remplacement de l’éclairage par des LED basse consommation, à l’intérieur comme à l’extérieur.", tarifDeplacement: "5 000 FCFA", tarifSimple: "20 000 - 45 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar, Thiès", disponibilite: "Du lundi au samedi, 8 h – 18 h", avis: [] },
+  { id: "normes", nom: "Mise aux normes électriques", tag: "Mise aux normes", tarifBase: "40 000 FCFA", note: 4.6, missions: 9, disponible: true, description: "Diagnostic de l’installation et mise en conformité avec la norme NF C 15-100, avec un rapport remis au client.", tarifDeplacement: "5 000 FCFA", tarifSimple: "40 000 - 65 000 FCFA", tarifComplete: "Sur devis", zone: "Dakar", disponibilite: "Du lundi au vendredi, 8 h – 17 h", avis: [] },
+  { id: "formation-elec", nom: "Formation électricité", tag: "Formation", tarifBase: "75 000 FCFA", note: 5.0, missions: 2, disponible: true, description: "Initiation aux normes électriques et aux gestes de sécurité pour particuliers et professionnels.", tarifDeplacement: "—", tarifSimple: "75 000 FCFA / session", tarifComplete: "Sur devis (groupe)", zone: "Dakar", disponibilite: "Sur rendez-vous", avis: [] },
 ];
 
 function ServiceCard({ s, onOpen, onEdit, onArchive }) {
@@ -3973,10 +3973,10 @@ function ServiceForm({ initial, onSave, onCancel }) {
       <h3 className={FORM.section}>Tarif et disponibilité</h3>
       <div className={`${FORM.grille} mb-4`}>
         <Champ id="service-tarif" label="Tarif de base" requis erreur={err("tarifBase")} aide="Le prix de départ affiché aux clients.">
-          <input {...attrs("service-tarif", "tarifBase", true, true)} placeholder="Ex. : 25 000 FCFA" className={AUTH.champ(err("tarifBase"))} />
+          <input {...attrs("service-tarif", "tarifBase", true, true)} placeholder="Ex. : 25 000 FCFA" className={AUTH.champ(err("tarifBase"))} />
         </Champ>
         <Champ id="service-disponibilite" label="Disponibilité">
-          <input {...attrs("service-disponibilite", "disponibilite")} placeholder="Ex. : Lundi au samedi, 8 h à 18 h" className={AUTH.champ()} />
+          <input {...attrs("service-disponibilite", "disponibilite")} placeholder="Ex. : Lundi au samedi, 8 h à 18 h" className={AUTH.champ()} />
         </Champ>
       </div>
       <div className="rounded-lg border border-base px-4 py-2">
@@ -4236,14 +4236,14 @@ function ServicesScreen({ creer = false }) {
 /* ---------- Screen 13 : Missions & Clients (Prestataire) ---------- */
 
 const MISSIONS_INITIAL = [
-  { id: "m1", titre: "Installation électrique complète", client: "Fatou Sarr", ville: "Dakar Plateau", budget: "85 000 FCFA", dateDemande: "Aujourd’hui, 10 h 30", statut: "En attente", description: "Le client souhaite une installation électrique complète pour un appartement de 4 pièces. Travaux incluant le câblage, la pose du tableau électrique, l’installation des prises et interrupteurs, et la mise en conformité.", type: "Installation complète", lieu: "Rue 10, Dakar Plateau", dateSouhaitee: "1er septembre 2026", dureeEstimee: "3 jours", telephone: "+221 77 123 45 67", email: "fatou.sarr@email.sn", membreDepuis: "Mars 2025", missionsPrecedentes: 2 },
-  { id: "m2", titre: "Réparation prise défectueuse", client: "Ibrahima Diallo", ville: "Médina", budget: "15 000 FCFA", dateDemande: "Aujourd’hui, 5 h 15", statut: "En attente", description: "Une prise électrique dans la cuisine ne fonctionne plus et présente un léger échauffement. Intervention rapide souhaitée par sécurité.", type: "Dépannage", lieu: "Médina, Dakar", dateSouhaitee: "Dès que possible", dureeEstimee: "2 heures", telephone: "+221 77 456 78 90", email: "ibrahima.diallo@email.sn", membreDepuis: "Janvier 2024", missionsPrecedentes: 5 },
-  { id: "m3", titre: "Câblage bureau 3 pièces", client: "Aminata Diop", ville: "Almadies", budget: "120 000 FCFA", dateDemande: "Hier, 9 h 10", statut: "Acceptée", description: "Câblage réseau et électrique complet pour un bureau de 3 pièces destiné à une petite entreprise.", type: "Câblage réseau", lieu: "Almadies, Dakar", dateSouhaitee: "5 septembre 2026", dureeEstimee: "2 jours", telephone: "+221 76 234 56 78", email: "aminata.diop@email.sn", membreDepuis: "Juin 2024", missionsPrecedentes: 1 },
-  { id: "m4", titre: "Mise aux normes tableau", client: "Cheikh Fall", ville: "Parcelles Assainies", budget: "65 000 FCFA", dateDemande: "Aujourd’hui, 8 h 45", statut: "En cours", description: "Le tableau électrique doit être mis aux normes NF C 15-100 suite à un contrôle d’assurance.", type: "Mise aux normes", lieu: "Parcelles Assainies, Dakar", dateSouhaitee: "En cours", dureeEstimee: "1 jour", telephone: "+221 77 345 67 89", email: "cheikh.fall2@email.sn", membreDepuis: "Février 2023", missionsPrecedentes: 4 },
-  { id: "m5", titre: "Installation éclairage LED", client: "Mariama Sow", ville: "Ouakam", budget: "45 000 FCFA", dateDemande: "Il y a 1 semaine", statut: "Terminée", description: "Remplacement de l’éclairage traditionnel par des LED basse consommation dans toute la maison.", type: "Installation", lieu: "Ouakam, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "1 jour", telephone: "+221 76 567 89 01", email: "mariama.sow@email.sn", membreDepuis: "Mai 2022", missionsPrecedentes: 3 },
-  { id: "m6", titre: "Dépannage urgent tableau", client: "Ousmane Ba", ville: "Médina", budget: "20 000 FCFA", dateDemande: "Il y a 2 jours", statut: "En attente", description: "Coupure générale récurrente sur le tableau électrique, intervention urgente demandée.", type: "Dépannage urgent", lieu: "Médina, Dakar", dateSouhaitee: "Dès que possible", dureeEstimee: "3 heures", telephone: "+221 78 678 90 12", email: "ousmane.ba@email.sn", membreDepuis: "Août 2024", missionsPrecedentes: 0 },
-  { id: "m7", titre: "Maintenance annuelle installation", client: "Khady Touré", ville: "Liberté 6", budget: "30 000 FCFA", dateDemande: "Il y a 3 jours", statut: "Acceptée", description: "Contrôle et entretien annuel de l’installation électrique d’une villa.", type: "Maintenance", lieu: "Liberté 6, Dakar", dateSouhaitee: "10 septembre 2026", dureeEstimee: "1 jour", telephone: "+221 77 789 01 23", email: "khady.toure@email.sn", membreDepuis: "Mars 2021", missionsPrecedentes: 6 },
-  { id: "m8", titre: "Installation panneaux solaires", client: "Babacar Niang", ville: "Ngor", budget: "200 000 FCFA", dateDemande: "Il y a 2 semaines", statut: "Terminée", description: "Installation d’un kit solaire domestique avec raccordement au tableau existant.", type: "Installation", lieu: "Ngor, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "4 jours", telephone: "+221 76 890 12 34", email: "babacar.niang@email.sn", membreDepuis: "Octobre 2023", missionsPrecedentes: 2 },
+  { id: "m1", titre: "Installation électrique complète", client: "Fatou Sarr", ville: "Dakar Plateau", budget: "85 000 FCFA", dateDemande: "Aujourd’hui, 10 h 30", statut: "En attente", description: "Le client souhaite une installation électrique complète pour un appartement de 4 pièces. Travaux incluant le câblage, la pose du tableau électrique, l’installation des prises et interrupteurs, et la mise en conformité.", type: "Installation complète", lieu: "Rue 10, Dakar Plateau", dateSouhaitee: "1er septembre 2026", dureeEstimee: "3 jours", telephone: "+221 77 123 45 67", email: "fatou.sarr@email.sn", membreDepuis: "Mars 2025", missionsPrecedentes: 2 },
+  { id: "m2", titre: "Réparation prise défectueuse", client: "Ibrahima Diallo", ville: "Médina", budget: "15 000 FCFA", dateDemande: "Aujourd’hui, 5 h 15", statut: "En attente", description: "Une prise électrique dans la cuisine ne fonctionne plus et présente un léger échauffement. Intervention rapide souhaitée par sécurité.", type: "Dépannage", lieu: "Médina, Dakar", dateSouhaitee: "Dès que possible", dureeEstimee: "2 heures", telephone: "+221 77 456 78 90", email: "ibrahima.diallo@email.sn", membreDepuis: "Janvier 2024", missionsPrecedentes: 5 },
+  { id: "m3", titre: "Câblage bureau 3 pièces", client: "Aminata Diop", ville: "Almadies", budget: "120 000 FCFA", dateDemande: "Hier, 9 h 10", statut: "Acceptée", description: "Câblage réseau et électrique complet pour un bureau de 3 pièces destiné à une petite entreprise.", type: "Câblage réseau", lieu: "Almadies, Dakar", dateSouhaitee: "5 septembre 2026", dureeEstimee: "2 jours", telephone: "+221 76 234 56 78", email: "aminata.diop@email.sn", membreDepuis: "Juin 2024", missionsPrecedentes: 1 },
+  { id: "m4", titre: "Mise aux normes tableau", client: "Cheikh Fall", ville: "Parcelles Assainies", budget: "65 000 FCFA", dateDemande: "Aujourd’hui, 8 h 45", statut: "En cours", description: "Le tableau électrique doit être mis aux normes NF C 15-100 suite à un contrôle d’assurance.", type: "Mise aux normes", lieu: "Parcelles Assainies, Dakar", dateSouhaitee: "En cours", dureeEstimee: "1 jour", telephone: "+221 77 345 67 89", email: "cheikh.fall2@email.sn", membreDepuis: "Février 2023", missionsPrecedentes: 4 },
+  { id: "m5", titre: "Installation éclairage LED", client: "Mariama Sow", ville: "Ouakam", budget: "45 000 FCFA", dateDemande: "Il y a 1 semaine", statut: "Terminée", description: "Remplacement de l’éclairage traditionnel par des LED basse consommation dans toute la maison.", type: "Installation", lieu: "Ouakam, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "1 jour", telephone: "+221 76 567 89 01", email: "mariama.sow@email.sn", membreDepuis: "Mai 2022", missionsPrecedentes: 3 },
+  { id: "m6", titre: "Dépannage urgent tableau", client: "Ousmane Ba", ville: "Médina", budget: "20 000 FCFA", dateDemande: "Il y a 2 jours", statut: "En attente", description: "Coupure générale récurrente sur le tableau électrique, intervention urgente demandée.", type: "Dépannage urgent", lieu: "Médina, Dakar", dateSouhaitee: "Dès que possible", dureeEstimee: "3 heures", telephone: "+221 78 678 90 12", email: "ousmane.ba@email.sn", membreDepuis: "Août 2024", missionsPrecedentes: 0 },
+  { id: "m7", titre: "Maintenance annuelle installation", client: "Khady Touré", ville: "Liberté 6", budget: "30 000 FCFA", dateDemande: "Il y a 3 jours", statut: "Acceptée", description: "Contrôle et entretien annuel de l’installation électrique d’une villa.", type: "Maintenance", lieu: "Liberté 6, Dakar", dateSouhaitee: "10 septembre 2026", dureeEstimee: "1 jour", telephone: "+221 77 789 01 23", email: "khady.toure@email.sn", membreDepuis: "Mars 2021", missionsPrecedentes: 6 },
+  { id: "m8", titre: "Installation panneaux solaires", client: "Babacar Niang", ville: "Ngor", budget: "200 000 FCFA", dateDemande: "Il y a 2 semaines", statut: "Terminée", description: "Installation d’un kit solaire domestique avec raccordement au tableau existant.", type: "Installation", lieu: "Ngor, Dakar", dateSouhaitee: "Terminée", dureeEstimee: "4 jours", telephone: "+221 76 890 12 34", email: "babacar.niang@email.sn", membreDepuis: "Octobre 2023", missionsPrecedentes: 2 },
 ];
 
 const MISSION_TABS = [
@@ -4757,29 +4757,29 @@ function EvaluationsScreen({ onNavigate }) {
 const ENTREPRISE_DEMO_NOM = "Senegal Construction SARL";
 
 const OFFRES_ENTREPRISE_INITIAL = [
-  { id: "off1", titre: "Chef d’équipe électricité", categorie: "BTP", contrat: "CDI", salaire: "350 000 FCFA/mois", localisation: "Dakar, Plateau", statut: "Active", nbCandidatures: 12, experience: "5-10 ans", dateLimite: "30 novembre 2026", description: "Nous recherchons un Chef d’équipe électricité expérimenté pour superviser nos chantiers résidentiels et tertiaires à Dakar. Vous serez garant de la conformité réglementaire (normes NF C 15-100) et animerez une équipe d’électriciens qualifiés.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d’équipe"], candidats: [
+  { id: "off1", titre: "Chef d’équipe électricité", categorie: "BTP", contrat: "CDI", salaire: "350 000 FCFA/mois", localisation: "Dakar, Plateau", statut: "Active", nbCandidatures: 12, experience: "5-10 ans", dateLimite: "30 novembre 2026", description: "Nous recherchons un Chef d’équipe électricité expérimenté pour superviser nos chantiers résidentiels et tertiaires à Dakar. Vous serez garant de la conformité réglementaire (normes NF C 15-100) et animerez une équipe d’électriciens qualifiés.", competences: ["Normes NF C 15-100", "Lecture de plans", "Management d’équipe"], candidats: [
     { nom: "Moussa Diop", metier: "Électricien bâtiment", date: "15/08", statut: "Nouveau", photo: "/images/plateforme/portraits/moussa-diop.jpg" },
     { nom: "Fatou Sarr", metier: "Plombière", date: "14/08", statut: "En cours", photo: "/images/plateforme/portraits/fatou-sarr.jpg" },
     { nom: "Ibrahima Diallo", metier: "Soudeur", date: "12/08", statut: "Retenu", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
     { nom: "Aminata Ndiaye", metier: "Couturière", date: "10/08", statut: "Rejeté", photo: "/images/plateforme/portraits/aminata-ndiaye.jpg" },
   ] },
-  { id: "off2", titre: "Technicienne plomberie", categorie: "Plomberie", contrat: "CDD", salaire: "250 000 FCFA/mois", localisation: "Dakar, Médina", statut: "Active", nbCandidatures: 8, experience: "2-5 ans", dateLimite: "15 novembre 2026", description: "Poste de technicienne plomberie pour l’entretien et l’installation de systèmes sanitaires sur nos chantiers.", competences: ["Plomberie sanitaire", "Diagnostic de panne"], candidats: [
+  { id: "off2", titre: "Technicienne plomberie", categorie: "Plomberie", contrat: "CDD", salaire: "250 000 FCFA/mois", localisation: "Dakar, Médina", statut: "Active", nbCandidatures: 8, experience: "2-5 ans", dateLimite: "15 novembre 2026", description: "Poste de technicienne plomberie pour l’entretien et l’installation de systèmes sanitaires sur nos chantiers.", competences: ["Plomberie sanitaire", "Diagnostic de panne"], candidats: [
     { nom: "Fatou Mbaye", metier: "Plombière sanitaire", date: "13/08", statut: "Nouveau", photo: "/images/plateforme/portraits/fatou-mbaye.jpg" },
   ] },
-  { id: "off3", titre: "Soudeur TIG/MIG", categorie: "Industrie", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Thiès", statut: "Active", nbCandidatures: 15, experience: "3-8 ans", dateLimite: "10 décembre 2026", description: "Soudeur qualifié TIG/MIG pour la fabrication et l’assemblage de structures métalliques industrielles.", competences: ["Soudure TIG", "Soudure MIG", "Lecture de plans"], candidats: [
+  { id: "off3", titre: "Soudeur TIG/MIG", categorie: "Industrie", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Thiès", statut: "Active", nbCandidatures: 15, experience: "3-8 ans", dateLimite: "10 décembre 2026", description: "Soudeur qualifié TIG/MIG pour la fabrication et l’assemblage de structures métalliques industrielles.", competences: ["Soudure TIG", "Soudure MIG", "Lecture de plans"], candidats: [
     { nom: "Ibrahima Diallo", metier: "Soudeur industriel", date: "11/08", statut: "Retenu", photo: "/images/plateforme/portraits/ibrahima-diallo.jpg" },
     { nom: "Ousmane Diaw", metier: "Soudeur TIG/MIG", date: "09/08", statut: "En cours", photo: "/images/plateforme/portraits/ousmane-diaw.jpg" },
   ] },
-  { id: "off4", titre: "Carreleur expérimenté", categorie: "BTP", contrat: "CDD", salaire: "280 000 FCFA/mois", localisation: "Dakar, Almadies", statut: "En pause", nbCandidatures: 6, experience: "3-6 ans", dateLimite: "5 novembre 2026", description: "Carreleur expérimenté pour la finition de villas haut standing aux Almadies.", competences: ["Pose de carrelage", "Finitions"], candidats: [
+  { id: "off4", titre: "Carreleur expérimenté", categorie: "BTP", contrat: "CDD", salaire: "280 000 FCFA/mois", localisation: "Dakar, Almadies", statut: "En pause", nbCandidatures: 6, experience: "3-6 ans", dateLimite: "5 novembre 2026", description: "Carreleur expérimenté pour la finition de villas haut standing aux Almadies.", competences: ["Pose de carrelage", "Finitions"], candidats: [
     { nom: "Mariama Tall", metier: "Carreleuse", date: "07/08", statut: "En cours", photo: "/images/plateforme/portraits/mariama-tall.jpg" },
   ] },
-  { id: "off5", titre: "Menuisier ébéniste", categorie: "Artisanat", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Saint-Louis", statut: "Clôturée", nbCandidatures: 5, experience: "5+ ans", dateLimite: "1er août 2026", description: "Menuisier ébéniste pour la fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], candidats: [
+  { id: "off5", titre: "Menuisier ébéniste", categorie: "Artisanat", contrat: "CDI", salaire: "300 000 FCFA/mois", localisation: "Saint-Louis", statut: "Clôturée", nbCandidatures: 5, experience: "5+ ans", dateLimite: "1er août 2026", description: "Menuisier ébéniste pour la fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], candidats: [
     { nom: "Ousmane Ba", metier: "Menuisier ébéniste", date: "28/07", statut: "Nouveau", photo: "/images/plateforme/portraits/ousmane-ba.jpg" },
   ] },
-  { id: "off6", titre: "Peintre bâtiment", categorie: "BTP", contrat: "CDD", salaire: "220 000 FCFA/mois", localisation: "Dakar, Parcelles", statut: "Active", nbCandidatures: 9, experience: "1-3 ans", dateLimite: "20 novembre 2026", description: "Peintre bâtiment pour travaux de finition sur nos chantiers résidentiels.", competences: ["Peinture intérieure/extérieure", "Enduits"], candidats: [
+  { id: "off6", titre: "Peintre bâtiment", categorie: "BTP", contrat: "CDD", salaire: "220 000 FCFA/mois", localisation: "Dakar, Parcelles", statut: "Active", nbCandidatures: 9, experience: "1-3 ans", dateLimite: "20 novembre 2026", description: "Peintre bâtiment pour travaux de finition sur nos chantiers résidentiels.", competences: ["Peinture intérieure/extérieure", "Enduits"], candidats: [
     { nom: "Abdoulaye Sow", metier: "Peintre bâtiment", date: "18/08", statut: "Nouveau", photo: "/images/plateforme/portraits/abdoulaye-sow.jpg" },
   ] },
-  { id: "off7", titre: "Aide-électricien (apprenti)", categorie: "BTP", contrat: "CDD", salaire: "120 000 FCFA/mois", localisation: "Dakar, Pikine", statut: "En vérification", soumiseLe: "18 octobre 2026", nbCandidatures: 0, experience: "Débutant accepté", dateLimite: "15 décembre 2026", description: "Nous recherchons un aide-électricien pour accompagner nos chefs d’équipe sur des chantiers résidentiels. Formation assurée sur le terrain, encadrement par un électricien confirmé.", competences: ["Motivation", "Travail en équipe", "Bases en électricité"], candidats: [] },
+  { id: "off7", titre: "Aide-électricien (apprenti)", categorie: "BTP", contrat: "CDD", salaire: "120 000 FCFA/mois", localisation: "Dakar, Pikine", statut: "En vérification", soumiseLe: "18 octobre 2026", nbCandidatures: 0, experience: "Débutant accepté", dateLimite: "15 décembre 2026", description: "Nous recherchons un aide-électricien pour accompagner nos chefs d’équipe sur des chantiers résidentiels. Formation assurée sur le terrain, encadrement par un électricien confirmé.", competences: ["Motivation", "Travail en équipe", "Bases en électricité"], candidats: [] },
 ];
 
 function EntrepriseDashboardScreen({ user, offres, onNavigate, todos }) {
@@ -4956,7 +4956,7 @@ function OffreEntrepriseForm({ initial, onSave, onCancel }) {
           <input {...attrs("offre-localisation", "localisation", true)} placeholder="Ex. : Dakar, Plateau" className={FORM.champ(err("localisation"))} />
         </Champ>
         <Champ id="offre-salaire" label="Salaire mensuel" requis erreur={err("salaire")}>
-          <input {...attrs("offre-salaire", "salaire", true)} placeholder="Ex. : 300 000 FCFA par mois" className={FORM.champ(err("salaire"))} />
+          <input {...attrs("offre-salaire", "salaire", true)} placeholder="Ex. : 300 000 FCFA par mois" className={FORM.champ(err("salaire"))} />
         </Champ>
         <Champ id="offre-experience" label="Expérience requise">
           <input {...attrs("offre-experience", "experience")} placeholder="Ex. : 3 à 5 ans" className={FORM.champ()} />
@@ -5654,7 +5654,7 @@ const PROFIL_ENTREPRISE_INITIAL = {
   ninea: "2938472 2G3",
   rccm: "SN-DKR-2008-B-1120",
   taille: "45-50 employés",
-  chiffreAffaires: "500M - 1B FCFA",
+  chiffreAffaires: "500 millions à 1 milliard de FCFA",
   telephone: "+221 33 824 55 99",
   email: "contact@senegalconstruct.sn",
   siteWeb: "www.senegalconstruct.sn",
@@ -6441,14 +6441,14 @@ function EntreprisesAdminScreen() {
 /* ---------- Offres (Admin) ---------- */
 
 const OFFRES_ADMIN_INITIAL = [
-  { id: "oa1", titre: "Chef d’équipe électricité", entreprise: "Senegal Construction SARL", secteur: "BTP et construction", candidatures: 5, date: "15 juillet 2026", statut: "Active", localisation: "Dakar, Plateau", contrat: "CDI", experience: "5+ ans", salaire: "350 000 - 450 000 FCFA/mois", description: "Nous recherchons un Chef d’équipe électricité expérimenté pour superviser nos chantiers de construction résidentiels et tertiaires à Dakar. Vous serez responsable de la gestion d’une équipe d’électriciens, de la planification des travaux et du respect rigoureux des consignes de sécurité sur le terrain.", competences: ["Normes NF C 15-100", "Management d’équipe", "Lecture de plans", "Câblage industriel"], publieeLe: "15 juillet 2026", expireLe: "15 septembre 2026", candidatsRecents: [{ title: "Moussa Diop", sub: "Électricien bâtiment", badge: "En cours" }, { title: "Fatou Sarr", sub: "Plombière sanitaire", badge: "Retenu" }, { title: "Ibrahima Diallo", sub: "Soudeur industriel", badge: "Rejeté" }] },
-  { id: "oa2", titre: "Plombier qualifié", entreprise: "Diallo & Fils", secteur: "Plomberie", candidatures: 8, date: "10 juillet 2026", statut: "Active", localisation: "Saint-Louis", contrat: "CDD", experience: "2-5 ans", salaire: "200 000 - 250 000 FCFA/mois", description: "Poste de plombier qualifié pour l’entretien et l’installation de systèmes sanitaires.", competences: ["Plomberie sanitaire"], publieeLe: "10 juillet 2026", expireLe: "10 septembre 2026", candidatsRecents: [] },
-  { id: "oa3", titre: "Menuisier ébéniste", entreprise: "Ndiaye Menuiserie", secteur: "Menuiserie", candidatures: 12, date: "5 juillet 2026", statut: "Active", localisation: "Kaolack", contrat: "CDI", experience: "5+ ans", salaire: "280 000 - 320 000 FCFA/mois", description: "Fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], publieeLe: "5 juillet 2026", expireLe: "5 septembre 2026", candidatsRecents: [] },
-  { id: "oa4", titre: "Technicien maintenance", entreprise: "Dakar Services Pro", secteur: "Multi-services", candidatures: 3, date: "1er juillet 2026", statut: "En vérification", localisation: "Dakar", contrat: "CDI", experience: "3-5 ans", salaire: "250 000 FCFA/mois", description: "Maintenance générale de bâtiments tertiaires.", competences: ["Maintenance générale"], publieeLe: "1er juillet 2026", expireLe: "1er septembre 2026", candidatsRecents: [] },
-  { id: "oa5", titre: "Maçon qualifié", entreprise: "Mbour Construction", secteur: "BTP", candidatures: 15, date: "25 juin 2026", statut: "Active", localisation: "Mbour", contrat: "CDD", experience: "3-8 ans", salaire: "250 000 - 300 000 FCFA/mois", description: "Travaux de maçonnerie générale sur chantiers résidentiels.", competences: ["Maçonnerie", "Fondations"], publieeLe: "25 juin 2026", expireLe: "25 août 2026", candidatsRecents: [] },
-  { id: "oa6", titre: "Électricien chantier", entreprise: "Thiès Électrique", secteur: "Électricité", candidatures: 0, date: "20 juin 2026", statut: "Expirée", localisation: "Thiès", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 FCFA/mois", description: "Installation électrique sur chantier.", competences: ["Électricité de base"], publieeLe: "20 juin 2026", expireLe: "20 août 2026", candidatsRecents: [] },
-  { id: "oa7", titre: "Peintre bâtiment", entreprise: "Rufisque Bâtiment", secteur: "BTP", candidatures: 7, date: "15 juin 2026", statut: "Suspendue", localisation: "Rufisque", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 - 220 000 FCFA/mois", description: "Travaux de peinture sur chantiers résidentiels.", competences: ["Peinture", "Enduits"], publieeLe: "15 juin 2026", expireLe: "15 août 2026", candidatsRecents: [] },
-  { id: "oa8", titre: "Carreleur intérieur", entreprise: "Senegal Construction", secteur: "BTP", candidatures: 4, date: "10 juin 2026", statut: "Active", localisation: "Dakar", contrat: "CDD", experience: "2-4 ans", salaire: "230 000 FCFA/mois", description: "Pose de carrelage sur chantiers résidentiels.", competences: ["Pose de carrelage"], publieeLe: "10 juin 2026", expireLe: "10 août 2026", candidatsRecents: [] },
+  { id: "oa1", titre: "Chef d’équipe électricité", entreprise: "Senegal Construction SARL", secteur: "BTP et construction", candidatures: 5, date: "15 juillet 2026", statut: "Active", localisation: "Dakar, Plateau", contrat: "CDI", experience: "5+ ans", salaire: "350 000 - 450 000 FCFA/mois", description: "Nous recherchons un Chef d’équipe électricité expérimenté pour superviser nos chantiers de construction résidentiels et tertiaires à Dakar. Vous serez responsable de la gestion d’une équipe d’électriciens, de la planification des travaux et du respect rigoureux des consignes de sécurité sur le terrain.", competences: ["Normes NF C 15-100", "Management d’équipe", "Lecture de plans", "Câblage industriel"], publieeLe: "15 juillet 2026", expireLe: "15 septembre 2026", candidatsRecents: [{ title: "Moussa Diop", sub: "Électricien bâtiment", badge: "En cours" }, { title: "Fatou Sarr", sub: "Plombière sanitaire", badge: "Retenu" }, { title: "Ibrahima Diallo", sub: "Soudeur industriel", badge: "Rejeté" }] },
+  { id: "oa2", titre: "Plombier qualifié", entreprise: "Diallo & Fils", secteur: "Plomberie", candidatures: 8, date: "10 juillet 2026", statut: "Active", localisation: "Saint-Louis", contrat: "CDD", experience: "2-5 ans", salaire: "200 000 - 250 000 FCFA/mois", description: "Poste de plombier qualifié pour l’entretien et l’installation de systèmes sanitaires.", competences: ["Plomberie sanitaire"], publieeLe: "10 juillet 2026", expireLe: "10 septembre 2026", candidatsRecents: [] },
+  { id: "oa3", titre: "Menuisier ébéniste", entreprise: "Ndiaye Menuiserie", secteur: "Menuiserie", candidatures: 12, date: "5 juillet 2026", statut: "Active", localisation: "Kaolack", contrat: "CDI", experience: "5+ ans", salaire: "280 000 - 320 000 FCFA/mois", description: "Fabrication de mobilier sur mesure.", competences: ["Menuiserie", "Ébénisterie"], publieeLe: "5 juillet 2026", expireLe: "5 septembre 2026", candidatsRecents: [] },
+  { id: "oa4", titre: "Technicien maintenance", entreprise: "Dakar Services Pro", secteur: "Multi-services", candidatures: 3, date: "1er juillet 2026", statut: "En vérification", localisation: "Dakar", contrat: "CDI", experience: "3-5 ans", salaire: "250 000 FCFA/mois", description: "Maintenance générale de bâtiments tertiaires.", competences: ["Maintenance générale"], publieeLe: "1er juillet 2026", expireLe: "1er septembre 2026", candidatsRecents: [] },
+  { id: "oa5", titre: "Maçon qualifié", entreprise: "Mbour Construction", secteur: "BTP", candidatures: 15, date: "25 juin 2026", statut: "Active", localisation: "Mbour", contrat: "CDD", experience: "3-8 ans", salaire: "250 000 - 300 000 FCFA/mois", description: "Travaux de maçonnerie générale sur chantiers résidentiels.", competences: ["Maçonnerie", "Fondations"], publieeLe: "25 juin 2026", expireLe: "25 août 2026", candidatsRecents: [] },
+  { id: "oa6", titre: "Électricien chantier", entreprise: "Thiès Électrique", secteur: "Électricité", candidatures: 0, date: "20 juin 2026", statut: "Expirée", localisation: "Thiès", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 FCFA/mois", description: "Installation électrique sur chantier.", competences: ["Électricité de base"], publieeLe: "20 juin 2026", expireLe: "20 août 2026", candidatsRecents: [] },
+  { id: "oa7", titre: "Peintre bâtiment", entreprise: "Rufisque Bâtiment", secteur: "BTP", candidatures: 7, date: "15 juin 2026", statut: "Suspendue", localisation: "Rufisque", contrat: "CDD", experience: "1-3 ans", salaire: "180 000 - 220 000 FCFA/mois", description: "Travaux de peinture sur chantiers résidentiels.", competences: ["Peinture", "Enduits"], publieeLe: "15 juin 2026", expireLe: "15 août 2026", candidatsRecents: [] },
+  { id: "oa8", titre: "Carreleur intérieur", entreprise: "Senegal Construction", secteur: "BTP", candidatures: 4, date: "10 juin 2026", statut: "Active", localisation: "Dakar", contrat: "CDD", experience: "2-4 ans", salaire: "230 000 FCFA/mois", description: "Pose de carrelage sur chantiers résidentiels.", competences: ["Pose de carrelage"], publieeLe: "10 juin 2026", expireLe: "10 août 2026", candidatsRecents: [] },
 ];
 
 function OffresAdminDetail(row, { onBack, update, remove }) {
@@ -6669,14 +6669,14 @@ function OffresAdminScreen({ offresEntreprise, setOffresEntreprise }) {
 /* ---------- Formations (Admin) ---------- */
 
 const FORMATIONS_ADMIN_INITIAL = [
-  { id: "fa1", nom: "Sécurité électrique", organisme: "CNEAP Dakar", categorie: "Sécurité", inscrits: 45, duree: "40 h", statut: "Active", niveau: "Intermédiaire", tarif: "75 000 FCFA", description: "Cette formation qualifiante est spécifiquement conçue pour sensibiliser et former les électriciens professionnels aux dangers inhérents aux chantiers. Elle couvre l’ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d’urgence.", prerequis: ["Expérience électricité", "Habilitation B2V"], enCoursApprentissage: 38, certificatsDelivres: 7, dernieresInscriptions: [{ title: "Moussa Diop", sub: "Inscrit le 12 août 2026", badge: "Apprenant" }, { title: "Fatou Sarr", sub: "Inscrit le 14 août 2026", badge: "Apprenant" }, { title: "Ibrahima Diallo", sub: "Inscrit le 15 août 2026", badge: "Apprenant" }] },
-  { id: "fa2", nom: "Lecture de plans BTP", organisme: "Institut BTP", categorie: "Technique", inscrits: 32, duree: "24 h", statut: "Active", niveau: "Débutant", tarif: "50 000 FCFA", description: "Apprendre à lire et interpréter des plans de construction BTP.", prerequis: [], enCoursApprentissage: 20, certificatsDelivres: 12, dernieresInscriptions: [] },
-  { id: "fa3", nom: "Normes NF C 15-100", organisme: "CNEAP Dakar", categorie: "Réglementation", inscrits: 28, duree: "16 h", statut: "Active", niveau: "Intermédiaire", tarif: "45 000 FCFA", description: "Maîtriser les normes électriques françaises appliquées au Sénégal.", prerequis: ["Expérience électricité"], enCoursApprentissage: 18, certificatsDelivres: 10, dernieresInscriptions: [] },
-  { id: "fa4", nom: "Plomberie sanitaire", organisme: "Centre de formation de Thiès", categorie: "Plomberie", inscrits: 18, duree: "32 h", statut: "Complète", niveau: "Débutant", tarif: "60 000 FCFA", description: "Formation complète en plomberie sanitaire résidentielle.", prerequis: [], enCoursApprentissage: 18, certificatsDelivres: 0, dernieresInscriptions: [] },
-  { id: "fa5", nom: "Soudure TIG-MIG", organisme: "CNEAP Dakar", categorie: "Technique", inscrits: 22, duree: "48 h", statut: "Active", niveau: "Avancé", tarif: "90 000 FCFA", description: "Techniques avancées de soudure TIG et MIG.", prerequis: ["Expérience soudure"], enCoursApprentissage: 15, certificatsDelivres: 7, dernieresInscriptions: [] },
-  { id: "fa6", nom: "Gestion de chantier", organisme: "Institut BTP", categorie: "Management", inscrits: 15, duree: "20 h", statut: "Brouillon", niveau: "Intermédiaire", tarif: "65 000 FCFA", description: "Piloter un chantier de construction de bout en bout.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
-  { id: "fa7", nom: "Menuiserie avancée", organisme: "Centre d’artisanat", categorie: "Menuiserie", inscrits: 12, duree: "36 h", statut: "Active", niveau: "Avancé", tarif: "70 000 FCFA", description: "Techniques avancées de menuiserie et ébénisterie.", prerequis: ["Bases menuiserie"], enCoursApprentissage: 10, certificatsDelivres: 2, dernieresInscriptions: [] },
-  { id: "fa8", nom: "Peinture décorative", organisme: "Centre d’artisanat", categorie: "Peinture", inscrits: 8, duree: "16 h", statut: "Suspendue", niveau: "Débutant", tarif: "35 000 FCFA", description: "Techniques de peinture décorative et finitions.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
+  { id: "fa1", nom: "Sécurité électrique", organisme: "CNEAP Dakar", categorie: "Sécurité", inscrits: 45, duree: "40 h", statut: "Active", niveau: "Intermédiaire", tarif: "75 000 FCFA", description: "Cette formation qualifiante est spécifiquement conçue pour sensibiliser et former les électriciens professionnels aux dangers inhérents aux chantiers. Elle couvre l’ensemble des protocoles de sécurité requis en habilitation électrique B2V, ainsi que la gestion des situations d’urgence.", prerequis: ["Expérience électricité", "Habilitation B2V"], enCoursApprentissage: 38, certificatsDelivres: 7, dernieresInscriptions: [{ title: "Moussa Diop", sub: "Inscrit le 12 août 2026", badge: "Apprenant" }, { title: "Fatou Sarr", sub: "Inscrit le 14 août 2026", badge: "Apprenant" }, { title: "Ibrahima Diallo", sub: "Inscrit le 15 août 2026", badge: "Apprenant" }] },
+  { id: "fa2", nom: "Lecture de plans BTP", organisme: "Institut BTP", categorie: "Technique", inscrits: 32, duree: "24 h", statut: "Active", niveau: "Débutant", tarif: "50 000 FCFA", description: "Apprendre à lire et interpréter des plans de construction BTP.", prerequis: [], enCoursApprentissage: 20, certificatsDelivres: 12, dernieresInscriptions: [] },
+  { id: "fa3", nom: "Normes NF C 15-100", organisme: "CNEAP Dakar", categorie: "Réglementation", inscrits: 28, duree: "16 h", statut: "Active", niveau: "Intermédiaire", tarif: "45 000 FCFA", description: "Maîtriser les normes électriques françaises appliquées au Sénégal.", prerequis: ["Expérience électricité"], enCoursApprentissage: 18, certificatsDelivres: 10, dernieresInscriptions: [] },
+  { id: "fa4", nom: "Plomberie sanitaire", organisme: "Centre de formation de Thiès", categorie: "Plomberie", inscrits: 18, duree: "32 h", statut: "Complète", niveau: "Débutant", tarif: "60 000 FCFA", description: "Formation complète en plomberie sanitaire résidentielle.", prerequis: [], enCoursApprentissage: 18, certificatsDelivres: 0, dernieresInscriptions: [] },
+  { id: "fa5", nom: "Soudure TIG-MIG", organisme: "CNEAP Dakar", categorie: "Technique", inscrits: 22, duree: "48 h", statut: "Active", niveau: "Avancé", tarif: "90 000 FCFA", description: "Techniques avancées de soudure TIG et MIG.", prerequis: ["Expérience soudure"], enCoursApprentissage: 15, certificatsDelivres: 7, dernieresInscriptions: [] },
+  { id: "fa6", nom: "Gestion de chantier", organisme: "Institut BTP", categorie: "Management", inscrits: 15, duree: "20 h", statut: "Brouillon", niveau: "Intermédiaire", tarif: "65 000 FCFA", description: "Piloter un chantier de construction de bout en bout.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
+  { id: "fa7", nom: "Menuiserie avancée", organisme: "Centre d’artisanat", categorie: "Menuiserie", inscrits: 12, duree: "36 h", statut: "Active", niveau: "Avancé", tarif: "70 000 FCFA", description: "Techniques avancées de menuiserie et ébénisterie.", prerequis: ["Bases menuiserie"], enCoursApprentissage: 10, certificatsDelivres: 2, dernieresInscriptions: [] },
+  { id: "fa8", nom: "Peinture décorative", organisme: "Centre d’artisanat", categorie: "Peinture", inscrits: 8, duree: "16 h", statut: "Suspendue", niveau: "Débutant", tarif: "35 000 FCFA", description: "Techniques de peinture décorative et finitions.", prerequis: [], enCoursApprentissage: 0, certificatsDelivres: 0, dernieresInscriptions: [] },
 ];
 
 function FormationsAdminDetail(row, { onBack, update, remove }) {
@@ -6830,14 +6830,14 @@ function MentoratAdminScreen() {
 /* ---------- Services (Admin) ---------- */
 
 const SERVICES_ADMIN_INITIAL = [
-  { id: "sa1", prestataire: "Moussa Diop", service: "Plomberie générale", categorie: "Plomberie", tarif: "15 000 FCFA/h", statut: "Actif", date: "12 avril 2026", metier: "Plombier qualifié", experience: "5 ans d’expérience", description: "Service complet d’installation, de réparation et de dépannage de plomberie générale. Intervention sur fuites d’eau, débouchage de canalisations, pose de sanitaires, chauffe-eau et raccordements divers. Travail soigné et respect des normes de sécurité.", tarifHoraire: "15 000 FCFA / heure", forfaitInstallation: "45 000 FCFA", zones: ["Dakar Ville", "Pikine", "Guédiawaye", "Rufisque"], devisRecus: 47, missionsTerminees: 38, note: 4.5, avis: [{ title: "Amadou Bamba", sub: "Intervention rapide pour une fuite d’eau urgente. Très professionnel !", value: "5/5" }, { title: "Khady Sy", sub: "Installation propre du nouveau lavabo. Service fiable et courtois.", value: "4/5" }] },
-  { id: "sa2", prestataire: "Fatou Cissé", service: "Couture traditionnelle", categorie: "Couture", tarif: "25 000 FCFA/forfait", statut: "Actif", date: "8 avril 2026", metier: "Couturière", experience: "10 ans d’expérience", description: "Confection de vêtements traditionnels sur mesure.", tarifHoraire: "—", forfaitInstallation: "25 000 FCFA / pièce", zones: ["Dakar"], devisRecus: 30, missionsTerminees: 25, note: 4.7, avis: [] },
-  { id: "sa3", prestataire: "Ibrahima Diallo", service: "Installation & dépannage électrique", categorie: "Électricité", tarif: "12 000 FCFA/h", statut: "En pause", date: "5 avril 2026", metier: "Électricien", experience: "6 ans d’expérience", description: "Installation et dépannage électrique résidentiel.", tarifHoraire: "12 000 FCFA / heure", forfaitInstallation: "—", zones: ["Saint-Louis"], devisRecus: 20, missionsTerminees: 15, note: 4.6, avis: [] },
-  { id: "sa4", prestataire: "Amadou Sow", service: "Rénovation de maison", categorie: "Maçonnerie", tarif: "35 000 FCFA/jour", statut: "Actif", date: "30 mars 2026", metier: "Maçon", experience: "8 ans d’expérience", description: "Travaux de rénovation complète de maisons.", tarifHoraire: "—", forfaitInstallation: "35 000 FCFA / jour", zones: ["Dakar"], devisRecus: 25, missionsTerminees: 20, note: 4.8, avis: [] },
-  { id: "sa5", prestataire: "Khady Ndiaye", service: "Tresses & soins capillaires", categorie: "Esthétique", tarif: "10 000 FCFA/forfait", statut: "Actif", date: "24 mars 2026", metier: "Coiffeuse", experience: "7 ans d’expérience", description: "Tresses, soins et coiffures pour femmes.", tarifHoraire: "—", forfaitInstallation: "10 000 FCFA / prestation", zones: ["Dakar"], devisRecus: 40, missionsTerminees: 35, note: 4.9, avis: [] },
-  { id: "sa6", prestataire: "Ousmane Fall", service: "Fabrication de meubles", categorie: "Menuiserie", tarif: "150 000 FCFA/forfait", statut: "Suspendu", date: "15 mars 2026", metier: "Menuisier", experience: "12 ans d’expérience", description: "Fabrication de meubles sur mesure.", tarifHoraire: "—", forfaitInstallation: "150 000 FCFA / meuble", zones: ["Dakar"], devisRecus: 10, missionsTerminees: 8, note: 4.5, avis: [] },
-  { id: "sa7", prestataire: "Babacar Gueye", service: "Peinture intérieure/extérieure", categorie: "Peinture", tarif: "8 000 FCFA/h", statut: "Actif", date: "10 mars 2026", metier: "Peintre", experience: "5 ans d’expérience", description: "Peinture intérieure et extérieure de bâtiments.", tarifHoraire: "8 000 FCFA / heure", forfaitInstallation: "—", zones: ["Dakar"], devisRecus: 18, missionsTerminees: 14, note: 4.4, avis: [] },
-  { id: "sa8", prestataire: "Mariama Sarr", service: "Entretien & réparation climatisation", categorie: "Froid et climatisation", tarif: "20 000 FCFA/forfait", statut: "En pause", date: "2 mars 2026", metier: "Technicienne froid", experience: "6 ans d’expérience", description: "Entretien et réparation de climatiseurs.", tarifHoraire: "—", forfaitInstallation: "20 000 FCFA / intervention", zones: ["Dakar"], devisRecus: 22, missionsTerminees: 18, note: 4.6, avis: [] },
+  { id: "sa1", prestataire: "Moussa Diop", service: "Plomberie générale", categorie: "Plomberie", tarif: "15 000 FCFA/h", statut: "Actif", date: "12 avril 2026", metier: "Plombier qualifié", experience: "5 ans d’expérience", description: "Service complet d’installation, de réparation et de dépannage de plomberie générale. Intervention sur fuites d’eau, débouchage de canalisations, pose de sanitaires, chauffe-eau et raccordements divers. Travail soigné et respect des normes de sécurité.", tarifHoraire: "15 000 FCFA / heure", forfaitInstallation: "45 000 FCFA", zones: ["Dakar Ville", "Pikine", "Guédiawaye", "Rufisque"], devisRecus: 47, missionsTerminees: 38, note: 4.5, avis: [{ title: "Amadou Bamba", sub: "Intervention rapide pour une fuite d’eau urgente. Très professionnel !", value: "5/5" }, { title: "Khady Sy", sub: "Installation propre du nouveau lavabo. Service fiable et courtois.", value: "4/5" }] },
+  { id: "sa2", prestataire: "Fatou Cissé", service: "Couture traditionnelle", categorie: "Couture", tarif: "25 000 FCFA/forfait", statut: "Actif", date: "8 avril 2026", metier: "Couturière", experience: "10 ans d’expérience", description: "Confection de vêtements traditionnels sur mesure.", tarifHoraire: "—", forfaitInstallation: "25 000 FCFA / pièce", zones: ["Dakar"], devisRecus: 30, missionsTerminees: 25, note: 4.7, avis: [] },
+  { id: "sa3", prestataire: "Ibrahima Diallo", service: "Installation & dépannage électrique", categorie: "Électricité", tarif: "12 000 FCFA/h", statut: "En pause", date: "5 avril 2026", metier: "Électricien", experience: "6 ans d’expérience", description: "Installation et dépannage électrique résidentiel.", tarifHoraire: "12 000 FCFA / heure", forfaitInstallation: "—", zones: ["Saint-Louis"], devisRecus: 20, missionsTerminees: 15, note: 4.6, avis: [] },
+  { id: "sa4", prestataire: "Amadou Sow", service: "Rénovation de maison", categorie: "Maçonnerie", tarif: "35 000 FCFA/jour", statut: "Actif", date: "30 mars 2026", metier: "Maçon", experience: "8 ans d’expérience", description: "Travaux de rénovation complète de maisons.", tarifHoraire: "—", forfaitInstallation: "35 000 FCFA / jour", zones: ["Dakar"], devisRecus: 25, missionsTerminees: 20, note: 4.8, avis: [] },
+  { id: "sa5", prestataire: "Khady Ndiaye", service: "Tresses & soins capillaires", categorie: "Esthétique", tarif: "10 000 FCFA/forfait", statut: "Actif", date: "24 mars 2026", metier: "Coiffeuse", experience: "7 ans d’expérience", description: "Tresses, soins et coiffures pour femmes.", tarifHoraire: "—", forfaitInstallation: "10 000 FCFA / prestation", zones: ["Dakar"], devisRecus: 40, missionsTerminees: 35, note: 4.9, avis: [] },
+  { id: "sa6", prestataire: "Ousmane Fall", service: "Fabrication de meubles", categorie: "Menuiserie", tarif: "150 000 FCFA/forfait", statut: "Suspendu", date: "15 mars 2026", metier: "Menuisier", experience: "12 ans d’expérience", description: "Fabrication de meubles sur mesure.", tarifHoraire: "—", forfaitInstallation: "150 000 FCFA / meuble", zones: ["Dakar"], devisRecus: 10, missionsTerminees: 8, note: 4.5, avis: [] },
+  { id: "sa7", prestataire: "Babacar Gueye", service: "Peinture intérieure/extérieure", categorie: "Peinture", tarif: "8 000 FCFA/h", statut: "Actif", date: "10 mars 2026", metier: "Peintre", experience: "5 ans d’expérience", description: "Peinture intérieure et extérieure de bâtiments.", tarifHoraire: "8 000 FCFA / heure", forfaitInstallation: "—", zones: ["Dakar"], devisRecus: 18, missionsTerminees: 14, note: 4.4, avis: [] },
+  { id: "sa8", prestataire: "Mariama Sarr", service: "Entretien & réparation climatisation", categorie: "Froid et climatisation", tarif: "20 000 FCFA/forfait", statut: "En pause", date: "2 mars 2026", metier: "Technicienne froid", experience: "6 ans d’expérience", description: "Entretien et réparation de climatiseurs.", tarifHoraire: "—", forfaitInstallation: "20 000 FCFA / intervention", zones: ["Dakar"], devisRecus: 22, missionsTerminees: 18, note: 4.6, avis: [] },
 ];
 
 function ServicesAdminDetail(row, { onBack, update }) {
@@ -6994,14 +6994,14 @@ function CandidaturesAdminScreen() {
 /* ---------- Missions (Admin) — custom detail ---------- */
 
 const MISSIONS_ADMIN_INITIAL = [
-  { id: "mia1", refId: "M-2026-041", description: "Réparation fuite d’eau urgente", prestataire: "Moussa Diop", client: "Alioune Sow", service: "Plomberie", statut: "En cours", montant: "45 000 FCFA", dateDebut: "15 avril 2026 à 9 h", dateFin: "15 avril 2026 à 13 h", duree: "4 heures", statutPaiement: "En attente", historique: [{ label: "Mission créée et devis validé", meta: "14 avril 2026 à 15 h 30 · Par Alioune Sow" }, { label: "Prestataire assigné", meta: "14 avril 2026 à 16 h · Moussa Diop" }, { label: "Début des travaux validé", meta: "15 avril 2026 à 9 h 15 · Par le prestataire" }] },
-  { id: "mia2", refId: "M-2026-039", description: "Couture de rideaux sur mesure", prestataire: "Fatou Cissé", client: "Awa Ndiaye", service: "Couture", statut: "Terminée", montant: "65 000 FCFA", dateDebut: "10 avril 2026 à 10 h", dateFin: "12 avril 2026 à 17 h", duree: "2 jours", statutPaiement: "Payé", historique: [{ label: "Mission créée et devis validé", meta: "9 avril 2026 à 11 h · Par Awa Ndiaye" }, { label: "Mission terminée", meta: "12 avril 2026 à 17 h · Par le prestataire" }] },
-  { id: "mia3", refId: "M-2026-038", description: "Installation tableau électrique", prestataire: "Ibrahima Diallo", client: "Dakar Bâtiment", service: "Électricité", statut: "Terminée", montant: "80 000 FCFA", dateDebut: "5 avril 2026 à 8 h", dateFin: "5 avril 2026 à 16 h", duree: "8 heures", statutPaiement: "Payé", historique: [] },
-  { id: "mia4", refId: "M-2026-035", description: "Construction mur de clôture", prestataire: "Amadou Sow", client: "Modou Fall", service: "Maçonnerie", statut: "En attente", montant: "120 000 FCFA", dateDebut: "20 avril 2026 à 8 h", dateFin: "25 avril 2026 à 18 h", duree: "5 jours", statutPaiement: "En attente", historique: [] },
-  { id: "mia5", refId: "M-2026-032", description: "Peinture façade extérieure", prestataire: "Babacar Gueye", client: "Seynabou Diop", service: "Peinture", statut: "Annulée", montant: "35 000 FCFA", dateDebut: "—", dateFin: "—", duree: "—", statutPaiement: "Annulé", historique: [] },
-  { id: "mia6", refId: "M-2026-030", description: "Entretien climatiseur split", prestataire: "Mariama Sarr", client: "Pathé Gueye", service: "Climatisation", statut: "Terminée", montant: "20 000 FCFA", dateDebut: "1er avril 2026 à 9 h", dateFin: "1er avril 2026 à 11 h", duree: "2 heures", statutPaiement: "Payé", historique: [] },
-  { id: "mia7", refId: "M-2026-027", description: "Soudure structure métallique", prestataire: "Cheikh Ndiaye", client: "Gorgui Diouf", service: "Soudure", statut: "Terminée", montant: "45 000 FCFA", dateDebut: "20 mars 2026 à 8 h", dateFin: "21 mars 2026 à 17 h", duree: "2 jours", statutPaiement: "Payé", historique: [] },
-  { id: "mia8", refId: "M-2026-025", description: "Tresses et soins capillaires", prestataire: "Khady Ndiaye", client: "Aicha Cissé", service: "Esthétique", statut: "Terminée", montant: "10 000 FCFA", dateDebut: "15 mars 2026 à 10 h", dateFin: "15 mars 2026 à 12 h", duree: "2 heures", statutPaiement: "Payé", historique: [] },
+  { id: "mia1", refId: "M-2026-041", description: "Réparation fuite d’eau urgente", prestataire: "Moussa Diop", client: "Alioune Sow", service: "Plomberie", statut: "En cours", montant: "45 000 FCFA", dateDebut: "15 avril 2026 à 9 h", dateFin: "15 avril 2026 à 13 h", duree: "4 heures", statutPaiement: "En attente", historique: [{ label: "Mission créée et devis validé", meta: "14 avril 2026 à 15 h 30 · Par Alioune Sow" }, { label: "Prestataire assigné", meta: "14 avril 2026 à 16 h · Moussa Diop" }, { label: "Début des travaux validé", meta: "15 avril 2026 à 9 h 15 · Par le prestataire" }] },
+  { id: "mia2", refId: "M-2026-039", description: "Couture de rideaux sur mesure", prestataire: "Fatou Cissé", client: "Awa Ndiaye", service: "Couture", statut: "Terminée", montant: "65 000 FCFA", dateDebut: "10 avril 2026 à 10 h", dateFin: "12 avril 2026 à 17 h", duree: "2 jours", statutPaiement: "Payé", historique: [{ label: "Mission créée et devis validé", meta: "9 avril 2026 à 11 h · Par Awa Ndiaye" }, { label: "Mission terminée", meta: "12 avril 2026 à 17 h · Par le prestataire" }] },
+  { id: "mia3", refId: "M-2026-038", description: "Installation tableau électrique", prestataire: "Ibrahima Diallo", client: "Dakar Bâtiment", service: "Électricité", statut: "Terminée", montant: "80 000 FCFA", dateDebut: "5 avril 2026 à 8 h", dateFin: "5 avril 2026 à 16 h", duree: "8 heures", statutPaiement: "Payé", historique: [] },
+  { id: "mia4", refId: "M-2026-035", description: "Construction mur de clôture", prestataire: "Amadou Sow", client: "Modou Fall", service: "Maçonnerie", statut: "En attente", montant: "120 000 FCFA", dateDebut: "20 avril 2026 à 8 h", dateFin: "25 avril 2026 à 18 h", duree: "5 jours", statutPaiement: "En attente", historique: [] },
+  { id: "mia5", refId: "M-2026-032", description: "Peinture façade extérieure", prestataire: "Babacar Gueye", client: "Seynabou Diop", service: "Peinture", statut: "Annulée", montant: "35 000 FCFA", dateDebut: "—", dateFin: "—", duree: "—", statutPaiement: "Annulé", historique: [] },
+  { id: "mia6", refId: "M-2026-030", description: "Entretien climatiseur split", prestataire: "Mariama Sarr", client: "Pathé Gueye", service: "Climatisation", statut: "Terminée", montant: "20 000 FCFA", dateDebut: "1er avril 2026 à 9 h", dateFin: "1er avril 2026 à 11 h", duree: "2 heures", statutPaiement: "Payé", historique: [] },
+  { id: "mia7", refId: "M-2026-027", description: "Soudure structure métallique", prestataire: "Cheikh Ndiaye", client: "Gorgui Diouf", service: "Soudure", statut: "Terminée", montant: "45 000 FCFA", dateDebut: "20 mars 2026 à 8 h", dateFin: "21 mars 2026 à 17 h", duree: "2 jours", statutPaiement: "Payé", historique: [] },
+  { id: "mia8", refId: "M-2026-025", description: "Tresses et soins capillaires", prestataire: "Khady Ndiaye", client: "Aicha Cissé", service: "Esthétique", statut: "Terminée", montant: "10 000 FCFA", dateDebut: "15 mars 2026 à 10 h", dateFin: "15 mars 2026 à 12 h", duree: "2 heures", statutPaiement: "Payé", historique: [] },
 ];
 
 function MissionsAdminDetail(row, { onBack, update }) {
@@ -8045,7 +8045,8 @@ function noteFr(n) {
 }
 
 function fcfa(n) {
-  return `${String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, " ")} FCFA`;
+  // Espaces insécables : un montant n’est jamais coupé en fin de ligne.
+  return `${String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g, "\u00a0")}\u00a0FCFA`;
 }
 
 function todayFr(offsetMonths = 0) {
@@ -8988,7 +8989,7 @@ function defaultCoachings(m) {
   const history = m.historique.map((x, i) => {
     const hasColon = x.note.includes(":");
     const theme = hasColon ? x.note.split(":")[0].trim() : x.note.split(" ").slice(0, 2).join(" ");
-    return { id: `h${i}`, date: x.date, theme, compteRendu: hasColon ? x.note.split(":").slice(1).join(":").trim() : x.note, duree: "1 h", format: i === m.historique.length - 1 ? "Présentiel" : "Visio", note: i === 0 ? null : 5 };
+    return { id: `h${i}`, date: x.date, theme, compteRendu: hasColon ? x.note.split(":").slice(1).join(":").trim() : x.note, duree: "1 h", format: i === m.historique.length - 1 ? "Présentiel" : "Visio", note: i === 0 ? null : 5 };
   });
   const upcoming = [{ id: "u1", date: nextSlots(4)[3], theme: "Point de suivi mensuel", format: "Visio" }];
   return { upcoming, history };
@@ -9005,7 +9006,7 @@ function nextSlots(n = 6) {
     for (const hr of [10, 16]) {
       if (out.length < n) {
         const label = d.toLocaleDateString("fr-FR", { weekday: "long", day: "numeric", month: "long" }).replace(/ 1 /, " 1er ");
-        out.push(`${label.charAt(0).toUpperCase() + label.slice(1)} · ${hr} h – ${hr + 1} h`);
+        out.push(`${label.charAt(0).toUpperCase() + label.slice(1)} · ${hr} h – ${hr + 1} h`);
       }
     }
   }
@@ -9120,7 +9121,7 @@ function MentorDetail({ mentor, coachings, onUpdate, onBack }) {
         meta={<>
           <MetaOffre icone={Star}>{profile.stats.note}</MetaOffre>
           <MetaOffre icone={UsersRound}>{profile.stats.mentores} mentorés</MetaOffre>
-          <MetaOffre icone={Clock}>{profile.stats.heures} h de mentorat</MetaOffre>
+          <MetaOffre icone={Clock}>{profile.stats.heures} h de mentorat</MetaOffre>
         </>}
         actions={
           <App.Bouton onClick={openBooking}>
@@ -9498,7 +9499,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
     const alerte = data.humeur <= 2 || Object.values(data.reponses).includes("Non");
     if (alerte) {
       onSignal({ espace: "chercheur", auteur: "Absatou Diallo", concerne: `${e.entreprise} · ${e.poste}`, type: `Alerte du point « ${jalon.label} »`, description: data.commentaire || "Réponses négatives au questionnaire de suivi." });
-      notify(`Merci. ${e.referent.nom} a été prévenue et vous recontactera sous 48 h.`, "info");
+      notify(`Merci. ${e.referent.nom} a été prévenue et vous recontactera sous 48 h.`, "info");
     } else {
       notify("Point de suivi envoyé. Merci !");
     }
@@ -9884,7 +9885,7 @@ const REGUL_STEPS_INITIAL = [
 ];
 
 const REGUL_DEMANDES_AUTRES = [
-  { id: "rd1", prestataire: "Fatou Cissé", metier: "Couturière", etape: "Numéro NINEA", document: "ninea_fatou_cisse.pdf", valeur: "008 765 432", date: "11 octobre 2026", statut: "En vérification" },
+  { id: "rd1", prestataire: "Fatou Cissé", metier: "Couturière", etape: "Numéro NINEA", document: "ninea_fatou_cisse.pdf", valeur: "008 765 432", date: "11 octobre 2026", statut: "En vérification" },
   { id: "rd2", prestataire: "Babacar Gueye", metier: "Peintre", etape: "Immatriculation de l’activité", document: "carte_artisan_bgueye.jpg", valeur: "RM-DKR-2026-0412", date: "10 octobre 2026", statut: "En vérification" },
   { id: "rd3", prestataire: "Khady Ndiaye", metier: "Esthéticienne", etape: "Régime fiscal", document: "—", valeur: "Contribution globale unique (CGU)", date: "8 octobre 2026", statut: "En vérification" },
 ];
@@ -9961,7 +9962,7 @@ function RegulStepCard({ step, index, onChange }) {
           {step.statut === "Refusé" && step.motif && (
             <div className="rounded-md px-3 py-2 text-sm mb-3 flex items-start gap-2" style={{ background: COLORS.dangerSoft, color: COLORS.danger }}><AlertCircle size={15} className="mt-0.5 shrink-0" /> {step.motif}</div>
           )}
-          {step.statut === "En vérification" && <p className="text-sm" style={{ color: COLORS.orangeText }}>Document reçu le {step.envoyeLe}. Vérification par l’équipe LIGGEEY sous 72 h.</p>}
+          {step.statut === "En vérification" && <p className="text-sm" style={{ color: COLORS.orangeText }}>Document reçu le {step.envoyeLe}. Vérification par l’équipe LIGGEEY sous 72 h.</p>}
           {step.statut === "Validé" && step.document && <p className="text-sm flex items-center gap-1.5" style={{ color: COLORS.success }}><FileCheck2 size={15} /> {step.document}{step.valeur ? ` · ${step.valeur}` : ""}</p>}
           {editable && (
             <div className="flex flex-col gap-3">
@@ -10293,7 +10294,7 @@ function RegularisationScreen({ steps, setSteps }) {
           <p className="flex items-center gap-2 font-semibold" style={{ color: COLORS.slate }}>Besoin d’aide pour vos dossiers ? {!accompOk && <PremiumChip locked />}</p>
           <p className="text-sm" style={{ color: COLORS.slateLight }}>Un conseiller LIGGEEY prépare les dossiers avec vous et vous oriente vers les bons guichets.</p>
         </div>
-        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="inline-flex shrink-0 items-center gap-1.5 rounded px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
+        <button type="button" onClick={() => planApi.gate("accompagnementRegularisation", () => notify("Demande envoyée : un conseiller vous appelle sous 48 h."))} className="inline-flex shrink-0 items-center gap-1.5 rounded px-4 py-2 text-sm font-semibold text-sur-marque" style={{ background: COLORS.orange }}>
           {!accompOk && <Lock size={13} />} Être rappelé(e) par un conseiller
         </button>
       </div>
@@ -10341,7 +10342,7 @@ function RegularisationsAdminScreen({ steps, setSteps }) {
       <div className="grid grid-cols-2 lg:grid-cols-3 gap-4 mb-6">
         <StatCard icon={FileCheck2} value={demandes.length} label="Justificatifs à vérifier" />
         <StatCard icon={BadgeCheck} value="38 %" label="Prestataires régularisés" />
-        <StatCard icon={Clock} value="41 h" label="Délai moyen de vérification" />
+        <StatCard icon={Clock} value="41 h" label="Délai moyen de vérification" />
       </div>
 
       <div className="flex flex-col gap-3 mb-6">
@@ -10475,7 +10476,7 @@ const ETAPES_CAP = [
 
 const FORMATS_SEANCE = ["Visio", "Téléphone", "Au bureau de Dakar", "En groupe, au bureau de Dakar"];
 const FORMATS_SEANCE_MINEUR = ["Au bureau de Dakar", "En groupe, au bureau de Dakar"];
-const HEURES_SEANCE = ["10 h", "14 h", "16 h", "18 h"];
+const HEURES_SEANCE = ["10 h", "14 h", "16 h", "18 h"];
 
 const JEUNES_CAP_INITIAL = [
   { id: "mame-diarra-sene", nom: "Mame Diarra Sène", naissance: "2010-03-12", ville: "Pikine", telephone: "+221 77 000 11 22", parent: { nom: "Ndèye Sène", lien: "Mère", telephone: "+221 77 000 12 34", accord: "Confirmé" }, etape: 2, piste: "Couture et stylisme", mentorId: "cheikh-fall", souhait: "", inscription: "2 septembre 2026", objectifs: ["Choisir entre la couture et la coiffure", "Trouver un atelier d’apprentissage à Pikine"] },
@@ -10502,17 +10503,17 @@ const NOTES_MENTORAT_INITIAL = {
 };
 
 const SEANCES_INITIAL = [
-  { id: "se1", mentoreId: "absatou-diallo", date: "2026-10-16", heure: "16 h", format: "Visio", statut: "Confirmée" }, // même créneau que le « prochain coaching » vu par Absatou (nextSlots)
-  { id: "se2", mentoreId: "mame-diarra-sene", date: "2026-10-17", heure: "10 h", format: "En groupe, au bureau de Dakar", statut: "Confirmée" },
-  { id: "se3", mentoreId: "serigne-mbaye", date: "2026-10-20", heure: "18 h", format: "Visio", statut: "Demandée", message: "Je voudrais qu’on travaille mon CV ensemble." },
-  { id: "se4", mentoreId: "pape-ndiaye", date: "2026-10-22", heure: "16 h", format: "Téléphone", statut: "Demandée", message: "Préparer mon entretien au cabinet Diop & Associés." },
+  { id: "se1", mentoreId: "absatou-diallo", date: "2026-10-16", heure: "16 h", format: "Visio", statut: "Confirmée" }, // même créneau que le « prochain coaching » vu par Absatou (nextSlots)
+  { id: "se2", mentoreId: "mame-diarra-sene", date: "2026-10-17", heure: "10 h", format: "En groupe, au bureau de Dakar", statut: "Confirmée" },
+  { id: "se3", mentoreId: "serigne-mbaye", date: "2026-10-20", heure: "18 h", format: "Visio", statut: "Demandée", message: "Je voudrais qu’on travaille mon CV ensemble." },
+  { id: "se4", mentoreId: "pape-ndiaye", date: "2026-10-22", heure: "16 h", format: "Téléphone", statut: "Demandée", message: "Préparer mon entretien au cabinet Diop & Associés." },
 ];
 
 const ATELIERS_CAP = [
-  { id: "at-couture", titre: "Découvrir la couture", lieu: "Bureau LIGGEEY, Dakar", date: "2026-10-24", heure: "10 h – 12 h", places: 12, texte: "Prendre en main une machine à coudre et réaliser une première pièce simple." },
-  { id: "at-numerique", titre: "Les métiers du numérique", lieu: "En ligne", date: "2026-10-28", heure: "16 h – 17 h", places: 30, texte: "Graphisme, réseaux sociaux, maintenance informatique : qui fait quoi, et comment s’y former ?" },
-  { id: "at-cuisine", titre: "Cuisine et pâtisserie", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-07", heure: "10 h – 12 h", places: 10, texte: "Rencontrer une pâtissière et découvrir le travail en cuisine." },
-  { id: "at-electricite", titre: "Électricité : le métier et la sécurité", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-14", heure: "10 h – 12 h", places: 12, texte: "Comprendre le métier, ses risques et les règles de sécurité.", noteMineur: "Avant 18 ans : démonstration seulement, sans manipulation." },
+  { id: "at-couture", titre: "Découvrir la couture", lieu: "Bureau LIGGEEY, Dakar", date: "2026-10-24", heure: "10 h – 12 h", places: 12, texte: "Prendre en main une machine à coudre et réaliser une première pièce simple." },
+  { id: "at-numerique", titre: "Les métiers du numérique", lieu: "En ligne", date: "2026-10-28", heure: "16 h – 17 h", places: 30, texte: "Graphisme, réseaux sociaux, maintenance informatique : qui fait quoi, et comment s’y former ?" },
+  { id: "at-cuisine", titre: "Cuisine et pâtisserie", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-07", heure: "10 h – 12 h", places: 10, texte: "Rencontrer une pâtissière et découvrir le travail en cuisine." },
+  { id: "at-electricite", titre: "Électricité : le métier et la sécurité", lieu: "Bureau LIGGEEY, Dakar", date: "2026-11-14", heure: "10 h – 12 h", places: 12, texte: "Comprendre le métier, ses risques et les règles de sécurité.", noteMineur: "Avant 18 ans : démonstration seulement, sans manipulation." },
 ];
 
 const GOUTS_ORIENTATION = [
@@ -10576,7 +10577,7 @@ function dateMajorite(naissance) {
   return dateFr(new Date(a + AGE_MAJORITE, m - 1, j));
 }
 
-// Tri des séances par date puis par heure (« 9 h » avant « 16 h »).
+// Tri des séances par date puis par heure (« 9 h » avant « 16 h »).
 const heureTri = (h) => String(parseInt(h, 10) || 0).padStart(2, "0");
 const parDate = (a, b) => (a.date + heureTri(a.heure)).localeCompare(b.date + heureTri(b.heure));
 

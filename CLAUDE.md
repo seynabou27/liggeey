@@ -30,7 +30,7 @@ Commandes : `npm install`, `npm run db:amorcer` (comptes de démonstration), `np
 
 ## Règles à respecter
 
-- **Parité visuelle avec les captures (depuis octobre 2026)** : la version de la plateforme de la branche `feat/back-socle` sert de référence aux captures du document et du prototype.
+- **Parité visuelle avec les captures (depuis octobre 2026)** : la version de la branche `feat/harmonisation-design` sert de référence aux captures du document et du prototype. Elle remplace `feat/back-socle` depuis la passe d’harmonisation validée le 24 octobre 2026 (contrastes, typographie, vocabulaire, données de démo) : les captures faites avant sont à refaire.
   - Le back-end se branche **sous** les écrans, sans changer leur aspect : même mise en page, mêmes textes, mêmes composants.
   - Les comptes de démonstration (`lib/comptesDemo.mjs`) affichent toujours les mêmes données fictives. Quand un domaine passe au serveur (offres, candidatures…), `npm run db:amorcer` recrée exactement les données de démo du prototype (`OFFRES_ENTREPRISE_INITIAL`, `CANDIDATURES`…). La date de démo (`DEMO_TODAY`, 14 octobre 2026) reste fixe pour ces comptes.
   - Tout changement visible (texte, disposition, écran ajouté ou retiré) est soumis à validation avant d'être fait. Seules exceptions : les messages d'erreur et d'attente propres au serveur (« Connexion… », « Connexion au serveur impossible… »).
@@ -51,6 +51,17 @@ Commandes : `npm install`, `npm run db:amorcer` (comptes de démonstration), `np
 - **Textes** : en français, avec le vouvoiement, des phrases courtes et un ton chaleureux et professionnel.
   - Ils vivent dans `content/fr/`, pas dans les composants.
   - Le wolof et l'anglais pourront s'ajouter plus tard dans `content/wo/` et `content/en/`.
+  - **Typographie française**, sur le site comme dans la plateforme :
+    - apostrophe typographique ’ (jamais l’apostrophe droite) et points de suspension « … » ;
+    - majuscule au premier mot et aux noms propres seulement : « Marketing digital », « Chef de projet », « Candidature retenue » ;
+    - virgule décimale : « 4,5/5 », « 43,5 % », « 1,2 Mo » (`noteFr` dans le prototype) ;
+    - dates en toutes lettres, mois en minuscules : « 28 juillet 2026 », « 1er août 2026 » (`dateFr` dans le prototype) ; jamais « 28/07/2026 » ni « 30 nov. » ;
+    - heures : « 15 h », « 9 h 30 », « 16 h – 17 h » ;
+    - exemples des champs : « Ex. : Moussa Diop ».
+  - **Vocabulaire** :
+    - abonnements : « formule » (Essentiel, Premium, Entreprise), jamais « profil », qui désigne le profil de la personne ; l’entreprise n’a qu’une formule, « Entreprise » ;
+    - suivi post-embauche : 90 jours, jalons J+7 (point de la première semaine), J+30, J+60 et J+90 (fin de la période d’essai), comme la page Entreprises ;
+    - statut d’une offre en attente de l’admin : « En vérification ».
 - **Accessibilité** :
   - contraste de 4,5:1 minimum ;
   - l'orange (`bg-marque`, #F0891D) sert de fond, toujours avec du texte ardoise (`text-sur-marque`), ou de couleur de grand titre ;
@@ -81,6 +92,8 @@ Commandes : `npm install`, `npm run db:amorcer` (comptes de démonstration), `np
   - **Thème sombre** : actif dans la plateforme seulement (le site public reste en clair). Il s'active avec `data-theme="sombre"` sur `<html>`.
     - choix : bouton lune/soleil dans la barre du haut et sur la connexion et l'inscription, plus « Apparence » dans les paramètres de l'admin (clair, sombre, comme l'appareil). Clair par défaut (`THEME_PAR_DEFAUT`) ;
     - code : `components/app/Theme.jsx` (`useTheme`, `useThemeApplique` appelé dans `Plateforme.jsx`, `BoutonTheme`, `ChoixTheme`) et `lib/theme.js` (clé du navigateur, script posé dans la page `/plateforme` pour éviter un flash clair) ;
+    - texte orange : jamais l’orange de fond comme couleur de texte (2,5:1). Sur blanc `text-marque` (`COLORS.orangeText`), sur orange doux `text-marque-fort` (`COLORS.orangeStrong`), sur fond sombre `text-marque-vif` (`COLORS.orangeOnDark`). Le texte discret (`neutre-550`) passe 4,5:1 sur tous les fonds clairs ;
+    - pastilles et logos sombres : `bg-sombre-doux` (`COLORS.darkSoft`), qui reste visible en thème sombre ;
     - règle : pas de couleur fixe dans le prototype. Statuts via `COLORS.success`, `danger`, `info`… (tokens `statut`), texte sur un statut plein en `text-sur-statut`. Un bloc qui doit rester clair (fac-similé de document) porte `data-theme="clair"`.
   - Ajouter ou modifier une couleur : changer `lib/tokens/couleurs.mjs`, puis vérifier les contrastes dans Storybook.
 - **Polices** :
@@ -94,7 +107,7 @@ Commandes : `npm install`, `npm run db:amorcer` (comptes de démonstration), `np
   - sous 768 px, les blocs longs sont compactés sans changer le style (le public est surtout sur téléphone) : offres en carrousel horizontal, cartes d'atouts et d'engagements avec l'icône à gauche du titre, maquette du téléphone masquée dans « Comment ça marche », chiffres et secteurs sur deux colonnes, pied de page sur deux colonnes. Au-dessus de 768 px, rien ne change ;
   - menu : 14 px, moyen ; étiquettes de formulaire : 12 px ; champs de 56 px de haut ; pied de page : titres 15 px, liens 13 px.
 - **Icônes** : `lucide-react`.
-- **Formes** : boutons à coins de 4 px, cartes à coins de 8 px, ombre `shadow-carte`.
+- **Formes** : boutons à coins de 4 px (y compris les boutons écrits à la main dans le prototype), cartes à coins de 8 px, ombre `shadow-carte`. Champs : 56 px sur le site, 48 px dans la plateforme (`FORM`).
 - **Logo** : `public/logo/` (versions ardoise, blanche, et monogramme orange).
 
 ## Storybook
@@ -118,6 +131,7 @@ Structure de la plateforme inspirée du modèle Mifty (https://mannatthemes.com/
 - `Export.jsx` : `MenuExport`, bouton « Exporter » des listes de l'admin (PDF, Excel .xlsx, CSV), sur toutes les lignes filtrées. Logique dans `lib/export.js` : le .xlsx et le CSV sont écrits sans bibliothèque ; le PDF utilise `jspdf` et `jspdf-autotable`, chargés seulement au clic.
 - Tout s'importe depuis `components/app` (`import * as App from "../app"` dans le prototype). Le `Bouton` du site a deux variantes de plus pour l'application : `doux` et `neutre`.
 - Le titre de chaque écran est affiché par la coquille (libellé du menu) : un écran ne remet pas de `h1`. Ses sous-titres sont des `h2` en demi-gras.
+- Onglets et filtres : `App.Onglets` (soulignés) pour les sections d’une page, `App.Segments` (pastilles) pour filtrer une liste, avec `BarreFiltres` (recherche dans une carte) et `CompteResultats`. Pas d’onglets recopiés à la main.
 - Couleurs de statut : tokens `statut` (`bg-statut-succes-doux`, `text-statut-danger`…). Les tons de `StatusBadge` sont dans `STATUT_TONS`.
 - Stories : `stories/composants/application/bibliotheque/`.
 
