@@ -30,6 +30,11 @@ Commandes : `npm install`, `npm run db:amorcer` (comptes de démonstration), `np
 
 ## Règles à respecter
 
+- **Parité visuelle avec les captures (depuis octobre 2026)** : la version de la plateforme de la branche `feat/back-socle` sert de référence aux captures du document et du prototype.
+  - Le back-end se branche **sous** les écrans, sans changer leur aspect : même mise en page, mêmes textes, mêmes composants.
+  - Les comptes de démonstration (`lib/comptesDemo.mjs`) affichent toujours les mêmes données fictives. Quand un domaine passe au serveur (offres, candidatures…), `npm run db:amorcer` recrée exactement les données de démo du prototype (`OFFRES_ENTREPRISE_INITIAL`, `CANDIDATURES`…). La date de démo (`DEMO_TODAY`, 14 octobre 2026) reste fixe pour ces comptes.
+  - Tout changement visible (texte, disposition, écran ajouté ou retiré) est soumis à validation avant d'être fait. Seules exceptions : les messages d'erreur et d'attente propres au serveur (« Connexion… », « Connexion au serveur impossible… »).
+
 - **N'inventer aucun chiffre, témoignage, partenaire ou logo client.** Les chiffres affichés viennent de l'enquête LIGGEEY (200 répondants, 2026) ou de l'ANSD, toujours avec leur source.
 - **Tarifs, à afficher tels quels** :
   - Pack Essentiel : 1 500 FCFA par mois ;

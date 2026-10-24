@@ -12063,8 +12063,10 @@ export default function LiggeeyPrototype({ ecranInitial = null, espaceInitial = 
     },
   } : null), [modeServeur, compteCourant, comptesDemo]); // eslint-disable-line react-hooks/exhaustive-deps
 
-  /* Le nom, le rôle et les initiales affichés viennent du compte connecté ; les données des écrans restent celles de la démo. */
-  const currentUser = compteCourant && compteCourant.profil === espace
+  /* Le nom, le rôle et les initiales affichés viennent du compte connecté ; les données des écrans restent celles de la démo.
+     Comptes de démonstration : profil de démo d'origine (USER_BY_ESPACE), pour que l'affichage reste celui des captures. */
+  const estCompteDemo = !!compteCourant && COMPTES_DEMO.some((c) => c.email === compteCourant.email);
+  const currentUser = compteCourant && compteCourant.profil === espace && !estCompteDemo
     ? { ...USER_BY_ESPACE[espace], name: compteCourant.nom, role: compteCourant.role, initials: compteCourant.initiales }
     : USER_BY_ESPACE[espace];
   const navItems = NAV_ITEMS_BY_ESPACE[espace];
