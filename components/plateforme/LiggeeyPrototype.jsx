@@ -7233,7 +7233,9 @@ function VerificationCVScreen() {
         <CompteResultats n={filtered.length} nom="document" />
       </div>
 
-      <div className="rounded-lg border bg-surface overflow-hidden" style={{ borderColor: COLORS.border }}>
+      {/* Comme les autres tableaux de l’admin : défilement horizontal sur téléphone, colonnes jamais écrasées */}
+      <div className="rounded-lg border bg-surface overflow-x-auto" style={{ borderColor: COLORS.border }}>
+        <div className="min-w-[760px]">
         <div className="flex items-center px-5 py-3" style={{ background: COLORS.soft, borderBottom: `1px solid ${COLORS.border}` }}>
           <p className="text-xs font-semibold" style={{ flex: 2, color: COLORS.slateLight }}>Utilisateur</p>
           <p className="text-xs font-semibold" style={{ flex: 1.2, color: COLORS.slateLight }}>Document</p>
@@ -7253,6 +7255,7 @@ function VerificationCVScreen() {
           </div>
         ))}
         {paged.length === 0 && <p className="text-sm p-5" style={{ color: COLORS.slateLight }}>Aucun document.</p>}
+        </div>
       </div>
 
       <Pagination page={page} pageSize={ADMIN_PAGE_SIZE} totalItems={filtered.length} onPageChange={setPage} />
@@ -8613,7 +8616,7 @@ function AbonnementsAdminScreen() {
     <div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les revenus, gérez les abonnés et ajustez les formules de chaque espace.</p>
 
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard icon={CreditCard} value={fcfa(mrr)} label="Revenu mensuel récurrent" />
         <StatCard icon={Crown} value={actifs.length} label="Abonnés payants actifs" />
         <StatCard icon={Sparkles} value="6,8 %" label="Passage Essentiel → Premium" />
@@ -9747,7 +9750,7 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
   return (
     <div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Accompagnez vos nouvelles recrues jusqu’à la fin de leur période d’essai et au-delà.</p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard icon={Users2} value={recrues.length} label="Recrues suivies" />
         <StatCard icon={UserCheck} value={recrues.filter((r) => r.statut === "Confirmé").length} label="Embauches confirmées" />
         <StatCard icon={AlertCircle} value={recrues.filter((r) => r.statut === "À risque").length} label="Recrues à risque" />
@@ -9790,7 +9793,7 @@ function SuiviPostEmbaucheAdminScreen({ signalements, setSignalements, recrues }
   return (
     <div>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Suivez les personnes placées via LIGGEEY et traitez les signalements des recrues et des employeurs.</p>
-      <div className="grid grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 mb-6">
         <StatCard icon={HeartHandshake} value={placements.length} label="Placements suivis" />
         <StatCard icon={TrendingUp} value="87 %" label="Toujours en poste à 3 mois" />
         <StatCard icon={AlertCircle} value={placements.filter((p) => p.statut === "À risque").length} label="Placements à risque" />
