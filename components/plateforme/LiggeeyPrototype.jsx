@@ -338,7 +338,7 @@ function AuthShell({ children, mode = "connexion" }) {
 
       <div className="relative flex flex-col bg-surface">
         {/* Conteneur positionné : le bouton garde sa propre classe relative (pastille) */}
-        <div className="absolute right-6 top-6 z-10 hidden md:block">
+        <div className="absolute right-6 top-6 z-20 hidden md:block">
           <App.BoutonTheme />
         </div>
         {/* Mobile : bandeau ardoise avec le message du panneau, le formulaire remonte dessus en feuille arrondie */}
