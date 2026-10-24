@@ -22,7 +22,7 @@ export const initiales = (nom) =>
 export function PastilleSecteur({ offre, className = 'h-12 w-12' }) {
   const secteur = secteurs.find((s) => s.id === offre.secteur);
   return (
-    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque ${className}`} aria-hidden="true">
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque-fort ${className}`} aria-hidden="true">
       {secteur ? <Icone nom={secteur.icone} className="h-1/2 w-1/2" /> : <span className="text-sm font-semibold">{initiales(offre.entreprise)}</span>}
     </span>
   );

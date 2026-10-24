@@ -17,7 +17,7 @@ export function GrilleAtouts({ items, colonnes = 3 }) {
         >
           {/* Mobile : icône à gauche du titre, pour des cartes plus courtes */}
           {item.icone && (
-            <span className="row-span-2 grid h-10 w-10 place-items-center rounded-lg bg-marque-doux text-marque md:h-12 md:w-12">
+            <span className="row-span-2 grid h-10 w-10 place-items-center rounded-lg bg-marque-doux text-marque-fort md:h-12 md:w-12">
               <Icone nom={item.icone} />
             </span>
           )}

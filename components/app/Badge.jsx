@@ -1,7 +1,7 @@
 /* Badges et pastilles de l'application. Fonds doux, texte contrasté (≥ 4,5:1), d'après les tokens de statut. */
 
 export const TONS = {
-  marque: 'bg-marque-doux text-marque',
+  marque: 'bg-marque-doux text-marque-fort',
   succes: 'bg-statut-succes-doux text-statut-succes',
   alerte: 'bg-statut-alerte-doux text-statut-alerte',
   danger: 'bg-statut-danger-doux text-statut-danger',

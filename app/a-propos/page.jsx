@@ -49,7 +49,7 @@ export default function PageAPropos() {
         <ul className="grid grid-cols-2 gap-8 lg:grid-cols-4">
           {t.equipe.membres.map((m) => (
             <li key={m.nom} className="flex flex-col items-center gap-3 text-center">
-              <div className="relative grid h-32 w-32 place-items-center overflow-hidden rounded-full bg-marque-doux text-3xl font-semibold text-marque">
+              <div className="relative grid h-32 w-32 place-items-center overflow-hidden rounded-full bg-marque-doux text-3xl font-semibold text-marque-fort">
                 {imageExiste(m.photo) ? <Image src={m.photo} alt={`Portrait de ${m.nom}`} fill sizes="128px" className="object-cover" /> : <span aria-hidden="true">{initiales(m.nom)}</span>}
               </div>
               <h3 className="text-lg font-semibold">{m.nom}</h3>

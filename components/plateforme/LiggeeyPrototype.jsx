@@ -127,6 +127,10 @@ import { apiConnexion, apiInscription, apiDeconnexion } from "./apiComptes";
 const COLORS = {
   orange: "rgb(var(--fond-marque))", // couleur de marque (primaire-500)
   orangeSoft: "rgb(var(--fond-marque-doux))",
+  // Texte orange : jamais l’orange de fond (2,5:1 sur blanc). Lisible sur blanc, sur orange doux, sur fond sombre.
+  orangeText: "rgb(var(--texte-marque))",
+  orangeStrong: "rgb(var(--texte-marque-fort))",
+  orangeOnDark: "rgb(var(--texte-marque-vif))",
   orangeSubtle: "rgb(var(--fond-marque-subtil))",
   onOrange: "rgb(var(--texte-sur-marque))", // texte sur orange : ardoise, contraste 6:1
   slate: "rgb(var(--texte-principal))",
@@ -324,7 +328,10 @@ function AuthShell({ children, mode = "connexion" }) {
       <AuthPanneau mode={mode} />
 
       <div className="relative flex flex-col bg-surface">
-        <App.BoutonTheme className="absolute right-6 top-6 hidden md:inline-flex" />
+        {/* Conteneur positionné : le bouton garde sa propre classe relative (pastille) */}
+        <div className="absolute right-6 top-6 z-10 hidden md:block">
+          <App.BoutonTheme />
+        </div>
         {/* Mobile : bandeau ardoise avec le message du panneau, le formulaire remonte dessus en feuille arrondie */}
         <div className="md:hidden relative overflow-hidden px-5 pt-2 pb-10 text-sur-sombre" style={{ background: "linear-gradient(155deg, rgb(var(--neutre-750)) 0%, rgb(var(--neutre-800)) 45%, rgb(var(--neutre-900)) 100%)" }}>
           <div className="pointer-events-none absolute -right-20 -top-24 h-56 w-56 rounded-full blur-3xl" style={{ background: "rgb(var(--primaire-500) / 0.14)" }} aria-hidden="true" />
@@ -466,7 +473,7 @@ function SafeImg({ src, alt = "", className = "", style, kind = "avatar" }) {
       );
     }
     return (
-      <div role="img" aria-label={alt} className={`${className} flex items-center justify-center font-semibold text-sm`} style={{ background: COLORS.orangeSoft, color: COLORS.orange, ...style }}>
+      <div role="img" aria-label={alt} className={`${className} flex items-center justify-center font-semibold text-sm`} style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong, ...style }}>
         {initials(alt || "?")}
       </div>
     );
@@ -1892,7 +1899,7 @@ function BoutonSauvegarde({ saved, onToggle, titre }) {
       aria-pressed={!!saved}
       aria-label={saved ? `Retirer « ${titre} » des offres sauvegardées` : `Sauvegarder « ${titre} »`}
       title={saved ? "Retirer des offres sauvegardées" : "Sauvegarder"}
-      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors ${saved ? "border-marque bg-marque-doux text-marque" : "border-base text-secondaire hover:border-forte hover:text-principal"}`}
+      className={`inline-flex h-11 w-11 shrink-0 items-center justify-center rounded-full border transition-colors ${saved ? "border-marque bg-marque-doux text-marque-fort" : "border-base text-secondaire hover:border-forte hover:text-principal"}`}
     >
       <Icone size={18} strokeWidth={1.75} aria-hidden="true" />
     </button>
@@ -1981,7 +1988,7 @@ function ListeCoches({ items }) {
     <ul className="space-y-3">
       {items.map((m) => (
         <li key={m} className="flex items-start gap-3 text-[15px] leading-[1.6] text-secondaire">
-          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-marque-doux text-marque" aria-hidden="true">
+          <span className="mt-0.5 inline-flex h-5 w-5 shrink-0 items-center justify-center rounded-full bg-marque-doux text-marque-fort" aria-hidden="true">
             <Check size={12} strokeWidth={2.5} />
           </span>
           {m}
@@ -2060,7 +2067,7 @@ function CarteListe({ visuel, titre, badges, sousTitre, meta, children, aside, a
 function VisuelIcone({ icone: Icone, taille = "md" }) {
   const dims = taille === "lg" ? "h-16 w-16" : "h-12 w-12";
   return (
-    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque ${dims}`} aria-hidden="true">
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque-fort ${dims}`} aria-hidden="true">
       <Icone size={taille === "lg" ? 28 : 22} strokeWidth={1.75} />
     </span>
   );
@@ -2076,7 +2083,7 @@ function VisuelDate({ iso, taille = "md" }) {
   const d = new Date(`${iso}T00:00:00`);
   const dims = taille === "lg" ? "h-16 w-16" : "h-12 w-12";
   return (
-    <span className={`flex shrink-0 flex-col items-center justify-center rounded-lg bg-marque-doux text-marque ${dims}`} aria-hidden="true">
+    <span className={`flex shrink-0 flex-col items-center justify-center rounded-lg bg-marque-doux text-marque-fort ${dims}`} aria-hidden="true">
       <span className={`font-semibold leading-none ${taille === "lg" ? "text-2xl" : "text-lg"}`}>{d.getDate()}</span>
       <span className="mt-0.5 text-[11px] font-semibold uppercase">{d.toLocaleDateString("fr-FR", { month: "short" }).replace(".", "")}</span>
     </span>
@@ -2655,7 +2662,7 @@ function moduleStatus(index, enrolled, progressCount) {
 
 const MODULE_BADGE_STYLE = {
   "Complété": { bg: COLORS.successSoft, color: COLORS.success },
-  "En cours": { bg: COLORS.orangeSoft, color: COLORS.orange },
+  "En cours": { bg: COLORS.orangeSoft, color: COLORS.orangeStrong },
   "Verrouillé": { bg: COLORS.softStrong, color: COLORS.slateLight },
 };
 
@@ -2685,7 +2692,7 @@ function progressionFormation(f, inscrit, fait) {
 function VisuelFormation({ taille = "md" }) {
   const dims = taille === "lg" ? "h-16 w-16" : "h-12 w-12";
   return (
-    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque ${dims}`} aria-hidden="true">
+    <span className={`grid shrink-0 place-items-center rounded-lg bg-marque-doux text-marque-fort ${dims}`} aria-hidden="true">
       <GraduationCap size={taille === "lg" ? 28 : 22} strokeWidth={1.75} />
     </span>
   );
@@ -2884,7 +2891,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
         <p className="text-sm" style={{ color: COLORS.slateLight }}>Ce document atteste que</p>
         <p className="text-xl font-bold mb-3" style={{ color: COLORS.slate }}>{userName}</p>
         <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>a suivi et validé avec succès l'ensemble des modules obligatoires requis pour la formation :</p>
-        <p className="text-lg font-bold mb-6" style={{ color: COLORS.orange }}>{formation.nom}</p>
+        <p className="text-lg font-bold mb-6" style={{ color: COLORS.orangeText }}>{formation.nom}</p>
         <div className="grid grid-cols-2 sm:grid-cols-4 gap-4 pt-4" style={{ borderTop: `1px solid ${COLORS.border}` }}>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>DATE D'OBTENTION</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>30 octobre 2026</p></div>
           <div><p className="text-xs" style={{ color: COLORS.slateLight }}>VOLUME HORAIRE</p><p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{formation.modules} Modules · {formation.heures}h</p></div>
@@ -2903,7 +2910,7 @@ function CertificateScreen({ formation, userName, onBack, dataset }) {
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         {recommandees.map((f) => (
           <div key={f.id} className="rounded-lg border bg-surface p-4" style={{ borderColor: COLORS.border }}>
-            <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>Recommandé</span>
+            <span className="text-xs font-semibold px-2 py-0.5 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>Recommandé</span>
             <p className="font-semibold text-sm mt-2" style={{ color: COLORS.slate }}>{f.nom}</p>
             <p className="text-xs" style={{ color: COLORS.slateLight }}>{f.modules} Modules · {f.heures}h</p>
           </div>
@@ -3151,7 +3158,7 @@ function MentorCard({ m, onOpen }) {
 function StatMini({ value, label }) {
   return (
     <div className="rounded-lg border bg-surface p-4 text-center" style={{ borderColor: COLORS.border }}>
-      <p className="text-2xl font-bold" style={{ color: COLORS.orange }}>{value}</p>
+      <p className="text-2xl font-bold" style={{ color: COLORS.orangeText }}>{value}</p>
       <p className="text-xs" style={{ color: COLORS.slateLight }}>{label}</p>
     </div>
   );
@@ -3534,7 +3541,7 @@ function ProfilScreen({ onNavigate }) {
               <FilePickerButton
                 accept=".pdf,.doc,.docx"
                 onPick={(f) => { setCv({ nom: f.name, date: demoNow().toLocaleDateString("fr-FR") }); notify("CV remplacé."); }}
-                className="inline-flex min-h-[44px] shrink-0 items-center rounded bg-marque-doux px-4 text-sm font-semibold text-marque hover:bg-marque-doux-survol"
+                className="inline-flex min-h-[44px] shrink-0 items-center rounded bg-marque-doux px-4 text-sm font-semibold text-marque-fort hover:bg-marque-doux-survol"
               >
                 {cv ? "Remplacer" : "Ajouter"}
               </FilePickerButton>
@@ -3626,9 +3633,9 @@ function DemandeCard({ d }) {
       <div className="flex items-start justify-between mb-2">
         <div>
           <p className="font-semibold text-sm" style={{ color: COLORS.slate }}>{d.titre}</p>
-          <p className="text-xs" style={{ color: COLORS.orange }}>{d.client} · {d.ville}</p>
+          <p className="text-xs" style={{ color: COLORS.orangeText }}>{d.client} · {d.ville}</p>
         </div>
-        <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{d.priorite}</span>
+        <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{d.priorite}</span>
       </div>
       <div className="flex items-center justify-between">
         <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{d.prix}</p>
@@ -4669,7 +4676,7 @@ function EvaluationsScreen({ onNavigate }) {
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.3fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-6 text-center" style={{ borderColor: COLORS.border }}>
           <p className="text-xs font-semibold mb-1" style={{ color: COLORS.slateLight }}>NOTE MOYENNE</p>
-          <p className="text-4xl font-bold mb-2" style={{ color: COLORS.orange }}>{AVG_NOTE}/5</p>
+          <p className="text-4xl font-bold mb-2" style={{ color: COLORS.orangeText }}>{AVG_NOTE}/5</p>
           <Stars note={Math.round(AVG_NOTE)} size={16} />
           <p className="text-xs mt-2" style={{ color: COLORS.slateLight }}>{REVIEWS_DATA.length} avis au total</p>
         </div>
@@ -4850,7 +4857,7 @@ function OffreEntrepriseCard({ o, onOpen }) {
         {o.dateLimite && <MetaOffre icone={Clock}>Jusqu'au {o.dateLimite}</MetaOffre>}
       </>}
       aside={
-        <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded bg-marque-doux px-3 text-sm font-semibold text-marque">
+        <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded bg-marque-doux px-3 text-sm font-semibold text-marque-fort">
           <UsersRound size={15} aria-hidden="true" /> {o.nbCandidatures} candidature{o.nbCandidatures > 1 ? "s" : ""}
         </span>
       }
@@ -5002,7 +5009,7 @@ function OffreEntrepriseDetail({ offre, onEdit, onToggleStatut, onSponsor, onBac
         actions={<>
           {offre.statut === "Active" && onSponsor && (
             offre.sponsorisee ? (
-              <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded bg-marque-doux px-4 text-sm font-semibold text-marque">
+              <span className="inline-flex min-h-[44px] items-center gap-1.5 rounded bg-marque-doux px-4 text-sm font-semibold text-marque-fort">
                 <Crown size={15} aria-hidden="true" /> Sponsorisée 7 jours
               </span>
             ) : (
@@ -5247,7 +5254,7 @@ function LockedRow({ label, onUnlock }) {
   return (
     <div>
       <p className="text-xs font-semibold mb-0.5" style={{ color: COLORS.slateLight }}>{label}</p>
-      <button type="button" onClick={onUnlock} className="text-sm inline-flex items-center gap-1.5 font-medium" style={{ color: COLORS.orange }}>
+      <button type="button" onClick={onUnlock} className="text-sm inline-flex items-center gap-1.5 font-medium" style={{ color: COLORS.orangeText }}>
         <Lock size={13} /> Débloquer
       </button>
     </div>
@@ -5663,7 +5670,7 @@ function EditableTags({ tags, onChange }) {
       {tags.length > 0 && (
         <ul className="mb-3 flex flex-wrap gap-2">
           {tags.map((t) => (
-            <li key={t} className="inline-flex items-center gap-1 rounded-full bg-marque-doux py-1 pl-3 pr-1 text-sm font-medium text-marque">
+            <li key={t} className="inline-flex items-center gap-1 rounded-full bg-marque-doux py-1 pl-3 pr-1 text-sm font-medium text-marque-fort">
               {t}
               <button type="button" onClick={() => onChange(tags.filter((x) => x !== t))} aria-label={`Retirer ${t}`} className="grid h-7 w-7 place-items-center rounded-full hover:bg-marque-doux-survol">
                 <X size={14} aria-hidden="true" />
@@ -5714,7 +5721,7 @@ function ProfilEntrepriseEdit({ profile, onSave, onCancel }) {
         {v.logo ? (
           <img src={v.logo} alt={`Logo ${v.nom}`} className="h-16 w-16 rounded-lg object-cover" />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-marque-doux text-base font-semibold text-marque" aria-hidden="true">
+          <div className="flex h-16 w-16 items-center justify-center rounded-lg bg-marque-doux text-base font-semibold text-marque-fort" aria-hidden="true">
             {initials(v.nom)}
           </div>
         )}
@@ -6214,7 +6221,7 @@ const CHERCHEURS_ADMIN_INITIAL = [
 function ChercheursAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du profil</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce chercheur d'emploi</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
@@ -6232,7 +6239,7 @@ function ChercheursAdminDetail(row, { onBack, update, remove }) {
           <Row label="Expérience" value={row.experience} />
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Compétences clés</p>
           <div className="flex flex-wrap gap-1.5">
-            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>)}
+            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{c}</span>)}
           </div>
         </div>
         <div className="flex flex-col gap-4">
@@ -6290,7 +6297,7 @@ const PRESTATAIRES_ADMIN_INITIAL = [
 function PrestatairesAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du prestataire</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de ce prestataire de services</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
@@ -6308,7 +6315,7 @@ function PrestatairesAdminDetail(row, { onBack, update, remove }) {
           <Row label="Années d'activité" value={row.anneesActivite} />
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Compétences clés</p>
           <div className="flex flex-wrap gap-1.5">
-            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>)}
+            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{c}</span>)}
           </div>
         </div>
         <div className="flex flex-col gap-4">
@@ -6339,7 +6346,7 @@ function PrestatairesAdminScreen() {
         { key: "profil", label: "Profil", flex: 1, render: (r) => <TierBadge premium={adminTier(r.nom, "prestataire") === "Premium"} size="sm" />, exportValue: (r) => adminTier(r.nom, "prestataire") },
         { key: "ville", label: "Localisation", flex: 1 },
         { key: "missions", label: "Missions", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.missions} missions</span> },
-        { key: "note", label: "Note", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orange }}>★ {r.note}</span> },
+        { key: "note", label: "Note", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>★ {r.note}</span> },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
       exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
@@ -6364,14 +6371,14 @@ const ENTREPRISES_ADMIN_INITIAL = [
 function EntreprisesAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de l'entreprise</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Consultez et gérez le profil de cette entreprise</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Profil de l'entreprise</h3>
           <div className="flex flex-col items-center text-center mb-4">
-            <div className="w-14 h-14 rounded-md flex items-center justify-center text-sm font-semibold mb-2" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.nom)}</div>
+            <div className="w-14 h-14 rounded-md flex items-center justify-center text-sm font-semibold mb-2" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.nom)}</div>
             <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.secteur} · {row.ville}</p>
           </div>
@@ -6439,7 +6446,7 @@ const OFFRES_ADMIN_INITIAL = [
 function OffresAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <div className="flex items-start justify-between mb-1">
         <h2 className="text-xl font-semibold" style={{ color: COLORS.slate }}>Détail de l'offre</h2>
       </div>
@@ -6448,7 +6455,7 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
         <div className="flex flex-col gap-4">
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center gap-3 mb-3">
-              <div className="w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.entreprise)}</div>
+              <div className="w-10 h-10 rounded-md flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.entreprise)}</div>
               <div>
                 <p className="font-bold" style={{ color: COLORS.slate }}>{row.titre}</p>
                 <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.entreprise}</p>
@@ -6465,7 +6472,7 @@ function OffresAdminDetail(row, { onBack, update, remove }) {
             <p className="text-sm mb-4" style={{ color: COLORS.slate }}>{row.description}</p>
             <p className="text-xs font-semibold mb-1.5" style={{ color: COLORS.slateLight }}>Compétences requises</p>
             <div className="flex flex-wrap gap-1.5">
-              {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>)}
+              {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{c}</span>)}
             </div>
           </div>
         </div>
@@ -6666,7 +6673,7 @@ const FORMATIONS_ADMIN_INITIAL = [
 function FormationsAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de la formation</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6 mt-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -6688,7 +6695,7 @@ function FormationsAdminDetail(row, { onBack, update, remove }) {
             <>
               <p className="text-xs font-semibold mb-1.5" style={{ color: COLORS.slateLight }}>Prérequis recommandés</p>
               <div className="flex flex-wrap gap-1.5">
-                {row.prerequis.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>)}
+                {row.prerequis.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{c}</span>)}
               </div>
             </>
           )}
@@ -6746,7 +6753,7 @@ const MENTORAT_ADMIN_INITIAL = [
 function MentoratAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du mentor</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1.2fr,1fr] gap-4 mb-6 mt-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
@@ -6762,7 +6769,7 @@ function MentoratAdminDetail(row, { onBack, update, remove }) {
           <Row label="NINEA" value={row.ninea} />
           <p className="text-xs font-semibold mt-4 mb-2" style={{ color: COLORS.slateLight }}>Compétences</p>
           <div className="flex flex-wrap gap-1.5 mb-4">
-            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>)}
+            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{c}</span>)}
           </div>
           {row.certifications.length > 0 && (
             <>
@@ -6802,7 +6809,7 @@ function MentoratAdminScreen() {
         { key: "nom", label: "Mentor", flex: 2, render: (r) => <IdentityCell nom={r.nom} sub={r.metier} photo={r.photo} />, exportSub: { label: "Métier", key: "metier" } },
         { key: "mentoresActifs", label: "Mentorés actifs", flex: 1, render: (r) => <span className="text-sm" style={{ color: COLORS.slate }}>{r.mentoresActifs} mentorés</span> },
         { key: "specialite", label: "Spécialité", flex: 1 },
-        { key: "note", label: "Note globale", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orange }}>★ {r.note}/5</span> },
+        { key: "note", label: "Note globale", flex: 1, render: (r) => <span className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>★ {r.note}/5</span> },
         { key: "statut", label: "Statut", flex: 1, render: (r) => <StatusBadge status={r.statut} /> },
       ]}
       exportExtra={[{ label: "Téléphone", key: "telephone" }, { label: "E-mail", key: "email" }]}
@@ -6827,12 +6834,12 @@ const SERVICES_ADMIN_INITIAL = [
 function ServicesAdminDetail(row, { onBack, update }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail du service</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6 mt-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-3">
-            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.prestataire)}</div>
+            <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.prestataire)}</div>
             <div>
               <p className="font-bold" style={{ color: COLORS.slate }}>{row.prestataire}</p>
               <p className="text-sm" style={{ color: COLORS.slateLight }}>{row.metier} · {row.experience}</p>
@@ -6903,12 +6910,12 @@ const CANDIDATURES_ADMIN_INITIAL = [
 function CandidaturesAdminDetail(row, { onBack, update, remove }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-6" style={{ color: COLORS.slate }}>Détail de la candidature</h2>
       <div className="grid grid-cols-1 lg:grid-cols-[1fr,1.4fr] gap-4 mb-6">
         <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
           <div className="flex items-center gap-3 mb-4">
-            <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(row.nom)}</div>
+            <div className="w-11 h-11 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(row.nom)}</div>
             <div>
               <p className="font-bold" style={{ color: COLORS.slate }}>{row.nom}</p>
               <p className="text-xs" style={{ color: COLORS.slateLight }}>{row.metier} · {row.localisation}</p>
@@ -6919,7 +6926,7 @@ function CandidaturesAdminDetail(row, { onBack, update, remove }) {
           <Row label="Expérience" value={row.experience} />
           <p className="text-xs font-semibold mt-4 mb-1.5" style={{ color: COLORS.slateLight }}>Compétences clés</p>
           <div className="flex flex-wrap gap-1.5">
-            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{c}</span>)}
+            {row.competences.map((c) => <span key={c} className="text-xs font-medium px-2.5 py-1 rounded-full" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{c}</span>)}
           </div>
         </div>
         <div className="flex flex-col gap-4">
@@ -6991,7 +6998,7 @@ const MISSIONS_ADMIN_INITIAL = [
 function MissionsAdminDetail(row, { onBack, update }) {
   return (
     <div>
-      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orange }}><ArrowLeft size={14} /> Retour</button>
+      <button type="button" onClick={onBack} className="flex items-center gap-1.5 text-sm font-medium mb-5" style={{ color: COLORS.orangeText }}><ArrowLeft size={14} /> Retour</button>
       <h2 className="text-xl font-semibold mb-1" style={{ color: COLORS.slate }}>Détail de la mission</h2>
       <p className="text-sm mb-6" style={{ color: COLORS.slateLight }}>Mission #{row.refId}</p>
       <div className="grid grid-cols-1 lg:grid-cols-[1.4fr,1fr] gap-4 mb-6">
@@ -7123,7 +7130,7 @@ function DocumentControlScreen({ doc, onBack, onDecide }) {
         <div className="flex flex-col gap-4">
           <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
             <div className="flex items-center gap-2.5 mb-3">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(doc.nom)}</div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-xs font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(doc.nom)}</div>
               <div><p className="font-semibold" style={{ color: COLORS.slate }}>{doc.nom}</p><p className="text-xs" style={{ color: COLORS.slateLight }}>{doc.metier} · Dakar</p></div>
             </div>
             <Row label="Type de document" value={doc.document} /><div className="h-2" />
@@ -7225,10 +7232,10 @@ function VerificationCVScreen() {
           <div key={d.id} className="flex items-center px-5 py-3.5" style={{ borderBottom: `1px solid ${COLORS.border}` }}>
             <div style={{ flex: 2 }}><IdentityCell nom={d.nom} sub={d.metier} /></div>
             <p className="text-sm" style={{ flex: 1.2, color: COLORS.slate }}>{d.document}</p>
-            <p className="text-sm truncate" style={{ flex: 1.4, color: COLORS.orange }}>{d.fichier}</p>
+            <p className="text-sm truncate" style={{ flex: 1.4, color: COLORS.orangeText }}>{d.fichier}</p>
             <p className="text-sm" style={{ flex: 1, color: COLORS.slateLight }}>{d.date}</p>
             <div style={{ flex: 1 }}><StatusBadge status={d.statut} /></div>
-            <button type="button" onClick={() => setSelectedId(d.id)} className="w-20 text-right text-sm font-semibold shrink-0" style={{ color: COLORS.orange }}>Consulter</button>
+            <button type="button" onClick={() => setSelectedId(d.id)} className="w-20 text-right text-sm font-semibold shrink-0" style={{ color: COLORS.orangeText }}>Consulter</button>
           </div>
         ))}
         {paged.length === 0 && <p className="text-sm p-5" style={{ color: COLORS.slateLight }}>Aucun document.</p>}
@@ -7539,7 +7546,7 @@ function ArchivesTab() {
               <p className="text-sm" style={{ color: COLORS.slateLight }}>{a.date}</p>
               <p className="text-sm" style={{ color: COLORS.slateLight }}>{a.taille}</p>
               <div className="text-right">
-                <button type="button" onClick={() => restore(a)} className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: COLORS.orange }}>
+                <button type="button" onClick={() => restore(a)} className="inline-flex items-center gap-1 text-sm font-semibold" style={{ color: COLORS.orangeText }}>
                   <RotateCcw size={13} /> Restaurer
                 </button>
               </div>
@@ -7557,7 +7564,7 @@ function ArchivesTab() {
 
 const EVENT_TYPE_COLORS = {
   Formation: { bg: COLORS.infoSoft, color: COLORS.info },
-  Mission: { bg: COLORS.orangeSoft, color: COLORS.orange },
+  Mission: { bg: COLORS.orangeSoft, color: COLORS.orangeStrong },
   Deadline: { bg: COLORS.dangerSoft, color: COLORS.danger },
   Événement: { bg: COLORS.successSoft, color: COLORS.success },
 };
@@ -7757,7 +7764,7 @@ function PlanningScreen() {
               {dayEvents.length === 0 ? (
                 <div className="text-center py-10">
                   <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>Aucun événement ce jour-là</p>
-                  <button type="button" onClick={() => setFormOpen(true)} className="mt-3 text-sm font-semibold" style={{ color: COLORS.orange }}>Planifier un événement</button>
+                  <button type="button" onClick={() => setFormOpen(true)} className="mt-3 text-sm font-semibold" style={{ color: COLORS.orangeText }}>Planifier un événement</button>
                 </div>
               ) : dayEvents.map((e) => (
                 <div key={e.id} className="rounded-md p-4 mb-3" style={{ background: EVENT_TYPE_COLORS[e.type].bg }}>
@@ -7874,7 +7881,7 @@ function CommunicationScreen({ onNavigate, ongletInitial }) {
                   </div>
                   <div className="text-right shrink-0">
                     <p className="text-xs mb-1" style={{ color: COLORS.slateLight }}>{n.temps}</p>
-                    <button type="button" onClick={() => onNavigate(n.target)} className="text-sm font-semibold" style={{ color: COLORS.orange }}>Gérer</button>
+                    <button type="button" onClick={() => onNavigate(n.target)} className="text-sm font-semibold" style={{ color: COLORS.orangeText }}>Gérer</button>
                   </div>
                 </div>
               );
@@ -7886,7 +7893,7 @@ function CommunicationScreen({ onNavigate, ongletInitial }) {
               <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Statistiques de communication</h3>
               <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Total envoyées</p><p className="text-sm font-bold" style={{ color: COLORS.slate }}>1 247</p></div>
               <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Taux de lecture</p><p className="text-sm font-bold" style={{ color: COLORS.success }}>78%</p></div>
-              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Messages en attente</p><p className="text-sm font-bold" style={{ color: COLORS.orange }}>5</p></div>
+              <div className="flex items-center justify-between py-1.5"><p className="text-sm" style={{ color: COLORS.slateLight }}>Messages en attente</p><p className="text-sm font-bold" style={{ color: COLORS.orangeText }}>5</p></div>
             </div>
             <div className="rounded-lg border bg-surface p-5" style={{ borderColor: COLORS.border }}>
               <div className="flex items-center gap-2 mb-2"><Archive size={16} color={COLORS.slate} /><h3 className="font-semibold" style={{ color: COLORS.slate }}>Archives plateforme</h3></div>
@@ -8423,7 +8430,7 @@ function AbonnementScreen() {
           <p className="text-2xl font-bold text-sur-sombre flex items-center gap-2">
             {plan.nom} {plan.id !== "essentiel" && <Crown size={20} color={COLORS.orange} />}
           </p>
-          <p className="text-sm mt-1" style={{ color: COLORS.orange }}>
+          <p className="text-sm mt-1" style={{ color: COLORS.orangeOnDark }}>
             {`${fcfa(plan.prixMensuel)} / mois${sub.prochain ? ` · renouvellement le ${sub.prochain}` : ""}`}
           </p>
           {canDowngrade && (
@@ -8457,7 +8464,7 @@ function AbonnementScreen() {
               <div className="flex items-center justify-between mb-1 min-h-[24px]">
                 <p className="font-bold text-lg" style={{ color: COLORS.slate }}>{p.nom}</p>
                 {p.recommande && !isCurrent && <PremiumChip label="Recommandé" />}
-                {isCurrent && <span className="text-xs font-semibold" style={{ color: COLORS.orange }}>Votre profil</span>}
+                {isCurrent && <span className="text-xs font-semibold" style={{ color: COLORS.orangeText }}>Votre profil</span>}
               </div>
               <p className="text-sm mb-4" style={{ color: COLORS.slateLight }}>{p.description}</p>
               <p className="mb-5">
@@ -8694,7 +8701,7 @@ function AbonnementsAdminScreen() {
                     <td className="px-4 py-3">{a.prochain}</td>
                     <td className="px-4 py-3"><StatusBadge status={a.statut} /></td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
-                      {a.statut === "Échec de paiement" && <button type="button" onClick={() => notify(`Relance de paiement envoyée à ${a.nom}.`)} className="text-xs font-semibold mr-3" style={{ color: COLORS.orange }}>Relancer</button>}
+                      {a.statut === "Échec de paiement" && <button type="button" onClick={() => notify(`Relance de paiement envoyée à ${a.nom}.`)} className="text-xs font-semibold mr-3" style={{ color: COLORS.orangeText }}>Relancer</button>}
                       <button type="button" onClick={() => { setAbonnes((l) => l.map((x) => (x.id === a.id ? { ...x, statut: x.statut === "Suspendu" ? "Actif" : "Suspendu" } : x))); notify(a.statut === "Suspendu" ? `Abonnement de ${a.nom} réactivé.` : `Abonnement de ${a.nom} suspendu.`, "info"); }} className="text-xs font-semibold" style={{ color: a.statut === "Suspendu" ? COLORS.success : COLORS.danger }}>
                         {a.statut === "Suspendu" ? "Réactiver" : "Suspendre"}
                       </button>
@@ -8711,7 +8718,7 @@ function AbonnementsAdminScreen() {
                     <td className="px-4 py-3"><StatusBadge status={t.statut} /></td>
                     <td className="px-4 py-3 text-right whitespace-nowrap">
                       {t.statut === "Payé" && <button type="button" onClick={() => { api.setTransactions((l) => l.map((x) => (x.id === t.id ? { ...x, statut: "Remboursé" } : x))); notify(`Transaction ${t.ref} remboursée.`, "info"); }} className="text-xs font-semibold" style={{ color: COLORS.danger }}>Rembourser</button>}
-                      {t.statut === "Échoué" && <button type="button" onClick={() => notify(`Relance de paiement envoyée à ${t.client}.`)} className="text-xs font-semibold" style={{ color: COLORS.orange }}>Relancer</button>}
+                      {t.statut === "Échoué" && <button type="button" onClick={() => notify(`Relance de paiement envoyée à ${t.client}.`)} className="text-xs font-semibold" style={{ color: COLORS.orangeText }}>Relancer</button>}
                     </td>
                   </tr>
                 ))}
@@ -9476,7 +9483,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
             <p className="text-xl font-bold text-sur-sombre">{e.poste} · {e.entreprise}</p>
             <p className="text-sm" style={{ color: COLORS.onDarkMuted }}>{e.contrat} · {e.ville} · Responsable : {e.manager}</p>
           </div>
-          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.darkLine, color: COLORS.orange }}>En poste depuis {jour} jours</span>
+          <span className="text-xs font-semibold px-3 py-1 rounded-full" style={{ background: COLORS.darkLine, color: COLORS.brandPale }}>En poste depuis {jour} jours</span>
         </div>
         <div className="flex justify-between text-sm mb-1.5">
           <span style={{ color: COLORS.onDarkMuted }}>Période d'essai</span>
@@ -9529,7 +9536,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
           <div className="rounded-lg border bg-surface p-6" style={{ borderColor: COLORS.border }}>
             <h3 className="font-semibold mb-3" style={{ color: COLORS.slate }}>Votre référente</h3>
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(e.referent.nom)}</div>
+              <div className="w-10 h-10 rounded-full flex items-center justify-center text-sm font-semibold" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(e.referent.nom)}</div>
               <div>
                 <p className="text-sm font-semibold" style={{ color: COLORS.slate }}>{e.referent.nom}</p>
                 <p className="text-xs" style={{ color: COLORS.slateLight }}>{e.referent.role}</p>
@@ -9563,7 +9570,7 @@ function SuiviEmbaucheScreen({ suivi, setSuivi, signalements, onSignal }) {
             <h3 className="font-semibold" style={{ color: COLORS.slate }}>Une difficulté dans votre poste ?</h3>
             <p className="text-sm" style={{ color: COLORS.slateLight }}>Votre référente traite chaque signalement. Votre employeur n'est contacté qu'avec votre accord.</p>
           </div>
-          {!signalOpen && <button type="button" onClick={() => setSignalOpen(true)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}><Flag size={14} /> Signaler une difficulté</button>}
+          {!signalOpen && <button type="button" onClick={() => setSignalOpen(true)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler une difficulté</button>}
         </div>
         {signalOpen && (
           <SignalementForm
@@ -9635,7 +9642,7 @@ function RecrueDetail({ r, onUpdate, onSignal, onBack }) {
           {r.statut !== "Confirmé" && (
             <button type="button" onClick={() => { onUpdate({ statut: "Confirmé" }); notify(`Embauche de ${r.nom} confirmée.`); }} className="rounded-md px-4 py-2 text-sm font-semibold text-sur-statut inline-flex items-center gap-1.5" style={{ background: COLORS.success }}><UserCheck size={14} /> Confirmer l'embauche</button>
           )}
-          <button type="button" onClick={() => setSignalOpen((o) => !o)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orange }}><Flag size={14} /> Signaler un problème</button>
+          <button type="button" onClick={() => setSignalOpen((o) => !o)} className="rounded-md px-4 py-2 text-sm font-semibold border inline-flex items-center gap-1.5" style={{ borderColor: COLORS.orange, color: COLORS.orangeText }}><Flag size={14} /> Signaler un problème</button>
         </div>
       </div>
 
@@ -9721,7 +9728,7 @@ function SuiviRecruesScreen({ recrues, setRecrues, onSignal }) {
           return (
             <button key={r.id} type="button" onClick={() => setSelectedId(r.id)} className="w-full text-left rounded-lg border bg-surface px-5 py-4 grid grid-cols-1 md:grid-cols-[1.4fr,1.2fr,1fr,auto] gap-3 md:items-center hover:shadow-md transition-shadow" style={{ borderColor: r.statut === "À risque" ? COLORS.danger : COLORS.border }}>
               <div className="flex items-center gap-3 min-w-0">
-                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orange }}>{initials(r.nom)}</div>
+                <div className="w-9 h-9 rounded-full flex items-center justify-center text-xs font-semibold shrink-0" style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}>{initials(r.nom)}</div>
                 <div className="min-w-0">
                   <p className="text-sm font-semibold truncate" style={{ color: COLORS.slate }}>{r.nom}</p>
                   <p className="text-xs truncate" style={{ color: COLORS.slateLight }}>{r.poste} · {r.contrat}</p>
@@ -9887,7 +9894,7 @@ function RegulBadge({ size = "md" }) {
   return complete ? (
     <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.successSoft, color: COLORS.success }}><BadgeCheck size={12} /> Activité régularisée</span>
   ) : (
-    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.orangeSoft, color: COLORS.orange }}><Landmark size={12} /> Régularisation en cours</span>
+    <span className={`inline-flex items-center gap-1 font-semibold rounded-full ${cls}`} style={{ background: COLORS.orangeSoft, color: COLORS.orangeStrong }}><Landmark size={12} /> Régularisation en cours</span>
   );
 }
 
@@ -9923,7 +9930,7 @@ function RegulStepCard({ step, index, onChange }) {
           {step.statut === "Refusé" && step.motif && (
             <div className="rounded-md px-3 py-2 text-sm mb-3 flex items-start gap-2" style={{ background: COLORS.dangerSoft, color: COLORS.danger }}><AlertCircle size={15} className="mt-0.5 shrink-0" /> {step.motif}</div>
           )}
-          {step.statut === "En vérification" && <p className="text-sm" style={{ color: COLORS.orange }}>Document reçu le {step.envoyeLe}. Vérification par l'équipe LIGGEEY sous 72 h.</p>}
+          {step.statut === "En vérification" && <p className="text-sm" style={{ color: COLORS.orangeText }}>Document reçu le {step.envoyeLe}. Vérification par l'équipe LIGGEEY sous 72 h.</p>}
           {step.statut === "Validé" && step.document && <p className="text-sm flex items-center gap-1.5" style={{ color: COLORS.success }}><FileCheck2 size={15} /> {step.document}{step.valeur ? ` · ${step.valeur}` : ""}</p>}
           {editable && (
             <div className="flex flex-col gap-3">
@@ -10026,7 +10033,7 @@ function RegulInfos() {
           {REGUL_ETAPES_EXPLIQUEES.map((e, i) => (
             <li key={e.titre} className="rounded-lg border border-base bg-surface p-4">
               <div className="mb-2 flex items-center gap-2">
-                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-marque-doux text-xs font-semibold text-marque">{i + 1}</span>
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-marque-doux text-xs font-semibold text-marque-fort">{i + 1}</span>
                 <e.icone size={17} className="text-marque" aria-hidden="true" />
               </div>
               <p className="text-sm font-semibold text-principal">{e.titre}</p>

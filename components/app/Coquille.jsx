@@ -245,7 +245,7 @@ function MenuNotifications({ notifications }) {
                       }}
                       className="flex w-full items-start gap-3 px-4 py-3 text-left hover:bg-doux"
                     >
-                      <span className={`mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${n.urgent ? 'bg-statut-danger-doux text-statut-danger' : 'bg-marque-doux text-marque'}`} aria-hidden="true">
+                      <span className={`mt-0.5 inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full ${n.urgent ? 'bg-statut-danger-doux text-statut-danger' : 'bg-marque-doux text-marque-fort'}`} aria-hidden="true">
                         <Icone size={16} />
                       </span>
                       <span className="min-w-0 text-sm">

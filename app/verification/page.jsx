@@ -21,7 +21,7 @@ export default function PageVerification() {
           {t.controles.map((c) => (
             <li key={c.titre} className="flex flex-col gap-4 rounded-lg border border-base p-7">
               <div className="flex items-center gap-4">
-                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-marque-doux text-marque">
+                <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-marque-doux text-marque-fort">
                   <Icone nom={c.icone} />
                 </span>
                 <h2 className="text-2xl font-semibold">{c.titre}</h2>

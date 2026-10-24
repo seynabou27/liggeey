@@ -15,7 +15,7 @@ function Colonne({ id, groupe, visible }) {
       <ol className="flex flex-col gap-6 md:gap-8">
         {groupe.items.map((etape) => (
           <li key={etape.titre} className="flex gap-4">
-            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-marque-doux text-marque">
+            <span className="grid h-12 w-12 shrink-0 place-items-center rounded-lg bg-marque-doux text-marque-fort">
               <Icone nom={etape.icone} />
             </span>
             <div>

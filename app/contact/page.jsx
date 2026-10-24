@@ -14,7 +14,7 @@ export const metadata = { title: contact.meta.titre, description: contact.meta.d
 function MoyenContact({ icone: IconeMoyen, titre, texte, children }) {
   return (
     <li className="flex flex-col gap-3 rounded-lg border border-base bg-surface p-6 transition-shadow hover:shadow-carte">
-      <span className="grid h-12 w-12 place-items-center rounded-lg bg-marque-doux text-marque" aria-hidden="true">
+      <span className="grid h-12 w-12 place-items-center rounded-lg bg-marque-doux text-marque-fort" aria-hidden="true">
         <IconeMoyen className="h-6 w-6" />
       </span>
       <h2 className="text-xl font-semibold">{titre}</h2>

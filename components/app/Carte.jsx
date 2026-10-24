@@ -3,7 +3,7 @@ import { TrendingDown, TrendingUp } from 'lucide-react';
 /* Cartes de l'application : fond blanc, filet fin, coins de 8 px, sans ombre. */
 
 const TONS_PASTILLE = {
-  marque: 'bg-marque-doux text-marque',
+  marque: 'bg-marque-doux text-marque-fort',
   succes: 'bg-statut-succes-doux text-statut-succes',
   alerte: 'bg-statut-alerte-doux text-statut-alerte',
   danger: 'bg-statut-danger-doux text-statut-danger',
@@ -128,7 +128,7 @@ export function CarteProfil({ photo, nom, sousTitre, badges, infos = [], actions
           {photo ? (
             <img src={photo} alt={nom} className="h-24 w-24 rounded-full border-4 border-[rgb(var(--fond-surface))] object-cover" />
           ) : (
-            <span className="inline-flex h-24 w-24 items-center justify-center rounded-full border-4 border-[rgb(var(--fond-surface))] bg-marque-doux text-2xl font-semibold text-marque">
+            <span className="inline-flex h-24 w-24 items-center justify-center rounded-full border-4 border-[rgb(var(--fond-surface))] bg-marque-doux text-2xl font-semibold text-marque-fort">
               {nom
                 .split(' ')
                 .map((m) => m[0])

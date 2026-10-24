@@ -25,7 +25,7 @@ export function BandeParcours() {
           {parcours.items.map((item) => (
             <li key={item.href}>
               <Link href={item.href} className="flex min-h-[56px] items-center justify-center gap-3 whitespace-nowrap rounded-lg px-4 py-3 text-lg font-semibold transition-colors hover:bg-marque-doux">
-                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-marque-doux text-marque">
+                <span className="grid h-10 w-10 shrink-0 place-items-center rounded-full bg-marque-doux text-marque-fort">
                   <Icone nom={item.icone} className="h-5 w-5" />
                 </span>
                 {item.label}
@@ -49,7 +49,7 @@ export function GrilleSecteurs() {
         {secteurs.map((s) => (
           <li key={s.id}>
             <Link href={lienOffresSite({ secteur: s.id })} scroll={false} className="flex h-full min-h-[44px] flex-col items-center gap-2 rounded-lg bg-surface p-4 text-center md:gap-3 md:p-6 shadow-[0_0_0_1px_rgb(var(--bordure-base))] transition-shadow hover:shadow-carte">
-              <span className="grid h-10 w-10 place-items-center rounded-lg bg-marque-doux text-marque md:h-12 md:w-12">
+              <span className="grid h-10 w-10 place-items-center rounded-lg bg-marque-doux text-marque-fort md:h-12 md:w-12">
                 <Icone nom={s.icone} />
               </span>
               <span className="text-[15px] font-medium leading-snug md:text-lg">{s.nom}</span>
@@ -116,7 +116,7 @@ export function Engagements() {
       <ul className="grid gap-3 sm:grid-cols-2 md:gap-5 lg:grid-cols-6">
         {t.items.map((item, i) => (
           <li key={item.titre} className={`grid grid-cols-[auto_minmax(0,1fr)] gap-x-4 gap-y-1 rounded-lg bg-surface p-5 shadow-[0_0_0_1px_rgb(var(--bordure-base))] md:flex md:flex-col md:gap-3 md:p-6 lg:col-span-2 ${i === 3 ? 'lg:col-start-2' : ''}`}>
-            <span className="row-span-2 grid h-10 w-10 place-items-center rounded-full bg-marque-doux text-marque md:h-12 md:w-12">
+            <span className="row-span-2 grid h-10 w-10 place-items-center rounded-full bg-marque-doux text-marque-fort md:h-12 md:w-12">
               <Icone nom={item.icone} />
             </span>
             <h3 className="self-center text-base font-semibold md:self-auto">{item.titre}</h3>

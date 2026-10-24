@@ -10,7 +10,7 @@ export function BoutonIcone({ icone: Icone, label, onClick, pastille = false, va
   const styles = {
     contour: 'border border-base bg-surface text-secondaire hover:text-principal hover:border-forte',
     fantome: 'text-discret hover:bg-doux hover:text-principal',
-    doux: 'bg-marque-doux text-marque hover:bg-marque-doux-survol',
+    doux: 'bg-marque-doux text-marque-fort hover:bg-marque-doux-survol',
     'sur-sombre': 'text-sur-sombre-secondaire hover:bg-sombre-doux hover:text-sur-sombre',
   }[variante];
   return (
@@ -84,7 +84,7 @@ export function Onglets({ onglets, actif, onChange, label = 'Sections', pleineLa
           >
             {o.label}
             {o.compte !== undefined && (
-              <span className={`rounded px-1.5 text-[11px] font-semibold ${estActif ? 'bg-marque-doux text-marque' : 'bg-doux-fort text-secondaire'}`}>{o.compte}</span>
+              <span className={`rounded px-1.5 text-[11px] font-semibold ${estActif ? 'bg-marque-doux text-marque-fort' : 'bg-doux-fort text-secondaire'}`}>{o.compte}</span>
             )}
           </button>
         );

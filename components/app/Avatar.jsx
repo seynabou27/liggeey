@@ -9,7 +9,7 @@ const TAILLES = {
 };
 
 const FONDS = {
-  marque: 'bg-marque-doux text-marque',
+  marque: 'bg-marque-doux text-marque-fort',
   plein: 'bg-marque text-sur-marque',
   sombre: 'bg-sombre text-sur-sombre',
   neutre: 'bg-doux-fort text-secondaire',
