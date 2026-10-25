@@ -371,7 +371,15 @@ function AuthShell({ children, mode = "connexion" }) {
             </a>
             {children}
 
-            {/* Mobile : l’aide du panneau, en bas du formulaire */}
+            {/* Mobile : l’aide du panneau, en bas du formulaire (une ligne sur la connexion, encart sur l’inscription) */}
+            {mode === "connexion" ? (
+            <p className="md:hidden mt-4 text-center text-sm text-secondaire">
+              Besoin d’aide ?{" "}
+              <a href={lienWhatsApp()} target="_blank" rel="noopener noreferrer" className={`inline-flex min-h-[44px] items-center ${AUTH.lien}`}>
+                Écrivez-nous sur WhatsApp
+              </a>
+            </p>
+            ) : (
             <div className="md:hidden mt-8 flex items-center justify-between gap-3 rounded-lg border border-base bg-doux px-4 py-3">
               <span>
                 <span className="block text-sm font-semibold text-principal">Besoin d’aide ?</span>
@@ -381,6 +389,7 @@ function AuthShell({ children, mode = "connexion" }) {
                 <MessageCircle size={16} aria-hidden="true" /> WhatsApp
               </a>
             </div>
+            )}
           </div>
         </div>
       </div>
@@ -421,9 +430,10 @@ function Stepper({ step }) {
   );
 }
 
-function SSLNote() {
+// masqueeMobile : la connexion, allégée sur téléphone, ne l’affiche qu’à partir de 768 px.
+function SSLNote({ masqueeMobile = false }) {
   return (
-    <p className="flex items-center justify-center gap-1.5 text-xs mt-5" style={{ color: COLORS.slateLight }}>
+    <p className={`${masqueeMobile ? "hidden md:flex" : "flex"} items-center justify-center gap-1.5 text-xs mt-5`} style={{ color: COLORS.slateLight }}>
       <Lock size={13} /> Connexion sécurisée SSL 256-bit
     </p>
   );
@@ -774,7 +784,8 @@ function ConnexionScreen({ onNavigate }) {
           aria-describedby="connexion-email-aide"
           className={AUTH.champ(emailErreur)}
         />
-        <p id="connexion-email-aide" className={AUTH.aide(emailErreur)}>
+        {/* Sur téléphone, l’aide ne s’affiche qu’en cas d’erreur (elle reste annoncée aux lecteurs d’écran). */}
+        <p id="connexion-email-aide" className={`${AUTH.aide(emailErreur)} ${emailErreur ? "" : "sr-only md:not-sr-only md:block"}`}>
           {serveur
             ? emailErreur ? "Saisissez une adresse e-mail ou un numéro sénégalais valide." : "L’adresse e-mail ou le numéro utilisé lors de votre inscription"
             : emailErreur ? "Veuillez saisir une adresse e-mail valide." : "Saisissez l’adresse e-mail utilisée lors de votre inscription"}
@@ -802,7 +813,7 @@ function ConnexionScreen({ onNavigate }) {
             {showPassword ? <EyeOff size={18} aria-hidden="true" /> : <Eye size={18} aria-hidden="true" />}
           </button>
         </div>
-        <p id="connexion-mdp-aide" className={AUTH.aide(passwordErreur)}>
+        <p id="connexion-mdp-aide" className={`${AUTH.aide(passwordErreur)} ${passwordErreur ? "" : "sr-only md:not-sr-only md:block"}`}>
           {passwordErreur ? "8 caractères minimum requis." : "8 caractères minimum"}
         </p>
       </div>
@@ -824,7 +835,7 @@ function ConnexionScreen({ onNavigate }) {
         </div>
       )}
 
-      <SSLNote />
+      <SSLNote masqueeMobile />
     </form>
   );
 }
