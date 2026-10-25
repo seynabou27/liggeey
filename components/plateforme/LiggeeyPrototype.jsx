@@ -355,11 +355,14 @@ function AuthShell({ children, mode = "connexion" }) {
               </a>
             </div>
           </div>
+          {/* Connexion : slogan seul, sans le surtitre */}
+          {mode !== "connexion" && (
           <p className="relative mt-4 flex items-center gap-2 text-xs font-semibold uppercase tracking-wider text-marque-vif">
             <span className="h-0.5 w-6 bg-marque" aria-hidden="true" />
             {t.surtitre}
           </p>
-          <p className="relative mt-2 max-w-xs text-balance text-[22px] font-semibold leading-tight">
+          )}
+          <p className={`relative ${mode === "connexion" ? "mt-3" : "mt-2"} max-w-xs text-balance text-[22px] font-semibold leading-tight`}>
             {t.titre} <span className="text-marque-vif">{t.accent}</span>
           </p>
         </div>
