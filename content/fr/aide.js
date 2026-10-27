@@ -33,7 +33,7 @@ export const faq = {
       questions: [
         { q: 'Qu’est-ce que LIGGEEY ?', r: 'Une plateforme sénégalaise d’insertion professionnelle. Elle rapproche talents, indépendants et entreprises, avec des offres vérifiées et un accompagnement humain.' },
         { q: 'Que veut dire « Liggeey » ?', r: '« Travail », en wolof.' },
-        { q: 'Où se trouve votre bureau ?', r: 'À Dakar, Hann Maristes 1, Îlot J, Villa n° 63. Ouvert du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h.' },
+        { q: 'Où se trouve votre bureau ?', r: 'À Dakar, Scat Urbam, rue GY-02. Ouvert du lundi au vendredi, 9 h – 18 h, et le samedi, 9 h – 13 h.' },
       ],
     },
     {
