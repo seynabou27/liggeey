@@ -121,7 +121,7 @@ import { adressePlateforme, lireAdressePlateforme, lireAdresseNavigateur, ECRANS
 import { AGE_MAJORITE, AGE_MIN_CAP_METIER, AGE_MIN_PAR_PROFIL, LIENS_PARENT, normaliserTelephone } from "@/lib/comptes.mjs";
 import { COMPTES_DEMO, MOT_DE_PASSE_DEMO } from "@/lib/comptesDemo.mjs";
 import { apiConnexion, apiInscription, apiDeconnexion } from "./apiComptes";
-import { choisirCampagne } from "@/lib/publicites";
+import { choisirCampagne, EXEMPLE_ACTIF } from "@/lib/publicites";
 
 // Couleurs : tokens LIGGEEY (lib/tokens/couleurs.mjs), lus via les variables CSS du site.
 // Les noms d’origine sont conservés ; chaque valeur suit le thème (clair ou sombre).
@@ -1555,11 +1555,12 @@ function AppShell({ espace, navItems, active, onNavigate, user, breadcrumb, badg
 
 /* Bannière d’une marque affiliée en bas des tableaux de bord chercheur, prestataire et entreprise
    (content/fr/publicites.js, lib/publicites.js). Seulement pour un vrai compte : ni les comptes de
-   démonstration ni Storybook ne l’affichent, pour que les captures restent identiques. */
+   démonstration ni Storybook ne l’affichent, pour que les captures restent identiques.
+   Exception : la campagne d’exemple (NEXT_PUBLIC_PUB_EXEMPLE=true) s’affiche aussi pour les comptes de démonstration. */
 function PubTableauDeBord({ espace }) {
   const compte = React.useContext(ServeurContext)?.compte;
   const reel = compte && !COMPTES_DEMO.some((c) => c.email === compte.email);
-  const [campagne] = useState(() => (reel ? choisirCampagne("tableau-de-bord", { espace }) : null));
+  const [campagne] = useState(() => (reel || (compte && EXEMPLE_ACTIF) ? choisirCampagne("tableau-de-bord", { espace }) : null));
   return <App.BannierePub campagne={campagne} />;
 }
 

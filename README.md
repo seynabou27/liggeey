@@ -43,6 +43,8 @@ Pour une campagne de publicité (service à 25 000 FCFA), déposez les deux imag
 Les gabarits `gabarit-mobile.png` et `gabarit-large.png` montrent ces formats ; vous pouvez les envoyer aux marques.
 Ajoutez ensuite la campagne dans `content/fr/publicites.js`, avec ses dates de début et de fin.
 La bannière apparaît pendant ces dates, dans l'heure qui suit le début, puis disparaît seule.
+Pour voir une bannière d'exemple (« Votre marque ici ») sur l'accueil, les articles et les tableaux de bord,
+comptes de démonstration compris, mettez `NEXT_PUBLIC_PUB_EXEMPLE=true` dans `.env.local`.
 
 ## Branchements
 
@@ -104,6 +106,7 @@ Ces valeurs ont été choisies pour avancer. Elles sont fictives, ou déduites d
 - **Mentions légales** : NINEA et RCCM « en cours d'attribution », hébergeur Vercel, conservation des données 3 ans. **Les trois pages légales doivent être rédigées ou validées par votre conseil juridique.**
 - **Chiffre ANSD** (22,9 %) : à revérifier à la source.
 - **Formules du prototype** : `PLANS_INITIAL` n'est pas encore aligné sur les tarifs du site (Essentiel 1 500, Premium 3 000, Entreprise 40 000 FCFA).
+- **Bannière publicitaire d'exemple** : `NEXT_PUBLIC_PUB_EXEMPLE` doit être à `false` (ou absente) en production.
 - **Données de démo du prototype** : elles citent de vraies entreprises (Sonatel, Banque Atlantique, Teranga Capital…). À remplacer par des noms fictifs avant toute démonstration publique.
 
 ## Médias à fournir

@@ -151,6 +151,7 @@ Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js`
 - composant `components/blocs/BannierePub.jsx` (aussi `App.BannierePub`) : mention « Publicité » visible, lien `rel="sponsored"`, `<picture>` 320 × 100 sous 768 px et 728 × 90 au-dessus, place réservée ; sans campagne, il ne rend rien ;
 - emplacements : `accueil` (sous la vitrine des offres), `ressources` (fin d'article, après le bouton d'inscription), `tableau-de-bord` (bas du tableau de bord chercheur, prestataire et entreprise, `PubTableauDeBord` dans le prototype) ;
 - jamais dans l'espace Cap Métier (mineurs), chez les mentors, dans l'admin, sur la connexion et l'inscription, ni au milieu des offres (confusion avec les offres vérifiées). Pas de bannière pour les comptes de démonstration ni dans Storybook : les captures restent identiques ;
+- campagne d'exemple (`publicites.exemple`, « Votre marque ici », lien vers `/tarifs`) : affichée sur les trois emplacements, comptes de démonstration compris, si `NEXT_PUBLIC_PUB_EXEMPLE=true`. Sert aux tests et aux captures ; `false` avant la mise en ligne ;
 - à venir : table `campagnes`, écran « Publicités » de l'admin, décompte des affichages et des clics.
 
 ## La plateforme (prototype)

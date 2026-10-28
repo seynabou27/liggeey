@@ -1,16 +1,8 @@
 import BannierePub from '../../../components/blocs/BannierePub';
+import { publicites } from '../../../content/fr/publicites';
 
-// Campagne fictive : les gabarits de public/images/publicites/ (aucune vraie marque).
-const EXEMPLE = {
-  id: 'exemple',
-  annonceur: 'Votre marque ici',
-  lien: 'https://www.exemple.sn',
-  alt: 'Exemple de bannière publicitaire : « Votre marque ici ».',
-  image: { mobile: '/images/publicites/gabarit-mobile.png', large: '/images/publicites/gabarit-large.png' },
-  emplacements: ['accueil', 'ressources', 'tableau-de-bord'],
-  debut: '2026-11-01',
-  fin: '2026-11-30',
-};
+// Campagne d’exemple de content/fr/publicites.js : les gabarits « Votre marque ici » (aucune vraie marque).
+const EXEMPLE = publicites.exemple;
 
 export default {
   title: 'Composants/Site/Publicité/BannierePub',

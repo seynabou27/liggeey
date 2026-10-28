@@ -26,8 +26,22 @@
  *      fin: '2026-11-30', // inclus
  *    }
  * Si plusieurs campagnes visent le même emplacement, une est tirée au hasard à chaque affichage.
+ *
+ * `exemple` : campagne de démonstration (gabarits « Votre marque ici », aucune vraie marque), sur les trois
+ * emplacements et aussi pour les comptes de démonstration. Affichée seulement si NEXT_PUBLIC_PUB_EXEMPLE=true,
+ * pour les tests et les captures. Mettre cette variable à false avant la mise en ligne.
  */
 export const publicites = {
   mention: 'Publicité',
   campagnes: [],
+  exemple: {
+    id: 'exemple',
+    annonceur: 'Votre marque ici',
+    lien: '/tarifs',
+    alt: 'Exemple de bannière publicitaire : « Votre marque ici ». Découvrir l’offre Publicité de LIGGEEY.',
+    image: { mobile: '/images/publicites/gabarit-mobile.png', large: '/images/publicites/gabarit-large.png' },
+    emplacements: ['accueil', 'ressources', 'tableau-de-bord'],
+    debut: '2000-01-01',
+    fin: '2999-12-31',
+  },
 };

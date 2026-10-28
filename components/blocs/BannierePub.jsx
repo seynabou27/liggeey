@@ -17,6 +17,9 @@ export default function BannierePub({ campagne, className = '' }) {
   } = getImageProps({ alt: campagne.alt, src: campagne.image.large, width: 728, height: 90 });
   const { props: mobile } = getImageProps({ alt: campagne.alt, src: campagne.image.mobile, width: 320, height: 100, sizes: '100vw' });
 
+  // Lien vers la marque : nouvel onglet. Lien interne (campagne d’exemple → /tarifs) : même onglet.
+  const cible = campagne.lien.startsWith('/') ? { rel: 'sponsored' } : { target: '_blank', rel: 'sponsored noopener noreferrer' };
+
   return (
     <aside aria-label={publicites.mention} className={`mx-auto w-full max-w-[728px] ${className}`}>
       <p className="mb-1.5 text-xs text-discret">
@@ -24,8 +27,7 @@ export default function BannierePub({ campagne, className = '' }) {
       </p>
       <a
         href={campagne.lien}
-        target="_blank"
-        rel="sponsored noopener noreferrer"
+        {...cible}
         className="block overflow-hidden rounded-lg border border-base bg-doux"
       >
         <picture>
