@@ -8,7 +8,7 @@ Privilégiez des photos réelles de personnes sénégalaises au travail.
 | `accueil-hero.jpg`              | Bandeau de l'accueil                 | 2400 × 1400 px, < 300 Ko |
 | `bande-constat.jpg`             | Bande des chiffres (accueil)         | 2400 × 1000 px, < 250 Ko |
 | `formation.jpg`                 | Carte « Formations » (accueil)       | 600 × 480 px            |
-| `app-capture-connexion.png`     | Écran du téléphone (accueil)         | 780 × 1560 px           |
+| `app-capture-ordinateur.png`    | Écran de l'ordinateur (accueil)      | 1440 × 900 px           |
 | `talents-hero.jpg`              | Haut de la page Talents              | 2400 × 1000 px          |
 | `independants-hero.jpg`         | Haut de la page Indépendants         | 2400 × 1000 px          |
 | `entreprises-hero.jpg`          | Haut de la page Entreprises          | 2400 × 1000 px          |
@@ -44,4 +44,4 @@ Photos réelles prises au Sénégal, gratuites sous licence Unsplash (usage comm
 
 Aucune de ces photos n'a été prise au Sénégal. Elles viennent d'autres pays d'Afrique ou des États-Unis. Remplacez-les en priorité par vos propres photos.
 
-`app-capture-connexion.png` est une capture de l'écran de connexion de la plateforme (`/plateforme/connexion`), version mobile, prise au format téléphone (390 × 780, densité 2) puis compressée. Le choix du compte de démonstration a été masqué et les champs vidés pour la capture. Si vous la refaites, changez aussi le nom du fichier (et `accueil.etapes.capture` dans `content/fr/accueil.js`) : Next.js garde en cache les images optimisées sous leur nom.
+`app-capture-ordinateur.png` est une capture de l'écran de connexion de la plateforme (`/plateforme/connexion`), version ordinateur, prise au format 1440 × 900 (densité 1) puis compressée. Le choix du compte de démonstration a été masqué et les champs vidés pour la capture. Si vous la refaites, changez aussi le nom du fichier (et `accueil.etapes.capture` dans `content/fr/accueil.js`) : Next.js garde en cache les images optimisées sous leur nom.

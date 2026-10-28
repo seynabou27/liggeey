@@ -73,7 +73,7 @@ export const accueil = {
   etapes: {
     titre: 'Comment ça marche',
     texte: 'Quelques étapes simples, que vous cherchiez un emploi ou que vous recrutiez.',
-    capture: '/images/app-capture-connexion.png',
+    capture: '/images/app-capture-ordinateur.png',
     talents: {
       titre: 'Talents et indépendants',
       items: [
