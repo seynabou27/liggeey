@@ -46,16 +46,16 @@ export const publicites = {
     debut: '2000-01-01',
     fin: '2999-12-31',
   },
-  // Textes de la bannière animée LIGGEEY : 4 messages de 5 secondes, chacun avec sa photo (public/images/).
+  // Bannière animée LIGGEEY : 4 messages de 5 secondes. Chacun a sa personne détourée
+  // (public/images/publicites/liggeey-….webp, photos Unsplash créditées dans content/fr/legal.js) et son badge.
   liggeey: {
     diapos: [
-      { surtitre: 'Insertion professionnelle au Sénégal', titre: 'Rendons l’insertion', accent: 'plus facile et plus juste.', photo: '/images/talents-hero.jpg', cadrage: '62% 25%' },
-      { surtitre: 'Pour les talents', titre: 'Postulez à des offres', accent: 'vérifiées par notre équipe.', photo: '/images/accueil-hero.jpg', cadrage: '50% 30%' },
-      { surtitre: 'Pour les indépendants', titre: 'Votre savoir-faire', accent: 'mérite d’être reconnu.', photo: '/images/independants-hero.jpg', cadrage: '40% 30%' },
-      { surtitre: 'Pour les entreprises', titre: 'Recrutez les bons profils.', accent: 'Nous faisons le tri.', photo: '/images/entreprises-hero.jpg', cadrage: '60% 40%' },
+      { surtitre: 'Plateforme sénégalaise', titre: 'Rendons l’insertion', accent: 'plus facile et plus juste.', photo: '/images/publicites/liggeey-slogan.webp', largeur: 510, badge: 'Accompagnement humain' },
+      { surtitre: 'Pour les talents', titre: 'Postulez à des offres', accent: 'vérifiées par notre équipe.', photo: '/images/publicites/liggeey-talents.webp', largeur: 520, badge: 'Offres vérifiées' },
+      { surtitre: 'Pour les indépendants', titre: 'Votre savoir-faire', accent: 'mérite d’être reconnu.', photo: '/images/publicites/liggeey-independants.webp', largeur: 587, badge: 'Profil vérifié' },
+      { surtitre: 'Pour les entreprises', titre: 'Recrutez les bons profils.', accent: 'Nous faisons le tri.', photo: '/images/publicites/liggeey-entreprises.webp', largeur: 664, badge: 'Short-list des profils' },
     ],
-    atouts: ['Offres vérifiées', 'Accompagnement humain', 'Bureau à Dakar'],
+    lieu: 'Bureau à Dakar',
     bouton: 'Découvrir LIGGEEY',
   },
-
 };

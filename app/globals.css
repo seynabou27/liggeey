@@ -67,33 +67,45 @@
 }
 
 /* Publicité LIGGEEY animée (components/blocs/PubLiggeey.jsx) : 4 diapos de 5 s, cycle de 20 s.
-   Chaque diapo porte --i (0 à 3) : elle s'anime avec un décalage de --i × 5 s. */
+   Chaque diapo porte --i (0 à 3) : elle s'anime avec un décalage de --i × 5 s.
+   --mx et --my (-1 à 1, posées par la souris) déplacent les plans : effet de profondeur. */
 @layer components {
   .pub-diapo {
     opacity: 0;
     animation: pub-diapo 20s infinite;
     animation-delay: calc(var(--i) * 5s);
   }
-  .pub-diapo .pub-photo {
-    animation: pub-photo 20s infinite;
+  .pub-personne,
+  .pub-texte,
+  .pub-badge {
+    animation: 20s infinite;
     animation-delay: calc(var(--i) * 5s);
   }
-  .pub-diapo .pub-texte {
-    animation: pub-texte 20s infinite;
-    animation-delay: calc(var(--i) * 5s);
-  }
+  .pub-personne { animation-name: pub-personne; transform-origin: bottom center; }
+  .pub-texte { animation-name: pub-texte; }
+  .pub-badge { animation-name: pub-badge; transform-origin: left center; }
   .pub-progres > span > span {
     transform: scaleX(0);
     transform-origin: left;
     animation: pub-progres 20s linear infinite;
     animation-delay: calc(var(--i) * 5s);
   }
-  .pub-fleche {
-    animation: pub-fleche 1.6s ease-in-out infinite;
+  /* Profondeur : le plan rapide (personnes) bouge plus que le moyen (disque) et le lent (formes) */
+  .pub-plan-lent,
+  .pub-plan-moyen,
+  .pub-plan-rapide {
+    transition: transform 0.5s ease-out;
   }
-  .pub-anneau {
-    animation: pub-anneau 40s linear infinite;
-  }
+  .pub-plan-lent { transform: translate3d(calc(var(--mx, 0) * -10px), calc(var(--my, 0) * -6px), 0); }
+  .pub-plan-moyen { transform: translate3d(calc(var(--mx, 0) * 8px), calc(var(--my, 0) * 5px), 0); }
+  .pub-plan-rapide { transform: translate3d(calc(var(--mx, 0) * 16px), calc(var(--my, 0) * 8px), 0); }
+  .pub-forme { animation: pub-forme 12s ease-in-out infinite alternate; }
+  .pub-forme-2 { animation-duration: 15s; animation-direction: alternate-reverse; }
+  .pub-disque { animation: pub-disque 5s ease-out infinite; }
+  .pub-tour { animation: pub-tour 30s linear infinite; }
+  .pub-flotte { animation: pub-flotte 3.2s ease-in-out infinite; }
+  .pub-flotte-2 { animation-duration: 4s; animation-delay: -1.5s; }
+  .pub-fleche { animation: pub-fleche 1.6s ease-in-out infinite; }
   /* Reflet qui traverse le bouton toutes les 4 s */
   .pub-bouton::after {
     content: '';
@@ -111,11 +123,16 @@
   .pub-liggeey:focus-visible *::after {
     animation-play-state: paused;
   }
-  /* Moins d'animations demandé : premier message seul, immobile */
+  /* Moins d'animations demandé : premier message seul, immobile, sans profondeur */
   @media (prefers-reduced-motion: reduce) {
     .pub-liggeey *,
     .pub-liggeey *::after {
       animation: none !important;
+    }
+    .pub-liggeey .pub-plan-lent,
+    .pub-liggeey .pub-plan-moyen,
+    .pub-liggeey .pub-plan-rapide {
+      transform: none;
     }
     .pub-liggeey .pub-diapo:first-child {
       opacity: 1;
@@ -128,29 +145,48 @@
 
 @keyframes pub-diapo {
   0% { opacity: 0; }
-  3%, 25% { opacity: 1; }
-  28%, 100% { opacity: 0; }
+  2%, 24.5% { opacity: 1; }
+  26%, 100% { opacity: 0; }
 }
-@keyframes pub-photo {
-  0% { transform: scale(1.12); }
-  28%, 100% { transform: scale(1); }
+@keyframes pub-personne {
+  0% { transform: translateY(28px) scale(0.94); }
+  6%, 24.5% { transform: none; }
+  26%, 100% { transform: translateX(-16px); }
 }
+/* Le texte sortant disparaît avant l'arrivée du suivant : pas de superposition */
 @keyframes pub-texte {
-  0%, 2% { opacity: 0; transform: translateY(14px); }
-  7%, 25% { opacity: 1; transform: none; }
-  28%, 100% { opacity: 0; transform: translateY(-8px); }
+  0%, 3% { opacity: 0; transform: translateY(14px); }
+  8%, 22% { opacity: 1; transform: none; }
+  24.5%, 100% { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes pub-badge {
+  0%, 6% { opacity: 0; transform: scale(0.6); }
+  9% { opacity: 1; transform: scale(1.06); }
+  11%, 22% { opacity: 1; transform: none; }
+  24%, 100% { opacity: 0; transform: scale(0.9); }
 }
 @keyframes pub-progres {
   0% { transform: scaleX(0); }
   25% { transform: scaleX(1); }
   25.01%, 100% { transform: scaleX(0); }
 }
+@keyframes pub-forme {
+  to { transform: translate(40px, -24px) scale(1.15); }
+}
+@keyframes pub-disque {
+  0% { transform: scale(0.94); }
+  18%, 100% { transform: none; }
+}
+@keyframes pub-tour {
+  to { transform: rotate(360deg); }
+}
+@keyframes pub-flotte {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-6px); }
+}
 @keyframes pub-fleche {
   0%, 100% { transform: none; }
   50% { transform: translateX(4px); }
-}
-@keyframes pub-anneau {
-  to { transform: rotate(360deg); }
 }
 @keyframes pub-reflet {
   0%, 60% { left: -60%; }
