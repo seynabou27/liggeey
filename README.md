@@ -39,11 +39,12 @@ Pour publier un article, copiez `content/ressources/modele-article.md`, renommez
 (le nom devient l'adresse : `/ressources/mon-article`), écrivez le texte, puis passez `brouillon` à `false`.
 
 Pour une campagne de publicité (service à 25 000 FCFA), déposez les deux images de la marque dans
-`public/images/publicites/` : 640 × 400 px pour le mobile et 1 940 × 500 px pour l'ordinateur, moins de 200 Ko chacune.
-Les gabarits `gabarit-320x200.png` et `gabarit-970x250.png` montrent ces formats ; vous pouvez les envoyer aux marques.
+`public/images/publicites/` : 640 × 400 px pour le mobile et 2 600 × 500 px pour l'ordinateur, moins de 200 Ko chacune.
+La bannière prend toute la largeur, comme les cartes voisines.
+Les gabarits `gabarit-320x200.png` et `gabarit-1300x250.png` montrent ces formats ; vous pouvez les envoyer aux marques.
 Ajoutez ensuite la campagne dans `content/fr/publicites.js`, avec ses dates de début et de fin.
 La bannière apparaît pendant ces dates, dans l'heure qui suit le début, puis disparaît seule.
-Pour voir la bannière d'exemple (une publicité pour LIGGEEY) sur l'accueil, les articles et les tableaux de bord,
+Pour voir la bannière d'exemple (une publicité animée pour LIGGEEY) sur l'accueil, les articles et les tableaux de bord,
 comptes de démonstration compris, mettez `NEXT_PUBLIC_PUB_EXEMPLE=true` dans `.env.local`.
 
 ## Branchements

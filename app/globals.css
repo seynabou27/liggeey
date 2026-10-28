@@ -65,3 +65,94 @@
     @apply mt-8 rounded-lg bg-marque-doux p-6 font-sans text-principal;
   }
 }
+
+/* Publicité LIGGEEY animée (components/blocs/PubLiggeey.jsx) : 4 diapos de 5 s, cycle de 20 s.
+   Chaque diapo porte --i (0 à 3) : elle s'anime avec un décalage de --i × 5 s. */
+@layer components {
+  .pub-diapo {
+    opacity: 0;
+    animation: pub-diapo 20s infinite;
+    animation-delay: calc(var(--i) * 5s);
+  }
+  .pub-diapo .pub-photo {
+    animation: pub-photo 20s infinite;
+    animation-delay: calc(var(--i) * 5s);
+  }
+  .pub-diapo .pub-texte {
+    animation: pub-texte 20s infinite;
+    animation-delay: calc(var(--i) * 5s);
+  }
+  .pub-progres > span > span {
+    transform: scaleX(0);
+    transform-origin: left;
+    animation: pub-progres 20s linear infinite;
+    animation-delay: calc(var(--i) * 5s);
+  }
+  .pub-fleche {
+    animation: pub-fleche 1.6s ease-in-out infinite;
+  }
+  .pub-anneau {
+    animation: pub-anneau 40s linear infinite;
+  }
+  /* Reflet qui traverse le bouton toutes les 4 s */
+  .pub-bouton::after {
+    content: '';
+    position: absolute;
+    inset: 0 auto 0 -60%;
+    width: 40%;
+    background: linear-gradient(100deg, transparent, rgb(255 255 255 / 0.45), transparent);
+    transform: skewX(-20deg);
+    animation: pub-reflet 4s ease-in-out infinite;
+  }
+  /* Pause au survol et au clavier */
+  .pub-liggeey:hover *,
+  .pub-liggeey:hover *::after,
+  .pub-liggeey:focus-visible *,
+  .pub-liggeey:focus-visible *::after {
+    animation-play-state: paused;
+  }
+  /* Moins d'animations demandé : premier message seul, immobile */
+  @media (prefers-reduced-motion: reduce) {
+    .pub-liggeey *,
+    .pub-liggeey *::after {
+      animation: none !important;
+    }
+    .pub-liggeey .pub-diapo:first-child {
+      opacity: 1;
+    }
+    .pub-liggeey .pub-progres {
+      display: none;
+    }
+  }
+}
+
+@keyframes pub-diapo {
+  0% { opacity: 0; }
+  3%, 25% { opacity: 1; }
+  28%, 100% { opacity: 0; }
+}
+@keyframes pub-photo {
+  0% { transform: scale(1.12); }
+  28%, 100% { transform: scale(1); }
+}
+@keyframes pub-texte {
+  0%, 2% { opacity: 0; transform: translateY(14px); }
+  7%, 25% { opacity: 1; transform: none; }
+  28%, 100% { opacity: 0; transform: translateY(-8px); }
+}
+@keyframes pub-progres {
+  0% { transform: scaleX(0); }
+  25% { transform: scaleX(1); }
+  25.01%, 100% { transform: scaleX(0); }
+}
+@keyframes pub-fleche {
+  0%, 100% { transform: none; }
+  50% { transform: translateX(4px); }
+}
+@keyframes pub-anneau {
+  to { transform: rotate(360deg); }
+}
+@keyframes pub-reflet {
+  0%, 60% { left: -60%; }
+  85%, 100% { left: 130%; }
+}
