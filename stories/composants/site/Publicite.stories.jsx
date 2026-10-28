@@ -11,7 +11,7 @@ const GABARIT = {
   annonceur: 'Votre marque ici',
   lien: 'https://www.exemple.sn',
   alt: 'Exemple de bannière publicitaire : « Votre marque ici ».',
-  image: { mobile: '/images/publicites/gabarit-mobile.png', large: '/images/publicites/gabarit-large.png' },
+  image: { mobile: '/images/publicites/gabarit-320x200.png', large: '/images/publicites/gabarit-970x250.png' },
 };
 
 export default {
@@ -22,7 +22,7 @@ export default {
     docs: {
       description: {
         component:
-          'Bannière d’une marque affiliée (components/blocs, aussi exportée par components/app). Campagnes dans content/fr/publicites.js, choix dans lib/publicites.js. Emplacements : accueil (sous la vitrine des offres), fin des articles Ressources, bas du tableau de bord chercheur, prestataire et entreprise (vrais comptes seulement). Image 320 × 100 sous 768 px, 728 × 90 au-dessus.',
+          'Bannière d’une marque affiliée (components/blocs, aussi exportée par components/app). Campagnes dans content/fr/publicites.js, choix dans lib/publicites.js. Emplacements : accueil (sous la vitrine des offres), fin des articles Ressources, bas du tableau de bord chercheur, prestataire et entreprise (vrais comptes seulement). Grand format : image 16:10 sur toute la largeur sous 768 px, 970 × 250 au-dessus.',
       },
     },
   },
@@ -33,14 +33,14 @@ export const PendantUneCampagne = {
 };
 
 export const SurMobile = {
-  name: 'Sur mobile (320 × 100)',
+  name: 'Sur mobile (16:10)',
   globals: { viewport: { value: 'mobile2', isRotated: false } },
 };
 
 export const Gabarit = {
   name: 'Gabarit pour les marques',
   args: { campagne: GABARIT },
-  parameters: { docs: { description: { story: 'Formats à envoyer aux marques : 640 × 200 px (mobile) et 1 456 × 180 px (ordinateur), moins de 100 Ko.' } } },
+  parameters: { docs: { description: { story: 'Formats à envoyer aux marques : 640 × 400 px (mobile) et 1 940 × 500 px (ordinateur), moins de 200 Ko.' } } },
 };
 
 export const SansCampagne = {

@@ -147,11 +147,11 @@ Les formulaires (contact, démo, Job Dating, newsletter) passent par `app/api/fo
 Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js` et `app/robots.js`.
 
 **Publicités des marques affiliées** (service à 25 000 FCFA / campagne) : bannières maison, sans régie extérieure (pas d'AdSense : pas de script tiers ni de cookies).
-- campagnes dans `content/fr/publicites.js` (annonceur, lien, `alt`, image mobile 640 × 200 et large 1 456 × 180 dans `public/images/publicites/`, emplacements, dates de début et de fin incluses), choix dans `lib/publicites.js` (`choisirCampagne`) ;
-- composant `components/blocs/BannierePub.jsx` (aussi `App.BannierePub`) : mention « Publicité » visible, lien `rel="sponsored"`, `<picture>` 320 × 100 sous 768 px et 728 × 90 au-dessus, place réservée ; sans campagne, il ne rend rien ;
+- campagnes dans `content/fr/publicites.js` (annonceur, lien, `alt`, image mobile 640 × 400 et large 1 940 × 500 dans `public/images/publicites/`, emplacements, dates de début et de fin incluses), choix dans `lib/publicites.js` (`choisirCampagne`) ;
+- composant `components/blocs/BannierePub.jsx` (aussi `App.BannierePub`) : mention « Publicité » visible, lien `rel="sponsored"`, `<picture>` grand format : 16:10 sur toute la largeur sous 768 px, 970 × 250 au-dessus, place réservée ; sans campagne, il ne rend rien ;
 - emplacements : `accueil` (sous la vitrine des offres), `ressources` (fin d'article, après le bouton d'inscription), `tableau-de-bord` (bas du tableau de bord chercheur, prestataire et entreprise, `PubTableauDeBord` dans le prototype) ;
 - jamais dans l'espace Cap Métier (mineurs), chez les mentors, dans l'admin, sur la connexion et l'inscription, ni au milieu des offres (confusion avec les offres vérifiées). Pas de bannière pour les comptes de démonstration ni dans Storybook : les captures restent identiques ;
-- campagne d'exemple (`publicites.exemple`) : une publicité pour LIGGEEY elle-même (slogan, « Offres vérifiées · Accompagnement humain · Bureau à Dakar », lien vers `/a-propos`), sources dans `docs/design/publicite-liggeey/`. Elle est affichée sur les trois emplacements, comptes de démonstration compris, si `NEXT_PUBLIC_PUB_EXEMPLE=true`. Sert aux tests et aux captures ; `false` avant la mise en ligne ;
+- campagne d'exemple (`publicites.exemple`) : une publicité pour LIGGEEY elle-même (photo de `talents-hero.jpg`, slogan, « Offres vérifiées · Accompagnement humain · Bureau à Dakar », lien vers `/a-propos`), sources dans `docs/design/publicite-liggeey/`. Elle est affichée sur les trois emplacements, comptes de démonstration compris, si `NEXT_PUBLIC_PUB_EXEMPLE=true`. Sert aux tests et aux captures ; `false` avant la mise en ligne ;
 - à venir : table `campagnes`, écran « Publicités » de l'admin, décompte des affichages et des clics.
 
 ## La plateforme (prototype)
