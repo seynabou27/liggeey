@@ -32,10 +32,17 @@ Pour la mise en production, renseignez `DATABASE_URL` (PostgreSQL), lancez `npm 
 | Job Dating (dates, lieu, programme, entreprises)   | `content/evenements.js`                   |
 | Articles du blog                                   | `content/ressources/*.md` (modèle fourni) |
 | Photos                                             | `public/images/` (voir `public/images/README.md`) |
+| Bannières publicitaires des marques                | `content/fr/publicites.js` (mode d'emploi en tête du fichier) |
 | Couleurs et polices                                | `tailwind.config.js`                      |
 
 Pour publier un article, copiez `content/ressources/modele-article.md`, renommez le fichier
 (le nom devient l'adresse : `/ressources/mon-article`), écrivez le texte, puis passez `brouillon` à `false`.
+
+Pour une campagne de publicité (service à 25 000 FCFA), déposez les deux images de la marque dans
+`public/images/publicites/` : 640 × 200 px pour le mobile et 1 456 × 180 px pour l'ordinateur, moins de 100 Ko chacune.
+Les gabarits `gabarit-mobile.png` et `gabarit-large.png` montrent ces formats ; vous pouvez les envoyer aux marques.
+Ajoutez ensuite la campagne dans `content/fr/publicites.js`, avec ses dates de début et de fin.
+La bannière apparaît pendant ces dates, dans l'heure qui suit le début, puis disparaît seule.
 
 ## Branchements
 

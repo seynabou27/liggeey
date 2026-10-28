@@ -11,3 +11,4 @@ export { BarreProgression, ListeClassee, Anneau } from './Progression';
 export { ElementConversation, BulleMessage, ZoneSaisie, SeparateurDate } from './Messagerie';
 export { Coquille, BarreIcones, BarreLaterale, BarreHaut, EnTetePage, PiedApp, grouperParSection } from './Coquille';
 export { default as Bouton } from '../ui/Bouton';
+export { default as BannierePub } from '../blocs/BannierePub';

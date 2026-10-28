@@ -146,6 +146,13 @@ Les formulaires (contact, démo, Job Dating, newsletter) passent par `app/api/fo
 
 Pour le référencement : chaque page a ses métadonnées, avec `app/sitemap.js` et `app/robots.js`.
 
+**Publicités des marques affiliées** (service à 25 000 FCFA / campagne) : bannières maison, sans régie extérieure (pas d'AdSense : pas de script tiers ni de cookies).
+- campagnes dans `content/fr/publicites.js` (annonceur, lien, `alt`, image mobile 640 × 200 et large 1 456 × 180 dans `public/images/publicites/`, emplacements, dates de début et de fin incluses), choix dans `lib/publicites.js` (`choisirCampagne`) ;
+- composant `components/blocs/BannierePub.jsx` (aussi `App.BannierePub`) : mention « Publicité » visible, lien `rel="sponsored"`, `<picture>` 320 × 100 sous 768 px et 728 × 90 au-dessus, place réservée ; sans campagne, il ne rend rien ;
+- emplacements : `accueil` (sous la vitrine des offres), `ressources` (fin d'article, après le bouton d'inscription), `tableau-de-bord` (bas du tableau de bord chercheur, prestataire et entreprise, `PubTableauDeBord` dans le prototype) ;
+- jamais dans l'espace Cap Métier (mineurs), chez les mentors, dans l'admin, sur la connexion et l'inscription, ni au milieu des offres (confusion avec les offres vérifiées). Pas de bannière pour les comptes de démonstration ni dans Storybook : les captures restent identiques ;
+- à venir : table `campagnes`, écran « Publicités » de l'admin, décompte des affichages et des clics.
+
 ## La plateforme (prototype)
 
 - **Fichier** : `components/plateforme/LiggeeyPrototype.jsx`. C'est le prototype repris tel quel, en un seul fichier d'environ 8 300 lignes, avec un sommaire en tête.

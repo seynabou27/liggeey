@@ -2,6 +2,7 @@ import { Suspense } from 'react';
 import { accueil } from '@/content/fr/accueil';
 import { getOffresVitrine } from '@/lib/offres';
 import { getProchainEvenement } from '@/lib/evenements';
+import { choisirCampagne } from '@/lib/publicites';
 import { imageExiste } from '@/lib/images';
 import { lienConnexion } from '@/lib/liens';
 import { Section, TitreSection } from '@/components/ui/Section';
@@ -13,8 +14,9 @@ import CommentCaMarche from '@/components/accueil/CommentCaMarche';
 import BandeVideo from '@/components/accueil/BandeVideo';
 import { AVenir, BandeConstat, BandeParcours, Engagements, GrilleSecteurs } from '@/components/accueil/Sections';
 import BandeNewsletter from '@/components/blocs/BandeNewsletter';
+import BannierePub from '@/components/blocs/BannierePub';
 
-// Offres et prochain Job Dating rafraîchis toutes les heures.
+// Offres, prochain Job Dating et bannière publicitaire rafraîchis toutes les heures.
 export const revalidate = 3600;
 
 export const metadata = {
@@ -44,6 +46,8 @@ export default async function Accueil() {
             {t.toutes}
           </Bouton>
         </div>
+        {/* Bannière d’une marque affiliée, seulement pendant une campagne (content/fr/publicites.js) */}
+        <BannierePub campagne={choisirCampagne('accueil')} className="mt-12" />
       </Section>
 
       <GrilleSecteurs />

@@ -4,8 +4,13 @@ import { ressources } from '@/content/fr/aide';
 import { getArticle, getArticles } from '@/lib/articles';
 import { dateLongue } from '@/lib/format';
 import { lienInscription } from '@/lib/liens';
+import { choisirCampagne } from '@/lib/publicites';
 import Bouton from '@/components/ui/Bouton';
 import BandeNewsletter from '@/components/blocs/BandeNewsletter';
+import BannierePub from '@/components/blocs/BannierePub';
+
+// Bannière publicitaire rafraîchie toutes les heures (début et fin des campagnes).
+export const revalidate = 3600;
 
 export function generateStaticParams() {
   return getArticles().map((a) => ({ slug: a.slug }));
@@ -65,6 +70,9 @@ export default async function PageArticle({ params }) {
           <p className="text-xl font-semibold">{cta.titre}</p>
           <Bouton href={lienCta(article.public)}>{cta.bouton}</Bouton>
         </aside>
+
+        {/* Bannière d’une marque affiliée, seulement pendant une campagne (content/fr/publicites.js) */}
+        <BannierePub campagne={choisirCampagne('ressources')} className="mt-12" />
 
         {autres.length > 0 && (
           <section className="mt-14">
