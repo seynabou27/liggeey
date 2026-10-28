@@ -43,7 +43,7 @@ Pour une campagne de publicité (service à 25 000 FCFA), déposez les deux imag
 Les gabarits `gabarit-mobile.png` et `gabarit-large.png` montrent ces formats ; vous pouvez les envoyer aux marques.
 Ajoutez ensuite la campagne dans `content/fr/publicites.js`, avec ses dates de début et de fin.
 La bannière apparaît pendant ces dates, dans l'heure qui suit le début, puis disparaît seule.
-Pour voir une bannière d'exemple (« Votre marque ici ») sur l'accueil, les articles et les tableaux de bord,
+Pour voir la bannière d'exemple (une publicité pour LIGGEEY) sur l'accueil, les articles et les tableaux de bord,
 comptes de démonstration compris, mettez `NEXT_PUBLIC_PUB_EXEMPLE=true` dans `.env.local`.
 
 ## Branchements

@@ -27,19 +27,20 @@
  *    }
  * Si plusieurs campagnes visent le même emplacement, une est tirée au hasard à chaque affichage.
  *
- * `exemple` : campagne de démonstration (gabarits « Votre marque ici », aucune vraie marque), sur les trois
+ * `exemple` : campagne de démonstration, une publicité pour LIGGEEY elle-même (aucune marque tierce), sur les trois
  * emplacements et aussi pour les comptes de démonstration. Affichée seulement si NEXT_PUBLIC_PUB_EXEMPLE=true,
  * pour les tests et les captures. Mettre cette variable à false avant la mise en ligne.
+ * Les gabarits gabarit-mobile.png et gabarit-large.png (« Votre marque ici ») montrent les formats aux marques.
  */
 export const publicites = {
   mention: 'Publicité',
   campagnes: [],
   exemple: {
-    id: 'exemple',
-    annonceur: 'Votre marque ici',
-    lien: '/tarifs',
-    alt: 'Exemple de bannière publicitaire : « Votre marque ici ». Découvrir l’offre Publicité de LIGGEEY.',
-    image: { mobile: '/images/publicites/gabarit-mobile.png', large: '/images/publicites/gabarit-large.png' },
+    id: 'exemple-liggeey',
+    annonceur: 'LIGGEEY',
+    lien: '/a-propos',
+    alt: 'LIGGEEY : rendons l’insertion plus facile et plus juste. Offres vérifiées, accompagnement humain, bureau à Dakar. Découvrir.',
+    image: { mobile: '/images/publicites/liggeey-mobile.jpg', large: '/images/publicites/liggeey-large.jpg' },
     emplacements: ['accueil', 'ressources', 'tableau-de-bord'],
     debut: '2000-01-01',
     fin: '2999-12-31',

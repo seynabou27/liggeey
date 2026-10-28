@@ -1,8 +1,18 @@
 import BannierePub from '../../../components/blocs/BannierePub';
 import { publicites } from '../../../content/fr/publicites';
 
-// Campagne d’exemple de content/fr/publicites.js : les gabarits « Votre marque ici » (aucune vraie marque).
+// Campagne d’exemple de content/fr/publicites.js : une publicité pour LIGGEEY elle-même.
 const EXEMPLE = publicites.exemple;
+
+// Gabarits envoyés aux marques (« Votre marque ici »), aux formats attendus.
+const GABARIT = {
+  ...EXEMPLE,
+  id: 'gabarit',
+  annonceur: 'Votre marque ici',
+  lien: 'https://www.exemple.sn',
+  alt: 'Exemple de bannière publicitaire : « Votre marque ici ».',
+  image: { mobile: '/images/publicites/gabarit-mobile.png', large: '/images/publicites/gabarit-large.png' },
+};
 
 export default {
   title: 'Composants/Site/Publicité/BannierePub',
@@ -25,6 +35,12 @@ export const PendantUneCampagne = {
 export const SurMobile = {
   name: 'Sur mobile (320 × 100)',
   globals: { viewport: { value: 'mobile2', isRotated: false } },
+};
+
+export const Gabarit = {
+  name: 'Gabarit pour les marques',
+  args: { campagne: GABARIT },
+  parameters: { docs: { description: { story: 'Formats à envoyer aux marques : 640 × 200 px (mobile) et 1 456 × 180 px (ordinateur), moins de 100 Ko.' } } },
 };
 
 export const SansCampagne = {
